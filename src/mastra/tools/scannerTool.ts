@@ -39,23 +39,48 @@ export const scannerTool = createTool({
     const logger = mastra?.getLogger();
     logger?.info('🔧 [ScannerTool] Starting scan', { type: context.type, limit: context.limit });
 
-    // Top crypto tickers to scan (reduced to avoid CoinGecko rate limits)
-    const TOP_CRYPTOS = [
+    // Top 100 crypto tickers by market cap
+    const TOP_100_CRYPTOS = [
       'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'MATIC',
+      'DOT', 'UNI', 'ATOM', 'LTC', 'BCH', 'NEAR', 'APT', 'ARB', 'OP', 'SUI',
+      'FIL', 'ICP', 'VET', 'ALGO', 'SAND', 'MANA', 'AXS', 'FTM', 'AAVE', 'GRT',
+      'SNX', 'AR', 'HBAR', 'XLM', 'TRX', 'ETC', 'XMR', 'TON', 'SHIB', 'PEPE',
+      'WIF', 'BONK', 'FLOKI', 'INJ', 'TIA', 'SEI', 'RUNE', 'OSMO', 'JUNO', 'CRV',
+      'MKR', 'LDO', 'QNT', 'IMX', 'RNDR', 'STX', 'FET', 'AGIX', 'OCEAN', 'ROSE',
+      'GALA', 'ENJ', 'CHZ', 'ZIL', 'BAT', 'COMP', 'YFI', 'SUSHI', '1INCH', 'UMA',
+      'BAL', 'REN', 'LRC', 'ZRX', 'KNC', 'BNT', 'BAND', 'NMR', 'MLN', 'ANT',
+      'RLC', 'STORJ', 'ANKR', 'CELR', 'CVC', 'DNT', 'FUN', 'GNO', 'KIN', 'LOOM',
+      'MAID', 'POWR', 'REP', 'REQ', 'SKL', 'SXP', 'TRAC', 'VIDT', 'WBTC', 'ZEN',
     ];
 
-    // Top stock tickers to scan (limited for API constraints)
-    const TOP_STOCKS = [
+    // Top 100 stock tickers by market cap
+    const TOP_100_STOCKS = [
       'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'V', 'WMT',
+      'JNJ', 'PG', 'MA', 'HD', 'CVX', 'MRK', 'ABBV', 'PEP', 'KO', 'COST',
+      'AVGO', 'TMO', 'ORCL', 'ACN', 'MCD', 'CSCO', 'NKE', 'ABT', 'ADBE', 'CRM',
+      'LIN', 'NFLX', 'PFE', 'DHR', 'TXN', 'DIS', 'UNP', 'VZ', 'INTC', 'AMD',
+      'NEE', 'CMCSA', 'UNH', 'RTX', 'QCOM', 'PM', 'BMY', 'HON', 'T', 'AMGN',
+      'BA', 'GE', 'IBM', 'CAT', 'SBUX', 'LOW', 'INTU', 'ISRG', 'MS', 'GS',
+      'BLK', 'AXP', 'DE', 'SPGI', 'NOW', 'GILD', 'BKNG', 'MDLZ', 'LRCX', 'ADI',
+      'MMM', 'SYK', 'VRTX', 'AMT', 'PLD', 'TJX', 'REGN', 'ZTS', 'CI', 'CVS',
+      'MO', 'CB', 'SO', 'BDX', 'DUK', 'TGT', 'USB', 'PNC', 'EOG', 'CCI',
+      'CL', 'ITW', 'BSX', 'SHW', 'APD', 'EL', 'CME', 'EQIX', 'NSC', 'MCO',
     ];
+
+    // Quick scan list (10+10 for "market" command)
+    const QUICK_CRYPTOS = TOP_100_CRYPTOS.slice(0, 10);
+    const QUICK_STOCKS = TOP_100_STOCKS.slice(0, 10);
 
     let tickersToScan: { ticker: string; type: 'crypto' | 'stock' }[] = [];
 
-    if (context.type === 'crypto' || context.type === 'both') {
-      tickersToScan.push(...TOP_CRYPTOS.map(t => ({ ticker: t, type: 'crypto' as const })));
-    }
-    if (context.type === 'stock' || context.type === 'both') {
-      tickersToScan.push(...TOP_STOCKS.map(t => ({ ticker: t, type: 'stock' as const })));
+    if (context.type === 'crypto') {
+      tickersToScan.push(...TOP_100_CRYPTOS.map(t => ({ ticker: t, type: 'crypto' as const })));
+    } else if (context.type === 'stock') {
+      tickersToScan.push(...TOP_100_STOCKS.map(t => ({ ticker: t, type: 'stock' as const })));
+    } else if (context.type === 'both') {
+      // For "market" command - quick scan
+      tickersToScan.push(...QUICK_CRYPTOS.map(t => ({ ticker: t, type: 'crypto' as const })));
+      tickersToScan.push(...QUICK_STOCKS.map(t => ({ ticker: t, type: 'stock' as const })));
     }
 
     logger?.info('📊 [ScannerTool] Scanning tickers', { count: tickersToScan.length });
