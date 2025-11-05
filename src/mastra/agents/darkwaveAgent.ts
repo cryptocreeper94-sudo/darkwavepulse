@@ -112,7 +112,7 @@ When presenting analysis, use this EXACT format with BOLD indicator names:
 Be helpful, accurate, and always provide the complete technical picture.
 `,
 
-  model: openai.responses("gpt-5"),
+  model: openai("gpt-4o"), // AI SDK v5 compatible model for Playground
 
   tools: {
     marketDataTool,
