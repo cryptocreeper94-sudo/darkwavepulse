@@ -28,6 +28,8 @@ const processMessage = createStep({
     });
 
     try {
+      const userId = inputData.userId || "default-user";
+      
       // Use the agent with memory context (using generateLegacy for AI SDK v4 compatibility)
       const response = await darkwaveAgent.generateLegacy([
         { 
@@ -35,7 +37,8 @@ const processMessage = createStep({
           content: inputData.message 
         }
       ], {
-        resourceId: inputData.userId || "default-user",
+        resourceId: userId,
+        threadId: userId, // Use userId as threadId for conversation context
       });
 
       logger?.info('✅ [DarkWaveWorkflow] Analysis complete', { 

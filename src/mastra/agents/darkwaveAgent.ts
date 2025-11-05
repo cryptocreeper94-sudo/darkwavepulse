@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { PostgresStore } from "@mastra/pg";
@@ -6,6 +6,12 @@ import { marketDataTool } from "../tools/marketDataTool";
 import { technicalAnalysisTool } from "../tools/technicalAnalysisTool";
 import { holdingsTool } from "../tools/holdingsTool";
 import { scannerTool } from "../tools/scannerTool";
+
+// Use Replit AI Integrations for OpenAI access
+const openai = createOpenAI({
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+});
 
 /**
  * DarkWave-V2 Agent - Advanced Technical Analysis Bot

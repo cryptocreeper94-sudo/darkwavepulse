@@ -11,6 +11,7 @@ import { sharedPostgresStorage } from "./storage";
 import { inngest, inngestServe } from "./inngest";
 import { darkwaveWorkflow } from "./workflows/darkwaveWorkflow";
 import { darkwaveAgent } from "./agents/darkwaveAgent";
+import { registerTelegramTrigger } from "../triggers/telegramTriggers";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -126,6 +127,17 @@ export const mastra = new Mastra({
         // 3. Establishing a publish-subscribe system for real-time monitoring
         //    through the workflow:${workflowId}:${runId} channel
       },
+      // Register Telegram webhook routes
+      ...registerTelegramTrigger({
+        triggerType: "telegram/message",
+        handler: async (mastra, triggerInfo) => {
+          const logger = mastra.getLogger();
+          logger?.info("✅ [Telegram] Handler called", { 
+            userName: triggerInfo.params.userName,
+            message: triggerInfo.params.message.substring(0, 50)
+          });
+        },
+      }),
     ],
   },
   logger:
