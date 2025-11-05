@@ -32,8 +32,9 @@ export const commandsTool = createTool({
 • \`clear\` - Clear your entire watchlist
 
 **🔍 MARKET SCANNING**
-• \`market\` - Scan top cryptocurrencies for strong buy signals
-• \`scan\` - Same as market command
+• \`market\` - Quick scan (top 10 cryptos + 10 stocks) ~5-7 seconds
+• \`crypto\` - Full crypto scan (top 100 cryptos) ~50-60 seconds
+• \`stock\` - Full stock scan (top 100 stocks) ~20-25 seconds
 
 **📚 EDUCATIONAL**
 • \`RSI\` - Learn about Relative Strength Index
