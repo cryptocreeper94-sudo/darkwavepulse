@@ -7,52 +7,52 @@ import { z } from "zod";
 
 const glossary: Record<string, { definition: string; howToUse: string }> = {
   RSI: {
-    definition: "Relative Strength Index - A momentum oscillator that measures the speed and magnitude of price changes on a scale of 0-100.",
-    howToUse: "Values below 30 indicate oversold conditions (potential buy opportunity). Values above 70 indicate overbought conditions (potential sell opportunity). Use it to identify when an asset might reverse direction.",
+    definition: "Relative Strength Index - A momentum oscillator measuring price change speed on a 0-100 scale. It compares the magnitude of recent gains to recent losses over a 14-day period to determine if an asset is overbought or oversold.",
+    howToUse: "RSI below 30 = OVERSOLD (potential buying opportunity - price may bounce). RSI above 70 = OVERBOUGHT (consider taking profits - correction likely). RSI 40-60 = neutral zone. Watch for divergence: if price makes new lows but RSI doesn't, that's a bullish signal suggesting the downtrend is weakening. Best combined with other indicators - don't trade on RSI alone.",
   },
   MACD: {
-    definition: "Moving Average Convergence Divergence - A trend-following momentum indicator that shows the relationship between two moving averages.",
-    howToUse: "When MACD crosses above the signal line, it's a bullish signal (consider buying). When it crosses below, it's bearish (consider selling). The histogram shows the strength of the trend.",
+    definition: "Moving Average Convergence Divergence - Shows the relationship between 12-day and 26-day exponential moving averages. Consists of three components: MACD line (12 EMA - 26 EMA), signal line (9-day EMA of MACD), and histogram (difference between MACD and signal).",
+    howToUse: "BULLISH SIGNALS: MACD crosses above signal line (buy signal), histogram turns positive, MACD crosses above zero line. BEARISH SIGNALS: MACD crosses below signal line (sell signal), histogram turns negative, MACD crosses below zero. Larger histogram bars = stronger momentum. Watch for MACD/price divergence - if price makes new highs but MACD doesn't, trend may be weakening.",
   },
   EMA: {
-    definition: "Exponential Moving Average - A type of moving average that gives more weight to recent prices, making it more responsive to new information.",
-    howToUse: "When price is above the EMA, the trend is bullish. When below, it's bearish. EMA crossovers (like EMA 50 crossing EMA 200) signal trend changes. Shorter EMAs (9, 21) react faster to price changes.",
+    definition: "Exponential Moving Average - A moving average that weighs recent prices more heavily than older prices, making it more responsive to new price action. Common periods: EMA 9 (very fast), EMA 21 (fast), EMA 50 (medium), EMA 200 (slow/long-term trend).",
+    howToUse: "Price ABOVE EMA = uptrend (bullish). Price BELOW EMA = downtrend (bearish). GOLDEN CROSS: Fast EMA (50) crosses above slow EMA (200) = strong buy signal. DEATH CROSS: Fast EMA crosses below slow EMA = strong sell signal. EMAs act as dynamic support/resistance - price often bounces off them. Multiple EMA strategy: when EMA 9 > EMA 21 > EMA 50 all aligned = strong trend, stay in the trade.",
   },
   SMA: {
-    definition: "Simple Moving Average - The average price over a specific number of periods, giving equal weight to all data points.",
-    howToUse: "Similar to EMA but smoother and slower to react. When price crosses above SMA, it's bullish. Below SMA is bearish. Common periods: 20, 50, 200 days.",
+    definition: "Simple Moving Average - The arithmetic average of prices over a set period, giving equal weight to all data points. More stable than EMA but slower to react. Commonly used periods: SMA 20 (short-term), SMA 50 (medium-term), SMA 200 (long-term/major trend).",
+    howToUse: "Price crossing ABOVE SMA = bullish signal. Price crossing BELOW SMA = bearish signal. SMA 50/200 crossovers are powerful signals: 50 crossing above 200 = 'Golden Cross' (major buy signal), 50 crossing below 200 = 'Death Cross' (major sell signal). SMA 20 often used for support/resistance in trending markets. The 200 SMA is watched by institutional traders as a key level.",
   },
   "BOLLINGER BANDS": {
-    definition: "Bollinger Bands - A volatility indicator consisting of a middle band (SMA) and two outer bands that are 2 standard deviations away.",
-    howToUse: "When price touches the lower band, the asset may be oversold (buy signal). When it touches the upper band, it may be overbought (sell signal). Narrow bands indicate low volatility; wide bands indicate high volatility.",
+    definition: "Bollinger Bands - Three lines: a 20-day SMA (middle), an upper band (middle + 2 standard deviations), and lower band (middle - 2 standard deviations). Bands expand during volatility and contract during consolidation. About 95% of price action occurs within the bands.",
+    howToUse: "Price at LOWER BAND = oversold, potential bounce (but confirm with RSI). Price at UPPER BAND = overbought, potential pullback. SQUEEZE: When bands narrow = low volatility, big move coming soon (direction unknown - wait for breakout). EXPANSION: Wide bands = high volatility, trend in progress. WALKING THE BAND: In strong trends, price can 'ride' the upper or lower band for extended periods. Bollinger Bounce strategy: buy at lower band in ranging market. Bollinger Breakout strategy: enter when price breaks outside bands with volume.",
   },
   BB: {
     definition: "Bollinger Bands - A volatility indicator consisting of a middle band (SMA) and two outer bands that are 2 standard deviations away.",
     howToUse: "When price touches the lower band, the asset may be oversold (buy signal). When it touches the upper band, it may be overbought (sell signal). Narrow bands indicate low volatility; wide bands indicate high volatility.",
   },
   VOLUME: {
-    definition: "Volume - The total number of shares or contracts traded during a specific time period.",
-    howToUse: "High volume during price increases confirms the trend is strong. Low volume suggests weak conviction. Volume spikes often precede major price moves.",
+    definition: "Volume - The total number of units traded in a period. Measures market participation and conviction behind price moves. High volume = many traders agreeing on direction. Low volume = weak participation, moves can easily reverse. Volume should confirm price action.",
+    howToUse: "BULLISH VOLUME SIGNALS: Price rises + volume increases = strong uptrend (high conviction). Price breaks resistance + high volume = valid breakout (not fake). BEARISH SIGNALS: Price rises + volume decreases = weak rally (beware reversal). Price breaks support + high volume = strong breakdown. VOLUME DIVERGENCE: Price makes new high but volume declining = trend weakening, potential reversal. Volume spikes often mark market tops/bottoms. In crypto/DEX: Low volume = easy price manipulation, high slippage risk.",
   },
   "SUPPORT": {
-    definition: "Support Level - A price level where buying pressure is strong enough to prevent the price from falling further.",
-    howToUse: "If price approaches support and bounces up, it confirms the support level. Breaking below support often leads to further declines. Use it to set buy orders or stop losses.",
+    definition: "Support - A price level where buying demand is strong enough to overcome selling pressure and prevent further decline. Acts like a 'floor' under price. Forms at previous lows, psychological price levels (round numbers like $100), or moving averages. The more times price bounces off a level without breaking, the stronger the support.",
+    howToUse: "TRADING SUPPORT: Set buy orders slightly above support (confirmation). Place stop-loss just below support (if it breaks, exit). Support becomes RESISTANCE after breaking (role reversal). SUPPORT STRENGTH: Multiple bounces = stronger support. High volume bounces = stronger support. Longer timeframe support (weekly/monthly) stronger than daily. SUPPORT BREAKS: If price closes BELOW support on high volume = real break (expect further downside). False breaks (wicks below with close above) = strong support, often good entry.",
   },
   "RESISTANCE": {
-    definition: "Resistance Level - A price level where selling pressure is strong enough to prevent the price from rising further.",
-    howToUse: "If price approaches resistance and falls back, it confirms the resistance level. Breaking above resistance often leads to further gains. Use it to set sell orders or take profits.",
+    definition: "Resistance - A price level where selling pressure overcomes buying and prevents further rise. Acts like a 'ceiling' above price. Forms at previous highs, psychological levels, or moving averages. The more rejections at a level, the stronger the resistance. Breaking resistance often leads to explosive moves as shorts cover and breakout buyers enter.",
+    howToUse: "TRADING RESISTANCE: Take profits near resistance in range-bound markets. Wait for confirmed breakout before buying (close ABOVE resistance on volume). Set stop-loss above resistance for short positions. RESISTANCE BREAKOUTS: Strong breakouts have high volume, large candles, no immediate pullback. Weak breakouts (low volume, small candles) often fail. After breakout, old resistance becomes new support (test this level). MULTIPLE REJECTIONS: 3+ rejections at same level = very strong resistance, big move when it finally breaks.",
   },
   LIQUIDITY: {
-    definition: "Liquidity - The ease with which an asset can be bought or sold without causing significant price changes.",
-    howToUse: "High liquidity means you can enter/exit positions easily with minimal slippage. Low liquidity increases risk of price manipulation and large spreads. Always check liquidity before trading.",
+    definition: "Liquidity - Ability to quickly buy/sell an asset without significantly moving its price. High liquidity = tight spreads, low slippage, instant execution. Low liquidity = wide spreads, high slippage, hard to exit. Measured by: trading volume, order book depth, number of active traders. For DEX pairs: liquidity pools determine how much can be traded without massive price impact.",
+    howToUse: "CHECKING LIQUIDITY: DEX pairs need $50k+ liquidity for safe trading ($100k+ is good, $500k+ excellent). Volume should be 10-50% of liquidity daily (higher = active, lower = dead coin). RISKS OF LOW LIQUIDITY: Your $1000 buy could pump price 20%, then you can't sell without crashing it. Whale dumps can crash price 50%+ instantly. Easy price manipulation by bots. SLIPPAGE: Set max slippage 1-3% for high liquidity, 5-10% for medium, avoid trading if you need >15% slippage. Always check liquidity BEFORE buying meme coins.",
   },
   "RUG RISK": {
-    definition: "Rug Risk - The probability that a token's developers will abandon the project and drain liquidity, causing the price to crash to zero.",
-    howToUse: "High rug risk tokens should be avoided or traded with extreme caution. Check: liquidity depth, holder distribution, contract verification, and team transparency. Never invest more than you can lose.",
+    definition: "Rug Risk - Probability that developers will abandon a project and drain liquidity, sending price to zero. Common in new/low-cap tokens and meme coins. Signs: unlocked liquidity, anonymous team, no contract verification, suspicious tokenomics (team holds >50%), very new token (<7 days old), no social media presence, unrealistic promises.",
+    howToUse: "ASSESSING RUG RISK: HIGH RISK = liquidity <$10k, <50 daily transactions, holders <100, token <3 days old, unlocked LP tokens. MODERATE RISK = liquidity $10-50k, contract unverified, low holder count. LOW RISK = liquidity >$100k locked for 6+ months, verified contract, distributed holders, established team. RED FLAGS: Developers can mint unlimited tokens, liquidity not locked, top 10 wallets hold >80%, honeypot contract (can't sell). PROTECTION: Never invest more than you can lose 100%. Always test sell small amount first. Check contract on token scanners. Exit strategy before entering.",
   },
   SLIPPAGE: {
-    definition: "Slippage - The difference between the expected price of a trade and the actual executed price, common in low-liquidity markets.",
-    howToUse: "Higher slippage means you get a worse price than expected. Low-liquidity DEX pairs have high slippage. Set slippage tolerance in your trades to avoid unexpected losses.",
+    definition: "Slippage - Difference between expected price and actual execution price. Happens because orders consume available liquidity at each price level. Example: You try to buy at $1.00, but execution happens at $1.05 = 5% slippage. More common in: low liquidity pairs, large orders, volatile markets, DEX swaps. Can work for or against you (positive slippage = better price than expected).",
+    howToUse: "SLIPPAGE SETTINGS: 0.1-0.5% = bluechip cryptos on major exchanges. 0.5-1% = established altcoins with good liquidity. 1-3% = smaller cap coins, DEX pairs. 5-15% = meme coins, new tokens (dangerous territory). >15% = avoid or you'll get rekt. REDUCING SLIPPAGE: Trade during high volume hours. Split large orders into smaller chunks. Use limit orders instead of market orders. Choose pairs with deep liquidity. FRONT-RUNNING: On DEX, bots can see your transaction and front-run you, increasing your slippage. This is why meme coin trades often execute worse than expected.",
   },
   DEX: {
     definition: "DEX (Decentralized Exchange) - A cryptocurrency exchange that operates without a central authority, allowing peer-to-peer trading.",
