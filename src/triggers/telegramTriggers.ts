@@ -52,7 +52,7 @@ export function registerTelegramTrigger({
           // Execute DarkWave-V2 workflow synchronously
           logger?.info("🚀 [Telegram] Triggering DarkWave-V2 workflow");
           
-          const run = await darkwaveWorkflow.createRun();
+          const run = await darkwaveWorkflow.createRunAsync();
           const workflowResult = await run.start({ 
             inputData: {
               message: messageText,
