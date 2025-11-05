@@ -130,13 +130,10 @@ export const scannerTool = createTool({
           });
         }
 
-        // Stop if we have enough results
-        if (strongBuys.length >= context.limit) {
-          break;
-        }
-
         // Add delay to avoid hitting CoinGecko rate limits (critical for crypto scans)
-        await new Promise(resolve => setTimeout(resolve, type === 'crypto' ? 500 : 200));
+        // Crypto: 4 seconds (CoinGecko free tier: ~15 requests/min)
+        // Stocks: 200ms (Yahoo Finance is more permissive)
+        await new Promise(resolve => setTimeout(resolve, type === 'crypto' ? 4000 : 200));
 
       } catch (error: any) {
         logger?.warn(`⚠️ [ScannerTool] Failed to analyze ${ticker}`, { error: error.message });
