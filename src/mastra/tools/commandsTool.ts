@@ -31,6 +31,11 @@ export const commandsTool = createTool({
 • \`list\` - Show your current watchlist
 • \`clear\` - Clear your entire watchlist
 
+**💼 SOLANA WALLET** *(NEW!)*
+• \`wallet\` - Create or view your Solana wallet
+• \`balance\` - Check your wallet's SOL balance
+• \`withdraw 0.5 ABC123...\` - Withdraw SOL to your Phantom wallet
+
 **🔍 MARKET SCANNING**
 • \`market\` - Quick scan (top 10 cryptos + 10 stocks) ~5-7 seconds
 • \`crypto\` - Full crypto scan (top 50 cryptos) ~8-9 minutes
