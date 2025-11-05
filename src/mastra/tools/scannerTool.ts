@@ -23,12 +23,14 @@ export const scannerTool = createTool({
       ticker: z.string(),
       type: z.string(),
       currentPrice: z.number(),
+      volume24h: z.number(),
+      priceChangePercent24h: z.number(),
+      rsi: z.number(),
       recommendation: z.string(),
       signalCount: z.object({
         bullish: z.number(),
         bearish: z.number(),
       }),
-      topSignals: z.array(z.string()),
     })),
     message: z.string(),
   }),
@@ -72,7 +74,7 @@ export const scannerTool = createTool({
         const marketData = await marketDataTool.execute({
           context: { ticker, days: 90, type },
           mastra,
-          runtimeContext: {},
+          runtimeContext: undefined as any,
         });
 
         // Perform technical analysis
@@ -86,7 +88,7 @@ export const scannerTool = createTool({
             prices: marketData.prices,
           },
           mastra,
-          runtimeContext: {},
+          runtimeContext: undefined as any,
         });
 
         scanned++;
@@ -97,9 +99,11 @@ export const scannerTool = createTool({
             ticker: analysis.ticker,
             type,
             currentPrice: analysis.currentPrice,
+            volume24h: marketData.volume24h,
+            priceChangePercent24h: marketData.priceChangePercent24h,
+            rsi: analysis.rsi,
             recommendation: analysis.recommendation,
             signalCount: analysis.signalCount,
-            topSignals: analysis.signals.slice(0, 3), // Top 3 signals
           });
         }
 
