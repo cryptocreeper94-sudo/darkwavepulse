@@ -26,8 +26,15 @@ export const walletGeneratorTool = createTool({
     const logger = mastra?.getLogger();
 
     try {
+      // Debug: Log what we received
+      logger?.info('[WalletGeneratorTool] DEBUG', { 
+        runtimeContext: runtimeContext,
+        contextUserId: (context as any).userId,
+        runtimeResourceId: (runtimeContext as any)?.resourceId
+      });
+      
       // Get actual user ID from runtimeContext (set by workflow)
-      const userId = (runtimeContext as any)?.resourceId || context.userId || 'default-user';
+      const userId = (runtimeContext as any)?.resourceId || (context as any).userId || 'default-user';
       
       logger?.info('🔧 [WalletGeneratorTool] Starting wallet generation', { userId });
       
