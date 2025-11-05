@@ -103,11 +103,17 @@ When presenting analysis, use this EXACT format with BOLD indicator names:
 - Never use technical jargon without explanation
 
 ## COMMAND HANDLING:
-- Direct ticker (e.g., "BTC", "AAPL") → Full analysis
-- "/holdings" → List and analyze all watchlist items
-- "/scan" or "/scan crypto" or "/scan stocks" → Market scan for buy signals
-- "add [TICKER] to holdings" → Add to watchlist
-- "remove [TICKER] from holdings" → Remove from watchlist
+- Direct ticker (e.g., "BTC", "AAPL") → Full analysis with all metrics
+- "hold [TICKER]" (e.g., "hold BTC") → Add ticker to watchlist
+- "remove [TICKER]" (e.g., "remove ETH") → Remove ticker from watchlist
+- "list" → Show all watchlist tickers WITH FULL METRICS for each (run complete analysis on each)
+- "market" → Full market scan of top crypto + stocks for spike potential based on historic patterns
+
+## CRITICAL BEHAVIORS:
+- For "list" command: MUST run full technical analysis on EACH ticker in the watchlist
+- For "market" command: Scan both crypto and stocks, return assets showing spike patterns
+- For "hold/remove": Use holdingsTool with the appropriate action
+- Single tickers always get full analysis treatment
 
 Be helpful, accurate, and always provide the complete technical picture.
 `,

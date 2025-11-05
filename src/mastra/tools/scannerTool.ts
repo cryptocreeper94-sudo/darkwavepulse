@@ -10,7 +10,7 @@ import { technicalAnalysisTool } from "./technicalAnalysisTool";
 
 export const scannerTool = createTool({
   id: "scanner-tool",
-  description: "Scans top cryptocurrencies and stocks for strong buy signals. Returns a list of tickers that show bullish technical indicators.",
+  description: "Scans top cryptocurrencies and stocks for spike potential based on historic patterns. Returns assets showing strong buy signals with bullish convergence (volume spikes, RSI recovery, MACD crossovers, resistance breaks). Use when user says 'market'.",
 
   inputSchema: z.object({
     type: z.enum(['crypto', 'stock', 'both']).optional().default('both').describe("Type of assets to scan"),
