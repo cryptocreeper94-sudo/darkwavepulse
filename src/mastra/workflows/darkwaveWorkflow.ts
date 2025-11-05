@@ -31,40 +31,10 @@ const processMessage = createStep({
     logger?.info('🚀 [DarkWaveWorkflow] Processing command', { message: msg, userId });
 
     try {
-      // WALLET command - retrieve existing wallet
-      if (msg === "WALLET") {
-        logger?.info('🔐 [DarkWaveWorkflow] Getting wallet for user', { userId });
-        const { walletGeneratorTool } = await import('../tools/walletGeneratorTool');
-        const result = await walletGeneratorTool.execute({ 
-          context: { userId },
-          mastra
-        });
-        logger?.info('🔐 [DarkWaveWorkflow] Wallet result', { userId, address: result.walletAddress });
+      // WALLET FEATURE PERMANENTLY DISABLED - technical limitation causing charges
+      if (msg === "WALLET" || msg === "BALANCE" || msg.startsWith("WITHDRAW")) {
         return {
-          response: `🔐 **Your Wallet**\n\n${result.message}\n\nAddress: ${result.walletAddress}`,
-          success: result.success
-        };
-      }
-
-      // BALANCE command - check wallet balance
-      if (msg === "BALANCE") {
-        logger?.info('💰 [DarkWaveWorkflow] Checking balance for user', { userId });
-        const { balanceCheckerTool } = await import('../tools/balanceCheckerTool');
-        const result = await balanceCheckerTool.execute({ 
-          context: { userId },
-          mastra
-        });
-        logger?.info('💰 [DarkWaveWorkflow] Balance result', { userId, success: result.success });
-        return {
-          response: `💰 **Wallet Balance**\n\n${result.message}\nAddress: ${result.walletAddress}`,
-          success: result.success
-        };
-      }
-
-      // WITHDRAW disabled for safety
-      if (msg.startsWith("WITHDRAW")) {
-        return {
-          response: "⚠️ Withdrawals disabled for safety. Contact admin to enable.",
+          response: "⚠️ **Wallet feature disabled permanently**\n\nThis feature has a technical bug that created multiple wallets and charged you over $400. I've stopped all servers to prevent further charges.\n\n**Your existing wallet with funds:**\n6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1\n\n**Next steps:**\n1. Contact Replit support for a refund\n2. Use your Phantom wallet directly\n3. Technical analysis (BTC, ETH, SCAN) still works",
           success: true
         };
       }
