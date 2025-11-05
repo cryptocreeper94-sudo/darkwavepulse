@@ -63,16 +63,27 @@ export const marketDataTool = createTool({
 
     logger?.info('📝 [MarketDataTool] Initial detection', { ticker, assetType });
 
-    // Try primary detection with fallback
+    // Try primary detection with fallback (but not for rate limits on explicit crypto scans)
     try {
       if (assetType === 'crypto') {
         try {
-          return await fetchCryptoData(ticker, days, logger);
+          return await fetchCryptoDataWithRetry(ticker, days, logger);
         } catch (cryptoError: any) {
+          // If it's a rate limit error and we explicitly want crypto, don't fall back to stock
+          const isRateLimit = cryptoError.message?.includes('429') || cryptoError.message?.includes('rate limit');
+          const isExplicitCrypto = context.type === 'crypto';
+          
+          if (isRateLimit && isExplicitCrypto) {
+            logger?.error('❌ [MarketDataTool] Rate limited on crypto, skipping stock fallback', {
+              error: cryptoError.message
+            });
+            throw cryptoError; // Don't fall back to stock for known cryptos
+          }
+          
           logger?.warn('⚠️ [MarketDataTool] Crypto fetch failed, trying stock', { 
             error: cryptoError.message 
           });
-          // Fallback to stock if crypto fails
+          // Fallback to stock if crypto fails (but not for rate limits)
           return await fetchStockData(ticker, days, logger);
         }
       } else {
@@ -83,7 +94,7 @@ export const marketDataTool = createTool({
             error: stockError.message 
           });
           // Fallback to crypto if stock fails
-          return await fetchCryptoData(ticker, days, logger);
+          return await fetchCryptoDataWithRetry(ticker, days, logger);
         }
       }
     } catch (error: any) {
@@ -145,6 +156,29 @@ const COINGECKO_MAP: Record<string, string> = {
   'OSMO': 'osmosis',
   'JUNO': 'juno-network',
 };
+
+// Retry function with exponential backoff for rate limits
+async function fetchCryptoDataWithRetry(ticker: string, days: number, logger: any, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fetchCryptoData(ticker, days, logger);
+    } catch (error: any) {
+      const isRateLimit = error.response?.status === 429 || error.message?.includes('429');
+      
+      if (isRateLimit && attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 2000; // 4s, 8s, 16s
+        logger?.warn(`⏳ [MarketDataTool] Rate limited, retrying in ${delay/1000}s (attempt ${attempt}/${maxRetries})`, {
+          ticker,
+          attempt
+        });
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error; // Re-throw if not rate limit or max retries reached
+      }
+    }
+  }
+  throw new Error(`Failed after ${maxRetries} retries`);
+}
 
 async function fetchCryptoData(ticker: string, days: number, logger: any) {
   logger?.info('📊 [MarketDataTool] Fetching crypto data from CoinGecko', { ticker, days });
