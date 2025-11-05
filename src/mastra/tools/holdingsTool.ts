@@ -8,12 +8,13 @@ import { z } from "zod";
 
 export const holdingsTool = createTool({
   id: "holdings-tool",
-  description: "Manages user's watchlist. Can add, remove, list, or clear holdings. Holdings are persisted in the database.",
+  description: "Manages user's watchlist. Can add, remove, list, or clear holdings. Holdings are persisted in the database per user.",
 
   inputSchema: z.object({
     action: z.enum(['add', 'remove', 'list', 'clear']).describe("Action to perform on holdings"),
     ticker: z.string().optional().describe("Ticker symbol to add or remove"),
     tickers: z.array(z.string()).optional().describe("Multiple tickers to add at once"),
+    userId: z.string().optional().describe("User ID for personalized storage"),
   }),
 
   outputSchema: z.object({
@@ -23,24 +24,43 @@ export const holdingsTool = createTool({
     message: z.string(),
   }),
 
-  execute: async ({ context, mastra }) => {
+  execute: async ({ context, mastra, runtimeContext }) => {
     const logger = mastra?.getLogger();
     logger?.info('🔧 [HoldingsTool] Starting execution', { action: context.action });
 
-    const HOLDINGS_KEY = 'user_holdings';
+    // Get userId from context (passed from agent's resourceId/threadId)
+    const userId = context.userId || (runtimeContext as any)?.resourceId || 'default-user';
+    const HOLDINGS_KEY = `user_holdings_${userId}`;
+
+    logger?.info('📝 [HoldingsTool] User context', { userId, holdingsKey: HOLDINGS_KEY });
 
     try {
-      // Get current holdings from environment variable (simple storage for now)
+      // Get current holdings from agent's memory storage (PostgreSQL-backed)
       let holdings: string[] = [];
+      
       try {
-        const stored = process.env.DARKWAVE_HOLDINGS || '[]';
-        holdings = JSON.parse(stored);
+        const memory = mastra?.memory;
+        if (memory) {
+          // Try to get holdings from memory
+          const messages = await memory.getMessages({
+            resourceId: userId,
+            threadId: HOLDINGS_KEY,
+          });
+          
+          if (messages && messages.length > 0) {
+            // Get the last saved holdings state
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.content) {
+              holdings = JSON.parse(lastMessage.content as string);
+            }
+          }
+        }
       } catch (e) {
         logger?.warn('[HoldingsTool] No existing holdings found, starting fresh');
         holdings = [];
       }
 
-      logger?.info('📝 [HoldingsTool] Current holdings', { count: holdings.length });
+      logger?.info('📝 [HoldingsTool] Current holdings', { userId, count: holdings.length });
 
       let message = '';
       let success = true;
@@ -94,12 +114,27 @@ export const holdingsTool = createTool({
           break;
       }
 
-      // Save updated holdings (note: env vars are read-only, so this is temporary storage per session)
-      // In production, this would use a proper database table
-      process.env.DARKWAVE_HOLDINGS = JSON.stringify(holdings);
+      // Save updated holdings to memory (PostgreSQL-backed, per-user storage)
+      try {
+        const memory = mastra?.memory;
+        if (memory) {
+          await memory.saveMessages({
+            messages: [{
+              role: 'assistant',
+              content: JSON.stringify(holdings),
+            }],
+            resourceId: userId,
+            threadId: HOLDINGS_KEY,
+          });
+          logger?.info('💾 [HoldingsTool] Holdings saved to database', { userId, holdingsCount: holdings.length });
+        }
+      } catch (saveError: any) {
+        logger?.error('❌ [HoldingsTool] Failed to save holdings', { error: saveError.message });
+      }
 
       logger?.info('✅ [HoldingsTool] Action completed', { 
-        action: context.action, 
+        action: context.action,
+        userId,
         holdingsCount: holdings.length 
       });
 
