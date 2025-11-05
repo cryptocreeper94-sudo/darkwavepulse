@@ -10,10 +10,10 @@ import { technicalAnalysisTool } from "./technicalAnalysisTool";
 
 export const scannerTool = createTool({
   id: "scanner-tool",
-  description: "Scans top cryptocurrencies and stocks for spike potential based on historic patterns. Returns assets showing strong buy signals with bullish convergence (volume spikes, RSI recovery, MACD crossovers, resistance breaks). Use when user says 'market'.",
+  description: "Scans top cryptocurrencies or stocks for spike potential based on historic patterns. Returns assets showing strong buy signals with bullish convergence (volume spikes, RSI recovery, MACD crossovers, resistance breaks). Use when user says 'crypto' or 'stock'.",
 
   inputSchema: z.object({
-    type: z.enum(['crypto', 'stock', 'both']).optional().default('both').describe("Type of assets to scan"),
+    type: z.enum(['crypto', 'stock']).describe("Type of assets to scan - 'crypto' for top 50 cryptocurrencies, 'stock' for top 100 stocks"),
     limit: z.number().optional().default(10).describe("Maximum number of results to return"),
   }),
 
@@ -62,20 +62,12 @@ export const scannerTool = createTool({
       'CL', 'ITW', 'BSX', 'SHW', 'APD', 'EL', 'CME', 'EQIX', 'NSC', 'MCO',
     ];
 
-    // Quick scan list (10+10 for "market" command)
-    const QUICK_CRYPTOS = TOP_50_CRYPTOS.slice(0, 10);
-    const QUICK_STOCKS = TOP_100_STOCKS.slice(0, 10);
-
     let tickersToScan: { ticker: string; type: 'crypto' | 'stock' }[] = [];
 
     if (context.type === 'crypto') {
       tickersToScan.push(...TOP_50_CRYPTOS.map(t => ({ ticker: t, type: 'crypto' as const })));
     } else if (context.type === 'stock') {
       tickersToScan.push(...TOP_100_STOCKS.map(t => ({ ticker: t, type: 'stock' as const })));
-    } else if (context.type === 'both') {
-      // For "market" command - quick scan
-      tickersToScan.push(...QUICK_CRYPTOS.map(t => ({ ticker: t, type: 'crypto' as const })));
-      tickersToScan.push(...QUICK_STOCKS.map(t => ({ ticker: t, type: 'stock' as const })));
     }
 
     logger?.info('📊 [ScannerTool] Scanning tickers', { count: tickersToScan.length });
