@@ -1,0 +1,133 @@
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
+import { marketDataTool } from "./marketDataTool";
+import { technicalAnalysisTool } from "./technicalAnalysisTool";
+
+/**
+ * Scanner Tool - Scans top cryptos and stocks for strong buy signals
+ * Returns only assets that meet buy criteria based on technical analysis
+ */
+
+export const scannerTool = createTool({
+  id: "scanner-tool",
+  description: "Scans top cryptocurrencies and stocks for strong buy signals. Returns a list of tickers that show bullish technical indicators.",
+
+  inputSchema: z.object({
+    type: z.enum(['crypto', 'stock', 'both']).optional().default('both').describe("Type of assets to scan"),
+    limit: z.number().optional().default(10).describe("Maximum number of results to return"),
+  }),
+
+  outputSchema: z.object({
+    scannedCount: z.number(),
+    strongBuys: z.array(z.object({
+      ticker: z.string(),
+      type: z.string(),
+      currentPrice: z.number(),
+      recommendation: z.string(),
+      signalCount: z.object({
+        bullish: z.number(),
+        bearish: z.number(),
+      }),
+      topSignals: z.array(z.string()),
+    })),
+    message: z.string(),
+  }),
+
+  execute: async ({ context, mastra }) => {
+    const logger = mastra?.getLogger();
+    logger?.info('🔧 [ScannerTool] Starting scan', { type: context.type, limit: context.limit });
+
+    // Top crypto tickers to scan (reduced for API rate limits)
+    const TOP_CRYPTOS = [
+      'BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'DOGE', 'DOT', 'MATIC', 'AVAX', 'LINK',
+      'UNI', 'ATOM', 'LTC', 'BCH', 'NEAR', 'APT', 'ARB', 'OP', 'SUI', 'FIL',
+    ];
+
+    // Top stock tickers to scan (limited to top 20 for API constraints)
+    const TOP_STOCKS = [
+      'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'V',
+      'JNJ', 'WMT', 'PG', 'MA', 'HD', 'CVX', 'MRK', 'ABBV', 'PEP', 'KO',
+    ];
+
+    let tickersToScan: { ticker: string; type: 'crypto' | 'stock' }[] = [];
+
+    if (context.type === 'crypto' || context.type === 'both') {
+      tickersToScan.push(...TOP_CRYPTOS.slice(0, 20).map(t => ({ ticker: t, type: 'crypto' as const })));
+    }
+    if (context.type === 'stock' || context.type === 'both') {
+      tickersToScan.push(...TOP_STOCKS.slice(0, 20).map(t => ({ ticker: t, type: 'stock' as const })));
+    }
+
+    logger?.info('📊 [ScannerTool] Scanning tickers', { count: tickersToScan.length });
+
+    const strongBuys: any[] = [];
+    let scanned = 0;
+
+    // Scan each ticker for buy signals
+    for (const { ticker, type } of tickersToScan) {
+      try {
+        logger?.info(`🔍 [ScannerTool] Analyzing ${ticker}`, { type });
+
+        // Fetch market data
+        const marketData = await marketDataTool.execute({
+          context: { ticker, days: 90, type },
+          mastra,
+          runtimeContext: {},
+        });
+
+        // Perform technical analysis
+        const analysis = await technicalAnalysisTool.execute({
+          context: {
+            ticker: marketData.ticker,
+            currentPrice: marketData.currentPrice,
+            priceChange24h: marketData.priceChange24h,
+            priceChangePercent24h: marketData.priceChangePercent24h,
+            volume24h: marketData.volume24h,
+            prices: marketData.prices,
+          },
+          mastra,
+          runtimeContext: {},
+        });
+
+        scanned++;
+
+        // Filter for BUY or STRONG_BUY signals
+        if (analysis.recommendation === 'BUY' || analysis.recommendation === 'STRONG_BUY') {
+          strongBuys.push({
+            ticker: analysis.ticker,
+            type,
+            currentPrice: analysis.currentPrice,
+            recommendation: analysis.recommendation,
+            signalCount: analysis.signalCount,
+            topSignals: analysis.signals.slice(0, 3), // Top 3 signals
+          });
+        }
+
+        // Stop if we have enough results
+        if (strongBuys.length >= context.limit) {
+          break;
+        }
+
+        // Add small delay to avoid hitting API rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+      } catch (error: any) {
+        logger?.warn(`⚠️ [ScannerTool] Failed to analyze ${ticker}`, { error: error.message });
+        // Continue scanning other tickers
+      }
+    }
+
+    logger?.info('✅ [ScannerTool] Scan complete', { 
+      scanned,
+      strongBuysFound: strongBuys.length 
+    });
+
+    return {
+      scannedCount: scanned,
+      strongBuys,
+      message: strongBuys.length > 0 
+        ? `Found ${strongBuys.length} asset(s) with strong buy signals out of ${scanned} scanned.`
+        : `No strong buy signals found in ${scanned} assets scanned.`,
+    };
+  },
+});

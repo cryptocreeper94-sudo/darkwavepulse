@@ -9,8 +9,8 @@ import { z } from "zod";
 
 import { sharedPostgresStorage } from "./storage";
 import { inngest, inngestServe } from "./inngest";
-import { exampleWorkflow } from "./workflows/exampleWorkflow";
-import { exampleAgent } from "./agents/exampleAgent";
+import { darkwaveWorkflow } from "./workflows/darkwaveWorkflow";
+import { darkwaveAgent } from "./agents/darkwaveAgent";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -56,9 +56,9 @@ class ProductionPinoLogger extends MastraLogger {
 export const mastra = new Mastra({
   storage: sharedPostgresStorage,
   // Register your workflows here
-  workflows: {},
+  workflows: { darkwaveWorkflow },
   // Register your agents here
-  agents: {},
+  agents: { darkwaveAgent },
   mcpServers: {
     allTools: new MCPServer({
       name: "allTools",

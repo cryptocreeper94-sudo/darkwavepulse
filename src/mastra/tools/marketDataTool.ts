@@ -1,0 +1,290 @@
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
+import axios from "axios";
+
+/**
+ * Market Data Tool - Fetches historical price data for stocks and crypto
+ * Uses free APIs: CoinGecko for crypto, Yahoo Finance for stocks
+ */
+
+export const marketDataTool = createTool({
+  id: "market-data-tool",
+  description: "Fetches historical price data for crypto or stock tickers. Returns OHLCV (Open, High, Low, Close, Volume) data for technical analysis.",
+
+  inputSchema: z.object({
+    ticker: z.string().describe("Ticker symbol (e.g., BTC, ETH, AAPL, TSLA)"),
+    days: z.number().optional().default(90).describe("Number of days of historical data (default: 90)"),
+    type: z.enum(["crypto", "stock"]).optional().describe("Asset type - auto-detected if not specified"),
+  }),
+
+  outputSchema: z.object({
+    ticker: z.string(),
+    type: z.string(),
+    currentPrice: z.number(),
+    priceChange24h: z.number(),
+    priceChangePercent24h: z.number(),
+    volume24h: z.number().optional(),
+    prices: z.array(z.object({
+      timestamp: z.number(),
+      open: z.number(),
+      high: z.number(),
+      low: z.number(),
+      close: z.number(),
+      volume: z.number(),
+    })),
+    marketCap: z.number().optional(),
+  }),
+
+  execute: async ({ context, mastra }) => {
+    const logger = mastra?.getLogger();
+    logger?.info('🔧 [MarketDataTool] Starting execution', { ticker: context.ticker, days: context.days });
+
+    const ticker = context.ticker.toUpperCase();
+    const days = context.days || 90;
+
+    // Auto-detect asset type with fallback logic
+    let assetType = context.type;
+    
+    if (!assetType) {
+      // Common stock patterns (longer tickers, dots for classes, known extensions)
+      const stockPatterns = [
+        ticker.includes('.'),  // E.g., BRK.B, GOOGL.L
+        ticker.length > 5,     // Most stocks are 1-5 chars, cryptos vary
+        /^[A-Z]{1,5}$/.test(ticker) && ticker !== ticker.slice(0, 4).toUpperCase(), // Typical stock format
+      ];
+      
+      // If it looks like a stock ticker, try stock first
+      if (stockPatterns.some(p => p)) {
+        assetType = 'stock';
+      } else {
+        assetType = 'crypto'; // Try crypto first for ambiguous cases
+      }
+    }
+
+    logger?.info('📝 [MarketDataTool] Initial detection', { ticker, assetType });
+
+    // Try primary detection with fallback
+    try {
+      if (assetType === 'crypto') {
+        try {
+          return await fetchCryptoData(ticker, days, logger);
+        } catch (cryptoError: any) {
+          logger?.warn('⚠️ [MarketDataTool] Crypto fetch failed, trying stock', { 
+            error: cryptoError.message 
+          });
+          // Fallback to stock if crypto fails
+          return await fetchStockData(ticker, days, logger);
+        }
+      } else {
+        try {
+          return await fetchStockData(ticker, days, logger);
+        } catch (stockError: any) {
+          logger?.warn('⚠️ [MarketDataTool] Stock fetch failed, trying crypto', { 
+            error: stockError.message 
+          });
+          // Fallback to crypto if stock fails
+          return await fetchCryptoData(ticker, days, logger);
+        }
+      }
+    } catch (error: any) {
+      logger?.error('❌ [MarketDataTool] Both fetch attempts failed', { error: error.message });
+      throw new Error(`Failed to fetch market data for ${ticker}: Not found in crypto or stock markets`);
+    }
+  },
+});
+
+// CoinGecko mapping for common tickers (expanded for better coverage)
+const COINGECKO_MAP: Record<string, string> = {
+  'BTC': 'bitcoin',
+  'ETH': 'ethereum',
+  'SOL': 'solana',
+  'BNB': 'binancecoin',
+  'XRP': 'ripple',
+  'ADA': 'cardano',
+  'DOGE': 'dogecoin',
+  'DOT': 'polkadot',
+  'MATIC': 'matic-network',
+  'AVAX': 'avalanche-2',
+  'LINK': 'chainlink',
+  'UNI': 'uniswap',
+  'ATOM': 'cosmos',
+  'LTC': 'litecoin',
+  'BCH': 'bitcoin-cash',
+  'NEAR': 'near',
+  'APT': 'aptos',
+  'ARB': 'arbitrum',
+  'OP': 'optimism',
+  'SUI': 'sui',
+  'FIL': 'filecoin',
+  'ICP': 'internet-computer',
+  'VET': 'vechain',
+  'ALGO': 'algorand',
+  'SAND': 'the-sandbox',
+  'MANA': 'decentraland',
+  'AXS': 'axie-infinity',
+  'FTM': 'fantom',
+  'AAVE': 'aave',
+  'GRT': 'the-graph',
+  'SNX': 'synthetix-network-token',
+  'AR': 'arweave',
+  'HBAR': 'hedera-hashgraph',
+  'XLM': 'stellar',
+  'TRX': 'tron',
+  'ETC': 'ethereum-classic',
+  'XMR': 'monero',
+  'TON': 'the-open-network',
+  'SHIB': 'shiba-inu',
+  'PEPE': 'pepe',
+  'WIF': 'dogwifcoin',
+  'BONK': 'bonk',
+  'FLOKI': 'floki',
+  'INJ': 'injective-protocol',
+  'TIA': 'celestia',
+  'SEI': 'sei-network',
+  'RUNE': 'thorchain',
+  'OSMO': 'osmosis',
+  'JUNO': 'juno-network',
+};
+
+async function fetchCryptoData(ticker: string, days: number, logger: any) {
+  logger?.info('📊 [MarketDataTool] Fetching crypto data from CoinGecko', { ticker, days });
+
+  // Try static map first, then search API
+  let coinId = COINGECKO_MAP[ticker];
+  
+  if (!coinId) {
+    logger?.info('🔍 [MarketDataTool] Ticker not in static map, searching CoinGecko', { ticker });
+    try {
+      const searchUrl = `https://api.coingecko.com/api/v3/search?query=${ticker}`;
+      const searchResponse = await axios.get(searchUrl);
+      
+      // Find ALL exact symbol matches (case-insensitive)
+      const matches = searchResponse.data.coins?.filter((coin: any) => 
+        coin.symbol?.toUpperCase() === ticker.toUpperCase()
+      ) || [];
+      
+      if (matches.length > 0) {
+        // If multiple matches, prefer the one with highest market cap (comes first in CoinGecko search results)
+        // CoinGecko search already sorts by relevance/market cap
+        coinId = matches[0].id;
+        logger?.info('✓ [MarketDataTool] Found coin via search', { 
+          ticker, 
+          coinId,
+          matchCount: matches.length,
+          selectedName: matches[0].name 
+        });
+      } else {
+        // No exact symbol match - try the coin if ticker appears in name
+        const nameMatch = searchResponse.data.coins?.find((coin: any) => 
+          coin.name?.toUpperCase().includes(ticker.toUpperCase())
+        );
+        
+        if (nameMatch) {
+          coinId = nameMatch.id;
+          logger?.info('✓ [MarketDataTool] Found coin by name match', { ticker, coinId, name: nameMatch.name });
+        } else {
+          throw new Error(`No CoinGecko match found for ${ticker}`);
+        }
+      }
+    } catch (searchError: any) {
+      logger?.warn('⚠️ [MarketDataTool] CoinGecko search failed', { 
+        ticker, 
+        error: searchError.message 
+      });
+      throw new Error(`Cryptocurrency ${ticker} not found on CoinGecko`);
+    }
+  }
+
+  // Fetch current price and 24h change
+  const currentDataUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true`;
+  const currentResponse = await axios.get(currentDataUrl);
+  
+  if (!currentResponse.data[coinId]) {
+    throw new Error(`Cryptocurrency ${ticker} not found on CoinGecko`);
+  }
+
+  const currentData = currentResponse.data[coinId];
+
+  // Fetch historical OHLC data
+  const historyUrl = `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`;
+  const historyResponse = await axios.get(historyUrl);
+
+  const prices = historyResponse.data.map((candle: number[]) => ({
+    timestamp: candle[0],
+    open: candle[1],
+    high: candle[2],
+    low: candle[3],
+    close: candle[4],
+    volume: currentData.usd_24h_vol || 0, // CoinGecko OHLC doesn't include volume per candle
+  }));
+
+  logger?.info('✅ [MarketDataTool] Successfully fetched crypto data', { 
+    ticker, 
+    dataPoints: prices.length,
+    currentPrice: currentData.usd 
+  });
+
+  return {
+    ticker,
+    type: 'crypto',
+    currentPrice: currentData.usd,
+    priceChange24h: currentData.usd * (currentData.usd_24h_change / 100),
+    priceChangePercent24h: currentData.usd_24h_change,
+    volume24h: currentData.usd_24h_vol,
+    marketCap: currentData.usd_market_cap,
+    prices,
+  };
+}
+
+async function fetchStockData(ticker: string, days: number, logger: any) {
+  logger?.info('📊 [MarketDataTool] Fetching stock data from Yahoo Finance', { ticker, days });
+
+  // Yahoo Finance v8 API endpoint
+  const period2 = Math.floor(Date.now() / 1000); // current timestamp
+  const period1 = period2 - (days * 24 * 60 * 60); // days ago
+  
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?period1=${period1}&period2=${period2}&interval=1d`;
+
+  const response = await axios.get(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+    },
+  });
+
+  const result = response.data.chart.result[0];
+  if (!result) {
+    throw new Error(`Stock ${ticker} not found`);
+  }
+
+  const quote = result.indicators.quote[0];
+  const timestamps = result.timestamp;
+
+  const prices = timestamps.map((ts: number, i: number) => ({
+    timestamp: ts * 1000,
+    open: quote.open[i] || 0,
+    high: quote.high[i] || 0,
+    low: quote.low[i] || 0,
+    close: quote.close[i] || 0,
+    volume: quote.volume[i] || 0,
+  }));
+
+  const currentPrice = result.meta.regularMarketPrice;
+  const previousClose = result.meta.chartPreviousClose;
+  const priceChange = currentPrice - previousClose;
+  const priceChangePercent = (priceChange / previousClose) * 100;
+
+  logger?.info('✅ [MarketDataTool] Successfully fetched stock data', { 
+    ticker, 
+    dataPoints: prices.length,
+    currentPrice 
+  });
+
+  return {
+    ticker,
+    type: 'stock',
+    currentPrice,
+    priceChange24h: priceChange,
+    priceChangePercent24h: priceChangePercent,
+    prices,
+  };
+}
