@@ -110,7 +110,7 @@ const processMessage = createStep({
           `• **Support:** $${analysis.support?.toFixed(4)}\n` +
           `• **Resistance:** $${analysis.resistance?.toFixed(4)}\n` +
           `• **Volatility:** ${analysis.volatility?.toFixed(1)}%\n` +
-          `• **Volume:** $${(analysis.volume24h / 1000000).toFixed(2)}M\n\n` +
+          `• **Volume:** $${((marketData.volume24h || 0) / 1000000).toFixed(2)}M\n\n` +
           `⚠️ **SIGNALS (${analysis.signals?.length || 0}):**\n` +
           (analysis.signals?.map(s => `• ${s}`).join('\n') || '• None');
 
