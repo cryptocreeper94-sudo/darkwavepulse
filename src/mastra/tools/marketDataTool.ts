@@ -264,60 +264,49 @@ async function fetchCryptoDataWithRetry(ticker: string, days: number, logger: an
 }
 
 async function fetchCryptoData(ticker: string, days: number, logger: any) {
-  logger?.info('📊 [MarketDataTool] Fetching crypto data from CoinGecko', { ticker, days });
+  logger?.info('📊 [MarketDataTool] Fetching crypto data from CoinCap', { ticker, days });
 
-  // Use CoinGecko ID mapping
-  let coinId = COINGECKO_MAP[ticker];
+  // CoinCap uses lowercase asset IDs
+  const assetId = ticker.toLowerCase();
   
-  if (!coinId) {
-    // Fall back to lowercase ticker if not in map
-    coinId = ticker.toLowerCase();
-    logger?.info('🔍 [MarketDataTool] Using lowercase ticker as fallback', { ticker, coinId });
+  // Fetch current price and market data from CoinCap (FREE, NO RATE LIMITS!)
+  const currentDataUrl = `https://api.coincap.io/v2/assets/${assetId}`;
+  const currentResponse = await axios.get(currentDataUrl);
+  
+  const assetData = currentResponse.data?.data;
+  if (!assetData) {
+    throw new Error(`Cryptocurrency ${ticker} not found on CoinCap`);
   }
 
-  // Fetch current price and market data from CoinGecko
-  const currentDataUrl = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`;
-  const currentResponse = await axios.get(currentDataUrl, {
-    headers: { 'Accept': 'application/json' }
-  });
+  const currentPrice = parseFloat(assetData.priceUsd) || 0;
+  const priceChangePercent24h = parseFloat(assetData.changePercent24Hr) || 0;
+  const volume24h = parseFloat(assetData.volumeUsd24Hr) || 0;
+  const marketCap = parseFloat(assetData.marketCapUsd) || 0;
   
-  const coinData = currentResponse.data;
-  if (!coinData || !coinData.market_data) {
-    throw new Error(`Cryptocurrency ${ticker} not found on CoinGecko`);
-  }
+  // Fetch historical price data from CoinCap
+  const now = Date.now();
+  const start = now - (days * 24 * 60 * 60 * 1000);
+  const interval = days <= 1 ? 'h1' : 'h6'; // Hourly for 1 day, 6-hour for longer
+  
+  const historyUrl = `https://api.coincap.io/v2/assets/${assetId}/history?interval=${interval}&start=${start}&end=${now}`;
+  const historyResponse = await axios.get(historyUrl);
 
-  const marketData = coinData.market_data;
-  const currentPrice = marketData.current_price?.usd || 0;
-  const priceChangePercent24h = marketData.price_change_percentage_24h || 0;
-  const volume24h = marketData.total_volume?.usd || 0;
-  const marketCap = marketData.market_cap?.usd || 0;
+  const priceData = historyResponse.data?.data || [];
   
-  // Add 2-second delay between API calls to avoid rate limiting
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  logger?.info('⏱️ [MarketDataTool] Waiting 2s before next request to avoid rate limits');
-  
-  // Fetch historical price data (hourly for better granularity)
-  const historyUrl = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=hourly`;
-  const historyResponse = await axios.get(historyUrl, {
-    headers: { 'Accept': 'application/json' }
-  });
-
-  const priceData = historyResponse.data.prices || [];
-  
-  // Group hourly prices into 4-hour candles for better analysis
-  const candleSize = 4; // 4-hour candles
+  // Convert CoinCap data to OHLCV format (group into 4-hour candles)
+  const candleSize = 4;
   const prices = [];
   
   for (let i = 0; i < priceData.length; i += candleSize) {
     const candlePrices = priceData.slice(i, Math.min(i + candleSize, priceData.length));
     if (candlePrices.length === 0) continue;
     
-    const candlePricesNum = candlePrices.map((p: any) => p[1]); // [timestamp, price]
+    const candlePricesNum = candlePrices.map((p: any) => parseFloat(p.priceUsd));
     const open = candlePricesNum[0];
     const close = candlePricesNum[candlePricesNum.length - 1];
     const high = Math.max(...candlePricesNum);
     const low = Math.min(...candlePricesNum);
-    const timestamp = candlePrices[0][0]; // CoinGecko timestamp in ms
+    const timestamp = candlePrices[0].time; // CoinCap timestamp in ms
     
     prices.push({
       timestamp,
@@ -325,13 +314,13 @@ async function fetchCryptoData(ticker: string, days: number, logger: any) {
       high,
       low,
       close,
-      volume: volume24h,
+      volume: volume24h / priceData.length, // Estimate volume per candle
     });
   }
 
-  logger?.info('✅ [MarketDataTool] Successfully fetched crypto data from CoinGecko', { 
-    ticker, 
-    coinId,
+  logger?.info('✅ [MarketDataTool] Successfully fetched crypto data from CoinCap', { 
+    ticker,
+    assetId,
     dataPoints: prices.length,
     currentPrice 
   });
