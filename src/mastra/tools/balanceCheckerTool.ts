@@ -54,7 +54,17 @@ export const balanceCheckerTool = createTool({
 
       const lastMessage = messages[messages.length - 1];
       const walletData = JSON.parse(lastMessage.content as string);
-      const publicKey = walletData.publicKey;
+      const publicKey = walletData.address; // Fixed: use 'address' not 'publicKey'
+
+      if (!publicKey) {
+        logger?.warn('[BalanceCheckerTool] Wallet data missing address');
+        return {
+          balance: 0,
+          walletAddress: '',
+          success: false,
+          message: 'Wallet address not found. Please reconnect your wallet.',
+        };
+      }
 
       logger?.info('📝 [BalanceCheckerTool] Checking balance', { 
         userId,
