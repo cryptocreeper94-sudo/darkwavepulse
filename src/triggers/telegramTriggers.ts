@@ -32,10 +32,10 @@ export function registerTelegramTrigger({
   ) => Promise<void>;
 }) {
   return [
-    registerApiRoute("/webhooks/telegram/action", {
-      method: "POST",
-      handler: async (c) => {
-        const mastra = c.get("mastra");
+    {
+      path: "/api/webhooks/telegram",
+      method: "POST" as const,
+      createHandler: async ({ mastra }: { mastra: Mastra }) => async (c: any) => {
         const logger = mastra.getLogger();
         try {
           const payload = await c.req.json();
@@ -125,6 +125,6 @@ export function registerTelegramTrigger({
           return c.text("Internal Server Error", 500);
         }
       },
-    }),
+    },
   ];
 }
