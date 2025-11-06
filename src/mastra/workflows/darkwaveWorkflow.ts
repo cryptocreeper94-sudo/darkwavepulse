@@ -256,6 +256,7 @@ const processMessage = createStep({
           
           const duration = rec.patternDuration?.estimate || 'Unknown';
           response += `🟢 ${rec.name} [${rec.ticker}](${url}) - ${rec.recommendation}\n`;
+          response += `💵 Price: $${rec.currentPrice?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}\n`;
           response += `⏱️ Duration: ${duration}\n`;
           response += `📊 RSI: ${rec.rsi?.toFixed(1)}\n`;
           response += `💰 24h Price: ${rec.priceChangePercent24h >= 0 ? '+' : ''}${rec.priceChangePercent24h?.toFixed(2)}%\n`;
@@ -427,6 +428,7 @@ const processMessage = createStep({
         const volumeChange = analysis.volume?.changePercent || 0;
         const duration = analysis.patternDuration?.estimate || 'Unknown';
         const response = `${emoji} [${ticker}](${tickerUrl}) - ${analysis.recommendation}\n` +
+          `💵 Price: $${marketData.currentPrice?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}\n` +
           `⏱️ Duration: ${duration}\n` +
           `📊 RSI: ${analysis.rsi?.toFixed(1)}\n` +
           `💰 24h Price: ${analysis.priceChangePercent24h >= 0 ? '+' : ''}${analysis.priceChangePercent24h?.toFixed(2)}%\n` +
