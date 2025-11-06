@@ -292,6 +292,10 @@ async function fetchCryptoData(ticker: string, days: number, logger: any) {
   const volume24h = marketData.total_volume?.usd || 0;
   const marketCap = marketData.market_cap?.usd || 0;
   
+  // Add 2-second delay between API calls to avoid rate limiting
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  logger?.info('⏱️ [MarketDataTool] Waiting 2s before next request to avoid rate limits');
+  
   // Fetch historical price data (hourly for better granularity)
   const historyUrl = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=hourly`;
   const historyResponse = await axios.get(historyUrl, {
