@@ -457,7 +457,7 @@ const processMessage = createStep({
         };
 
         let tickerUrl: string;
-        const isCrypto = marketData.assetType === 'crypto';
+        const isCrypto = marketData.type === 'crypto';
 
         if (linkPref === 'kraken') {
           // Kraken format: /prices/{crypto-name}
