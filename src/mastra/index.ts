@@ -215,26 +215,79 @@ export const mastra = new Mastra({
             const high24h = Math.max(...recentPrices.map((p: any) => p.high));
             const low24h = Math.min(...recentPrices.map((p: any) => p.low));
             
-            // Return structured data for Mini App
+            // Return ALL structured data for Mini App including advanced predictive metrics
             return c.json({
               ticker: ticker.toUpperCase(),
               price: analysis.currentPrice || marketData.currentPrice,
               priceChange: analysis.priceChangePercent24h || marketData.priceChangePercent24h || 0, // PERCENTAGE
               priceChangeDollar: analysis.priceChange24h || marketData.priceChange24h || 0, // DOLLAR AMOUNT
               recommendation: analysis.recommendation || 'HOLD',
+              
+              // Core indicators
               rsi: analysis.rsi || 50,
-              macd: analysis.macd?.value || 0,
-              macdSignal: analysis.macd?.signal || 0,
-              volume: analysis.volume?.current || 0,
-              high24h: high24h || 0,
-              low24h: low24h || 0,
+              macd: {
+                value: analysis.macd?.value || 0,
+                signal: analysis.macd?.signal || 0,
+                histogram: analysis.macd?.histogram || 0
+              },
+              
+              // Moving averages
               sma50: analysis.sma50 || 0,
               sma200: analysis.sma200 || 0,
               ema50: analysis.ema50 || 0,
               ema200: analysis.ema200 || 0,
+              
+              // Support/Resistance
               support: analysis.support || 0,
               resistance: analysis.resistance || 0,
-              signals: analysis.signals || []
+              
+              // Bollinger Bands
+              bollingerBands: {
+                upper: analysis.bollingerBands?.upper || 0,
+                middle: analysis.bollingerBands?.middle || 0,
+                lower: analysis.bollingerBands?.lower || 0,
+                bandwidth: analysis.bollingerBands?.bandwidth || 0
+              },
+              
+              // Volume analysis
+              volume: {
+                current: analysis.volume?.current || 0,
+                average: analysis.volume?.average || 0,
+                changePercent: analysis.volume?.changePercent || 0
+              },
+              
+              // ADVANCED PREDICTIVE METRICS
+              volumeDelta: {
+                buyVolume: analysis.volumeDelta?.buyVolume || 0,
+                sellVolume: analysis.volumeDelta?.sellVolume || 0,
+                delta: analysis.volumeDelta?.delta || 0,
+                buySellRatio: analysis.volumeDelta?.buySellRatio || 1
+              },
+              
+              spikeScore: {
+                score: analysis.spikeScore?.score || 0,
+                signal: analysis.spikeScore?.signal || 'NO_SIGNAL',
+                prediction: analysis.spikeScore?.prediction || 'No prediction available'
+              },
+              
+              volatility: analysis.volatility || 0,
+              
+              patternDuration: {
+                estimate: analysis.patternDuration?.estimate || 'Unknown',
+                confidence: analysis.patternDuration?.confidence || 'Low',
+                type: analysis.patternDuration?.type || 'Unknown'
+              },
+              
+              // Price extremes
+              high24h: high24h || 0,
+              low24h: low24h || 0,
+              
+              // Signals
+              signals: analysis.signals || [],
+              signalCount: {
+                bullish: analysis.signalCount?.bullish || 0,
+                bearish: analysis.signalCount?.bearish || 0
+              }
             });
           } catch (error: any) {
             logger?.error('❌ [Mini App] Analysis error', { error: error.message });
@@ -447,6 +500,171 @@ export const mastra = new Mastra({
           } catch (error: any) {
             logger?.error('❌ [Mini App] Update settings error', { error: error.message });
             return c.json({ success: false }, 500);
+          }
+        },
+      },
+      // Scanner endpoint
+      {
+        path: "/api/scanner",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { type = 'crypto', limit = 20, userId } = await c.req.json();
+            logger?.info('🔍 [Mini App] Scanner request', { type, limit, userId });
+            
+            const result = await scannerTool.execute({
+              context: { type, limit },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json({
+              results: result.strongBuys || [],
+              scannedCount: result.scannedCount || 0,
+              type: type,
+              timestamp: new Date().toISOString()
+            });
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] Scanner error', { error: error.message });
+            return c.json({ results: [], scannedCount: 0, error: error.message }, 500);
+          }
+        },
+      },
+      // Chart endpoint
+      {
+        path: "/api/chart",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { ticker, userId } = await c.req.json();
+            logger?.info('📈 [Mini App] Chart request', { ticker, userId });
+            
+            // Get market data first
+            const marketData = await marketDataTool.execute({
+              context: { ticker, days: 90 },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            // Get analysis for EMAs
+            const analysis = await technicalAnalysisTool.execute({
+              context: { 
+                ticker,
+                prices: marketData.prices,
+                currentPrice: marketData.currentPrice,
+                priceChange24h: marketData.priceChange24h,
+                priceChangePercent24h: marketData.priceChangePercent24h
+              },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            // Prepare data for chart
+            const prices = marketData.prices.map((p: any) => ({
+              timestamp: p.timestamp,
+              close: p.close
+            }));
+            
+            // Create EMA arrays (simplified - use last value for all points)
+            const ema50 = new Array(prices.length).fill(analysis.ema50);
+            const ema200 = new Array(prices.length).fill(analysis.ema200);
+            
+            const result = await chartGeneratorTool.execute({
+              context: { ticker, prices, ema50, ema200 },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json({
+              chartUrl: result.chartUrl || '',
+              ticker: ticker.toUpperCase(),
+              success: result.success || false,
+              message: result.message || ''
+            });
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] Chart error', { error: error.message });
+            return c.json({ chartUrl: '', ticker: '', success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // DEX Search endpoint
+      {
+        path: "/api/dex-search",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { query, userId } = await c.req.json();
+            logger?.info('🔍 [Mini App] DEX search request', { query, userId });
+            
+            const result = await dexscreenerTool.execute({
+              context: { query },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            // dexscreenerTool returns a single pair object, not an array
+            return c.json({
+              pair: result.success ? result : null,
+              success: result.success || false,
+              query: query
+            });
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] DEX search error', { error: error.message });
+            return c.json({ pair: null, success: false, query: '', error: error.message }, 500);
+          }
+        },
+      },
+      // DEX Analysis endpoint
+      {
+        path: "/api/dex-analyze",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { query, userId } = await c.req.json();
+            logger?.info('📊 [Mini App] DEX analysis request', { query, userId });
+            
+            // First search for the DEX pair
+            const searchResult = await dexscreenerTool.execute({
+              context: { query },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            if (!searchResult.success) {
+              return c.json({ error: 'Pair not found', success: false }, 404);
+            }
+            
+            // Then analyze it
+            const analysisResult = await dexAnalysisTool.execute({
+              context: {
+                ticker: searchResult.ticker,
+                name: searchResult.name,
+                chain: searchResult.chain,
+                dex: searchResult.dex,
+                currentPrice: searchResult.currentPrice,
+                priceChange24h: searchResult.priceChange24h,
+                priceChangePercent24h: searchResult.priceChangePercent24h,
+                priceChange6h: searchResult.priceChange6h,
+                priceChangePercent6h: searchResult.priceChangePercent6h,
+                volume24h: searchResult.volume24h,
+                volume6h: searchResult.volume6h,
+                liquidity: searchResult.liquidity,
+                marketCap: searchResult.marketCap,
+                txns24h: searchResult.txns24h,
+                priceHistory: searchResult.priceHistory || []
+              },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json(analysisResult);
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] DEX analysis error', { error: error.message });
+            return c.json({ error: error.message, success: false }, 500);
           }
         },
       },
