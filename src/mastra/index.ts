@@ -816,7 +816,7 @@ export const mastra = new Mastra({
         },
       },
       {
-        path: "/styles.css",
+        path: "/mini-app/styles.css",
         method: "GET",
         createHandler: async () => async (c: any) => {
           const fs = await import('fs/promises');
@@ -827,7 +827,7 @@ export const mastra = new Mastra({
         },
       },
       {
-        path: "/app.js",
+        path: "/mini-app/app.js",
         method: "GET",
         createHandler: async () => async (c: any) => {
           const fs = await import('fs/promises');
