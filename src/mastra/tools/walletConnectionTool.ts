@@ -1,0 +1,165 @@
+import { createTool } from '@mastra/core/tools';
+import { z } from 'zod';
+
+export const walletConnectionTool = createTool({
+  id: 'wallet-connection',
+  description: `Connect or view the user's Phantom wallet address. This tool ONLY stores the PUBLIC wallet address - no private keys are ever stored. 
+  Use this when the user wants to:
+  - Link their Phantom wallet
+  - Check which wallet is connected
+  - Update their wallet address`,
+  inputSchema: z.object({
+    action: z.enum(['connect', 'view', 'disconnect']).describe('Action to perform'),
+    walletAddress: z
+      .string()
+      .optional()
+      .describe('Solana wallet address (required for connect action)'),
+    userId: z.string().describe('User ID from Telegram'),
+  }),
+  outputSchema: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    walletAddress: z.string().optional(),
+    balance: z.number().optional().describe('SOL balance'),
+  }),
+  execute: async ({ context, mastra, runtimeContext }) => {
+    const logger = mastra?.getLogger();
+    const { action, walletAddress } = context;
+    const userId = context.userId || (runtimeContext as any)?.resourceId || 'default-user';
+    const WALLET_KEY = `user_wallet_${userId}`;
+
+    logger?.info('🔗 [WalletConnection] Starting wallet operation', {
+      action,
+      userId,
+      hasAddress: !!walletAddress,
+    });
+
+    try {
+      const memory = mastra?.memory;
+      
+      // Get current wallet data from memory
+      let walletData: any = null;
+      try {
+        if (memory) {
+          const messages = await memory.getMessages({
+            resourceId: userId,
+            threadId: WALLET_KEY,
+          });
+          
+          if (messages && messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.content) {
+              walletData = JSON.parse(lastMessage.content as string);
+            }
+          }
+        }
+      } catch (e) {
+        logger?.warn('[WalletConnection] No existing wallet found');
+        walletData = null;
+      }
+
+      if (action === 'connect') {
+        if (!walletAddress) {
+          logger?.error('❌ [WalletConnection] No wallet address provided');
+          return {
+            success: false,
+            message: 'Please provide your Phantom wallet address',
+          };
+        }
+
+        // Validate Solana address format (base58, 32-44 chars)
+        if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletAddress)) {
+          logger?.error('❌ [WalletConnection] Invalid wallet address format');
+          return {
+            success: false,
+            message: 'Invalid Solana wallet address format',
+          };
+        }
+
+        // Store wallet address in PostgreSQL (PUBLIC address only, NO private keys)
+        const newWalletData = {
+          address: walletAddress,
+          connectedAt: new Date().toISOString(),
+        };
+
+        if (memory) {
+          await memory.saveMessages({
+            messages: [{
+              role: 'assistant',
+              content: JSON.stringify(newWalletData),
+            }],
+            resourceId: userId,
+            threadId: WALLET_KEY,
+          });
+        }
+
+        logger?.info('✅ [WalletConnection] Wallet connected successfully', {
+          userId,
+          address: walletAddress.slice(0, 8) + '...' + walletAddress.slice(-4),
+        });
+
+        return {
+          success: true,
+          message: `✅ Wallet connected!\n\n📍 Address: ${walletAddress}\n\n⚠️ Your private keys stay in Phantom - this bot only stores your public address for read-only operations.`,
+          walletAddress,
+        };
+      }
+
+      if (action === 'view') {
+        if (!walletData || !walletData.address) {
+          logger?.info('📭 [WalletConnection] No wallet connected');
+          return {
+            success: false,
+            message:
+              'No wallet connected. Use /connect to link your Phantom wallet.',
+          };
+        }
+
+        const address = walletData.address;
+        logger?.info('👁️ [WalletConnection] Viewing connected wallet', {
+          userId,
+          address: address.slice(0, 8) + '...' + address.slice(-4),
+        });
+
+        return {
+          success: true,
+          message: `📍 Connected Wallet:\n${address}\n\nConnected: ${new Date(walletData.connectedAt).toLocaleString()}`,
+          walletAddress: address,
+        };
+      }
+
+      if (action === 'disconnect') {
+        // Clear wallet data
+        if (memory) {
+          await memory.saveMessages({
+            messages: [{
+              role: 'assistant',
+              content: JSON.stringify(null),
+            }],
+            resourceId: userId,
+            threadId: WALLET_KEY,
+          });
+        }
+
+        logger?.info('🔌 [WalletConnection] Wallet disconnected', { userId });
+
+        return {
+          success: true,
+          message:
+            '✅ Wallet disconnected. Your data has been removed from the bot.',
+        };
+      }
+
+      return {
+        success: false,
+        message: 'Unknown action',
+      };
+    } catch (error) {
+      logger?.error('❌ [WalletConnection] Error:', error);
+      return {
+        success: false,
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  },
+});
