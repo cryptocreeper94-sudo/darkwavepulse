@@ -1,0 +1,116 @@
+Subject: URGENT FOLLOW-UP: $600 Overcharges Causing Financial Hardship - IMMEDIATE Response Required
+
+To: Replit Support Team
+
+Date: November 6, 2025
+Follow-up to: Initial complaint sent November 5, 2025
+Project: DarkWave-V2 Telegram Bot (@Darkwave_RSI_Bot)
+User ID: 7806554124
+
+CRITICAL UPDATE - FINANCIAL EMERGENCY:
+
+This is an URGENT follow-up to my complaint submitted yesterday regarding catastrophic billing overcharges. Since my initial email:
+
+NEW CHARGE TODAY: $55 (bringing total overcharges to approximately $600)
+
+FINANCIAL IMPACT:
+I am now unable to pay bills or purchase groceries due to these unexpected charges. This has created a genuine financial emergency. I NEED IMMEDIATE ACTION.
+
+UPDATED BILLING BREAKDOWN:
+- Expected monthly cost (as requested): $5-10/month
+- First charge: $165 (unwanted OpenAI/GPT-4o API calls)
+- Second charge: $150 (failed wallet feature testing)
+- Third charge: $200 (recent charges)
+- Fourth charge: $55 (received TODAY, November 6, 2025)
+- TOTAL CHARGES: ~$600
+- OVERCHARGE AMOUNT: ~$590 (59x my stated budget)
+
+REITERATION OF CRITICAL ISSUES:
+
+1. LOST CRYPTOCURRENCY FUNDS:
+   - Wallet Address: 6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1
+   - Status: I deposited REAL MONEY (SOL) to this address
+   - Problem: Private key was NEVER saved to database
+   - Evidence: Database query confirms ZERO wallet records exist
+   - Latest Query Result: SELECT * FROM mastra_messages WHERE thread_id LIKE '%wallet%' = 0 rows
+   - My funds are INACCESSIBLE
+
+2. MASTRA FRAMEWORK SILENT FAILURE:
+   - Code: memory.saveMessages() executed without errors
+   - Result: Data was NEVER persisted to PostgreSQL
+   - File: src/mastra/tools/walletGeneratorTool.ts (lines 84-98)
+   - This is a critical framework bug that caused complete data loss
+
+3. UNAUTHORIZED AI FEATURE CHARGES:
+   - I explicitly requested NO AI features to stay within $5-10/month budget
+   - Initial implementation violated this requirement
+   - Result: $165 in unwanted OpenAI charges
+
+IMMEDIATE ACTIONS REQUIRED (24-HOUR RESPONSE DEADLINE):
+
+1. EMERGENCY REFUND of all charges (~$600) - I cannot afford basic necessities
+2. SERVER LOG RECOVERY to retrieve lost private key from logs/memory dumps
+3. COMPENSATION for cryptocurrency funds stuck at wallet 6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1
+4. INVESTIGATION into Mastra memory.saveMessages() silent failure
+5. BILLING FREEZE on this account to prevent further charges
+6. DIRECT CONTACT from senior support (phone call or priority email)
+
+ADDITIONAL EVIDENCE SINCE YESTERDAY:
+- Confirmed mastra_messages table is completely empty (0 rows)
+- Confirmed no wallet records exist in any database table
+- Confirmed $55 new charge posted today (November 6, 2025)
+- Confirmed financial hardship preventing basic living expenses
+
+SEVERITY ESCALATION:
+This is no longer just a billing dispute. This is a FINANCIAL EMERGENCY involving:
+- 60x budget overrun ($600 vs $10 expected)
+- Lost deposited cryptocurrency (unrecoverable without private key)
+- Inability to pay for food and bills
+- Silent system failures with zero error messages
+- Continuing charges despite reported issues
+
+WHY THIS IS URGENT:
+- I cannot pay my bills
+- I cannot buy groceries
+- Charges are still accumulating (new $55 charge today)
+- My deposited cryptocurrency remains inaccessible
+- I have been patient through multiple failures, but this is now a crisis
+
+WHAT I NEED WITHIN 24 HOURS:
+1. Acknowledgment of this email
+2. Timeline for full refund processing
+3. Status update on private key recovery attempt
+4. Immediate freeze on all future charges
+5. Direct contact information for escalation
+
+EVIDENCE PACKAGE AVAILABLE:
+- Database queries showing zero wallet records
+- Source code showing wallet generation logic
+- Encryption code showing data should have been saved
+- Billing statements showing $600 in charges
+- Blockchain explorer showing deposited funds at wallet address
+- Screenshot of latest $55 charge
+
+I am requesting immediate escalation to senior management. This situation requires emergency intervention.
+
+Please respond within 24 hours with a clear action plan. I can be reached immediately via this email and am available for phone contact if needed.
+
+This is a critical situation requiring your highest priority attention.
+
+Urgently,
+[Your Name]
+User ID: 7806554124
+Telegram ID: 7806554124
+Project: DarkWave-V2 (@Darkwave_RSI_Bot)
+
+TECHNICAL DETAILS FOR ENGINEERING TEAM:
+- Database: PostgreSQL (Replit-provided)
+- Framework: Mastra (@mastra/core, @mastra/memory)
+- Failed Component: PostgresStore in @mastra/memory
+- Wallet Address: 6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1
+- Blockchain: Solana
+- Explorer: https://explorer.solana.com/address/6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1
+- Database Evidence: mastra_messages table empty despite code execution
+- Log Search Needed: Server logs from wallet creation timestamp
+
+REQUEST FOR IMMEDIATE CALLBACK OR PRIORITY EMAIL RESPONSE
