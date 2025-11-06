@@ -224,12 +224,30 @@ const processMessage = createStep({
           'JUNO': 'juno-network', 'CRV': 'curve-dao-token'
         };
 
+        // Kraken name mapping for scanner
+        const krakenMap: Record<string, string> = {
+          'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binance-coin',
+          'XRP': 'xrp', 'ADA': 'cardano', 'DOGE': 'dogecoin', 'AVAX': 'avalanche',
+          'LINK': 'chainlink', 'MATIC': 'polygon', 'DOT': 'polkadot', 'UNI': 'uniswap',
+          'ATOM': 'cosmos', 'LTC': 'litecoin', 'BCH': 'bitcoin-cash', 'NEAR': 'near-protocol',
+          'APT': 'aptos', 'ARB': 'arbitrum', 'OP': 'optimism', 'SUI': 'sui',
+          'FIL': 'filecoin', 'ICP': 'internet-computer', 'VET': 'vechain', 'ALGO': 'algorand',
+          'SAND': 'the-sandbox', 'MANA': 'decentraland', 'AXS': 'axie-infinity', 'FTM': 'fantom',
+          'AAVE': 'aave', 'GRT': 'the-graph', 'SNX': 'synthetix', 'AR': 'arweave',
+          'HBAR': 'hedera', 'XLM': 'stellar-lumens', 'TRX': 'tron', 'ETC': 'ethereum-classic',
+          'XMR': 'monero', 'TON': 'toncoin', 'SHIB': 'shiba-inu', 'PEPE': 'pepe',
+          'WIF': 'dogwifhat', 'BONK': 'bonk', 'FLOKI': 'floki', 'INJ': 'injective',
+          'TIA': 'celestia', 'SEI': 'sei', 'RUNE': 'thorchain', 'OSMO': 'osmosis',
+          'JUNO': 'juno', 'CRV': 'curve-dao-token'
+        };
+
         let response = "🔍 *Crypto Market Scan*\n\n";
         result.strongBuys.slice(0, 10).forEach((rec: any) => {
           let url: string;
           if (linkPref === 'kraken') {
-            // Kraken format: https://www.kraken.com/prices/[ticker]-price-chart/[symbol]-usd
-            url = `https://www.kraken.com/prices/${rec.ticker.toLowerCase()}-price-chart/${rec.ticker.toLowerCase()}-usd`;
+            // Kraken format: /prices/{crypto-name}
+            const krakenName = krakenMap[rec.ticker] || rec.ticker.toLowerCase();
+            url = `https://www.kraken.com/prices/${krakenName}`;
           } else {
             // Default: CoinGecko
             const coinGeckoId = coinGeckoMap[rec.ticker] || rec.ticker.toLowerCase();
@@ -313,6 +331,14 @@ const processMessage = createStep({
       if (ticker.length >= 2 && ticker.length <= 6) {
         logger?.info('📊 [DarkWaveWorkflow] Analyzing ticker', { ticker });
         
+        // Get user's link preference
+        const prefResult = await preferencesTool.execute({
+          context: { action: 'get', userId },
+          mastra,
+          runtimeContext: undefined as any
+        });
+        const linkPref = prefResult.linkPreference;
+
         // Try market data first, fallback to dexscreener for unknown tickers
         let marketData;
         let isDexPair = false;
@@ -396,7 +422,64 @@ const processMessage = createStep({
         if (analysis.recommendation === "BUY" || analysis.recommendation === "STRONG_BUY") emoji = "🟢";
         if (analysis.recommendation === "SELL" || analysis.recommendation === "STRONG_SELL") emoji = "🔴";
 
-        const response = `${emoji} *${ticker} Analysis*\n\n` +
+        // Generate hyperlink based on preference and asset type
+        const coinGeckoMap: Record<string, string> = {
+          'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binancecoin', 
+          'XRP': 'ripple', 'ADA': 'cardano', 'DOGE': 'dogecoin', 'AVAX': 'avalanche-2', 
+          'LINK': 'chainlink', 'MATIC': 'matic-network', 'DOT': 'polkadot', 'UNI': 'uniswap',
+          'ATOM': 'cosmos', 'LTC': 'litecoin', 'BCH': 'bitcoin-cash', 'NEAR': 'near',
+          'APT': 'aptos', 'ARB': 'arbitrum', 'OP': 'optimism', 'SUI': 'sui',
+          'FIL': 'filecoin', 'ICP': 'internet-computer', 'VET': 'vechain', 'ALGO': 'algorand',
+          'SAND': 'the-sandbox', 'MANA': 'decentraland', 'AXS': 'axie-infinity', 'FTM': 'fantom',
+          'AAVE': 'aave', 'GRT': 'the-graph', 'SNX': 'havven', 'AR': 'arweave',
+          'HBAR': 'hedera-hashgraph', 'XLM': 'stellar', 'TRX': 'tron', 'ETC': 'ethereum-classic',
+          'XMR': 'monero', 'TON': 'the-open-network', 'SHIB': 'shiba-inu', 'PEPE': 'pepe',
+          'WIF': 'dogwifcoin', 'BONK': 'bonk', 'FLOKI': 'floki', 'INJ': 'injective-protocol',
+          'TIA': 'celestia', 'SEI': 'sei-network', 'RUNE': 'thorchain', 'OSMO': 'osmosis',
+          'JUNO': 'juno-network', 'CRV': 'curve-dao-token'
+        };
+
+        // Kraken uses crypto names, not tickers
+        const krakenMap: Record<string, string> = {
+          'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binance-coin',
+          'XRP': 'xrp', 'ADA': 'cardano', 'DOGE': 'dogecoin', 'AVAX': 'avalanche',
+          'LINK': 'chainlink', 'MATIC': 'polygon', 'DOT': 'polkadot', 'UNI': 'uniswap',
+          'ATOM': 'cosmos', 'LTC': 'litecoin', 'BCH': 'bitcoin-cash', 'NEAR': 'near-protocol',
+          'APT': 'aptos', 'ARB': 'arbitrum', 'OP': 'optimism', 'SUI': 'sui',
+          'FIL': 'filecoin', 'ICP': 'internet-computer', 'VET': 'vechain', 'ALGO': 'algorand',
+          'SAND': 'the-sandbox', 'MANA': 'decentraland', 'AXS': 'axie-infinity', 'FTM': 'fantom',
+          'AAVE': 'aave', 'GRT': 'the-graph', 'SNX': 'synthetix', 'AR': 'arweave',
+          'HBAR': 'hedera', 'XLM': 'stellar-lumens', 'TRX': 'tron', 'ETC': 'ethereum-classic',
+          'XMR': 'monero', 'TON': 'toncoin', 'SHIB': 'shiba-inu', 'PEPE': 'pepe',
+          'WIF': 'dogwifhat', 'BONK': 'bonk', 'FLOKI': 'floki', 'INJ': 'injective',
+          'TIA': 'celestia', 'SEI': 'sei', 'RUNE': 'thorchain', 'OSMO': 'osmosis',
+          'JUNO': 'juno', 'CRV': 'curve-dao-token'
+        };
+
+        let tickerUrl: string;
+        const isCrypto = marketData.assetType === 'crypto';
+
+        if (linkPref === 'kraken') {
+          // Kraken format: /prices/{crypto-name}
+          if (isCrypto) {
+            const krakenName = krakenMap[ticker] || ticker.toLowerCase();
+            tickerUrl = `https://www.kraken.com/prices/${krakenName}`;
+          } else {
+            // For stocks, use Yahoo Finance even in Kraken mode
+            tickerUrl = `https://finance.yahoo.com/quote/${ticker}`;
+          }
+        } else {
+          // DEFAULT mode
+          if (isCrypto) {
+            const coinGeckoId = coinGeckoMap[ticker] || ticker.toLowerCase();
+            tickerUrl = `https://www.coingecko.com/en/coins/${coinGeckoId}`;
+          } else {
+            // Stock - Yahoo Finance
+            tickerUrl = `https://finance.yahoo.com/quote/${ticker}`;
+          }
+        }
+
+        const response = `${emoji} *[${ticker}](${tickerUrl}) Analysis*\n\n` +
           `💰 *Current Price:* $${analysis.currentPrice?.toFixed(4)}\n` +
           `📈 *24h Change:* ${analysis.priceChange24h >= 0 ? '+' : ''}${analysis.priceChange24h?.toFixed(2)}%\n\n` +
           `${emoji} *${analysis.recommendation}*\n` +
