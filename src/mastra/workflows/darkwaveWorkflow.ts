@@ -3,6 +3,7 @@ import { z } from "zod";
 import { marketDataTool } from "../tools/marketDataTool";
 import { technicalAnalysisTool } from "../tools/technicalAnalysisTool";
 import { scannerTool } from "../tools/scannerTool";
+import { holdingsTool } from "../tools/holdingsTool";
 
 /**
  * DarkWave-V2 Workflow - NO AI, NO WALLET (disabled to prevent issues)
@@ -40,6 +41,11 @@ const processMessage = createStep({
             "• Get full technical analysis with RSI, MACD, EMAs, Bollinger Bands\n\n" +
             "*🔍 Market Scan:*\n" +
             "• SCAN or CRYPTO - Top 10 cryptos with buy signals\n\n" +
+            "*📋 Watchlist (Holdings):*\n" +
+            "• ADD [ticker] or HOLD [ticker] - Add to watchlist\n" +
+            "• REMOVE [ticker] - Remove from watchlist\n" +
+            "• LIST or HOLDINGS - View your watchlist\n" +
+            "• CLEAR - Clear entire watchlist\n\n" +
             "*⚠️ Note:*\n" +
             "• Wallet features are permanently disabled\n" +
             "• All analysis uses FREE APIs only",
@@ -51,6 +57,108 @@ const processMessage = createStep({
       if (msg === "WALLET" || msg === "BALANCE" || msg.startsWith("WITHDRAW")) {
         return {
           response: "⚠️ *Wallet feature disabled permanently*\n\nThis feature has a technical bug that created multiple wallets and charged you over $400. I've stopped all servers to prevent further charges.\n\n*Your existing wallet with funds:*\n6vexNEjjuygFqvQehKyDBNCZ4WRRo7G5BmoZmG8x3bR1\n\n*Next steps:*\n1. Contact Replit support for a refund\n2. Use your Phantom wallet directly\n3. Technical analysis (BTC, ETH, SCAN) still works",
+          success: true
+        };
+      }
+
+      // HOLDINGS - ADD ticker to watchlist
+      if (msg.startsWith("ADD ") || msg.startsWith("HOLD ")) {
+        const ticker = msg.replace(/^(ADD|HOLD)\s+/, '').trim();
+        if (ticker) {
+          const result = await holdingsTool.execute({
+            context: { action: 'add', ticker, userId },
+            mastra,
+            runtimeContext: undefined as any
+          });
+          return {
+            response: `✅ ${result.message}\n\n*Your watchlist (${result.holdings.length}):*\n${result.holdings.join(', ')}`,
+            success: true
+          };
+        }
+      }
+
+      // HOLDINGS - REMOVE ticker from watchlist
+      if (msg.startsWith("REMOVE ")) {
+        const ticker = msg.replace(/^REMOVE\s+/, '').trim();
+        if (ticker) {
+          const result = await holdingsTool.execute({
+            context: { action: 'remove', ticker, userId },
+            mastra,
+            runtimeContext: undefined as any
+          });
+          return {
+            response: `✅ ${result.message}\n\n*Your watchlist (${result.holdings.length}):*\n${result.holdings.length > 0 ? result.holdings.join(', ') : 'Empty'}`,
+            success: true
+          };
+        }
+      }
+
+      // HOLDINGS - LIST watchlist with full analysis
+      if (msg === "LIST" || msg === "HOLDINGS" || msg === "WATCHLIST") {
+        const result = await holdingsTool.execute({
+          context: { action: 'list', userId },
+          mastra,
+          runtimeContext: undefined as any
+        });
+
+        if (result.holdings.length === 0) {
+          return {
+            response: "📋 *Your watchlist is empty*\n\nAdd tickers with:\n• ADD BTC\n• HOLD ETH",
+            success: true
+          };
+        }
+
+        // Analyze each holding
+        let response = `📋 *Your Watchlist (${result.holdings.length} tickers)*\n\n`;
+        
+        for (const ticker of result.holdings.slice(0, 5)) {
+          try {
+            const marketData = await marketDataTool.execute({
+              context: { ticker, days: 90 },
+              mastra,
+              runtimeContext: undefined as any
+            });
+
+            const analysis = await technicalAnalysisTool.execute({
+              context: {
+                ticker: marketData.ticker,
+                currentPrice: marketData.currentPrice,
+                priceChange24h: marketData.priceChange24h,
+                priceChangePercent24h: marketData.priceChangePercent24h,
+                volume24h: marketData.volume24h,
+                prices: marketData.prices,
+              },
+              mastra,
+              runtimeContext: undefined as any
+            });
+
+            let emoji = "🟡";
+            if (analysis.recommendation === "BUY" || analysis.recommendation === "STRONG_BUY") emoji = "🟢";
+            if (analysis.recommendation === "SELL" || analysis.recommendation === "STRONG_SELL") emoji = "🔴";
+
+            response += `${emoji} *${ticker}* - $${analysis.currentPrice?.toFixed(4)} (${analysis.priceChange24h >= 0 ? '+' : ''}${analysis.priceChange24h?.toFixed(2)}%)\n`;
+            response += `   ${analysis.recommendation} | RSI: ${analysis.rsi?.toFixed(1)}\n\n`;
+          } catch (error) {
+            response += `⚠️ *${ticker}* - Error fetching data\n\n`;
+          }
+        }
+
+        if (result.holdings.length > 5) {
+          response += `\n_Showing 5 of ${result.holdings.length} holdings_`;
+        }
+
+        return { response, success: true };
+      }
+
+      // HOLDINGS - CLEAR watchlist
+      if (msg === "CLEAR" || msg === "CLEAR HOLDINGS") {
+        const result = await holdingsTool.execute({
+          context: { action: 'clear', userId },
+          mastra,
+          runtimeContext: undefined as any
+        });
+        return {
+          response: `✅ ${result.message}`,
           success: true
         };
       }
