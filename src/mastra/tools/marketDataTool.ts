@@ -63,30 +63,26 @@ export const marketDataTool = createTool({
 
     logger?.info('📝 [MarketDataTool] Initial detection', { ticker, assetType });
 
-    // Try primary detection with fallback (but not for rate limits on explicit crypto scans)
+    // Try primary detection with fallback
     try {
       if (assetType === 'crypto') {
+        // For crypto, try Yahoo Finance first (works in production with -USD suffix)
+        // Then fall back to CoinCap API
         try {
-          return await fetchCryptoDataWithRetry(ticker, days, logger);
-        } catch (cryptoError: any) {
-          // If it's a rate limit/auth error (429 or 401) and we explicitly want crypto, don't fall back
-          const isRateLimit = cryptoError.message?.includes('429') || 
-                             cryptoError.message?.includes('401') ||
-                             cryptoError.message?.includes('rate limit');
-          const isExplicitCrypto = context.type === 'crypto';
-          
-          if (isRateLimit && isExplicitCrypto) {
-            logger?.error('❌ [MarketDataTool] Rate limited/auth error on crypto, skipping stock fallback', {
+          logger?.info('📊 [MarketDataTool] Trying Yahoo Finance for crypto', { ticker });
+          return await fetchStockData(`${ticker}-USD`, days, logger);
+        } catch (yahooError: any) {
+          logger?.warn('⚠️ [MarketDataTool] Yahoo Finance failed, trying CoinCap', { 
+            error: yahooError.message 
+          });
+          try {
+            return await fetchCryptoDataWithRetry(ticker, days, logger);
+          } catch (cryptoError: any) {
+            logger?.error('❌ [MarketDataTool] Both crypto attempts failed', {
               error: cryptoError.message
             });
-            throw cryptoError; // Don't fall back to stock for known cryptos
+            throw cryptoError;
           }
-          
-          logger?.warn('⚠️ [MarketDataTool] Crypto fetch failed, trying stock', { 
-            error: cryptoError.message 
-          });
-          // Fallback to stock if crypto fails (but not for rate limits)
-          return await fetchStockData(ticker, days, logger);
         }
       } else {
         try {
@@ -96,11 +92,15 @@ export const marketDataTool = createTool({
             error: stockError.message 
           });
           // Fallback to crypto if stock fails
-          return await fetchCryptoDataWithRetry(ticker, days, logger);
+          try {
+            return await fetchStockData(`${ticker}-USD`, days, logger);
+          } catch (yahooError: any) {
+            return await fetchCryptoDataWithRetry(ticker, days, logger);
+          }
         }
       }
     } catch (error: any) {
-      logger?.error('❌ [MarketDataTool] Both fetch attempts failed', { error: error.message });
+      logger?.error('❌ [MarketDataTool] All fetch attempts failed', { error: error.message });
       throw new Error(`Failed to fetch market data for ${ticker}: Not found in crypto or stock markets`);
     }
   },
