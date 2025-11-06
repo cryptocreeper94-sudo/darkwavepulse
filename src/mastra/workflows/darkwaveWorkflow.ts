@@ -92,17 +92,27 @@ const processMessage = createStep({
         if (analysis.recommendation === "SELL" || analysis.recommendation === "STRONG_SELL") emoji = "🔴";
 
         const response = `${emoji} **${ticker} Analysis**\n\n` +
-          `💰 **Price:** $${analysis.currentPrice?.toFixed(4)}\n` +
+          `💰 **Current Price:** $${analysis.currentPrice?.toFixed(4)}\n` +
           `📈 **24h Change:** ${analysis.priceChange24h >= 0 ? '+' : ''}${analysis.priceChange24h?.toFixed(2)}%\n\n` +
-          `**${analysis.recommendation}**\n\n` +
-          `📊 **Indicators:**\n` +
-          `• **RSI:** ${analysis.rsi?.toFixed(1)}\n` +
-          `• **MACD:** ${analysis.macd?.value.toFixed(2)} | Signal: ${analysis.macd?.signal.toFixed(2)}\n` +
+          `${emoji} **${analysis.recommendation}**\n\n` +
+          `📊 **TECHNICAL INDICATORS:**\n` +
+          `• **RSI (14):** ${analysis.rsi?.toFixed(1)}\n` +
+          `• **MACD:** ${analysis.macd?.value.toFixed(2)} | **Signal:** ${analysis.macd?.signal.toFixed(2)} | **Histogram:** ${analysis.macd?.histogram.toFixed(2)}\n` +
+          `• **SMA 50:** $${analysis.sma50?.toFixed(4)}\n` +
+          `• **SMA 200:** $${analysis.sma200?.toFixed(4)}\n` +
           `• **EMA 50:** $${analysis.ema50?.toFixed(4)}\n` +
+          `• **EMA 200:** $${analysis.ema200?.toFixed(4)}\n` +
+          `• **Bollinger Bands:**\n` +
+          `  **Upper:** $${analysis.bollingerBands?.upper.toFixed(4)}\n` +
+          `  **Middle:** $${analysis.bollingerBands?.middle.toFixed(4)}\n` +
+          `  **Lower:** $${analysis.bollingerBands?.lower.toFixed(4)}\n` +
+          `  **Bandwidth:** ${analysis.bollingerBands?.bandwidth.toFixed(2)}%\n` +
           `• **Support:** $${analysis.support?.toFixed(4)}\n` +
-          `• **Resistance:** $${analysis.resistance?.toFixed(4)}\n\n` +
-          `⚠️ **Signals (${analysis.signals?.length || 0}):**\n` +
-          (analysis.signals?.slice(0, 3).map(s => `• ${s}`).join('\n') || 'None');
+          `• **Resistance:** $${analysis.resistance?.toFixed(4)}\n` +
+          `• **Volatility:** ${analysis.volatility?.toFixed(1)}%\n` +
+          `• **Volume:** $${(analysis.volume24h / 1000000).toFixed(2)}M\n\n` +
+          `⚠️ **SIGNALS (${analysis.signals?.length || 0}):**\n` +
+          (analysis.signals?.map(s => `• ${s}`).join('\n') || '• None');
 
         return { response, success: true };
       }
