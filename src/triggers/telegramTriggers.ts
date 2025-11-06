@@ -86,6 +86,12 @@ export function registerTelegramTrigger({
               }
 
               if (responseText && chatId) {
+                logger?.info("📤 [Telegram] Preparing to send", { 
+                  chatId, 
+                  textPreview: responseText.substring(0, 100),
+                  fullLength: responseText.length 
+                });
+                
                 const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
                 const telegramResponse = await fetch(telegramApiUrl, {
                   method: "POST",
@@ -98,10 +104,18 @@ export function registerTelegramTrigger({
                 });
                 
                 const responseData = await telegramResponse.json();
-                logger?.info("📨 [Telegram] Message sent", { ok: responseData.ok, statusCode: telegramResponse.status });
+                logger?.info("📨 [Telegram] Message sent", { 
+                  ok: responseData.ok, 
+                  statusCode: telegramResponse.status,
+                  chatId 
+                });
                 
                 if (!responseData.ok) {
-                  logger?.error("❌ [Telegram] Failed to send message", { error: responseData.description });
+                  logger?.error("❌ [Telegram] Failed to send message", { 
+                    error: responseData.description,
+                    chatId,
+                    textPreview: responseText.substring(0, 200)
+                  });
                 }
               }
 
