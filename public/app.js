@@ -473,6 +473,13 @@ async function loadChart(ticker) {
     
     if (data.success && data.chartUrl && chartContainer) {
       chartContainer.innerHTML = `<img src="${data.chartUrl}" style="width: 100%; border-radius: 8px;" alt="Price Chart" />`;
+      
+      // Add click handler to open full-screen modal
+      chartContainer.onclick = () => openChartModal(data.chartUrl, ticker);
+      
+      // Store chart URL for modal
+      state.currentChartUrl = data.chartUrl;
+      state.currentChartTicker = ticker;
     } else {
       chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">Chart unavailable</div>';
     }
@@ -480,6 +487,63 @@ async function loadChart(ticker) {
     console.error('Chart error:', error);
   }
 }
+
+// Chart Modal Functions
+function openChartModal(chartUrl, ticker) {
+  const modal = document.getElementById('chartModal');
+  const modalImage = document.getElementById('chartModalImage');
+  const modalTitle = document.getElementById('chartModalTitle');
+  
+  modalImage.src = chartUrl;
+  modalTitle.textContent = `${ticker.toUpperCase()} - Price Chart`;
+  modal.classList.add('active');
+  
+  if (tg) {
+    tg.HapticFeedback?.impactOccurred('medium');
+  }
+  
+  // Prevent background scrolling
+  document.body.style.overflow = 'hidden';
+}
+
+function closeChartModal() {
+  const modal = document.getElementById('chartModal');
+  modal.classList.remove('active');
+  
+  // Re-enable background scrolling
+  document.body.style.overflow = '';
+  
+  if (tg) {
+    tg.HapticFeedback?.impactOccurred('light');
+  }
+}
+
+// Modal Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const closeBtn = document.getElementById('closeChartModal');
+  const modal = document.getElementById('chartModal');
+  const modalContent = document.getElementById('chartModalImage');
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeChartModal);
+  }
+  
+  if (modal) {
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target === modalContent) {
+        closeChartModal();
+      }
+    });
+  }
+  
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeChartModal();
+    }
+  });
+});
 
 function formatVolume(volume) {
   if (!volume && volume !== 0) return 'N/A';
