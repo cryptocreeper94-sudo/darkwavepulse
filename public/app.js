@@ -2662,6 +2662,7 @@ async function fetchTokenData(tokenAddress) {
       address: tokenAddress,
       name: pair.baseToken?.name || 'Unknown',
       symbol: pair.baseToken?.symbol || '???',
+      logo: pair.info?.imageUrl || pair.baseToken?.logo || null,
       price: parseFloat(pair.priceUsd || 0),
       priceChange24h: parseFloat(pair.priceChange?.h24 || 0),
       volume24h: parseFloat(pair.volume?.h24 || 0),
@@ -2760,7 +2761,12 @@ async function renderProjectsTab() {
     return `
       <div class="project-card">
         <div class="project-header">
-          <div class="project-title">
+          ${data.logo ? `
+            <div class="project-logo" style="width: 48px; height: 48px; margin-right: 12px; flex-shrink: 0;">
+              <img src="${data.logo}" alt="${data.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'">
+            </div>
+          ` : ''}
+          <div class="project-title" style="flex: 1;">
             <h3>
               ${data.name}
               <span class="project-platform-badge ${platformClass}">${token.platform || 'pumpfun'}</span>
@@ -3201,3 +3207,94 @@ async function submitFeedback(event, type) {
     showToast('❌ Error submitting feedback');
   }
 }
+
+// ===== EMAIL MODAL FUNCTIONS =====
+function showEmailModal() {
+  const modal = document.getElementById('emailModal');
+  const hasSubmittedEmail = localStorage.getItem('darkwave_email_submitted');
+  
+  // Show modal on first visit only
+  if (!hasSubmittedEmail && modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+async function submitEmail() {
+  const emailInput = document.getElementById('emailInput');
+  const email = emailInput?.value?.trim();
+  
+  if (!email) {
+    showToast('⚠️ Please enter an email address');
+    return;
+  }
+  
+  // Basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showToast('⚠️ Please enter a valid email address');
+    return;
+  }
+  
+  try {
+    const sessionToken = localStorage.getItem('sessionToken');
+    const response = await fetch(`${API_BASE}/api/register-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        email, 
+        sessionToken 
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      // Show success message
+      document.getElementById('emailFormContainer').style.display = 'none';
+      document.getElementById('emailSuccess').style.display = 'block';
+      
+      // Mark as submitted
+      localStorage.setItem('darkwave_email_submitted', 'true');
+      localStorage.setItem('darkwave_user_email', email);
+      
+      // Update subscription status
+      state.subscription.plan = 'premium';
+      state.subscription.status = 'active';
+      
+      // Hide upgrade banner
+      const upgradeBanner = document.getElementById('upgradeBanner');
+      if (upgradeBanner) upgradeBanner.style.display = 'none';
+      
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    } else {
+      showToast('❌ ' + (result.message || 'Registration failed'));
+    }
+  } catch (error) {
+    console.error('Email registration error:', error);
+    showToast('❌ Error registering email');
+  }
+}
+
+function skipEmail() {
+  closeEmailModal();
+  localStorage.setItem('darkwave_email_skipped', 'true');
+  showToast('💡 You can register your email anytime in Settings');
+}
+
+function closeEmailModal() {
+  const modal = document.getElementById('emailModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Show email modal on page load (after access code verified)
+document.addEventListener('DOMContentLoaded', () => {
+  const accessGranted = localStorage.getItem('accessGranted');
+  if (accessGranted === 'true') {
+    // Wait 2 seconds after page load to show email modal
+    setTimeout(showEmailModal, 2000);
+  }
+});

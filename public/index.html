@@ -147,6 +147,28 @@
           <div id="featuredTokensCarousel" class="featured-carousel"></div>
         </div>
 
+        <!-- Submit Your Token Banner -->
+        <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.15)); border: 2px solid #4ADE80; border-radius: 12px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 10px;">🚀</div>
+          <h3 style="margin: 0 0 8px 0; color: #4ADE80; font-size: 1.2rem;">Got a Token Worth Featuring?</h3>
+          <p style="margin: 0 0 15px 0; color: #ccc; font-size: 0.9rem;">Submit your project for potential listing and promotion!</p>
+          <button onclick="switchTab('feedback')" style="
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4ADE80, #22C55E);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+          ">
+            📝 Submit Your Token
+          </button>
+          <p style="margin: 10px 0 0 0; font-size: 0.75rem; opacity: 0.6;">We review all submissions based on contract security & legitimacy</p>
+        </div>
+
         <!-- Blockchain Filter (for crypto categories) -->
         <div id="blockchainFilter" class="blockchain-filter">
           <div class="filter-label">Chain:</div>
@@ -590,6 +612,102 @@
       <div id="tokenOfDayContent">
         <!-- Populated by JavaScript -->
       </div>
+    </div>
+  </div>
+
+  <!-- Email Registration Modal -->
+  <div id="emailModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px; border-radius: 20px; max-width: 450px; width: 90%; border: 2px solid rgba(255, 215, 0, 0.3); box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2);">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 48px; margin-bottom: 12px;">📧</div>
+        <h2 style="margin: 0 0 12px 0; color: #FFD700; font-size: 1.6rem;">Welcome to DarkWave!</h2>
+        <p style="color: #ccc; font-size: 0.95rem; margin: 0;">Get unlimited access by registering your email</p>
+      </div>
+
+      <div id="emailFormContainer">
+        <input 
+          type="email" 
+          id="emailInput" 
+          placeholder="Enter your email address"
+          style="
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+          "
+          onkeypress="if(event.key==='Enter') submitEmail()"
+        />
+        
+        <button 
+          onclick="submitEmail()" 
+          style="
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+          "
+          onmouseover="this.style.transform='scale(1.02)'"
+          onmouseout="this.style.transform='scale(1)'"
+        >
+          🚀 Get Unlimited Access
+        </button>
+
+        <button 
+          onclick="skipEmail()" 
+          style="
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #999;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+          "
+        >
+          Skip for now (limited features)
+        </button>
+      </div>
+
+      <div id="emailSuccess" style="display: none; text-align: center;">
+        <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
+        <h3 style="color: #4ADE80; margin: 0 0 12px 0;">You're All Set!</h3>
+        <p style="color: #ccc; margin-bottom: 20px;">You now have unlimited access to all premium features!</p>
+        <button 
+          onclick="closeEmailModal()" 
+          style="
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4ADE80, #22C55E);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+          "
+        >
+          Start Exploring 🎉
+        </button>
+      </div>
+
+      <p style="text-align: center; color: #666; font-size: 0.8rem; margin-top: 16px;">
+        🔒 Your email is secure and won't be shared
+      </p>
     </div>
   </div>
   </div>
