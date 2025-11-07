@@ -5,9 +5,7 @@ import { db } from "../../db/client.js";
 import { subscriptions, userUsage } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-11-20.acacia",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 export const subscriptionTool = createTool({
   id: "subscription-management",
@@ -138,8 +136,8 @@ export const subscriptionTool = createTool({
 
             await db.insert(userUsage).values({
               userId: userId,
-              searchCount: "0",
-              alertCount: "0",
+              searchCount: 0,
+              alertCount: 0,
             });
 
             return {
