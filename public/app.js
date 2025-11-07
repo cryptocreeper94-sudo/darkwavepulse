@@ -1445,10 +1445,19 @@ function getAuthHeaders() {
 
 async function verifyAccessCode(code) {
   try {
+    // Get or generate persistent userId
+    let userId = localStorage.getItem('darkwave_userId');
+    if (!userId) {
+      // Generate a unique ID for this browser/user
+      userId = `user_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
+      localStorage.setItem('darkwave_userId', userId);
+    }
+    state.userId = userId;
+    
     const response = await fetch(`${API_BASE}/api/verify-access`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
+      body: JSON.stringify({ code, userId })
     });
     
     const data = await response.json();
