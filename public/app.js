@@ -143,12 +143,12 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
-  // Token #11: (Not on Dexscreener yet - please provide name/symbol)
+  // Token #11: Crypto Cat Halloween 2025
   { 
     address: 'HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump',
-    name: 'Token Name TBD',
-    symbol: '$TBD',
-    description: 'Token description coming soon',
+    name: 'Crypto Cat Halloween 2025',
+    symbol: '$GRIMCAT',
+    description: 'Spooky crypto cat for Halloween',
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
