@@ -30,9 +30,21 @@ const FEATURED_TOKENS = [
     symbol: '$JH-25',
     description: 'A movement for global justice and humanitarian causes',
     platform: 'pumpfun',
-    twitter: '',  // Add your Twitter link when you send it
-    telegram: '', // Add your Telegram link when you send it
-    featured: true // Shows in banner, popup, and Projects tab
+    twitter: '',
+    telegram: '',
+    featured: true
+  },
+  
+  // Token #2: United
+  { 
+    address: 'Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump',
+    name: 'United',
+    symbol: '$LOVE',
+    description: 'United in love and community',
+    platform: 'pumpfun',
+    twitter: '',
+    telegram: '',
+    featured: true
   },
   
   // Add more tokens below as you send them:
