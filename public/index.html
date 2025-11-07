@@ -64,6 +64,10 @@
         <span class="tab-icon">💰</span>
         <span class="tab-label">Wallet</span>
       </button>
+      <button class="tab-btn" data-tab="feedback">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">Feedback</span>
+      </button>
       <button class="tab-btn" data-tab="settings">
         <span class="tab-icon">⚙️</span>
         <span class="tab-label">Settings</span>
@@ -433,6 +437,132 @@
             <p>Loading projects...</p>
           </div>
         </div>
+      </div>
+
+      <!-- Feedback Tab -->
+      <div id="feedback" class="tab-pane">
+        <div class="section-header">
+          <h2>💬 Feedback & Submissions</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Help us improve or submit your token for review</p>
+        </div>
+
+        <!-- General Suggestions Section -->
+        <div style="background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(168, 85, 247, 0.3);">
+          <h3 style="margin: 0 0 12px 0; color: #A855F7; font-size: 1.1rem;">💡 General Suggestions</h3>
+          <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Share your ideas to make DarkWave-V2 better!</p>
+          
+          <form id="suggestionForm" onsubmit="submitFeedback(event, 'suggestion')">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Your Suggestion</label>
+              <textarea 
+                id="suggestionText"
+                required
+                rows="4"
+                placeholder="Tell us what features or improvements you'd like to see..."
+                style="width: 100%; padding: 12px; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem; font-family: inherit; resize: vertical;"
+              ></textarea>
+            </div>
+            <button 
+              type="submit"
+              class="action-btn"
+              style="width: 100%; padding: 14px; background: linear-gradient(135deg, #A855F7, #8B5CF6); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;"
+            >
+              📤 Send Suggestion
+            </button>
+          </form>
+        </div>
+
+        <!-- Token Submission Section -->
+        <div style="background: var(--bg-card); border-radius: 12px; padding: 20px; border: 1px solid rgba(74, 222, 128, 0.3);">
+          <h3 style="margin: 0 0 12px 0; color: #4ADE80; font-size: 1.1rem;">🚀 Submit Your Token</h3>
+          <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Request your token to be listed and analyzed on DarkWave-V2</p>
+          
+          <form id="tokenSubmissionForm" onsubmit="submitFeedback(event, 'token')">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Token Name</label>
+              <input 
+                type="text"
+                id="tokenName"
+                required
+                placeholder="e.g., DarkWave Token"
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
+              />
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Token Symbol/Ticker</label>
+              <input 
+                type="text"
+                id="tokenSymbol"
+                required
+                placeholder="e.g., $DWV"
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
+              />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Contract Address</label>
+              <input 
+                type="text"
+                id="tokenContract"
+                required
+                placeholder="e.g., 0x... or Solana address"
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
+              />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Blockchain/Network</label>
+              <select 
+                id="tokenChain"
+                required
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
+              >
+                <option value="">Select blockchain...</option>
+                <option value="Solana">Solana</option>
+                <option value="Ethereum">Ethereum</option>
+                <option value="BSC">Binance Smart Chain</option>
+                <option value="Polygon">Polygon</option>
+                <option value="Arbitrum">Arbitrum</option>
+                <option value="Base">Base</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Why should we list this token?</label>
+              <textarea 
+                id="tokenDescription"
+                required
+                rows="4"
+                placeholder="Tell us about your project, utility, community, etc..."
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem; font-family: inherit; resize: vertical;"
+              ></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Contact (optional)</label>
+              <input 
+                type="text"
+                id="tokenContact"
+                placeholder="Twitter, Telegram, Email..."
+                style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
+              />
+            </div>
+            
+            <button 
+              type="submit"
+              class="action-btn"
+              style="width: 100%; padding: 14px; background: linear-gradient(135deg, #4ADE80, #22C55E); border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer;"
+            >
+              🚀 Submit Token for Review
+            </button>
+          </form>
+        </div>
+
+        <p style="text-align: center; color: #666; font-size: 0.85rem; margin-top: 20px;">
+          📧 All submissions are sent to the admin team for review
+        </p>
       </div>
     </div>
   </main>

@@ -1818,6 +1818,103 @@ export const mastra = new Mastra({
           }
         },
       },
+      // Feedback & Token Submission endpoint
+      {
+        path: "/api/submit-feedback",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            // Check access session
+            const { checkAccessSession } = await import('./middleware/accessControl.js');
+            const sessionCheck = await checkAccessSession(c);
+            if (!sessionCheck.valid) {
+              return c.json({ error: 'Unauthorized - Invalid or expired session' }, 401);
+            }
+            
+            const body = await c.req.json();
+            const { type, userId, suggestion, tokenName, tokenSymbol, tokenContract, tokenChain, tokenDescription, tokenContact } = body;
+            
+            logger?.info('💬 [Feedback] Received submission', { type, userId });
+            
+            // Get admin email from environment
+            const adminEmail = process.env.ADMIN_EMAIL;
+            if (!adminEmail) {
+              logger?.error('❌ [Feedback] ADMIN_EMAIL not configured');
+              return c.json({ error: 'Admin email not configured' }, 500);
+            }
+            
+            let subject, htmlContent, textContent;
+            
+            if (type === 'suggestion') {
+              subject = '💡 New User Suggestion - DarkWave-V2';
+              htmlContent = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #A855F7;">💡 New User Suggestion</h2>
+                  <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>👤 User ID:</strong> ${userId}</p>
+                    <p><strong>📅 Submitted:</strong> ${new Date().toLocaleString()}</p>
+                  </div>
+                  <div style="background: #fff; border-left: 4px solid #A855F7; padding: 20px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #333;">Suggestion:</h3>
+                    <p style="color: #555; white-space: pre-wrap;">${suggestion}</p>
+                  </div>
+                  <p style="color: #999; font-size: 0.9rem;">Sent from DarkWave-V2 Feedback System</p>
+                </div>
+              `;
+              textContent = `New User Suggestion\n\nUser ID: ${userId}\nSubmitted: ${new Date().toLocaleString()}\n\nSuggestion:\n${suggestion}`;
+            } else if (type === 'token') {
+              subject = '🚀 New Token Submission - DarkWave-V2';
+              htmlContent = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #4ADE80;">🚀 New Token Submission</h2>
+                  <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>👤 Submitted by:</strong> ${userId}</p>
+                    <p><strong>📅 Submitted:</strong> ${new Date().toLocaleString()}</p>
+                  </div>
+                  <div style="background: #fff; border-left: 4px solid #4ADE80; padding: 20px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #333;">Token Details:</h3>
+                    <p><strong>Name:</strong> ${tokenName}</p>
+                    <p><strong>Symbol:</strong> ${tokenSymbol}</p>
+                    <p><strong>Contract:</strong> <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${tokenContract}</code></p>
+                    <p><strong>Blockchain:</strong> ${tokenChain}</p>
+                    <p><strong>Contact:</strong> ${tokenContact}</p>
+                  </div>
+                  <div style="background: #fff; border-left: 4px solid #4ADE80; padding: 20px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #333;">Why List This Token:</h3>
+                    <p style="color: #555; white-space: pre-wrap;">${tokenDescription}</p>
+                  </div>
+                  <p style="color: #999; font-size: 0.9rem;">Sent from DarkWave-V2 Feedback System</p>
+                </div>
+              `;
+              textContent = `New Token Submission\n\nSubmitted by: ${userId}\nSubmitted: ${new Date().toLocaleString()}\n\nToken Details:\nName: ${tokenName}\nSymbol: ${tokenSymbol}\nContract: ${tokenContract}\nBlockchain: ${tokenChain}\nContact: ${tokenContact}\n\nWhy List This Token:\n${tokenDescription}`;
+            } else {
+              return c.json({ error: 'Invalid submission type' }, 400);
+            }
+            
+            // Send email to admin
+            try {
+              const { sendEmail } = await import('../utils/replitmail.js');
+              await sendEmail({
+                to: adminEmail,
+                subject,
+                html: htmlContent,
+                text: textContent
+              });
+              
+              logger?.info('✅ [Feedback] Email sent to admin', { type, adminEmail });
+            } catch (emailError: any) {
+              logger?.error('❌ [Feedback] Failed to send email', { error: emailError.message });
+              return c.json({ error: 'Failed to send email' }, 500);
+            }
+            
+            return c.json({ success: true, message: 'Submission sent successfully' });
+          } catch (error: any) {
+            logger?.error('❌ [Feedback] Submission error', { error: error.message });
+            return c.json({ error: 'Failed to process submission' }, 500);
+          }
+        },
+      },
       // Chart endpoint
       {
         path: "/api/chart",

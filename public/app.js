@@ -3139,3 +3139,61 @@ const originalLoadWallet = loadWallet;
 loadWallet = async function() {
   await loadTrackedWallets();
 };
+
+// ===== FEEDBACK & TOKEN SUBMISSION =====
+async function submitFeedback(event, type) {
+  event.preventDefault();
+  
+  let data = {};
+  let formId, successMessage;
+  
+  if (type === 'suggestion') {
+    formId = 'suggestionForm';
+    data = {
+      type: 'suggestion',
+      userId: state.userId,
+      suggestion: document.getElementById('suggestionText').value
+    };
+    successMessage = '✅ Suggestion sent! Thank you for your feedback!';
+  } else if (type === 'token') {
+    formId = 'tokenSubmissionForm';
+    data = {
+      type: 'token',
+      userId: state.userId,
+      tokenName: document.getElementById('tokenName').value,
+      tokenSymbol: document.getElementById('tokenSymbol').value,
+      tokenContract: document.getElementById('tokenContract').value,
+      tokenChain: document.getElementById('tokenChain').value,
+      tokenDescription: document.getElementById('tokenDescription').value,
+      tokenContact: document.getElementById('tokenContact').value || 'Not provided'
+    };
+    successMessage = '✅ Token submitted for review! We\'ll evaluate it soon!';
+  }
+  
+  try {
+    showLoading();
+    const response = await fetch(`${API_BASE}/api/submit-feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify(data)
+    });
+    
+    hideLoading();
+    
+    if (response.ok) {
+      showToast(successMessage);
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+      document.getElementById(formId).reset();
+    } else {
+      const error = await response.json();
+      showToast('❌ ' + (error.message || 'Failed to submit'));
+    }
+  } catch (error) {
+    hideLoading();
+    console.error('Feedback submission error:', error);
+    showToast('❌ Error submitting feedback');
+  }
+}
