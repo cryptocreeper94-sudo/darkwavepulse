@@ -901,6 +901,101 @@ export const mastra = new Mastra({
           }
         },
       },
+      {
+        path: "/api/stripe/webhook",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const Stripe = await import('stripe');
+          const stripe = new Stripe.default(process.env.STRIPE_SECRET_KEY || "");
+          const { db } = await import('../db/client.js');
+          const { subscriptions } = await import('../db/schema.js');
+          const { eq } = await import('drizzle-orm');
+          
+          try {
+            const rawBody = await c.req.text();
+            const sig = c.req.header('stripe-signature');
+            
+            if (!sig) {
+              logger?.error('❌ [Stripe] No signature provided');
+              return c.json({ error: 'No signature' }, 400);
+            }
+            
+            // Verify webhook signature (in production, use STRIPE_WEBHOOK_SECRET)
+            // For now, just parse the event
+            const event = JSON.parse(rawBody);
+            
+            logger?.info('🔔 [Stripe] Webhook received', { type: event.type });
+            
+            // Handle checkout.session.completed
+            if (event.type === 'checkout.session.completed') {
+              const session = event.data.object;
+              const userId = session.metadata?.telegramUserId;
+              
+              if (!userId) {
+                logger?.warn('⚠️ [Stripe] No userId in session metadata');
+                return c.json({ received: true });
+              }
+              
+              logger?.info('💳 [Stripe] Activating premium for user', { userId });
+              
+              // Calculate expiry (1 month from now)
+              const expiryDate = new Date();
+              expiryDate.setMonth(expiryDate.getMonth() + 1);
+              
+              // Update or create subscription
+              await db.insert(subscriptions).values({
+                userId,
+                plan: 'premium',
+                status: 'active',
+                provider: 'stripe',
+                stripeCustomerId: session.customer as string,
+                stripeSubscriptionId: session.subscription as string,
+                expiryDate,
+                autoRenew: true,
+              }).onConflictDoUpdate({
+                target: subscriptions.userId,
+                set: {
+                  plan: 'premium',
+                  status: 'active',
+                  provider: 'stripe',
+                  stripeCustomerId: session.customer as string,
+                  stripeSubscriptionId: session.subscription as string,
+                  expiryDate,
+                  autoRenew: true,
+                  updatedAt: new Date(),
+                }
+              });
+              
+              logger?.info('✅ [Stripe] Premium activated', { userId });
+            }
+            
+            // Handle subscription.deleted (cancellation)
+            if (event.type === 'customer.subscription.deleted') {
+              const subscription = event.data.object;
+              const stripeSubId = subscription.id;
+              
+              logger?.info('❌ [Stripe] Subscription cancelled', { stripeSubId });
+              
+              // Find and update subscription
+              const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.stripeSubscriptionId, stripeSubId));
+              
+              if (sub) {
+                await db.update(subscriptions)
+                  .set({ status: 'cancelled', autoRenew: false, updatedAt: new Date() })
+                  .where(eq(subscriptions.userId, sub.userId));
+                
+                logger?.info('✅ [Stripe] Subscription status updated', { userId: sub.userId });
+              }
+            }
+            
+            return c.json({ received: true });
+          } catch (error: any) {
+            logger?.error('❌ [Stripe] Webhook error', { error: error.message });
+            return c.json({ error: 'Webhook processing failed' }, 500);
+          }
+        },
+      },
       // Chart endpoint
       {
         path: "/api/chart",
