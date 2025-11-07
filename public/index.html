@@ -43,22 +43,55 @@
     <div class="tab-content">
       <!-- Analysis Tab -->
       <div id="analysis" class="tab-pane active">
+        <!-- Category Navigation -->
+        <div class="category-nav">
+          <button class="category-btn active" data-category="bluechip">
+            <span class="category-icon">🔵</span>
+            <span class="category-label">Blue Chip</span>
+          </button>
+          <button class="category-btn" data-category="stocks">
+            <span class="category-icon">📈</span>
+            <span class="category-label">Stocks</span>
+          </button>
+          <button class="category-btn" data-category="meme">
+            <span class="category-icon">🐸</span>
+            <span class="category-label">Meme</span>
+          </button>
+          <button class="category-btn" data-category="defi">
+            <span class="category-icon">💎</span>
+            <span class="category-label">DeFi</span>
+          </button>
+          <button class="category-btn" data-category="dex">
+            <span class="category-icon">🔄</span>
+            <span class="category-label">DEX</span>
+          </button>
+        </div>
+
+        <!-- Blockchain Filter (for crypto categories) -->
+        <div id="blockchainFilter" class="blockchain-filter">
+          <div class="filter-label">Chain:</div>
+          <button class="filter-chip active" data-chain="all">All</button>
+          <button class="filter-chip" data-chain="solana">Solana</button>
+          <button class="filter-chip" data-chain="ethereum">Ethereum</button>
+          <button class="filter-chip" data-chain="base">Base</button>
+          <button class="filter-chip" data-chain="bsc">BSC</button>
+        </div>
+
+        <!-- Search Container -->
         <div class="search-container">
-          <input type="text" id="searchInput" class="search-input" placeholder="Search ticker (BTC, ETH, AAPL...)">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search ticker...">
           <button class="search-btn" id="searchBtn">🔍</button>
         </div>
 
+        <!-- Quick Picks (Dynamic per category) -->
+        <div id="quickPicksContainer" class="quick-picks-section"></div>
+
+        <!-- Analysis Result -->
         <div id="analysisResult" class="analysis-result">
           <div class="welcome-card">
-            <div class="welcome-icon">📊</div>
-            <h2>Welcome to DarkWave-V2</h2>
-            <p>Enter a ticker symbol to get comprehensive technical analysis</p>
-            <div class="quick-picks">
-              <button class="quick-pick-btn" data-ticker="BTC">BTC</button>
-              <button class="quick-pick-btn" data-ticker="ETH">ETH</button>
-              <button class="quick-pick-btn" data-ticker="SOL">SOL</button>
-              <button class="quick-pick-btn" data-ticker="AAPL">AAPL</button>
-            </div>
+            <div class="welcome-icon">🔵</div>
+            <h2>Blue Chip Crypto</h2>
+            <p>Top market cap cryptocurrencies with proven track records</p>
           </div>
         </div>
 
