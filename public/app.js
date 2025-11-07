@@ -1076,8 +1076,106 @@ async function loadSettings() {
     document.querySelectorAll('[data-exchange]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.exchange === settings.exchange);
     });
+    
+    // Load price alerts
+    await loadPriceAlerts();
   } catch (error) {
     console.error('Settings load error:', error);
+  }
+}
+
+// ===== PRICE ALERTS FUNCTIONALITY =====
+async function loadPriceAlerts() {
+  try {
+    const response = await fetch(`${API_BASE}/api/alerts?userId=${state.userId}`);
+    const data = await response.json();
+    
+    const alertsList = document.getElementById('alertsList');
+    
+    if (!data.alerts || data.alerts.length === 0) {
+      alertsList.innerHTML = `
+        <div class="empty-state" style="padding: 20px; text-align: center;">
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">No alerts configured</p>
+        </div>
+      `;
+      return;
+    }
+    
+    alertsList.innerHTML = data.alerts.map(alert => `
+      <div class="alert-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card-bg); border-radius: 8px; margin-bottom: 8px;">
+        <div>
+          <div style="font-weight: 600;">${alert.ticker}</div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary);">
+            ${alert.condition === 'above' ? '⬆️' : '⬇️'} ${alert.condition} $${alert.targetPrice}
+          </div>
+        </div>
+        <button class="action-btn danger-btn" onclick="deleteAlert('${alert.id}')" style="padding: 4px 12px; font-size: 0.85rem;">
+          🗑️ Delete
+        </button>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading alerts:', error);
+  }
+}
+
+async function deleteAlert(alertId) {
+  try {
+    const response = await fetch(`${API_BASE}/api/alerts/${alertId}?userId=${state.userId}`, {
+      method: 'DELETE'
+    });
+    const result = await response.json();
+    
+    if (result.success) {
+      showToast('✅ Alert deleted');
+      await loadPriceAlerts();
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    } else {
+      showToast('❌ Failed to delete alert');
+    }
+  } catch (error) {
+    console.error('Error deleting alert:', error);
+    showToast('❌ Error deleting alert');
+  }
+}
+
+// Add alert button handler
+window.addPriceAlert = async function() {
+  const ticker = prompt('Enter ticker symbol (e.g., BTC, ETH):');
+  if (!ticker) return;
+  
+  const targetPrice = parseFloat(prompt('Enter target price:'));
+  if (!targetPrice || isNaN(targetPrice)) {
+    showToast('❌ Invalid price');
+    return;
+  }
+  
+  const condition = confirm('Alert when price goes ABOVE this target?\n\nClick OK for ABOVE, Cancel for BELOW') ? 'above' : 'below';
+  
+  try {
+    const response = await fetch(`${API_BASE}/api/alerts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticker: ticker.toUpperCase(),
+        targetPrice,
+        condition,
+        userId: state.userId
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showToast(`✅ Alert created: ${ticker} ${condition} $${targetPrice}`);
+      await loadPriceAlerts();
+      if (tg) tg.HapticFeedback?.notificationOccurred('success');
+    } else {
+      showToast('❌ Failed to create alert');
+    }
+  } catch (error) {
+    console.error('Error creating alert:', error);
+    showToast('❌ Error creating alert');
   }
 }
 
@@ -1173,6 +1271,12 @@ document.getElementById('settingsBtn')?.addEventListener('click', () => {
 
 // Scan button in holdings tab
 document.getElementById('scanBtn')?.addEventListener('click', runScanner);
+
+// Add alert button
+document.getElementById('addAlertBtn')?.addEventListener('click', () => {
+  addPriceAlert();
+  if (tg) tg.HapticFeedback?.impactOccurred('medium');
+});
 
 // ===== GLOSSARY FUNCTIONALITY =====
 let currentPath = 'all';
