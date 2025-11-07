@@ -167,12 +167,12 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
-  // Token #13: (Not on Dexscreener yet - please provide name/symbol)
+  // Token #13: CryptoCat
   { 
     address: 'CyokFVBYyvdDzvScSSpHeJ3gR2oGPU5o9CjBHXwkpump',
-    name: 'Token Name TBD',
-    symbol: '$TBD',
-    description: 'Token description coming soon',
+    name: 'CryptoCat',
+    symbol: '$CCAT',
+    description: 'The crypto cat community token',
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
