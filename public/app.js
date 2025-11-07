@@ -631,6 +631,9 @@ function switchCategory(category) {
   
   // Update UI for category
   updateCategoryUI(category);
+  
+  // Update trending carousel
+  loadTrendingCarousel(category);
 }
 
 function updateCategoryUI(category) {
@@ -681,6 +684,95 @@ function updateCategoryUI(category) {
   `;
 }
 
+// Trending Carousel Data
+const TRENDING_DATA = {
+  bluechip: [
+    { icon: '₿', name: 'Bitcoin', ticker: 'BTC', price: '$95,234', change: '+3.5%', positive: true },
+    { icon: '♦️', name: 'Ethereum', ticker: 'ETH', price: '$2,456', change: '+2.1%', positive: true },
+    { icon: '⚡', name: 'Solana', ticker: 'SOL', price: '$145', change: '+8.3%', positive: true },
+    { icon: '🟡', name: 'BNB', ticker: 'BNB', price: '$612', change: '-1.2%', positive: false },
+    { icon: '🔷', name: 'XRP', ticker: 'XRP', price: '$0.58', change: '+5.7%', positive: true },
+    { icon: '🌙', name: 'Cardano', ticker: 'ADA', price: '$0.42', change: '+1.9%', positive: true }
+  ],
+  stocks: [
+    { icon: '🍎', name: 'Apple', ticker: 'AAPL', price: '$178.32', change: '+1.4%', positive: true },
+    { icon: '⚡', name: 'Tesla', ticker: 'TSLA', price: '$242.84', change: '+4.2%', positive: true },
+    { icon: '🎮', name: 'NVIDIA', ticker: 'NVDA', price: '$485.23', change: '+6.8%', positive: true },
+    { icon: '🛒', name: 'Amazon', ticker: 'AMZN', price: '$168.45', change: '+2.1%', positive: true },
+    { icon: '🔍', name: 'Google', ticker: 'GOOGL', price: '$138.27', change: '+1.7%', positive: true },
+    { icon: '💻', name: 'Microsoft', ticker: 'MSFT', price: '$392.14', change: '+0.9%', positive: true }
+  ],
+  meme: [
+    { icon: '🐕', name: 'Dogecoin', ticker: 'DOGE', price: '$0.142', change: '+12.5%', positive: true },
+    { icon: '🐸', name: 'Pepe', ticker: 'PEPE', price: '$0.000009', change: '+18.3%', positive: true },
+    { icon: '🐶', name: 'Shiba Inu', ticker: 'SHIB', price: '$0.000012', change: '+7.2%', positive: true },
+    { icon: '🦴', name: 'Bonk', ticker: 'BONK', price: '$0.000015', change: '+24.8%', positive: true },
+    { icon: '🧢', name: 'WIF', ticker: 'WIF', price: '$2.34', change: '+15.1%', positive: true },
+    { icon: '🎩', name: 'FLOKI', ticker: 'FLOKI', price: '$0.00018', change: '+9.4%', positive: true }
+  ],
+  defi: [
+    { icon: '🦄', name: 'Uniswap', ticker: 'UNI', price: '$8.45', change: '+5.3%', positive: true },
+    { icon: '👻', name: 'Aave', ticker: 'AAVE', price: '$145.23', change: '+3.8%', positive: true },
+    { icon: '🏦', name: 'Maker', ticker: 'MKR', price: '$1,234', change: '+2.4%', positive: true },
+    { icon: '💎', name: 'Compound', ticker: 'COMP', price: '$56.78', change: '-1.2%', positive: false },
+    { icon: '🌊', name: 'SushiSwap', ticker: 'SUSHI', price: '$1.23', change: '+6.7%', positive: true },
+    { icon: '🔵', name: 'Curve', ticker: 'CRV', price: '$0.85', change: '+4.1%', positive: true }
+  ],
+  dex: [
+    { icon: '🔥', name: 'BONK/SOL', ticker: 'BONK', price: '$0.000015', change: '+145%', positive: true },
+    { icon: '🚀', name: 'PEPE/ETH', ticker: 'PEPE', price: '$0.000009', change: '+89%', positive: true },
+    { icon: '💫', name: 'WIF/SOL', ticker: 'WIF', price: '$2.34', change: '+67%', positive: true },
+    { icon: '⚡', name: 'MEME/SOL', ticker: 'MEME', price: '$0.045', change: '+234%', positive: true },
+    { icon: '🌟', name: 'BOME/SOL', ticker: 'BOME', price: '$0.012', change: '+178%', positive: true },
+    { icon: '💎', name: 'MEW/SOL', ticker: 'MEW', price: '$0.0078', change: '+156%', positive: true }
+  ],
+  nft: [
+    { icon: '🐵', name: 'BAYC', ticker: 'BAYC', price: '30.5 ETH', change: '+12.4%', positive: true },
+    { icon: '🎨', name: 'Azuki', ticker: 'AZUKI', price: '15.2 ETH', change: '-5.3%', positive: false },
+    { icon: '🐧', name: 'Pudgys', ticker: 'PPG', price: '12.8 ETH', change: '+18.7%', positive: true },
+    { icon: '👑', name: 'DeGods', ticker: 'DGOD', price: '8.5 ETH', change: '-3.2%', positive: false },
+    { icon: '✨', name: 'Milady', ticker: 'MIL', price: '3.2 ETH', change: '+22.1%', positive: true },
+    { icon: '🐧', name: 'Lil Pudgys', ticker: 'LPG', price: '2.8 ETH', change: '+8.5%', positive: true }
+  ]
+};
+
+function loadTrendingCarousel(category) {
+  const trendingItems = document.getElementById('trendingItems');
+  const items = TRENDING_DATA[category] || [];
+  
+  if (items.length === 0) {
+    document.getElementById('trendingCarousel').style.display = 'none';
+    return;
+  }
+  
+  document.getElementById('trendingCarousel').style.display = 'block';
+  
+  // Duplicate items for seamless infinite scroll
+  const duplicatedItems = [...items, ...items];
+  
+  trendingItems.innerHTML = duplicatedItems.map(item => `
+    <div class="trending-item" data-ticker="${item.ticker}" data-category="${category}">
+      <div class="trending-item-icon">${item.icon}</div>
+      <div class="trending-item-name">${item.name}</div>
+      <div class="trending-item-ticker">${item.ticker}</div>
+      <div class="trending-item-price">${item.price}</div>
+      <div class="trending-item-change ${item.positive ? 'positive' : 'negative'}">
+        ${item.change}
+      </div>
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  trendingItems.querySelectorAll('.trending-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const ticker = item.dataset.ticker;
+      searchInput.value = ticker;
+      performSearch();
+      if (tg) tg.HapticFeedback?.impactOccurred('medium');
+    });
+  });
+}
+
 // Blockchain Filter
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', () => {
@@ -697,6 +789,7 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
 
 // Initialize with Blue Chip category
 updateCategoryUI('bluechip');
+loadTrendingCarousel('bluechip');
 
 // Search Functionality
 searchBtn.addEventListener('click', () => performSearch());
