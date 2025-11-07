@@ -686,55 +686,55 @@ function updateCategoryUI(category) {
   `;
 }
 
-// Trending Carousel Configuration (icons and tickers)
+// Trending Carousel Configuration (icons, tickers, and logo URLs)
 const TRENDING_CONFIG = {
   bluechip: [
-    { icon: '₿', id: 'bitcoin', ticker: 'BTC' },
-    { icon: '♦️', id: 'ethereum', ticker: 'ETH' },
-    { icon: '⚡', id: 'solana', ticker: 'SOL' },
-    { icon: '🟡', id: 'binancecoin', ticker: 'BNB' },
-    { icon: '🔷', id: 'ripple', ticker: 'XRP' },
-    { icon: '🌙', id: 'cardano', ticker: 'ADA' }
+    { icon: '₿', id: 'bitcoin', ticker: 'BTC', logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
+    { icon: '♦️', id: 'ethereum', ticker: 'ETH', logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png' },
+    { icon: '⚡', id: 'solana', ticker: 'SOL', logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png' },
+    { icon: '🟡', id: 'binancecoin', ticker: 'BNB', logo: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png' },
+    { icon: '🔷', id: 'ripple', ticker: 'XRP', logo: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png' },
+    { icon: '🌙', id: 'cardano', ticker: 'ADA', logo: 'https://assets.coingecko.com/coins/images/975/large/cardano.png' }
   ],
   stocks: [
-    { icon: '🍎', ticker: 'AAPL', name: 'Apple' },
-    { icon: '⚡', ticker: 'TSLA', name: 'Tesla' },
-    { icon: '🎮', ticker: 'NVDA', name: 'NVIDIA' },
-    { icon: '🛒', ticker: 'AMZN', name: 'Amazon' },
-    { icon: '🔍', ticker: 'GOOGL', name: 'Google' },
-    { icon: '💻', ticker: 'MSFT', name: 'Microsoft' }
+    { icon: '🍎', ticker: 'AAPL', name: 'Apple', logo: 'https://logo.clearbit.com/apple.com' },
+    { icon: '⚡', ticker: 'TSLA', name: 'Tesla', logo: 'https://logo.clearbit.com/tesla.com' },
+    { icon: '🎮', ticker: 'NVDA', name: 'NVIDIA', logo: 'https://logo.clearbit.com/nvidia.com' },
+    { icon: '🛒', ticker: 'AMZN', name: 'Amazon', logo: 'https://logo.clearbit.com/amazon.com' },
+    { icon: '🔍', ticker: 'GOOGL', name: 'Google', logo: 'https://logo.clearbit.com/google.com' },
+    { icon: '💻', ticker: 'MSFT', name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com' }
   ],
   meme: [
-    { icon: '🐕', id: 'dogecoin', ticker: 'DOGE' },
-    { icon: '🐸', id: 'pepe', ticker: 'PEPE' },
-    { icon: '🐶', id: 'shiba-inu', ticker: 'SHIB' },
-    { icon: '🦴', id: 'bonk', ticker: 'BONK' },
-    { icon: '🧢', id: 'dogwifcoin', ticker: 'WIF' },
-    { icon: '🎩', id: 'floki', ticker: 'FLOKI' }
+    { icon: '🐕', id: 'dogecoin', ticker: 'DOGE', logo: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png' },
+    { icon: '🐸', id: 'pepe', ticker: 'PEPE', logo: 'https://assets.coingecko.com/coins/images/29850/large/pepe-token.jpeg' },
+    { icon: '🐶', id: 'shiba-inu', ticker: 'SHIB', logo: 'https://assets.coingecko.com/coins/images/11939/large/shiba.png' },
+    { icon: '🦴', id: 'bonk', ticker: 'BONK', logo: 'https://assets.coingecko.com/coins/images/28600/large/bonk.jpg' },
+    { icon: '🧢', id: 'dogwifcoin', ticker: 'WIF', logo: 'https://assets.coingecko.com/coins/images/33566/large/dogwifhat.jpg' },
+    { icon: '🎩', id: 'floki', ticker: 'FLOKI', logo: 'https://assets.coingecko.com/coins/images/16746/large/PNG_image.png' }
   ],
   defi: [
-    { icon: '🦄', id: 'uniswap', ticker: 'UNI' },
-    { icon: '👻', id: 'aave', ticker: 'AAVE' },
-    { icon: '🏦', id: 'maker', ticker: 'MKR' },
-    { icon: '💎', id: 'compound-governance-token', ticker: 'COMP' },
-    { icon: '🌊', id: 'sushi', ticker: 'SUSHI' },
-    { icon: '🔵', id: 'curve-dao-token', ticker: 'CRV' }
+    { icon: '🦄', id: 'uniswap', ticker: 'UNI', logo: 'https://assets.coingecko.com/coins/images/12504/large/uni.jpg' },
+    { icon: '👻', id: 'aave', ticker: 'AAVE', logo: 'https://assets.coingecko.com/coins/images/12645/large/AAVE.png' },
+    { icon: '🏦', id: 'maker', ticker: 'MKR', logo: 'https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png' },
+    { icon: '💎', id: 'compound-governance-token', ticker: 'COMP', logo: 'https://assets.coingecko.com/coins/images/10775/large/COMP.png' },
+    { icon: '🌊', id: 'sushi', ticker: 'SUSHI', logo: 'https://assets.coingecko.com/coins/images/12271/large/512x512_Logo_no_chop.png' },
+    { icon: '🔵', id: 'curve-dao-token', ticker: 'CRV', logo: 'https://assets.coingecko.com/coins/images/12124/large/Curve.png' }
   ],
   dex: [
-    { icon: '🔥', ticker: 'BONK', search: 'bonk solana' },
-    { icon: '🚀', ticker: 'PEPE', search: 'pepe ethereum' },
-    { icon: '💫', ticker: 'WIF', search: 'wif solana' },
-    { icon: '⚡', ticker: 'MEME', search: 'meme solana' },
-    { icon: '🌟', ticker: 'BOME', search: 'bome solana' },
-    { icon: '💎', ticker: 'MEW', search: 'mew solana' }
+    { icon: '🔥', ticker: 'BONK', search: 'bonk solana', logo: 'https://assets.coingecko.com/coins/images/28600/large/bonk.jpg' },
+    { icon: '🚀', ticker: 'PEPE', search: 'pepe ethereum', logo: 'https://assets.coingecko.com/coins/images/29850/large/pepe-token.jpeg' },
+    { icon: '💫', ticker: 'WIF', search: 'wif solana', logo: 'https://assets.coingecko.com/coins/images/33566/large/dogwifhat.jpg' },
+    { icon: '⚡', ticker: 'MEME', search: 'meme solana', logo: 'https://dd.dexscreener.com/ds-data/tokens/solana/meme.png' },
+    { icon: '🌟', ticker: 'BOME', search: 'bome solana', logo: 'https://dd.dexscreener.com/ds-data/tokens/solana/bome.png' },
+    { icon: '💎', ticker: 'MEW', search: 'mew solana', logo: 'https://dd.dexscreener.com/ds-data/tokens/solana/mew.png' }
   ],
   nft: [
-    { icon: '🐵', ticker: 'BAYC', name: 'BAYC' },
-    { icon: '🎨', ticker: 'AZUKI', name: 'Azuki' },
-    { icon: '🐧', ticker: 'PPG', name: 'Pudgys' },
-    { icon: '👑', ticker: 'DGOD', name: 'DeGods' },
-    { icon: '✨', ticker: 'MIL', name: 'Milady' },
-    { icon: '🐧', ticker: 'LPG', name: 'Lil Pudgys' }
+    { icon: '🐵', ticker: 'BAYC', name: 'BAYC', logo: 'https://i.seadn.io/gae/Ju9CkWtV-1Okvf45wo8UctR-M9He2PjILP0oOvxE89AyiPPGtrR3gysu1Zgy0hjd2xKIgjJJtWIc0ybj4Vd7wv8t3pxDGHoJBzDB?w=500' },
+    { icon: '🎨', ticker: 'AZUKI', name: 'Azuki', logo: 'https://i.seadn.io/gae/H8jOCJuQokNqGBpkBN5wk1oZwO7LM8bNnrHCaekV2nKjnCqw6UB5oaH8XyNeBDj6bA_n1mjejzhFQUP3O1NfjFLHr3FOaeHcTOOT?w=500' },
+    { icon: '🐧', ticker: 'PPG', name: 'Pudgys', logo: 'https://i.seadn.io/gae/yNi-XdGxsgQCPpqSio4o31ygAV6wURdIdInWRcFIl46UjUQ1eV7BEndGe8L661OoG-clRi7EgInLX4LPu9Jfw4fq0bnVYHqg7RFi?w=500' },
+    { icon: '👑', ticker: 'DGOD', name: 'DeGods', logo: 'https://i.seadn.io/gcs/files/3d8e01bf38ecdeb7e6e3c6e88e463843.png?w=500' },
+    { icon: '✨', ticker: 'MIL', name: 'Milady', logo: 'https://i.seadn.io/gcs/files/b33a2b6a0b4c8ce0e7d0d4e5f9e9e9e9.png?w=500' },
+    { icon: '🐧', ticker: 'LPG', name: 'Lil Pudgys', logo: 'https://i.seadn.io/gcs/files/c1e5e2e2e2e2e2e2e2e2e2e2e2e2e2e2.png?w=500' }
   ]
 };
 
@@ -773,6 +773,7 @@ async function fetchLiveTrendingData(category) {
           icon: cfg.icon,
           name: cfg.ticker,
           ticker: cfg.ticker,
+          logo: cfg.logo,
           price: price >= 1 ? `$${price.toFixed(2)}` : `$${price.toFixed(6)}`,
           change: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
           positive: change >= 0
@@ -785,6 +786,7 @@ async function fetchLiveTrendingData(category) {
         icon: cfg.icon,
         name: cfg.name,
         ticker: cfg.ticker,
+        logo: cfg.logo,
         price: '–',
         change: 'Live',
         positive: true
@@ -805,6 +807,7 @@ async function fetchLiveTrendingData(category) {
               icon: cfg.icon,
               name: pair.baseToken?.symbol || cfg.ticker,
               ticker: cfg.ticker,
+              logo: cfg.logo,
               price: pair.priceUsd ? `$${parseFloat(pair.priceUsd).toFixed(8)}` : '–',
               change: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
               positive: change >= 0
@@ -825,6 +828,7 @@ async function fetchLiveTrendingData(category) {
         icon: cfg.icon,
         name: cfg.name,
         ticker: cfg.ticker,
+        logo: cfg.logo,
         price: '–',
         change: 'Floor',
         positive: true
@@ -863,7 +867,10 @@ async function loadTrendingCarousel(category) {
   
   trendingItems.innerHTML = duplicatedItems.map(item => `
     <div class="trending-item" data-ticker="${item.ticker}" data-category="${category}">
-      <div class="trending-item-icon">${item.icon}</div>
+      <div class="trending-item-logo">
+        <img src="${item.logo || ''}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="trending-item-icon-fallback" style="display: none;">${item.icon}</div>
+      </div>
       <div class="trending-item-name">${item.name}</div>
       <div class="trending-item-ticker">${item.ticker}</div>
       <div class="trending-item-price">${item.price}</div>

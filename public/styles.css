@@ -391,6 +391,47 @@ body {
   box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4), var(--button-glow);
 }
 
+.trending-item-logo {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.trending-item-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(230, 57, 70, 0.1));
+  padding: 4px;
+  transition: all 0.3s ease;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.trending-item:hover .trending-item-logo img {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+  animation: none;
+}
+
+.trending-item-icon-fallback {
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  }
+}
+
 .trending-item-icon {
   font-size: 2rem;
   margin-bottom: 0.5rem;
