@@ -1089,6 +1089,32 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.category-filter-btn {
+  background: rgba(139, 0, 0, 0.2);
+  border: 2px solid var(--primary-maroon);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.category-filter-btn.active {
+  background: var(--gradient-primary);
+  border-color: var(--glow-purple);
+  box-shadow: var(--button-glow), 0 4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.category-filter-btn:hover {
+  background: rgba(139, 0, 0, 0.4);
+  border-color: var(--glow-purple);
+  box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
+}
+
 .path-btn {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(168, 85, 247, 0.3);
