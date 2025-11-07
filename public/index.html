@@ -181,10 +181,21 @@
           <!-- Add Wallet Section -->
           <div class="wallet-card" style="margin-bottom: 20px;">
             <h3 style="margin-bottom: 12px; font-size: 1rem;">➕ Add Wallet (Read-Only)</h3>
+            <select 
+              id="walletChainSelect" 
+              style="width: 100%; padding: 12px; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: white; font-size: 0.9rem; margin-bottom: 8px;"
+            >
+              <option value="solana">Solana (SOL)</option>
+              <option value="ethereum">Ethereum (ETH)</option>
+              <option value="polygon">Polygon (MATIC)</option>
+              <option value="arbitrum">Arbitrum (ARB)</option>
+              <option value="base">Base (ETH)</option>
+              <option value="bsc">Binance Smart Chain (BNB)</option>
+            </select>
             <input 
               type="text" 
               id="walletAddressInput" 
-              placeholder="Paste Solana wallet address"
+              placeholder="Paste wallet address"
               style="width: 100%; padding: 12px; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: white; font-size: 0.9rem; margin-bottom: 8px; font-family: monospace;"
             />
             <input 
@@ -197,7 +208,7 @@
               Track Wallet
             </button>
             <p style="margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
-              🔒 Read-only tracking • Up to 5 wallets • Auto-saves balances
+              🔒 Read-only • Multi-chain support • Up to 5 wallets
             </p>
           </div>
 
