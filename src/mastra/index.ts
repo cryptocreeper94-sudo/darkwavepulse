@@ -199,7 +199,7 @@ export const mastra = new Mastra({
             if (code === correctCode) {
               // Generate session token
               const { generateSessionToken } = await import('./middleware/accessControl.js');
-              const sessionToken = generateSessionToken();
+              const sessionToken = await generateSessionToken();
               
               logger?.info('✅ [Access Code] Valid code entered, session created');
               return c.json({ 
@@ -222,6 +222,15 @@ export const mastra = new Mastra({
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized analyze request');
+            return sessionCheck.error;
+          }
+          
           try {
             const { ticker, userId } = await c.req.json();
             logger?.info('📊 [Mini App] Analysis request', { ticker, userId });
@@ -356,6 +365,15 @@ export const mastra = new Mastra({
         method: "GET",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized holdings GET request');
+            return sessionCheck.error;
+          }
+          
           const userId = c.req.query('userId') || 'demo-user';
           logger?.info('📊 [Mini App] Holdings request', { userId });
           
@@ -413,6 +431,15 @@ export const mastra = new Mastra({
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized holdings POST request');
+            return sessionCheck.error;
+          }
+          
           try {
             const { ticker, userId } = await c.req.json();
             logger?.info('⭐ [Mini App] Add holding', { ticker, userId });
@@ -1224,6 +1251,15 @@ export const mastra = new Mastra({
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized DEX search request');
+            return sessionCheck.error;
+          }
+          
           try {
             const { query, userId } = await c.req.json();
             logger?.info('🔍 [Mini App] DEX search request', { query, userId });
@@ -1252,6 +1288,15 @@ export const mastra = new Mastra({
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized DEX analyze request');
+            return sessionCheck.error;
+          }
+          
           try {
             const { query, userId } = await c.req.json();
             logger?.info('📊 [Mini App] DEX analysis request', { query, userId });
@@ -1303,6 +1348,15 @@ export const mastra = new Mastra({
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized NFT analyze request');
+            return sessionCheck.error;
+          }
+          
           try {
             const { query, userId } = await c.req.json();
             logger?.info('🎨 [Mini App] NFT analysis request', { query, userId });
