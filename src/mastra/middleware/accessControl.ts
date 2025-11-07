@@ -73,12 +73,10 @@ async function cleanExpiredSessions(): Promise<void> {
 setInterval(cleanExpiredSessions, 60 * 60 * 1000);
 
 // Helper to check session in request (async now that we use database)
-export async function checkAccessSession(c: any): Promise<{ valid: boolean; error?: any }> {
+export async function checkAccessSession(c: any): Promise<{ valid: boolean; userId?: string; error?: any }> {
   const sessionToken = c.req.header('X-Session-Token');
   
-  const isValid = await verifySessionToken(sessionToken);
-  
-  if (!isValid) {
+  if (!sessionToken) {
     return {
       valid: false,
       error: c.json({ 
@@ -88,5 +86,48 @@ export async function checkAccessSession(c: any): Promise<{ valid: boolean; erro
     };
   }
   
-  return { valid: true };
+  try {
+    // Fetch session and extract userId
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.token, sessionToken))
+      .limit(1);
+    
+    if (!session) {
+      return {
+        valid: false,
+        error: c.json({ 
+          error: 'Access denied. Please enter the access code.',
+          requiresAccessCode: true 
+        }, 401)
+      };
+    }
+    
+    // Check if expired
+    if (new Date() > new Date(session.expiresAt)) {
+      await db.delete(sessions).where(eq(sessions.token, sessionToken));
+      return {
+        valid: false,
+        error: c.json({ 
+          error: 'Session expired. Please enter the access code again.',
+          requiresAccessCode: true 
+        }, 401)
+      };
+    }
+    
+    // Update last used timestamp
+    await db
+      .update(sessions)
+      .set({ lastUsed: new Date() })
+      .where(eq(sessions.token, sessionToken));
+    
+    return { valid: true, userId: session.userId || 'demo-user' };
+  } catch (error) {
+    console.error('Session verification error:', error);
+    return {
+      valid: false,
+      error: c.json({ error: 'Session validation failed' }, 500)
+    };
+  }
 }
