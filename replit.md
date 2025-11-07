@@ -14,7 +14,9 @@ The application uses a workflow-based architecture to process user messages thro
 
 **New in v2.4**: Database-backed session management with PostgreSQL storage (30-day expiry). Tracked wallets feature (read-only, up to 5 wallets per user) with multi-chain support (Solana, Ethereum, Polygon, Arbitrum, Base, BSC). Automatic balance fetching via Helius API (Solana) and Alchemy free API (EVM chains).
 
-**Security Note**: Current implementation uses browser-generated unique user IDs for session isolation. For production Telegram Mini App deployment, implement Telegram initData HMAC-SHA256 signature validation to cryptographically verify user identity and prevent ID spoofing.
+**New in v2.5**: Comprehensive subscription notification system and admin dashboard. When users subscribe via Stripe, admin receives instant notifications via Telegram (formatted alerts) and Email (HTML formatted with revenue tracking). Admin dashboard at /admin provides real-time subscriber metrics, whitelist management, and revenue tracking. All admin actions are logged for security and traceability.
+
+**Security Note**: Current implementation uses browser-generated unique user IDs for session isolation. For production Telegram Mini App deployment, implement Telegram initData HMAC-SHA256 signature validation to cryptographically verify user identity and prevent ID spoofing. Admin dashboard protected by ADMIN_ACCESS_CODE environment variable.
 
 ## User Preferences
 
