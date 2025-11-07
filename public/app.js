@@ -2224,10 +2224,18 @@ async function renderProjectsTab() {
   `;
   
   const tokenDataPromises = FEATURED_TOKENS.map(token => 
-    fetchTokenData(token.address).then(data => ({ ...token, liveData: data }))
+    fetchTokenData(token.address)
+      .then(data => ({ ...token, liveData: data }))
+      .catch(err => {
+        console.warn(`Failed to fetch data for ${token.name}:`, err);
+        return { ...token, liveData: null };
+      })
   );
   
-  const tokens = await Promise.all(tokenDataPromises);
+  const results = await Promise.allSettled(tokenDataPromises);
+  const tokens = results
+    .filter(r => r.status === 'fulfilled')
+    .map(r => r.value);
   
   container.innerHTML = tokens.map(token => {
     const data = token.liveData;
