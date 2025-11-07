@@ -1428,12 +1428,18 @@ async function loadTabContent(tabName) {
   if (tabName === 'movers') {
     loadTopMovers('gainers');
   } else if (tabName === 'learn') {
-    renderGlossary();
+    // Initialize glossary with all terms visible
+    renderGlossary('', 'all');
   }
 }
 
-// Initialize
+// Initialize on DOM ready
 console.log('🌊 DarkWave-V2 Mini App loaded with ALL features');
 if (tg) {
   console.log('Telegram WebApp initialized', tg.initDataUnsafe);
+}
+
+// Make sure glossary initializes if we're on the learn tab on page load
+if (state.currentTab === 'learn') {
+  renderGlossary('', 'all');
 }
