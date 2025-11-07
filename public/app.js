@@ -14,8 +14,54 @@ const API_BASE = window.location.origin;
 // State Management
 const state = {
   currentTab: 'analysis',
+  currentCategory: 'bluechip',
+  currentBlockchain: 'all',
   userId: tg?.initDataUnsafe?.user?.id || 'demo-user',
   currentAnalysis: null
+};
+
+// Category Quick Picks Data
+const CATEGORY_DATA = {
+  bluechip: {
+    icon: '🔵',
+    title: 'Blue Chip Crypto',
+    description: 'Top market cap cryptocurrencies with proven track records',
+    placeholder: 'Search BTC, ETH, SOL...',
+    quickPicks: ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'AVAX', 'DOT'],
+    showBlockchain: true
+  },
+  stocks: {
+    icon: '📈',
+    title: 'Stock Market',
+    description: 'Analyze stocks with comprehensive technical indicators',
+    placeholder: 'Search AAPL, AMD, NVDA...',
+    quickPicks: ['AAPL', 'AMD', 'NVDA', 'TSLA', 'MSFT', 'GOOGL', 'META', 'AMZN'],
+    showBlockchain: false
+  },
+  meme: {
+    icon: '🐸',
+    title: 'Meme Coins',
+    description: 'High-volatility meme coins and community tokens',
+    placeholder: 'Search PEPE, DOGE, SHIB...',
+    quickPicks: ['PEPE', 'DOGE', 'SHIB', 'WIF', 'BONK', 'FLOKI', 'MEME', 'DEGEN'],
+    showBlockchain: true
+  },
+  defi: {
+    icon: '💎',
+    title: 'DeFi Tokens',
+    description: 'Decentralized finance protocols and governance tokens',
+    placeholder: 'Search UNI, AAVE, CRV...',
+    quickPicks: ['UNI', 'AAVE', 'MKR', 'CRV', 'COMP', 'SNX', 'SUSHI', 'LDO'],
+    showBlockchain: true
+  },
+  dex: {
+    icon: '🔄',
+    title: 'DEX Pairs',
+    description: 'Search any token pair across all DEXes and chains',
+    placeholder: 'Search token name or address...',
+    quickPicks: [],
+    showBlockchain: true
+  }
 };
 
 // Technical term tooltips
@@ -91,19 +137,96 @@ async function loadTabContent(tabName) {
   }
 }
 
+// Category Navigation
+document.querySelectorAll('.category-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const category = btn.dataset.category;
+    switchCategory(category);
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+});
+
+function switchCategory(category) {
+  state.currentCategory = category;
+  
+  // Update active button
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.category === category);
+  });
+  
+  // Update UI for category
+  updateCategoryUI(category);
+}
+
+function updateCategoryUI(category) {
+  const data = CATEGORY_DATA[category];
+  
+  // Update search placeholder
+  searchInput.placeholder = data.placeholder;
+  
+  // Show/hide blockchain filter
+  const blockchainFilter = document.getElementById('blockchainFilter');
+  if (blockchainFilter) {
+    blockchainFilter.style.display = data.showBlockchain ? 'flex' : 'none';
+  }
+  
+  // Update quick picks
+  const quickPicksContainer = document.getElementById('quickPicksContainer');
+  if (data.quickPicks && data.quickPicks.length > 0) {
+    quickPicksContainer.innerHTML = `
+      <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">
+        ${data.icon} Popular ${data.title}
+      </h3>
+      <div class="quick-picks">
+        ${data.quickPicks.map(ticker => `
+          <button class="quick-pick-btn" data-ticker="${ticker}">${ticker}</button>
+        `).join('')}
+      </div>
+    `;
+    
+    // Add click handlers to new quick pick buttons
+    quickPicksContainer.querySelectorAll('.quick-pick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        searchInput.value = btn.dataset.ticker;
+        performSearch();
+        if (tg) tg.HapticFeedback?.impactOccurred('medium');
+      });
+    });
+  } else {
+    quickPicksContainer.innerHTML = '';
+  }
+  
+  // Update welcome card
+  analysisResult.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-icon">${data.icon}</div>
+      <h2>${data.title}</h2>
+      <p>${data.description}</p>
+    </div>
+  `;
+}
+
+// Blockchain Filter
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const chain = chip.dataset.chain;
+    state.currentBlockchain = chain;
+    
+    document.querySelectorAll('.filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.chain === chain);
+    });
+    
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+});
+
+// Initialize with Blue Chip category
+updateCategoryUI('bluechip');
+
 // Search Functionality
 searchBtn.addEventListener('click', () => performSearch());
 searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') performSearch();
-});
-
-document.querySelectorAll('.quick-pick-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const ticker = btn.dataset.ticker;
-    searchInput.value = ticker;
-    performSearch();
-    if (tg) tg.HapticFeedback?.impactOccurred('medium');
-  });
 });
 
 async function performSearch() {
