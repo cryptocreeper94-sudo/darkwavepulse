@@ -115,7 +115,7 @@ export const priceAlertTool = createTool({
           const initialCount = alerts.length;
           alerts = alerts.filter((a: any) => a.id !== alertId);
 
-          // Save updated list
+          // Save updated alerts
           alertsCache.set(userId, alerts);
 
           if (alerts.length === initialCount) {
