@@ -611,6 +611,18 @@ async function loadTabContent(tabName) {
     case 'settings':
       await loadSettings();
       break;
+    case 'movers':
+      loadTopMovers('gainers');
+      break;
+    case 'learn':
+      renderGlossary('', 'all');
+      break;
+    case 'projects':
+      await renderProjectsTab();
+      break;
+    case 'analysis':
+      await renderFeaturedBanner();
+      break;
   }
 }
 
@@ -2135,18 +2147,7 @@ document.getElementById('refreshMoversBtn')?.addEventListener('click', () => {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
 });
 
-// Update loadTabContent to initialize movers and glossary
-const originalLoadTabContent = loadTabContent;
-async function loadTabContent(tabName) {
-  await originalLoadTabContent(tabName);
-  
-  if (tabName === 'movers') {
-    loadTopMovers('gainers');
-  } else if (tabName === 'learn') {
-    // Initialize glossary with all terms visible
-    renderGlossary('', 'all');
-  }
-}
+// Movers tab loading handled in main loadTabContent function
 
 // Initialize on DOM ready
 console.log('🌊 DarkWave-V2 Mini App loaded with ALL features');
@@ -2471,21 +2472,7 @@ function formatNumber(num) {
   return num.toFixed(2);
 }
 
-// Update loadTabContent to handle Projects tab
-const originalLoadTabContent2 = loadTabContent;
-async function loadTabContent(tabName) {
-  await originalLoadTabContent2(tabName);
-  
-  if (tabName === 'movers') {
-    loadTopMovers('gainers');
-  } else if (tabName === 'learn') {
-    renderGlossary('', 'all');
-  } else if (tabName === 'projects') {
-    await renderProjectsTab();
-  } else if (tabName === 'analysis') {
-    await renderFeaturedBanner();
-  }
-}
+// Projects tab loading handled in main loadTabContent function
 
 // Initialize featured system on page load
 setTimeout(() => {
