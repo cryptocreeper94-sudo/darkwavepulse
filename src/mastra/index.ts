@@ -30,6 +30,7 @@ import { scannerTool } from "./tools/scannerTool";
 import { chartGeneratorTool } from "./tools/chartGeneratorTool";
 import { dexscreenerTool } from "./tools/dexscreenerTool";
 import { dexAnalysisTool } from "./tools/dexAnalysisTool";
+import { priceAlertTool } from "./tools/priceAlertTool";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -98,6 +99,7 @@ export const mastra = new Mastra({
         'chart-generator-tool': chartGeneratorTool,
         'dexscreener-tool': dexscreenerTool,
         'dex-analysis-tool': dexAnalysisTool,
+        'price-alert-tool': priceAlertTool,
       },
     }),
   },
@@ -449,6 +451,87 @@ export const mastra = new Mastra({
               { ticker: 'SOL', price: 150, change: 8.5 }
             ];
             return c.json({ movers: fallbackMovers });
+          }
+        },
+      },
+      // Price Alerts endpoints
+      {
+        path: "/api/alerts",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const userId = c.req.query('userId') || 'demo-user';
+          logger?.info('🔔 [Mini App] Get alerts request', { userId });
+          
+          try {
+            const result = await priceAlertTool.execute({
+              context: { action: 'list', userId },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json({
+              success: result.success,
+              alerts: result.alerts || []
+            });
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] Get alerts error', { error: error.message });
+            return c.json({ success: false, alerts: [], error: error.message }, 500);
+          }
+        },
+      },
+      {
+        path: "/api/alerts",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { ticker, targetPrice, condition, userId } = await c.req.json();
+            logger?.info('➕ [Mini App] Create alert request', { ticker, targetPrice, condition, userId });
+            
+            const result = await priceAlertTool.execute({
+              context: {
+                action: 'create',
+                ticker,
+                targetPrice,
+                condition,
+                userId: userId || 'demo-user'
+              },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] Create alert error', { error: error.message });
+            return c.json({ success: false, message: error.message }, 500);
+          }
+        },
+      },
+      {
+        path: "/api/alerts/:id",
+        method: "DELETE",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const alertId = c.req.param('id');
+            const userId = c.req.query('userId') || 'demo-user';
+            logger?.info('🗑️ [Mini App] Delete alert request', { alertId, userId });
+            
+            const result = await priceAlertTool.execute({
+              context: {
+                action: 'delete',
+                alertId,
+                userId
+              },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('❌ [Mini App] Delete alert error', { error: error.message });
+            return c.json({ success: false, message: error.message }, 500);
           }
         },
       },
