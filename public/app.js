@@ -71,6 +71,18 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
+  // Token #5: Pumpaholic - 2025
+  { 
+    address: '3gyRB7GVxzM4tUj41WvWpcgaHqbmZsvU7ANP9vnaLSgZ',
+    name: 'Pumpaholic - 2025',
+    symbol: '$CHEERS',
+    description: 'Celebrating the pump lifestyle',
+    platform: 'pumpfun',
+    twitter: '',
+    telegram: '',
+    featured: true
+  },
+  
   // Add more tokens below as you send them:
   
 ];
