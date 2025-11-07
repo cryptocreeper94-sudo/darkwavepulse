@@ -179,7 +179,17 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
-  // Add more tokens below as you send them:
+  // Token #14: (Raydium token - not on Dexscreener yet - please provide name/symbol)
+  { 
+    address: '75A2MwNbiXMBNoJuKFgEsaN42fHAqjHhEuW4fPpKMGF',
+    name: 'Token Name TBD',
+    symbol: '$TBD',
+    description: 'Token description coming soon',
+    platform: 'raydium',
+    twitter: '',
+    telegram: '',
+    featured: true
+  },
   
 ];
 
