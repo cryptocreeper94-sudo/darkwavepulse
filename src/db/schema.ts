@@ -30,3 +30,11 @@ export const whitelistedUsers = pgTable('whitelisted_users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const sessions = pgTable('sessions', {
+  token: varchar('token', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }), // Optional: bind session to user (for future use)
+  issuedAt: timestamp('issued_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  lastUsed: timestamp('last_used').defaultNow().notNull(),
+});
