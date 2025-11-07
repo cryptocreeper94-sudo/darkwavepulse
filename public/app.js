@@ -1901,6 +1901,11 @@ document.getElementById('settingsBtn')?.addEventListener('click', () => {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
 });
 
+document.getElementById('walletBtn')?.addEventListener('click', () => {
+  switchTab('wallet');
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+});
+
 // Scan button in holdings tab
 document.getElementById('scanBtn')?.addEventListener('click', runScanner);
 
