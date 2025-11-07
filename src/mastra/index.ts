@@ -32,6 +32,7 @@ import { dexscreenerTool } from "./tools/dexscreenerTool";
 import { dexAnalysisTool } from "./tools/dexAnalysisTool";
 import { priceAlertTool } from "./tools/priceAlertTool";
 import { nftTool } from "./tools/nftTool";
+import { subscriptionTool } from "./tools/subscriptionTool";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -102,6 +103,7 @@ export const mastra = new Mastra({
         'dex-analysis-tool': dexAnalysisTool,
         'price-alert-tool': priceAlertTool,
         'nft-tool': nftTool,
+        'subscription-tool': subscriptionTool,
       },
     }),
   },
