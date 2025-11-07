@@ -179,6 +179,31 @@ export const mastra = new Mastra({
         },
       }),
       // Mini App Backend API Routes
+      // Access Code Verification
+      {
+        path: "/api/verify-access",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { code } = await c.req.json();
+            logger?.info('🔐 [Access Code] Verification attempt');
+            
+            const correctCode = process.env.ACCESS_CODE || 'Lucky777';
+            
+            if (code === correctCode) {
+              logger?.info('✅ [Access Code] Valid code entered');
+              return c.json({ success: true, message: 'Access granted' });
+            } else {
+              logger?.warn('❌ [Access Code] Invalid code attempt');
+              return c.json({ success: false, message: 'Invalid access code' }, 401);
+            }
+          } catch (error: any) {
+            logger?.error('🚨 [Access Code] Verification error', error);
+            return c.json({ error: 'Verification failed' }, 500);
+          }
+        }
+      },
       {
         path: "/api/analyze",
         method: "POST",
