@@ -47,35 +47,44 @@ export const marketDataTool = createTool({
     const ticker = context.ticker.toUpperCase();
     const days = context.days || 90;
 
-    // Auto-detect asset type with fallback logic
+    // Auto-detect asset type with smart fallback logic
     let assetType = context.type;
     
     if (!assetType) {
-      // Common stock patterns (longer tickers, dots for classes, known extensions)
-      const stockPatterns = [
-        ticker.includes('.'),  // E.g., BRK.B, GOOGL.L
-        ticker.length > 5,     // Most stocks are 1-5 chars, cryptos vary
-        /^[A-Z]{1,5}$/.test(ticker) && ticker !== ticker.slice(0, 4).toUpperCase(), // Typical stock format
-      ];
+      // Known crypto tickers - if matches, definitely crypto
+      const knownCryptos = ['BTC', 'ETH', 'SOL', 'USDT', 'USDC', 'BNB', 'XRP', 'ADA', 'DOGE', 'MATIC', 'DOT', 'SHIB', 'AVAX', 'UNI', 'LINK', 'ATOM', 'LTC', 'BCH', 'XLM', 'ALGO', 'ICP', 'FIL', 'NEAR', 'APT', 'ARB', 'OP', 'SUI'];
       
-      // If it looks like a stock ticker, try stock first
-      if (stockPatterns.some(p => p)) {
+      if (knownCryptos.includes(ticker)) {
+        assetType = 'crypto';
+      } else if (ticker.includes('.')) {
+        // Stocks with exchange suffix: BRK.B, GOOGL.L
         assetType = 'stock';
+      } else if (ticker.length > 5) {
+        // Most stocks are 1-5 chars
+        assetType = 'crypto';
       } else {
-        assetType = 'crypto'; // Try crypto first for ambiguous cases
+        // For ambiguous 1-5 character tickers, try stock first (AMD, AAPL, TSLA, etc.)
+        assetType = 'stock';
       }
     }
 
     logger?.info('📝 [MarketDataTool] Initial detection', { ticker, assetType });
 
-    // STRICT SEPARATION: Crypto → Binance, Stocks → Yahoo Finance
+    // Try the detected type first, then fallback to the other
     try {
       if (assetType === 'crypto') {
-        // For crypto, use Binance ONLY (keeps crypto separate from stocks)
-        logger?.info('📊 [MarketDataTool] Fetching crypto from Binance', { ticker });
-        return await fetchCryptoDataWithRetry(ticker, days, logger);
+        logger?.info('📊 [MarketDataTool] Fetching as crypto', { ticker });
+        try {
+          return await fetchCryptoDataWithRetry(ticker, days, logger);
+        } catch (cryptoError: any) {
+          logger?.warn('⚠️ [MarketDataTool] Crypto fetch failed, trying as stock', { 
+            error: cryptoError.message 
+          });
+          // Fallback to stock if crypto fails
+          return await fetchStockData(ticker, days, logger);
+        }
       } else {
-        // For stocks, use Yahoo Finance ONLY
+        logger?.info('📊 [MarketDataTool] Fetching as stock', { ticker });
         try {
           return await fetchStockData(ticker, days, logger);
         } catch (stockError: any) {
