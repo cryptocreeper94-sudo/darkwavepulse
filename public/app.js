@@ -1037,6 +1037,14 @@ async function searchAsset(query) {
   });
   
   const data = await response.json();
+  
+  // Check for server-side limit enforcement
+  if (response.status === 402 && data.upgradeRequired) {
+    hideLoading();
+    showUpgradeLimitModal('search', 10);
+    return;
+  }
+  
   if (data.error) {
     showToast(data.error);
     hideLoading();
