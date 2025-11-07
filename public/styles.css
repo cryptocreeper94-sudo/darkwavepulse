@@ -31,7 +31,6 @@
 .tooltip .tooltip-text {
   visibility: hidden;
   width: 280px;
-  max-width: calc(100vw - 40px);
   background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   color: var(--text-primary);
   text-align: left;
@@ -66,12 +65,25 @@
   opacity: 1;
 }
 
+/* Mobile: Keep tooltips safely on screen */
 @media (max-width: 480px) {
   .tooltip .tooltip-text {
-    width: 90vw;
-    max-width: 280px;
+    /* Use fixed positioning to keep tooltip centered in viewport */
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    bottom: auto;
+    top: 50%;
+    margin-top: -50px;
     font-size: 0.75rem;
     padding: 10px;
+  }
+  
+  .tooltip .tooltip-text::after {
+    display: none; /* Hide arrow on mobile since we're using fixed positioning */
   }
 }
 
