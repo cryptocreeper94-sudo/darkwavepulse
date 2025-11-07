@@ -1115,10 +1115,11 @@ body {
 }
 
 .chart-modal-content img {
-  max-width: 100%;
-  max-height: calc(100vh - 150px);
-  width: auto;
+  width: 95vw;
+  max-width: 95vw;
   height: auto;
+  max-height: 85vh;
+  object-fit: contain;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   cursor: pointer;
