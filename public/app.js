@@ -20,6 +20,25 @@ const state = {
   currentAnalysis: null
 };
 
+// ===== FEATURED TOKENS CONFIGURATION =====
+// Paste your token contract addresses here as you get them
+const FEATURED_TOKENS = [
+  // Example format (replace with your real addresses):
+  // { 
+  //   address: 'YOUR_TOKEN_CONTRACT_ADDRESS',
+  //   name: 'Token Name',
+  //   symbol: 'TICKER',
+  //   description: 'Your token description',
+  //   platform: 'pumpfun', // or 'raydium'
+  //   twitter: 'https://twitter.com/yourtoken',
+  //   telegram: 'https://t.me/yourtoken',
+  //   featured: true // Set to true for featured banner
+  // },
+  
+  // Add your tokens below (I'll add them as you send addresses):
+  
+];
+
 // Category Quick Picks Data
 const CATEGORY_DATA = {
   bluechip: {
@@ -1485,3 +1504,298 @@ if (tg) {
 if (state.currentTab === 'learn') {
   renderGlossary('', 'all');
 }
+
+// ===== FEATURED TOKENS SYSTEM =====
+
+// Fetch token data from Dexscreener
+async function fetchTokenData(tokenAddress) {
+  try {
+    const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
+    if (!response.ok) throw new Error('Failed to fetch token data');
+    const data = await response.json();
+    
+    if (!data.pairs || data.pairs.length === 0) return null;
+    
+    const pair = data.pairs[0];
+    return {
+      address: tokenAddress,
+      name: pair.baseToken?.name || 'Unknown',
+      symbol: pair.baseToken?.symbol || '???',
+      price: parseFloat(pair.priceUsd || 0),
+      priceChange24h: parseFloat(pair.priceChange?.h24 || 0),
+      volume24h: parseFloat(pair.volume?.h24 || 0),
+      liquidity: parseFloat(pair.liquidity?.usd || 0),
+      marketCap: parseFloat(pair.fdv || 0),
+      holders: 'N/A',
+      pairAddress: pair.pairAddress,
+      dexUrl: pair.url,
+      chain: pair.chainId || 'solana'
+    };
+  } catch (error) {
+    console.error('Error fetching token data:', error);
+    return null;
+  }
+}
+
+// Render Projects Tab
+async function renderProjectsTab() {
+  const container = document.getElementById('projectsContent');
+  
+  if (!FEATURED_TOKENS || FEATURED_TOKENS.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🚀</div>
+        <h3 style="color: var(--text-primary); margin-bottom: 12px;">No Projects Yet</h3>
+        <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">
+          Featured projects will appear here once tokens are added.
+        </p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading ${FEATURED_TOKENS.length} projects...</p>
+    </div>
+  `;
+  
+  const tokenDataPromises = FEATURED_TOKENS.map(token => 
+    fetchTokenData(token.address).then(data => ({ ...token, liveData: data }))
+  );
+  
+  const tokens = await Promise.all(tokenDataPromises);
+  
+  container.innerHTML = tokens.map(token => {
+    const data = token.liveData;
+    if (!data) {
+      return `
+        <div class="project-card">
+          <div style="text-align: center; padding: 20px;">
+            <p style="color: var(--text-secondary);">Failed to load: ${token.name || token.address}</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    const changeClass = data.priceChange24h >= 0 ? 'positive' : 'negative';
+    const platformClass = token.platform === 'raydium' ? 'raydium' : 'pumpfun';
+    const buyUrl = token.platform === 'raydium' 
+      ? `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token.address}`
+      : `https://pump.fun/${token.address}`;
+    
+    return `
+      <div class="project-card">
+        <div class="project-header">
+          <div class="project-title">
+            <h3>
+              ${data.name}
+              <span class="project-platform-badge ${platformClass}">${token.platform || 'pumpfun'}</span>
+            </h3>
+            <div class="project-symbol">$${data.symbol}</div>
+          </div>
+          <div class="project-price-info">
+            <div class="project-price">$${data.price.toFixed(8)}</div>
+            <div class="project-change ${changeClass}">
+              ${data.priceChange24h >= 0 ? '+' : ''}${data.priceChange24h.toFixed(2)}%
+            </div>
+          </div>
+        </div>
+        
+        ${token.description ? `<div class="project-description">${token.description}</div>` : ''}
+        
+        <div class="project-stats">
+          <div class="project-stat">
+            <span class="project-stat-label">Volume 24h</span>
+            <span class="project-stat-value">$${formatNumber(data.volume24h)}</span>
+          </div>
+          <div class="project-stat">
+            <span class="project-stat-label">Liquidity</span>
+            <span class="project-stat-value">$${formatNumber(data.liquidity)}</span>
+          </div>
+          <div class="project-stat">
+            <span class="project-stat-label">Market Cap</span>
+            <span class="project-stat-value">$${formatNumber(data.marketCap)}</span>
+          </div>
+        </div>
+        
+        <div class="project-actions">
+          <button class="project-btn project-btn-primary" onclick="window.open('${buyUrl}', '_blank')">
+            💰 Buy Now
+          </button>
+          <button class="project-btn project-btn-secondary" onclick="window.open('${data.dexUrl}', '_blank')">
+            📊 Chart
+          </button>
+          <button class="project-btn project-btn-secondary" onclick="addToHoldings('${data.symbol}')">
+            ⭐ Watch
+          </button>
+        </div>
+        
+        ${token.twitter || token.telegram ? `
+          <div class="project-socials">
+            ${token.twitter ? `<button class="project-social-btn" onclick="window.open('${token.twitter}', '_blank')">🐦 Twitter</button>` : ''}
+            ${token.telegram ? `<button class="project-social-btn" onclick="window.open('${token.telegram}', '_blank')">📱 Telegram</button>` : ''}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// Render Featured Banner
+async function renderFeaturedBanner() {
+  const banner = document.getElementById('featuredBanner');
+  const carousel = document.getElementById('featuredTokensCarousel');
+  
+  const featuredTokens = FEATURED_TOKENS.filter(t => t.featured);
+  
+  if (!featuredTokens || featuredTokens.length === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+  
+  banner.style.display = 'block';
+  carousel.innerHTML = `<div class="spinner" style="margin: 20px auto;"></div>`;
+  
+  const tokenDataPromises = featuredTokens.slice(0, 5).map(token => 
+    fetchTokenData(token.address).then(data => ({ ...token, liveData: data }))
+  );
+  
+  const tokens = await Promise.all(tokenDataPromises);
+  
+  carousel.innerHTML = tokens.map(token => {
+    const data = token.liveData;
+    if (!data) return '';
+    
+    const changeClass = data.priceChange24h >= 0 ? 'positive' : 'negative';
+    
+    return `
+      <div class="featured-token-card" onclick="switchTab('projects')">
+        <div class="featured-token-header">
+          <div class="featured-token-info">
+            <h4>${data.name}</h4>
+            <p>$${data.symbol}</p>
+          </div>
+          <div class="featured-token-price">
+            <div class="price">$${data.price.toFixed(8)}</div>
+            <div class="change ${changeClass}">
+              ${data.priceChange24h >= 0 ? '+' : ''}${data.priceChange24h.toFixed(2)}%
+            </div>
+          </div>
+        </div>
+        <div class="featured-token-stats">
+          <div class="featured-stat">
+            <div class="featured-stat-label">Volume</div>
+            <div class="featured-stat-value">$${formatNumber(data.volume24h)}</div>
+          </div>
+          <div class="featured-stat">
+            <div class="featured-stat-label">Liquidity</div>
+            <div class="featured-stat-value">$${formatNumber(data.liquidity)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Show Token of the Day popup
+async function showTokenOfDay() {
+  const lastShown = localStorage.getItem('tokenOfDayShown');
+  const today = new Date().toDateString();
+  
+  if (lastShown === today) return;
+  
+  const featuredTokens = FEATURED_TOKENS.filter(t => t.featured);
+  if (!featuredTokens || featuredTokens.length === 0) return;
+  
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const tokenIndex = dayOfYear % featuredTokens.length;
+  const token = featuredTokens[tokenIndex];
+  
+  const data = await fetchTokenData(token.address);
+  if (!data) return;
+  
+  const changeClass = data.priceChange24h >= 0 ? 'positive' : 'negative';
+  const buyUrl = token.platform === 'raydium' 
+    ? `https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${token.address}`
+    : `https://pump.fun/${token.address}`;
+  
+  document.getElementById('tokenOfDayContent').innerHTML = `
+    <div class="token-modal-badge">💎 Token of the Day</div>
+    <h2 class="token-modal-title">${data.name}</h2>
+    <p class="token-modal-subtitle">$${data.symbol} on ${token.platform || 'Pump.fun'}</p>
+    
+    <div class="project-header" style="margin-bottom: 20px;">
+      <div class="project-price-info" style="text-align: left;">
+        <div class="project-price">$${data.price.toFixed(8)}</div>
+        <div class="project-change ${changeClass}">
+          ${data.priceChange24h >= 0 ? '📈 +' : '📉 '}${Math.abs(data.priceChange24h).toFixed(2)}% (24h)
+        </div>
+      </div>
+    </div>
+    
+    ${token.description ? `<p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">${token.description}</p>` : ''}
+    
+    <div class="project-stats" style="margin-bottom: 20px;">
+      <div class="project-stat">
+        <span class="project-stat-label">Volume 24h</span>
+        <span class="project-stat-value">$${formatNumber(data.volume24h)}</span>
+      </div>
+      <div class="project-stat">
+        <span class="project-stat-label">Liquidity</span>
+        <span class="project-stat-value">$${formatNumber(data.liquidity)}</span>
+      </div>
+      <div class="project-stat">
+        <span class="project-stat-label">Market Cap</span>
+        <span class="project-stat-value">$${formatNumber(data.marketCap)}</span>
+      </div>
+    </div>
+    
+    <div class="project-actions">
+      <button class="project-btn project-btn-primary" onclick="window.open('${buyUrl}', '_blank')">
+        💰 Buy Now
+      </button>
+      <button class="project-btn project-btn-secondary" onclick="switchTab('projects'); closeTokenOfDay();">
+        🚀 View All Projects
+      </button>
+    </div>
+  `;
+  
+  document.getElementById('tokenOfDayModal').style.display = 'flex';
+  localStorage.setItem('tokenOfDayShown', today);
+}
+
+// Close Token of the Day popup
+function closeTokenOfDay() {
+  document.getElementById('tokenOfDayModal').style.display = 'none';
+}
+
+// Helper function to format numbers
+function formatNumber(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+  return num.toFixed(2);
+}
+
+// Update loadTabContent to handle Projects tab
+const originalLoadTabContent2 = loadTabContent;
+async function loadTabContent(tabName) {
+  await originalLoadTabContent2(tabName);
+  
+  if (tabName === 'movers') {
+    loadTopMovers('gainers');
+  } else if (tabName === 'learn') {
+    renderGlossary('', 'all');
+  } else if (tabName === 'projects') {
+    await renderProjectsTab();
+  } else if (tabName === 'analysis') {
+    await renderFeaturedBanner();
+  }
+}
+
+// Initialize featured system on page load
+setTimeout(() => {
+  renderFeaturedBanner();
+  showTokenOfDay();
+}, 1000);
