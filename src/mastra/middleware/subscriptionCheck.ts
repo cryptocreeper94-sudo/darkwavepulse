@@ -2,8 +2,28 @@ import { db } from "../../db/client.js";
 import { subscriptions, userUsage, whitelistedUsers } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
 
-export async function checkSubscriptionLimit(userId: string, feature: 'search' | 'alert', userEmail?: string): Promise<{ allowed: boolean; isPremium: boolean; isWhitelisted?: boolean; message?: string }> {
+// Helper: Get email from session token
+async function getEmailFromSession(sessionToken?: string): Promise<string | null> {
+  if (!sessionToken) return null;
+  
   try {
+    const { sessions } = await import('../../db/schema.js');
+    const [session] = await db.select()
+      .from(sessions)
+      .where(eq(sessions.token, sessionToken))
+      .limit(1);
+    
+    return session?.email || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function checkSubscriptionLimit(userId: string, feature: 'search' | 'alert', sessionToken?: string): Promise<{ allowed: boolean; isPremium: boolean; isWhitelisted?: boolean; message?: string }> {
+  try {
+    // Get email from session if token provided
+    const userEmail = await getEmailFromSession(sessionToken);
+    
     // Check if user is whitelisted first (by userId OR email)
     const { or } = await import('drizzle-orm');
     

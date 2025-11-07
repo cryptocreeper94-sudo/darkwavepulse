@@ -572,6 +572,126 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Email Registration - Auto-whitelist + admin notifications
+      {
+        path: "/api/register-email",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            const { email, sessionToken } = await c.req.json();
+            logger?.info('📧 [Email Registration] New registration attempt', { email: email?.substring(0, 10) + '...' });
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+              logger?.warn('⚠️ [Email Registration] Invalid email format');
+              return c.json({ 
+                success: false, 
+                message: 'Invalid email address' 
+              }, 400);
+            }
+            
+            const cleanEmail = email.trim().toLowerCase();
+            
+            // Update session with email
+            if (sessionToken) {
+              const { db } = await import('../db/client.js');
+              const { sessions } = await import('../db/schema.js');
+              const { eq } = await import('drizzle-orm');
+              
+              await db.update(sessions)
+                .set({ 
+                  email: cleanEmail,
+                  verifiedAt: new Date() // Auto-verify for simplicity
+                })
+                .where(eq(sessions.token, sessionToken));
+              
+              logger?.info('✅ [Email Registration] Session updated with email', { email: cleanEmail });
+            }
+            
+            // Auto-whitelist the email
+            const { db } = await import('../db/client.js');
+            const { whitelistedUsers } = await import('../db/schema.js');
+            
+            await db.insert(whitelistedUsers).values({
+              userId: cleanEmail,
+              email: cleanEmail,
+              reason: 'Email registration',
+              expiresAt: null,
+            }).onConflictDoNothing();
+            
+            logger?.info('✅ [Email Registration] Email auto-whitelisted', { email: cleanEmail });
+            
+            // Send Telegram notification to admin
+            try {
+              const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+              const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+              
+              if (telegramToken && adminChatId) {
+                const axios = await import('axios');
+                const message = `📧 *New Email Registration!*\n\n` +
+                  `✉️ Email: ${cleanEmail}\n` +
+                  `📅 Registered: ${new Date().toLocaleString()}\n` +
+                  `✅ Auto-whitelisted for unlimited access\n\n` +
+                  `🎯 Platform: ${sessionToken ? 'Mini App/Website' : 'Unknown'}`;
+                
+                await axios.default.post(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+                  chat_id: adminChatId,
+                  text: message,
+                  parse_mode: 'Markdown'
+                });
+                
+                logger?.info('📱 [Telegram] Admin notification sent for new registration', { email: cleanEmail });
+              }
+            } catch (telegramError: any) {
+              logger?.error('❌ [Telegram] Failed to send admin notification', { error: telegramError.message });
+            }
+            
+            // Send Email notification to admin
+            try {
+              const adminEmail = process.env.ADMIN_EMAIL;
+              
+              if (adminEmail) {
+                const { sendEmail } = await import('../utils/replitmail.js');
+                const htmlContent = `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #4ADE80;">📧 New Email Registration!</h2>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                      <p><strong>✉️ Email:</strong> ${cleanEmail}</p>
+                      <p><strong>📅 Registered:</strong> ${new Date().toLocaleString()}</p>
+                      <p><strong>✅ Status:</strong> Auto-whitelisted for unlimited access</p>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">User can now access all premium features without subscription.</p>
+                  </div>
+                `;
+                
+                await sendEmail({
+                  to: adminEmail,
+                  subject: '📧 New DarkWave Email Registration',
+                  html: htmlContent,
+                  text: `New Email Registration!\n\nEmail: ${cleanEmail}\nRegistered: ${new Date().toLocaleString()}\nStatus: Auto-whitelisted`
+                });
+                
+                logger?.info('📧 [Email] Admin notification sent for new registration', { email: cleanEmail });
+              }
+            } catch (emailError: any) {
+              logger?.error('❌ [Email] Failed to send admin notification', { error: emailError.message });
+            }
+            
+            return c.json({ 
+              success: true, 
+              message: 'Email registered successfully! You now have unlimited access.',
+              isWhitelisted: true
+            });
+            
+          } catch (error: any) {
+            logger?.error('🚨 [Email Registration] Registration error', error);
+            return c.json({ error: 'Registration failed' }, 500);
+          }
+        }
+      },
       {
         path: "/api/analyze",
         method: "POST",
@@ -590,9 +710,10 @@ export const mastra = new Mastra({
             const { ticker, userId } = await c.req.json();
             logger?.info('📊 [Mini App] Analysis request', { ticker, userId });
             
-            // Check subscription limits
+            // Check subscription limits (pass session token for email whitelist check)
+            const sessionToken = c.req.header('X-Session-Token');
             const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
-            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search', sessionToken);
             
             if (!limitCheck.allowed) {
               logger?.warn('🚫 [Mini App] Usage limit exceeded', { userId });
@@ -948,9 +1069,10 @@ export const mastra = new Mastra({
             const { ticker, targetPrice, condition, userId } = await c.req.json();
             logger?.info('➕ [Mini App] Create alert request', { ticker, targetPrice, condition, userId });
             
-            // Check subscription limits
+            // Check subscription limits (pass session token for email whitelist check)
+            const sessionToken = c.req.header('X-Session-Token');
             const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
-            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'alert');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'alert', sessionToken);
             
             if (!limitCheck.allowed) {
               logger?.warn('🚫 [Mini App] Alert limit exceeded', { userId });
@@ -2250,9 +2372,10 @@ export const mastra = new Mastra({
             const { query, userId } = await c.req.json();
             logger?.info('🎨 [Mini App] NFT analysis request', { query, userId });
             
-            // Check subscription limits
+            // Check subscription limits (pass session token for email whitelist check)
+            const sessionToken = c.req.header('X-Session-Token');
             const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
-            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search', sessionToken);
             
             if (!limitCheck.allowed) {
               logger?.warn('🚫 [Mini App] NFT search limit exceeded', { userId });

@@ -35,6 +35,8 @@ export const whitelistedUsers = pgTable('whitelisted_users', {
 export const sessions = pgTable('sessions', {
   token: varchar('token', { length: 255 }).primaryKey(),
   userId: varchar('user_id', { length: 255 }), // Optional: bind session to user (for future use)
+  email: varchar('email', { length: 255 }), // Email address for email-based whitelist
+  verifiedAt: timestamp('verified_at'), // When email was verified (null = unverified)
   issuedAt: timestamp('issued_at').defaultNow().notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   lastUsed: timestamp('last_used').defaultNow().notNull(),
