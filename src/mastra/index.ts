@@ -188,6 +188,18 @@ export const mastra = new Mastra({
             const { ticker, userId } = await c.req.json();
             logger?.info('📊 [Mini App] Analysis request', { ticker, userId });
             
+            // Check subscription limits
+            const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search');
+            
+            if (!limitCheck.allowed) {
+              logger?.warn('🚫 [Mini App] Usage limit exceeded', { userId });
+              return c.json({ 
+                error: limitCheck.message,
+                upgradeRequired: true
+              }, 402); // 402 Payment Required
+            }
+            
             // Step 1: Get market data
             const marketData = await marketDataTool.execute({
               context: { ticker, days: 90 },
@@ -492,6 +504,19 @@ export const mastra = new Mastra({
           try {
             const { ticker, targetPrice, condition, userId } = await c.req.json();
             logger?.info('➕ [Mini App] Create alert request', { ticker, targetPrice, condition, userId });
+            
+            // Check subscription limits
+            const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'alert');
+            
+            if (!limitCheck.allowed) {
+              logger?.warn('🚫 [Mini App] Alert limit exceeded', { userId });
+              return c.json({ 
+                success: false,
+                message: limitCheck.message,
+                upgradeRequired: true
+              }, 402); // 402 Payment Required
+            }
             
             const result = await priceAlertTool.execute({
               context: {
@@ -1243,6 +1268,18 @@ export const mastra = new Mastra({
           try {
             const { query, userId } = await c.req.json();
             logger?.info('🎨 [Mini App] NFT analysis request', { query, userId });
+            
+            // Check subscription limits
+            const { checkSubscriptionLimit } = await import('./middleware/subscriptionCheck.js');
+            const limitCheck = await checkSubscriptionLimit(userId || 'demo-user', 'search');
+            
+            if (!limitCheck.allowed) {
+              logger?.warn('🚫 [Mini App] NFT search limit exceeded', { userId });
+              return c.json({ 
+                error: limitCheck.message,
+                upgradeRequired: true
+              }, 402);
+            }
             
             const result = await nftTool.execute({
               context: { query },
