@@ -220,8 +220,15 @@ export const mastra = new Mastra({
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
           try {
-            const { code } = await c.req.json();
-            logger?.info('🔐 [Access Code] Verification attempt');
+            const { code, userId } = await c.req.json();
+            logger?.info('🔐 [Access Code] Verification attempt', { userId });
+            
+            if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+              return c.json({ 
+                success: false, 
+                message: 'User ID is required' 
+              }, 400);
+            }
             
             const correctCode = process.env.ACCESS_CODE;
             
@@ -231,18 +238,18 @@ export const mastra = new Mastra({
             }
             
             if (code === correctCode) {
-              // Generate session token
+              // Generate session token with user ID
               const { generateSessionToken } = await import('./middleware/accessControl.js');
-              const sessionToken = await generateSessionToken();
+              const sessionToken = await generateSessionToken(userId.trim());
               
-              logger?.info('✅ [Access Code] Valid code entered, session created');
+              logger?.info('✅ [Access Code] Valid code entered, session created', { userId: userId.trim() });
               return c.json({ 
                 success: true, 
                 message: 'Access granted',
                 sessionToken 
               });
             } else {
-              logger?.warn('❌ [Access Code] Invalid code attempt');
+              logger?.warn('❌ [Access Code] Invalid code attempt', { userId: userId.trim() });
               return c.json({ success: false, message: 'Invalid access code' }, 401);
             }
           } catch (error: any) {

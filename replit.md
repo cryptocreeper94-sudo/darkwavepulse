@@ -12,6 +12,10 @@ The application uses a workflow-based architecture to process user messages thro
 
 **New in v2.3**: Live trending carousel with auto-scroll animation showing real-time prices and 24h changes for all categories. Fetches live data from CoinGecko (crypto) and Dexscreener (DEX pairs) with 5-minute browser caching to minimize API calls. Supports 10-20 users with 100+ daily loads under free API tier limits.
 
+**New in v2.4**: Database-backed session management with PostgreSQL storage (30-day expiry). Tracked wallets feature (read-only, up to 5 Solana wallets per user) with automatic balance fetching via Helius API.
+
+**Security Note**: Current implementation uses browser-generated unique user IDs for session isolation. For production Telegram Mini App deployment, implement Telegram initData HMAC-SHA256 signature validation to cryptographically verify user identity and prevent ID spoofing.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

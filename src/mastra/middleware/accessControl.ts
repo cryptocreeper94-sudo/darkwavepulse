@@ -6,14 +6,18 @@ import { eq, lt } from 'drizzle-orm';
 // Session expiry: 30 days
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
-export async function generateSessionToken(userId?: string): Promise<string> {
+export async function generateSessionToken(userId: string): Promise<string> {
+  if (!userId || userId === 'demo-user') {
+    throw new Error('Valid userId required for session generation');
+  }
+  
   const token = randomBytes(32).toString('hex');
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_DURATION_MS);
   
   await db.insert(sessions).values({
     token,
-    userId: userId || null,
+    userId,
     issuedAt: now,
     expiresAt,
     lastUsed: now
@@ -122,7 +126,14 @@ export async function checkAccessSession(c: any): Promise<{ valid: boolean; user
       .set({ lastUsed: new Date() })
       .where(eq(sessions.token, sessionToken));
     
-    return { valid: true, userId: session.userId || 'demo-user' };
+    if (!session.userId) {
+      return {
+        valid: false,
+        error: c.json({ error: 'Invalid session: no user ID' }, 401)
+      };
+    }
+    
+    return { valid: true, userId: session.userId };
   } catch (error) {
     console.error('Session verification error:', error);
     return {
