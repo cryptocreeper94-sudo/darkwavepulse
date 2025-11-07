@@ -43,6 +43,7 @@ export const trackedWallets = pgTable('tracked_wallets', {
   id: varchar('id', { length: 255 }).primaryKey(),
   userId: varchar('user_id', { length: 255 }).notNull(),
   address: varchar('address', { length: 255 }).notNull(),
+  chain: varchar('chain', { length: 50 }).notNull().default('solana'), // 'solana' | 'ethereum' | 'polygon' | 'arbitrum' | 'base' | 'bsc'
   nickname: varchar('nickname', { length: 100 }), // Optional nickname for the wallet
   balance: text('balance'), // JSON string of token balances
   lastUpdated: timestamp('last_updated').defaultNow().notNull(),

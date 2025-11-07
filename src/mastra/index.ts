@@ -784,6 +784,7 @@ export const mastra = new Mastra({
               wallets: wallets.map(w => ({
                 id: w.id,
                 address: w.address,
+                chain: w.chain || 'solana',
                 nickname: w.nickname,
                 balance: w.balance ? JSON.parse(w.balance) : null,
                 lastUpdated: w.lastUpdated
@@ -808,8 +809,9 @@ export const mastra = new Mastra({
           }
           
           const userId = sessionCheck.userId || 'demo-user';
-          const { address, nickname } = await c.req.json();
-          logger?.info('➕ [Tracked Wallets] POST request', { userId, address });
+          const { address, nickname, chain } = await c.req.json();
+          const selectedChain = chain || 'solana'; // Default to Solana
+          logger?.info('➕ [Tracked Wallets] POST request', { userId, address, chain: selectedChain });
           
           try {
             const { db } = await import('../db/client.js');
@@ -839,17 +841,82 @@ export const mastra = new Mastra({
               }, 400);
             }
             
-            // Fetch balance from Helius
+            // Fetch balance based on chain
             let balance = null;
             try {
-              const response = await fetch(
-                `https://api.helius.xyz/v0/addresses/${address}/balances?api-key=demo`,
-                { method: 'GET' }
-              );
-              const data = await response.json();
-              balance = JSON.stringify(data);
-            } catch (err) {
-              logger?.warn('Failed to fetch balance, saving wallet anyway');
+              if (selectedChain === 'solana') {
+                // Solana via Helius
+                const response = await fetch(
+                  `https://api.helius.xyz/v0/addresses/${address}/balances?api-key=demo`,
+                  { method: 'GET' }
+                );
+                const data = await response.json();
+                balance = JSON.stringify(data);
+              } else {
+                // EVM chains (Ethereum, Polygon, Arbitrum, Base, BSC) via Alchemy free API
+                // PRODUCTION NOTE: Replace 'demo' with your own Alchemy API key or use environment variable
+                // Get your API key at: https://dashboard.alchemy.com/
+                const alchemyApiKey = process.env.ALCHEMY_API_KEY || 'demo';
+                const rpcUrls: Record<string, string> = {
+                  ethereum: `https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  polygon: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  arbitrum: `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  base: `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  bsc: 'https://bsc-dataseed1.binance.org' // Public BSC RPC (consider paid alternative for production)
+                };
+                
+                const rpcUrl = rpcUrls[selectedChain];
+                if (!rpcUrl) {
+                  return c.json({ 
+                    success: false, 
+                    message: `Unsupported chain: ${selectedChain}` 
+                  }, 400);
+                }
+                
+                // Get native balance via eth_getBalance
+                const response = await fetch(rpcUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'eth_getBalance',
+                    params: [address, 'latest'],
+                    id: 1
+                  })
+                });
+                
+                const data = await response.json();
+                
+                // Check for RPC errors
+                if (data.error) {
+                  logger?.error('🚨 [Tracked Wallets] RPC error', { error: data.error, address, chain: selectedChain });
+                  return c.json({ 
+                    success: false, 
+                    message: `Failed to fetch balance: ${data.error.message || 'RPC error'}` 
+                  }, 500);
+                }
+                
+                if (!data.result) {
+                  logger?.error('🚨 [Tracked Wallets] No result from RPC', { address, chain: selectedChain });
+                  return c.json({ 
+                    success: false, 
+                    message: 'Failed to fetch balance from RPC provider' 
+                  }, 500);
+                }
+                
+                // Use BigInt for safe handling of large balances
+                const balanceWei = BigInt(data.result);
+                const balanceEthBigInt = balanceWei / BigInt(1e15); // Convert to milliETH first
+                const balanceEth = Number(balanceEthBigInt) / 1000; // Then to ETH
+                
+                balance = JSON.stringify({
+                  nativeBalance: balanceWei.toString(), // Store as string to preserve precision
+                  nativeBalanceFormatted: balanceEth,
+                  chain: selectedChain
+                });
+              }
+            } catch (err: any) {
+              logger?.warn('Failed to fetch balance, saving wallet anyway', { error: err.message });
             }
             
             // Insert wallet
@@ -858,6 +925,7 @@ export const mastra = new Mastra({
               id,
               userId,
               address,
+              chain: selectedChain,
               nickname: nickname || null,
               balance,
               lastUpdated: new Date(),
@@ -867,7 +935,7 @@ export const mastra = new Mastra({
             return c.json({ 
               success: true, 
               message: 'Wallet added',
-              wallet: { id, address, nickname, balance: balance ? JSON.parse(balance) : null }
+              wallet: { id, address, chain: selectedChain, nickname, balance: balance ? JSON.parse(balance) : null }
             });
           } catch (error: any) {
             logger?.error('❌ [Tracked Wallets] POST error', { error: error.message });

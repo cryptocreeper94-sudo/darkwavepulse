@@ -2970,14 +2970,56 @@ async function loadTrackedWallets() {
     
     list.innerHTML = data.wallets.map(wallet => {
       const shortAddr = `${wallet.address.slice(0,6)}...${wallet.address.slice(-4)}`;
-      const balance = wallet.balance?.tokens?.length || 0;
-      const solBalance = wallet.balance?.nativeBalance || 0;
+      const chain = wallet.chain || 'solana';
+      
+      // Chain badges with colors
+      const chainBadges = {
+        solana: { emoji: '◎', name: 'SOL', color: '#14F195' },
+        ethereum: { emoji: '♦', name: 'ETH', color: '#627EEA' },
+        polygon: { emoji: '⬡', name: 'MATIC', color: '#8247E5' },
+        arbitrum: { emoji: '◆', name: 'ARB', color: '#28A0F0' },
+        base: { emoji: '🔵', name: 'BASE', color: '#0052FF' },
+        bsc: { emoji: '◉', name: 'BSC', color: '#F3BA2F' }
+      };
+      
+      const badge = chainBadges[chain] || chainBadges.solana;
+      
+      // Format balance based on chain
+      let balanceDisplay;
+      if (chain === 'solana') {
+        const solBalance = wallet.balance?.nativeBalance || 0;
+        const tokenCount = wallet.balance?.tokens?.length || 0;
+        balanceDisplay = `
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Balance</div>
+            <div style="font-weight: 600;">${(solBalance / 1e9).toFixed(4)} ${badge.name}</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Tokens</div>
+            <div style="font-weight: 600;">${tokenCount} tokens</div>
+          </div>
+        `;
+      } else {
+        // EVM chains - balance could be number or string
+        const nativeBalance = wallet.balance?.nativeBalanceFormatted || 0;
+        const balanceNum = typeof nativeBalance === 'string' ? parseFloat(nativeBalance) : nativeBalance;
+        const balanceStr = balanceNum.toFixed(6);
+        balanceDisplay = `
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Balance</div>
+            <div style="font-weight: 600;">${balanceStr} ${badge.name}</div>
+          </div>
+        `;
+      }
       
       return `
-        <div class="wallet-card" style="margin-bottom: 12px; border-left: 3px solid #A855F7;">
+        <div class="wallet-card" style="margin-bottom: 12px; border-left: 3px solid ${badge.color};">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
             <div style="flex: 1;">
-              ${wallet.nickname ? `<div style="font-weight: 600; margin-bottom: 4px;">${wallet.nickname}</div>` : ''}
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                ${wallet.nickname ? `<span style="font-weight: 600;">${wallet.nickname}</span>` : ''}
+                <span style="padding: 2px 8px; border-radius: 12px; background: ${badge.color}20; color: ${badge.color}; font-size: 0.7rem; font-weight: 600;">${badge.emoji} ${badge.name}</span>
+              </div>
               <div style="font-family: monospace; font-size: 0.85rem; color: var(--text-secondary);">${shortAddr}</div>
             </div>
             <button onclick="removeTrackedWallet('${wallet.id}')" style="padding: 4px 8px; background: rgba(230, 57, 70, 0.2); border: 1px solid #E63946; border-radius: 6px; color: #E63946; font-size: 0.8rem; cursor: pointer;">
@@ -2985,14 +3027,7 @@ async function loadTrackedWallets() {
             </button>
           </div>
           <div style="display: flex; gap: 16px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary);">SOL Balance</div>
-              <div style="font-weight: 600;">${(solBalance / 1e9).toFixed(4)} SOL</div>
-            </div>
-            <div>
-              <div style="font-size: 0.75rem; color: var(--text-secondary);">Tokens</div>
-              <div style="font-weight: 600;">${balance} tokens</div>
-            </div>
+            ${balanceDisplay}
           </div>
         </div>
       `;
@@ -3031,6 +3066,7 @@ window.removeTrackedWallet = async function(walletId) {
 document.getElementById('addWalletBtn')?.addEventListener('click', async () => {
   const address = document.getElementById('walletAddressInput').value.trim();
   const nickname = document.getElementById('walletNicknameInput').value.trim();
+  const chain = document.getElementById('walletChainSelect')?.value || 'solana';
   
   if (!address) {
     showToast('Please enter a wallet address');
@@ -3042,7 +3078,7 @@ document.getElementById('addWalletBtn')?.addEventListener('click', async () => {
     const response = await fetch(`${API_BASE}/api/tracked-wallets`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ address, nickname: nickname || null })
+      body: JSON.stringify({ address, nickname: nickname || null, chain })
     });
     
     const data = await response.json();
