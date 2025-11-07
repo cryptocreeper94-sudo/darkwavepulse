@@ -14,10 +14,14 @@ export const chartGeneratorTool = createTool({
     ticker: z.string().describe("Ticker symbol"),
     prices: z.array(z.object({
       timestamp: z.number(),
+      open: z.number().optional(),
+      high: z.number().optional(),
+      low: z.number().optional(),
       close: z.number(),
     })).describe("Historical price data"),
     ema50: z.array(z.number()).describe("50-day EMA values"),
     ema200: z.array(z.number()).describe("200-day EMA values"),
+    chartType: z.enum(['line', 'candlestick']).optional().describe("Chart type: line or candlestick (defaults to line)"),
   }),
 
   outputSchema: z.object({
@@ -55,42 +59,101 @@ export const chartGeneratorTool = createTool({
       const ema50Padded = [...Array(ema50PadLength).fill(null), ...ema50Data];
       const ema200Padded = [...Array(ema200PadLength).fill(null), ...ema200Data];
 
-      // Create Chart.js v4 configuration
-      const chartConfig = {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Price',
-              data: closePrices,
-              borderColor: 'rgb(75, 192, 192)',
-              backgroundColor: 'rgba(75, 192, 192, 0.1)',
-              borderWidth: 2,
-              fill: true,
-              tension: 0.1,
+      const chartType = context.chartType || 'line';
+      let chartConfig: any;
+
+      if (chartType === 'candlestick') {
+        // Prepare candlestick data (OHLC format)
+        const candlestickData = recentPrices.map(p => ({
+          x: p.timestamp * 1000,
+          o: p.open || p.close,
+          h: p.high || p.close,
+          l: p.low || p.close,
+          c: p.close,
+        }));
+
+        // Create candlestick chart configuration
+        chartConfig = {
+          type: 'candlestick',
+          data: {
+            datasets: [
+              {
+                label: context.ticker,
+                data: candlestickData,
+                borderColor: {
+                  up: 'rgb(75, 192, 128)',
+                  down: 'rgb(239, 68, 68)',
+                  unchanged: 'rgb(156, 163, 175)',
+                },
+                backgroundColor: {
+                  up: 'rgba(75, 192, 128, 0.5)',
+                  down: 'rgba(239, 68, 68, 0.5)',
+                  unchanged: 'rgba(156, 163, 175, 0.5)',
+                },
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: `${context.ticker} - Candlestick Chart`,
+                font: { size: 16 },
+              },
+              legend: { display: false },
             },
-            {
-              label: 'EMA 50',
-              data: ema50Padded,
-              borderColor: 'rgb(255, 159, 64)',
-              borderWidth: 2,
-              fill: false,
-              tension: 0.1,
-              pointRadius: 0,
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: 'day' },
+              },
+              y: {
+                ticks: {
+                  callback: function(value: any) {
+                    return '$' + value.toFixed(2);
+                  },
+                },
+              },
             },
-            {
-              label: 'EMA 200',
-              data: ema200Padded,
-              borderColor: 'rgb(153, 102, 255)',
-              borderWidth: 2,
-              fill: false,
-              tension: 0.1,
-              pointRadius: 0,
-            },
-          ],
-        },
-        options: {
+          },
+        };
+      } else {
+        // Create line chart configuration (default)
+        chartConfig = {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Price',
+                data: closePrices,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1,
+              },
+              {
+                label: 'EMA 50',
+                data: ema50Padded,
+                borderColor: 'rgb(255, 159, 64)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1,
+                pointRadius: 0,
+              },
+              {
+                label: 'EMA 200',
+                data: ema200Padded,
+                borderColor: 'rgb(153, 102, 255)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1,
+                pointRadius: 0,
+              },
+            ],
+          },
+          options: {
           plugins: {
             title: {
               display: true,
@@ -113,8 +176,9 @@ export const chartGeneratorTool = createTool({
               },
             },
           },
-        },
-      };
+          },
+        };
+      }
 
       // Encode chart config for QuickChart.io
       const chartJson = JSON.stringify(chartConfig);

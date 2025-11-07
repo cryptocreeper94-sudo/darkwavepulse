@@ -1383,10 +1383,14 @@ async function loadChart(ticker) {
     const chartContainer = document.getElementById('chartContainer');
     
     if (data.success && data.chartUrl && chartContainer) {
-      chartContainer.innerHTML = `<img src="${data.chartUrl}" style="width: 100%; border-radius: 8px;" alt="Price Chart" />`;
+      chartContainer.innerHTML = `<img src="${data.chartUrl}" style="width: 100%; border-radius: 8px; cursor: pointer; display: block;" alt="Price Chart" />`;
       
-      // Add click handler to open full-screen modal
+      // Add click handler to both container and image for full clickability
       chartContainer.onclick = () => openChartModal(data.chartUrl, ticker);
+      const img = chartContainer.querySelector('img');
+      if (img) {
+        img.onclick = () => openChartModal(data.chartUrl, ticker);
+      }
       
       // Store chart URL for modal
       state.currentChartUrl = data.chartUrl;
