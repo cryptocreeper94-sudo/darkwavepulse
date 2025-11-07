@@ -47,6 +47,18 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
+  // Token #3: Illuminati
+  { 
+    address: 'FXXVV7T7MHptzLMd9b4cCtUYpqqbVg8rUGxMtRTuUq5k',
+    name: 'Illuminati',
+    symbol: '$OBEY',
+    description: 'The all-seeing eye watches',
+    platform: 'pumpfun',
+    twitter: '',
+    telegram: '',
+    featured: true
+  },
+  
   // Add more tokens below as you send them:
   
 ];
