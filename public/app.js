@@ -83,6 +83,18 @@ const FEATURED_TOKENS = [
     featured: true
   },
   
+  // Token #6: Pumpocracy - 2025
+  { 
+    address: '3eFj4ujRnuWH9SpvHyK9o4VJymkWHKsoweP5916Rywux',
+    name: 'Pumpocracy - 2025',
+    symbol: '$P-25',
+    description: 'Power to the pumpers',
+    platform: 'pumpfun',
+    twitter: '',
+    telegram: '',
+    featured: true
+  },
+  
   // Add more tokens below as you send them:
   
 ];
