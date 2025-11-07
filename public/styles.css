@@ -31,6 +31,7 @@
 .tooltip .tooltip-text {
   visibility: hidden;
   width: 280px;
+  max-width: calc(100vw - 40px);
   background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   color: var(--text-primary);
   text-align: left;
@@ -40,7 +41,7 @@
   z-index: 1000;
   bottom: 125%;
   left: 50%;
-  margin-left: -140px;
+  transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.3s;
   border: 2px solid var(--primary-purple);
@@ -67,9 +68,10 @@
 
 @media (max-width: 480px) {
   .tooltip .tooltip-text {
-    width: 220px;
-    margin-left: -110px;
+    width: 90vw;
+    max-width: 280px;
     font-size: 0.75rem;
+    padding: 10px;
   }
 }
 
