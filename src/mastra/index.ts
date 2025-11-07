@@ -185,8 +185,26 @@ export const mastra = new Mastra({
         createHandler: async ({ mastra }) => async (c: any) => {
           const fs = await import('fs/promises');
           const path = await import('path');
-          const html = await fs.readFile(path.join(process.cwd(), 'public', 'index.html'), 'utf-8');
-          return c.html(html);
+          const url = await import('url');
+          
+          // Try multiple paths for dev vs deployment
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possiblePaths = [
+            path.join(process.cwd(), 'public', 'index.html'),
+            path.join(__dirname, '..', '..', 'public', 'index.html'),
+            path.join(__dirname, '..', '..', '..', 'public', 'index.html'),
+          ];
+          
+          for (const filePath of possiblePaths) {
+            try {
+              const html = await fs.readFile(filePath, 'utf-8');
+              return c.html(html);
+            } catch (err) {
+              continue;
+            }
+          }
+          
+          return c.text('Frontend not found. Tried paths: ' + possiblePaths.join(', '), 404);
         }
       },
       // Serve static assets
@@ -196,9 +214,26 @@ export const mastra = new Mastra({
         createHandler: async ({ mastra }) => async (c: any) => {
           const fs = await import('fs/promises');
           const path = await import('path');
-          const js = await fs.readFile(path.join(process.cwd(), 'public', 'app.js'), 'utf-8');
-          c.header('Content-Type', 'application/javascript');
-          return c.body(js);
+          const url = await import('url');
+          
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possiblePaths = [
+            path.join(process.cwd(), 'public', 'app.js'),
+            path.join(__dirname, '..', '..', 'public', 'app.js'),
+            path.join(__dirname, '..', '..', '..', 'public', 'app.js'),
+          ];
+          
+          for (const filePath of possiblePaths) {
+            try {
+              const js = await fs.readFile(filePath, 'utf-8');
+              c.header('Content-Type', 'application/javascript');
+              return c.body(js);
+            } catch (err) {
+              continue;
+            }
+          }
+          
+          return c.text('app.js not found', 404);
         }
       },
       {
@@ -207,9 +242,26 @@ export const mastra = new Mastra({
         createHandler: async ({ mastra }) => async (c: any) => {
           const fs = await import('fs/promises');
           const path = await import('path');
-          const css = await fs.readFile(path.join(process.cwd(), 'public', 'styles.css'), 'utf-8');
-          c.header('Content-Type', 'text/css');
-          return c.body(css);
+          const url = await import('url');
+          
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possiblePaths = [
+            path.join(process.cwd(), 'public', 'styles.css'),
+            path.join(__dirname, '..', '..', 'public', 'styles.css'),
+            path.join(__dirname, '..', '..', '..', 'public', 'styles.css'),
+          ];
+          
+          for (const filePath of possiblePaths) {
+            try {
+              const css = await fs.readFile(filePath, 'utf-8');
+              c.header('Content-Type', 'text/css');
+              return c.body(css);
+            } catch (err) {
+              continue;
+            }
+          }
+          
+          return c.text('styles.css not found', 404);
         }
       },
       // Mini App Backend API Routes
