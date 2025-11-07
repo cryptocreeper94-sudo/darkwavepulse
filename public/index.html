@@ -33,6 +33,10 @@
         <span class="tab-icon">⭐</span>
         <span class="tab-label">Holdings</span>
       </button>
+      <button class="tab-btn" data-tab="projects">
+        <span class="tab-icon">🚀</span>
+        <span class="tab-label">Projects</span>
+      </button>
       <button class="tab-btn" data-tab="learn">
         <span class="tab-icon">📚</span>
         <span class="tab-label">Learn</span>
@@ -73,6 +77,15 @@
             <span class="category-icon">🔄</span>
             <span class="category-label">DEX</span>
           </button>
+        </div>
+
+        <!-- Featured Tokens Banner -->
+        <div id="featuredBanner" class="featured-banner" style="display: none;">
+          <div class="featured-header">
+            <span class="featured-label">⭐ Featured Projects</span>
+            <button class="featured-view-all" onclick="switchTab('projects')">View All →</button>
+          </div>
+          <div id="featuredTokensCarousel" class="featured-carousel"></div>
         </div>
 
         <!-- Blockchain Filter (for crypto categories) -->
@@ -393,6 +406,21 @@
         <!-- Glossary Content -->
         <div id="glossaryContent" class="glossary-content"></div>
       </div>
+
+      <!-- Projects Tab -->
+      <div id="projects" class="tab-pane">
+        <div class="section-header">
+          <h2>🚀 Featured Projects</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Discover innovative tokens with real potential</p>
+        </div>
+
+        <div id="projectsContent" class="projects-content">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading projects...</p>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -410,6 +438,17 @@
 
   <!-- Toast Notifications -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- Token of the Day Popup -->
+  <div id="tokenOfDayModal" class="token-modal" style="display: none;">
+    <div class="token-modal-overlay" onclick="closeTokenOfDay()"></div>
+    <div class="token-modal-content">
+      <button class="token-modal-close" onclick="closeTokenOfDay()">✕</button>
+      <div id="tokenOfDayContent">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
 
   <script src="/mini-app/app.js"></script>
 </body>
