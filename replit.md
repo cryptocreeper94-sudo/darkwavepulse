@@ -10,6 +10,8 @@ The application uses a workflow-based architecture to process user messages thro
 
 **New in v2.2**: NFT collection analysis with curated database of popular collections (BAYC, Azuki, Pudgy Penguins, DeGods, Milady, Lil Pudgys). Supports search by collection name or contract address. Educational glossary expanded with 8 NFT-specific terms (Floor Price, Mint, Reveal, Utility, Royalties, Trait Rarity, Allowlist, Bluechip NFT).
 
+**New in v2.3**: Live trending carousel with auto-scroll animation showing real-time prices and 24h changes for all categories. Fetches live data from CoinGecko (crypto) and Dexscreener (DEX pairs) with 5-minute browser caching to minimize API calls. Supports 10-20 users with 100+ daily loads under free API tier limits.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

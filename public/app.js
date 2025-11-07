@@ -17,7 +17,9 @@ const state = {
   currentCategory: 'bluechip',
   currentBlockchain: 'all',
   userId: tg?.initDataUnsafe?.user?.id || 'demo-user',
-  currentAnalysis: null
+  currentAnalysis: null,
+  trendingCache: {}, // Cache for trending data
+  trendingCacheTime: {} // Cache timestamps
 };
 
 // ===== FEATURED TOKENS CONFIGURATION =====
@@ -684,68 +686,177 @@ function updateCategoryUI(category) {
   `;
 }
 
-// Trending Carousel Data
-const TRENDING_DATA = {
+// Trending Carousel Configuration (icons and tickers)
+const TRENDING_CONFIG = {
   bluechip: [
-    { icon: '₿', name: 'Bitcoin', ticker: 'BTC', price: '$95,234', change: '+3.5%', positive: true },
-    { icon: '♦️', name: 'Ethereum', ticker: 'ETH', price: '$2,456', change: '+2.1%', positive: true },
-    { icon: '⚡', name: 'Solana', ticker: 'SOL', price: '$145', change: '+8.3%', positive: true },
-    { icon: '🟡', name: 'BNB', ticker: 'BNB', price: '$612', change: '-1.2%', positive: false },
-    { icon: '🔷', name: 'XRP', ticker: 'XRP', price: '$0.58', change: '+5.7%', positive: true },
-    { icon: '🌙', name: 'Cardano', ticker: 'ADA', price: '$0.42', change: '+1.9%', positive: true }
+    { icon: '₿', id: 'bitcoin', ticker: 'BTC' },
+    { icon: '♦️', id: 'ethereum', ticker: 'ETH' },
+    { icon: '⚡', id: 'solana', ticker: 'SOL' },
+    { icon: '🟡', id: 'binancecoin', ticker: 'BNB' },
+    { icon: '🔷', id: 'ripple', ticker: 'XRP' },
+    { icon: '🌙', id: 'cardano', ticker: 'ADA' }
   ],
   stocks: [
-    { icon: '🍎', name: 'Apple', ticker: 'AAPL', price: '$178.32', change: '+1.4%', positive: true },
-    { icon: '⚡', name: 'Tesla', ticker: 'TSLA', price: '$242.84', change: '+4.2%', positive: true },
-    { icon: '🎮', name: 'NVIDIA', ticker: 'NVDA', price: '$485.23', change: '+6.8%', positive: true },
-    { icon: '🛒', name: 'Amazon', ticker: 'AMZN', price: '$168.45', change: '+2.1%', positive: true },
-    { icon: '🔍', name: 'Google', ticker: 'GOOGL', price: '$138.27', change: '+1.7%', positive: true },
-    { icon: '💻', name: 'Microsoft', ticker: 'MSFT', price: '$392.14', change: '+0.9%', positive: true }
+    { icon: '🍎', ticker: 'AAPL', name: 'Apple' },
+    { icon: '⚡', ticker: 'TSLA', name: 'Tesla' },
+    { icon: '🎮', ticker: 'NVDA', name: 'NVIDIA' },
+    { icon: '🛒', ticker: 'AMZN', name: 'Amazon' },
+    { icon: '🔍', ticker: 'GOOGL', name: 'Google' },
+    { icon: '💻', ticker: 'MSFT', name: 'Microsoft' }
   ],
   meme: [
-    { icon: '🐕', name: 'Dogecoin', ticker: 'DOGE', price: '$0.142', change: '+12.5%', positive: true },
-    { icon: '🐸', name: 'Pepe', ticker: 'PEPE', price: '$0.000009', change: '+18.3%', positive: true },
-    { icon: '🐶', name: 'Shiba Inu', ticker: 'SHIB', price: '$0.000012', change: '+7.2%', positive: true },
-    { icon: '🦴', name: 'Bonk', ticker: 'BONK', price: '$0.000015', change: '+24.8%', positive: true },
-    { icon: '🧢', name: 'WIF', ticker: 'WIF', price: '$2.34', change: '+15.1%', positive: true },
-    { icon: '🎩', name: 'FLOKI', ticker: 'FLOKI', price: '$0.00018', change: '+9.4%', positive: true }
+    { icon: '🐕', id: 'dogecoin', ticker: 'DOGE' },
+    { icon: '🐸', id: 'pepe', ticker: 'PEPE' },
+    { icon: '🐶', id: 'shiba-inu', ticker: 'SHIB' },
+    { icon: '🦴', id: 'bonk', ticker: 'BONK' },
+    { icon: '🧢', id: 'dogwifcoin', ticker: 'WIF' },
+    { icon: '🎩', id: 'floki', ticker: 'FLOKI' }
   ],
   defi: [
-    { icon: '🦄', name: 'Uniswap', ticker: 'UNI', price: '$8.45', change: '+5.3%', positive: true },
-    { icon: '👻', name: 'Aave', ticker: 'AAVE', price: '$145.23', change: '+3.8%', positive: true },
-    { icon: '🏦', name: 'Maker', ticker: 'MKR', price: '$1,234', change: '+2.4%', positive: true },
-    { icon: '💎', name: 'Compound', ticker: 'COMP', price: '$56.78', change: '-1.2%', positive: false },
-    { icon: '🌊', name: 'SushiSwap', ticker: 'SUSHI', price: '$1.23', change: '+6.7%', positive: true },
-    { icon: '🔵', name: 'Curve', ticker: 'CRV', price: '$0.85', change: '+4.1%', positive: true }
+    { icon: '🦄', id: 'uniswap', ticker: 'UNI' },
+    { icon: '👻', id: 'aave', ticker: 'AAVE' },
+    { icon: '🏦', id: 'maker', ticker: 'MKR' },
+    { icon: '💎', id: 'compound-governance-token', ticker: 'COMP' },
+    { icon: '🌊', id: 'sushi', ticker: 'SUSHI' },
+    { icon: '🔵', id: 'curve-dao-token', ticker: 'CRV' }
   ],
   dex: [
-    { icon: '🔥', name: 'BONK/SOL', ticker: 'BONK', price: '$0.000015', change: '+145%', positive: true },
-    { icon: '🚀', name: 'PEPE/ETH', ticker: 'PEPE', price: '$0.000009', change: '+89%', positive: true },
-    { icon: '💫', name: 'WIF/SOL', ticker: 'WIF', price: '$2.34', change: '+67%', positive: true },
-    { icon: '⚡', name: 'MEME/SOL', ticker: 'MEME', price: '$0.045', change: '+234%', positive: true },
-    { icon: '🌟', name: 'BOME/SOL', ticker: 'BOME', price: '$0.012', change: '+178%', positive: true },
-    { icon: '💎', name: 'MEW/SOL', ticker: 'MEW', price: '$0.0078', change: '+156%', positive: true }
+    { icon: '🔥', ticker: 'BONK', search: 'bonk solana' },
+    { icon: '🚀', ticker: 'PEPE', search: 'pepe ethereum' },
+    { icon: '💫', ticker: 'WIF', search: 'wif solana' },
+    { icon: '⚡', ticker: 'MEME', search: 'meme solana' },
+    { icon: '🌟', ticker: 'BOME', search: 'bome solana' },
+    { icon: '💎', ticker: 'MEW', search: 'mew solana' }
   ],
   nft: [
-    { icon: '🐵', name: 'BAYC', ticker: 'BAYC', price: '30.5 ETH', change: '+12.4%', positive: true },
-    { icon: '🎨', name: 'Azuki', ticker: 'AZUKI', price: '15.2 ETH', change: '-5.3%', positive: false },
-    { icon: '🐧', name: 'Pudgys', ticker: 'PPG', price: '12.8 ETH', change: '+18.7%', positive: true },
-    { icon: '👑', name: 'DeGods', ticker: 'DGOD', price: '8.5 ETH', change: '-3.2%', positive: false },
-    { icon: '✨', name: 'Milady', ticker: 'MIL', price: '3.2 ETH', change: '+22.1%', positive: true },
-    { icon: '🐧', name: 'Lil Pudgys', ticker: 'LPG', price: '2.8 ETH', change: '+8.5%', positive: true }
+    { icon: '🐵', ticker: 'BAYC', name: 'BAYC' },
+    { icon: '🎨', ticker: 'AZUKI', name: 'Azuki' },
+    { icon: '🐧', ticker: 'PPG', name: 'Pudgys' },
+    { icon: '👑', ticker: 'DGOD', name: 'DeGods' },
+    { icon: '✨', ticker: 'MIL', name: 'Milady' },
+    { icon: '🐧', ticker: 'LPG', name: 'Lil Pudgys' }
   ]
 };
 
-function loadTrendingCarousel(category) {
+// Fetch live trending data with 5-minute caching
+async function fetchLiveTrendingData(category) {
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const now = Date.now();
+  
+  // Check cache
+  if (state.trendingCache[category] && 
+      state.trendingCacheTime[category] && 
+      (now - state.trendingCacheTime[category] < CACHE_DURATION)) {
+    return state.trendingCache[category];
+  }
+  
+  try {
+    const config = TRENDING_CONFIG[category];
+    if (!config) return [];
+    
+    let items = [];
+    
+    if (category === 'bluechip' || category === 'meme' || category === 'defi') {
+      // Fetch crypto data from CoinGecko
+      const ids = config.map(c => c.id).join(',');
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+      const data = await response.json();
+      
+      items = config.map(cfg => {
+        const coinData = data[cfg.id];
+        if (!coinData) return null;
+        
+        const price = coinData.usd;
+        const change = coinData.usd_24h_change || 0;
+        
+        return {
+          icon: cfg.icon,
+          name: cfg.ticker,
+          ticker: cfg.ticker,
+          price: price >= 1 ? `$${price.toFixed(2)}` : `$${price.toFixed(6)}`,
+          change: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
+          positive: change >= 0
+        };
+      }).filter(item => item !== null);
+      
+    } else if (category === 'stocks') {
+      // For stocks, use static data (Yahoo Finance requires API key for live data)
+      items = config.map(cfg => ({
+        icon: cfg.icon,
+        name: cfg.name,
+        ticker: cfg.ticker,
+        price: '–',
+        change: 'Live',
+        positive: true
+      }));
+      
+    } else if (category === 'dex') {
+      // Fetch DEX data from Dexscreener
+      const searchPromises = config.map(async cfg => {
+        try {
+          const response = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${cfg.search || cfg.ticker}`);
+          const data = await response.json();
+          
+          if (data.pairs && data.pairs.length > 0) {
+            const pair = data.pairs[0];
+            const change = parseFloat(pair.priceChange?.h24 || 0);
+            
+            return {
+              icon: cfg.icon,
+              name: pair.baseToken?.symbol || cfg.ticker,
+              ticker: cfg.ticker,
+              price: pair.priceUsd ? `$${parseFloat(pair.priceUsd).toFixed(8)}` : '–',
+              change: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
+              positive: change >= 0
+            };
+          }
+        } catch (e) {
+          console.error('DEX fetch error:', e);
+        }
+        return null;
+      });
+      
+      const results = await Promise.all(searchPromises);
+      items = results.filter(item => item !== null);
+      
+    } else if (category === 'nft') {
+      // NFT data remains static (no free API)
+      items = config.map(cfg => ({
+        icon: cfg.icon,
+        name: cfg.name,
+        ticker: cfg.ticker,
+        price: '–',
+        change: 'Floor',
+        positive: true
+      }));
+    }
+    
+    // Cache the results
+    state.trendingCache[category] = items;
+    state.trendingCacheTime[category] = now;
+    
+    return items;
+    
+  } catch (error) {
+    console.error('Error fetching trending data:', error);
+    return [];
+  }
+}
+
+async function loadTrendingCarousel(category) {
   const trendingItems = document.getElementById('trendingItems');
-  const items = TRENDING_DATA[category] || [];
+  
+  // Show loading state
+  trendingItems.innerHTML = '<div style="color: var(--text-secondary); padding: 1rem; text-align: center;">Loading trending...</div>';
+  document.getElementById('trendingCarousel').style.display = 'block';
+  
+  // Fetch live data
+  const items = await fetchLiveTrendingData(category);
   
   if (items.length === 0) {
     document.getElementById('trendingCarousel').style.display = 'none';
     return;
   }
-  
-  document.getElementById('trendingCarousel').style.display = 'block';
   
   // Duplicate items for seamless infinite scroll
   const duplicatedItems = [...items, ...items];
