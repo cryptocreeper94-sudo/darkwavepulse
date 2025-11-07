@@ -237,11 +237,13 @@ const CATEGORY_DATA = {
   }
 };
 
-// Comprehensive Trading Glossary
+// Comprehensive Trading Glossary with Categories
 const GLOSSARY_TERMS = [
+  // Technical Indicators
   {
     term: 'RSI',
     full: 'Relative Strength Index',
+    category: 'indicators',
     level: 'beginner',
     definition: 'A momentum indicator that measures the speed and magnitude of price changes on a scale of 0-100. Values above 70 suggest overbought conditions, while values below 30 indicate oversold conditions.',
     example: 'If BTC has an RSI of 25, it may be oversold and due for a bounce upward.'
@@ -249,6 +251,7 @@ const GLOSSARY_TERMS = [
   {
     term: 'MACD',
     full: 'Moving Average Convergence Divergence',
+    category: 'indicators',
     level: 'intermediate',
     definition: 'A trend-following momentum indicator that shows the relationship between two exponential moving averages (12-day and 26-day). When MACD crosses above the signal line, it generates a bullish signal.',
     example: 'A MACD crossover from -2.5 to +1.2 suggests strengthening upward momentum.'
@@ -256,6 +259,7 @@ const GLOSSARY_TERMS = [
   {
     term: 'EMA',
     full: 'Exponential Moving Average',
+    category: 'indicators',
     level: 'beginner',
     definition: 'A type of moving average that gives more weight to recent prices, making it more responsive to new information than a simple moving average.',
     example: 'The 50-day EMA is often used to identify the medium-term trend direction.'
@@ -263,85 +267,74 @@ const GLOSSARY_TERMS = [
   {
     term: 'SMA',
     full: 'Simple Moving Average',
+    category: 'indicators',
     level: 'beginner',
     definition: 'The average price over a specific number of periods, calculated by adding closing prices and dividing by the number of periods. Smooths out price data to identify trends.',
     example: 'A 200-day SMA is commonly used to determine the long-term trend - prices above it suggest a bull market.'
   },
   {
-    term: 'Support',
-    level: 'beginner',
-    definition: 'A price level where buying interest is strong enough to prevent the price from falling further. Acts as a "floor" for the price.',
-    example: 'If ETH repeatedly bounces at $3,000, that level becomes a strong support zone.'
-  },
-  {
-    term: 'Resistance',
-    level: 'beginner',
-    definition: 'A price level where selling pressure is strong enough to prevent the price from rising higher. Acts as a "ceiling" for the price.',
-    example: 'If SOL fails to break above $150 multiple times, that becomes a resistance level.'
-  },
-  {
     term: 'Bollinger Bands',
+    category: 'indicators',
     level: 'intermediate',
     definition: 'Volatility indicator consisting of a moving average with upper and lower bands 2 standard deviations away. Price touching the upper band suggests overbought, lower band suggests oversold.',
     example: 'When price breaks above the upper Bollinger Band, it often indicates strong momentum but potential reversal.'
   },
   {
     term: 'Volume',
+    category: 'indicators',
     level: 'beginner',
     definition: 'The number of shares or coins traded during a specific period. High volume confirms trend strength, while low volume suggests weak conviction.',
     example: 'A price breakout with 3x average volume is more reliable than one with low volume.'
   },
+  
+  // Chart Patterns & Analysis
   {
-    term: 'Market Cap',
-    full: 'Market Capitalization',
+    term: 'Support',
+    category: 'patterns',
     level: 'beginner',
-    definition: 'The total value of all coins or shares in circulation, calculated as price × circulating supply. Indicates the relative size of an asset.',
-    example: 'BTC with a $1.2T market cap is a blue chip, while a $50M cap coin is considered small cap.'
+    definition: 'A price level where buying interest is strong enough to prevent the price from falling further. Acts as a "floor" for the price.',
+    example: 'If ETH repeatedly bounces at $3,000, that level becomes a strong support zone.'
   },
   {
-    term: 'Liquidity',
-    level: 'intermediate',
-    definition: 'How easily an asset can be bought or sold without significantly affecting its price. Higher liquidity means tighter spreads and less slippage.',
-    example: 'A DEX pair with $10M liquidity will have less slippage than one with $100K.'
-  },
-  {
-    term: 'Bull Market',
+    term: 'Resistance',
+    category: 'patterns',
     level: 'beginner',
-    definition: 'A market condition characterized by rising prices and optimistic investor sentiment, typically defined as a 20%+ increase from recent lows.',
-    example: 'The 2021 crypto bull market saw BTC rise from $10K to $69K.'
-  },
-  {
-    term: 'Bear Market',
-    level: 'beginner',
-    definition: 'A market condition characterized by falling prices and pessimistic sentiment, typically defined as a 20%+ decline from recent highs.',
-    example: 'The 2022 bear market saw many altcoins drop 80-90% from their peaks.'
+    definition: 'A price level where selling pressure is strong enough to prevent the price from rising higher. Acts as a "ceiling" for the price.',
+    example: 'If SOL fails to break above $150 multiple times, that becomes a resistance level.'
   },
   {
     term: 'Breakout',
+    category: 'patterns',
     level: 'intermediate',
     definition: 'When price moves above a resistance level or below a support level with increased volume, often signaling the start of a new trend.',
     example: 'BTC breaking above $50K resistance with high volume could signal a move to $60K.'
   },
   {
     term: 'Consolidation',
+    category: 'patterns',
     level: 'intermediate',
     definition: 'A period where price moves sideways in a tight range, typically occurring after a strong move as the market digests gains or losses.',
     example: 'After rallying 40%, ETH consolidated between $3,200-$3,400 for two weeks.'
   },
   {
     term: 'Divergence',
+    category: 'patterns',
     level: 'advanced',
     definition: 'When price and an indicator (like RSI or MACD) move in opposite directions. Bullish divergence: price makes lower lows while indicator makes higher lows. Bearish divergence: opposite.',
     example: 'Price making new lows while RSI makes higher lows (bullish divergence) often precedes a reversal.'
   },
+  
+  // Trading Strategies
   {
     term: 'Stop Loss',
+    category: 'trading',
     level: 'beginner',
     definition: 'An order placed to automatically sell an asset when it reaches a specific price, limiting potential losses on a trade.',
     example: 'Setting a stop loss at $95 when buying at $100 limits your maximum loss to 5%.'
   },
   {
     term: 'Take Profit',
+    category: 'trading',
     level: 'beginner',
     definition: 'An order to automatically sell an asset when it reaches a target price, locking in gains.',
     example: 'Setting a take profit at $120 when buying at $100 secures a 20% gain.'
@@ -349,13 +342,31 @@ const GLOSSARY_TERMS = [
   {
     term: 'DCA',
     full: 'Dollar-Cost Averaging',
+    category: 'trading',
     level: 'beginner',
     definition: 'An investment strategy of buying fixed dollar amounts at regular intervals regardless of price, reducing the impact of volatility.',
     example: 'Buying $100 of BTC every week averages out your entry price over time.'
   },
   {
+    term: 'Market Order',
+    category: 'trading',
+    level: 'beginner',
+    definition: 'An order to buy or sell immediately at the current market price, guaranteeing execution but not price.',
+    example: 'A market order to buy 1 ETH will execute instantly at whatever price sellers are offering.'
+  },
+  {
+    term: 'Limit Order',
+    category: 'trading',
+    level: 'beginner',
+    definition: 'An order to buy or sell at a specific price or better. Won\'t execute until the market reaches that price.',
+    example: 'A limit buy order at $50K for BTC will only execute if BTC drops to $50K or below.'
+  },
+  
+  // Crypto Acronyms & Slang
+  {
     term: 'ATH',
     full: 'All-Time High',
+    category: 'acronyms',
     level: 'beginner',
     definition: 'The highest price an asset has ever reached in its trading history.',
     example: 'BTC\'s ATH was $69,000 in November 2021.'
@@ -363,6 +374,7 @@ const GLOSSARY_TERMS = [
   {
     term: 'ATL',
     full: 'All-Time Low',
+    category: 'acronyms',
     level: 'beginner',
     definition: 'The lowest price an asset has ever reached since it began trading.',
     example: 'Many altcoins hit new ATLs during the 2022 bear market.'
@@ -370,6 +382,7 @@ const GLOSSARY_TERMS = [
   {
     term: 'FOMO',
     full: 'Fear Of Missing Out',
+    category: 'acronyms',
     level: 'beginner',
     definition: 'The anxiety of potentially missing a profitable opportunity, often leading to impulsive buying at high prices.',
     example: 'FOMO drove many retail investors to buy BTC near $69K in 2021.'
@@ -377,57 +390,85 @@ const GLOSSARY_TERMS = [
   {
     term: 'FUD',
     full: 'Fear, Uncertainty, and Doubt',
+    category: 'acronyms',
     level: 'beginner',
     definition: 'Negative information or rumors spread to create fear and drive prices down, sometimes deliberately by competitors or short sellers.',
     example: 'Regulatory FUD can cause sudden price drops even without actual policy changes.'
   },
   {
+    term: 'Hodl',
+    category: 'acronyms',
+    level: 'beginner',
+    definition: 'A misspelling of "hold" that became a meme, meaning to hold crypto long-term regardless of price fluctuations.',
+    example: 'Many BTC hodlers who held through the 2018 bear market profited in 2021.'
+  },
+  
+  // Market Terms
+  {
+    term: 'Market Cap',
+    full: 'Market Capitalization',
+    category: 'market',
+    level: 'beginner',
+    definition: 'The total value of all coins or shares in circulation, calculated as price × circulating supply. Indicates the relative size of an asset.',
+    example: 'BTC with a $1.2T market cap is a blue chip, while a $50M cap coin is considered small cap.'
+  },
+  {
+    term: 'Liquidity',
+    category: 'market',
+    level: 'intermediate',
+    definition: 'How easily an asset can be bought or sold without significantly affecting its price. Higher liquidity means tighter spreads and less slippage.',
+    example: 'A DEX pair with $10M liquidity will have less slippage than one with $100K.'
+  },
+  {
+    term: 'Bull Market',
+    category: 'market',
+    level: 'beginner',
+    definition: 'A market condition characterized by rising prices and optimistic investor sentiment, typically defined as a 20%+ increase from recent lows.',
+    example: 'The 2021 crypto bull market saw BTC rise from $10K to $69K.'
+  },
+  {
+    term: 'Bear Market',
+    category: 'market',
+    level: 'beginner',
+    definition: 'A market condition characterized by falling prices and pessimistic sentiment, typically defined as a 20%+ decline from recent highs.',
+    example: 'The 2022 bear market saw many altcoins drop 80-90% from their peaks.'
+  },
+  {
     term: 'Whale',
+    category: 'market',
     level: 'intermediate',
     definition: 'An individual or entity that holds a very large amount of a cryptocurrency, capable of moving the market with their trades.',
     example: 'A whale selling 10,000 BTC can cause significant price drops.'
   },
-  {
-    term: 'Rug Pull',
-    level: 'intermediate',
-    definition: 'A scam where developers abandon a project and run away with investors\' funds, common in new DeFi tokens and meme coins.',
-    example: 'The project\'s liquidity was drained overnight - it was a rug pull.'
-  },
+  
+  // Blockchain & DeFi
   {
     term: 'Gas Fees',
+    category: 'blockchain',
     level: 'beginner',
     definition: 'Transaction fees paid to blockchain validators for processing transactions. Varies by network congestion.',
     example: 'Ethereum gas fees can range from $2 during low activity to $50+ during high demand.'
   },
   {
     term: 'Slippage',
+    category: 'blockchain',
     level: 'intermediate',
     definition: 'The difference between the expected price of a trade and the actual executed price, caused by market movement or low liquidity.',
     example: 'With 5% slippage, a $100 buy order might execute at $105 in a fast-moving market.'
   },
   {
+    term: 'Rug Pull',
+    category: 'blockchain',
+    level: 'intermediate',
+    definition: 'A scam where developers abandon a project and run away with investors\' funds, common in new DeFi tokens and meme coins.',
+    example: 'The project\'s liquidity was drained overnight - it was a rug pull.'
+  },
+  {
     term: 'Pump and Dump',
+    category: 'blockchain',
     level: 'intermediate',
     definition: 'A scheme where a group artificially inflates (pumps) the price of an asset through coordinated buying or hype, then sells (dumps) at the peak.',
     example: 'The coin pumped 300% in an hour, then crashed 90% - classic pump and dump.'
-  },
-  {
-    term: 'Hodl',
-    level: 'beginner',
-    definition: 'A misspelling of "hold" that became a meme, meaning to hold crypto long-term regardless of price fluctuations.',
-    example: 'Many BTC hodlers who held through the 2018 bear market profited in 2021.'
-  },
-  {
-    term: 'Market Order',
-    level: 'beginner',
-    definition: 'An order to buy or sell immediately at the current market price, guaranteeing execution but not price.',
-    example: 'A market order to buy 1 ETH will execute instantly at whatever price sellers are offering.'
-  },
-  {
-    term: 'Limit Order',
-    level: 'beginner',
-    definition: 'An order to buy or sell at a specific price or better. Won\'t execute until the market reaches that price.',
-    example: 'A limit buy order at $50K for BTC will only execute if BTC drops to $50K or below.'
   }
 ];
 
@@ -1453,12 +1494,32 @@ document.getElementById('addAlertBtn')?.addEventListener('click', () => {
 
 // ===== GLOSSARY FUNCTIONALITY =====
 let currentLetter = 'ALL';
+let currentCategory = 'all';
 let expandedTerms = new Set();
 
-function renderGlossary(searchTerm = '') {
+const CATEGORY_NAMES = {
+  indicators: '📊 Technical Indicators',
+  patterns: '📈 Chart Patterns & Analysis',
+  trading: '💰 Trading Strategies',
+  acronyms: '🔤 Crypto Acronyms & Slang',
+  market: '💎 Market Terms',
+  blockchain: '⛓️ Blockchain & DeFi'
+};
+
+function renderGlossary(searchTerm = '', category = null) {
   const glossaryContent = document.getElementById('glossaryContent');
   
+  // Update current category if provided
+  if (category !== null) {
+    currentCategory = category;
+  }
+  
   let filteredTerms = GLOSSARY_TERMS;
+  
+  // Filter by category
+  if (currentCategory !== 'all') {
+    filteredTerms = filteredTerms.filter(t => t.category === currentCategory);
+  }
   
   // Filter by search term
   if (searchTerm) {
@@ -1485,23 +1546,36 @@ function renderGlossary(searchTerm = '') {
     return;
   }
   
-  // Group by first letter
-  const grouped = {};
-  filteredTerms.forEach(term => {
-    const letter = term.term.charAt(0).toUpperCase();
-    if (!grouped[letter]) grouped[letter] = [];
-    grouped[letter].push(term);
-  });
+  // Group by category if showing all, otherwise by letter
+  let grouped = {};
+  if (currentCategory === 'all' && !searchTerm && currentLetter === 'ALL') {
+    // Group by category
+    filteredTerms.forEach(term => {
+      const cat = term.category || 'other';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(term);
+    });
+  } else {
+    // Group by first letter
+    filteredTerms.forEach(term => {
+      const letter = term.term.charAt(0).toUpperCase();
+      if (!grouped[letter]) grouped[letter] = [];
+      grouped[letter].push(term);
+    });
+  }
   
-  // Sort alphabetically
-  const letters = Object.keys(grouped).sort();
+  const groupKeys = Object.keys(grouped).sort();
   
-  glossaryContent.innerHTML = letters.map(letter => `
+  glossaryContent.innerHTML = groupKeys.map(key => {
+    const isCategory = currentCategory === 'all' && !searchTerm && currentLetter === 'ALL';
+    const groupTitle = isCategory ? (CATEGORY_NAMES[key] || key) : key;
+    
+    return `
     <div class="letter-group" style="margin-bottom: 24px;">
-      <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; padding: 8px 0; border-bottom: 2px solid var(--primary);">
-        ${letter}
+      <div style="font-size: 1.5rem; font-weight: 700; color: var(--glow-purple); margin-bottom: 12px; padding: 8px 0; border-bottom: 2px solid var(--glow-purple);">
+        ${groupTitle}
       </div>
-      ${grouped[letter].map(term => {
+      ${grouped[key].map(term => {
         const termId = term.term.replace(/\s+/g, '-').toLowerCase();
         const isExpanded = expandedTerms.has(termId);
         return `
@@ -1545,6 +1619,25 @@ if (glossarySearch) {
     renderGlossary(e.target.value);
   });
 }
+
+// Category filter buttons
+document.querySelectorAll('.category-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const category = btn.dataset.category;
+    currentCategory = category;
+    currentLetter = 'ALL'; // Reset letter filter when changing category
+    
+    document.querySelectorAll('.category-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Reset alphabet nav to ALL
+    document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.path-btn[data-path="all"]')?.classList.add('active');
+    
+    renderGlossary('', category);
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+  });
+});
 
 // Alphabet navigation buttons
 document.querySelectorAll('.path-btn').forEach(btn => {
