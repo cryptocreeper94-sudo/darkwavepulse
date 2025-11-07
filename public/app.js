@@ -1030,7 +1030,7 @@ function showUpgradeLimitModal(feature, limit) {
 async function searchAsset(query) {
   const response = await fetch(`${API_BASE}/api/analyze`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ 
       ticker: query,
       userId: state.userId 
@@ -1063,7 +1063,7 @@ async function searchAsset(query) {
 async function searchNFT(query) {
   const response = await fetch(`${API_BASE}/api/nft-analyze`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ 
       query: query,
       userId: state.userId 
@@ -1375,7 +1375,7 @@ async function loadChart(ticker) {
   try {
     const response = await fetch(`${API_BASE}/api/chart`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ ticker, userId: state.userId })
     });
     
@@ -1431,8 +1431,16 @@ function closeChartModal() {
 
 // ===== ACCESS CODE SYSTEM =====
 function checkAccessCode() {
-  const savedCode = localStorage.getItem('darkwave_access');
-  return savedCode === 'granted';
+  const savedToken = localStorage.getItem('darkwave_session');
+  return !!savedToken;
+}
+
+function getAuthHeaders() {
+  const sessionToken = localStorage.getItem('darkwave_session');
+  return {
+    'Content-Type': 'application/json',
+    'X-Session-Token': sessionToken || ''
+  };
 }
 
 async function verifyAccessCode(code) {
@@ -1445,7 +1453,8 @@ async function verifyAccessCode(code) {
     
     const data = await response.json();
     
-    if (data.success) {
+    if (data.success && data.sessionToken) {
+      localStorage.setItem('darkwave_session', data.sessionToken);
       localStorage.setItem('darkwave_access', 'granted');
       state.accessGranted = true;
       return true;
@@ -1626,7 +1635,9 @@ async function loadHoldings() {
   holdingsList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
   
   try {
-    const response = await fetch(`${API_BASE}/api/holdings?userId=${state.userId}`);
+    const response = await fetch(`${API_BASE}/api/holdings?userId=${state.userId}`, {
+      headers: getAuthHeaders()
+    });
     const holdings = await response.json();
     
     let html = '';
@@ -1682,7 +1693,7 @@ async function runScanner() {
   try {
     const response = await fetch(`${API_BASE}/api/scanner`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ type: 'crypto', limit: 20, userId: state.userId })
     });
     
@@ -1729,7 +1740,7 @@ async function addToHoldings(ticker) {
   try {
     await fetch(`${API_BASE}/api/holdings`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ ticker, userId: state.userId })
     });
     showToast(`${ticker} added to watchlist!`);
@@ -1742,7 +1753,9 @@ async function addToHoldings(ticker) {
 // Wallet
 async function loadWallet() {
   try {
-    const response = await fetch(`${API_BASE}/api/wallet?userId=${state.userId}`);
+    const response = await fetch(`${API_BASE}/api/wallet?userId=${state.userId}`, {
+      headers: getAuthHeaders()
+    });
     const wallet = await response.json();
     
     const walletStatus = document.getElementById('walletStatus');
@@ -2152,7 +2165,9 @@ async function cancelSubscription() {
 // ===== PRICE ALERTS FUNCTIONALITY =====
 async function loadPriceAlerts() {
   try {
-    const response = await fetch(`${API_BASE}/api/alerts?userId=${state.userId}`);
+    const response = await fetch(`${API_BASE}/api/alerts?userId=${state.userId}`, {
+      headers: getAuthHeaders()
+    });
     const data = await response.json();
     
     const alertsList = document.getElementById('alertsList');
@@ -2187,7 +2202,8 @@ async function loadPriceAlerts() {
 async function deleteAlert(alertId) {
   try {
     const response = await fetch(`${API_BASE}/api/alerts/${alertId}?userId=${state.userId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
     const result = await response.json();
     
@@ -2225,7 +2241,7 @@ window.addPriceAlert = async function() {
   try {
     const response = await fetch(`${API_BASE}/api/alerts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         ticker: ticker.toUpperCase(),
         targetPrice,
