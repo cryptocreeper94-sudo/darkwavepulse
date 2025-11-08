@@ -851,14 +851,14 @@ export const mastra = new Mastra({
             
             // METHOD 1: Check if code matches "lucky 777"
             if (code === correctCode) {
-              // Generate session token with user ID
+              // Generate session token with user ID (7-day free tier)
               const { generateSessionToken } = await import('./middleware/accessControl.js');
-              const sessionToken = await generateSessionToken(userId.trim());
+              const sessionToken = await generateSessionToken(userId.trim(), undefined, false);
               
-              logger?.info('✅ [Access Code] Valid code entered, session created', { userId: userId.trim() });
+              logger?.info('✅ [Access Code] Valid code entered, 7-day session created', { userId: userId.trim() });
               return c.json({ 
                 success: true, 
-                message: 'Access granted',
+                message: 'Access granted (7-day trial)',
                 sessionToken 
               });
             }
@@ -886,9 +886,9 @@ export const mastra = new Mastra({
                   return c.json({ success: false, message: 'Email whitelist has expired' }, 401);
                 }
                 
-                // Generate session token with email attached
+                // Generate session token with email attached (30-day premium)
                 const { generateSessionToken } = await import('./middleware/accessControl.js');
-                const sessionToken = await generateSessionToken(userId.trim(), cleanEmail);
+                const sessionToken = await generateSessionToken(userId.trim(), cleanEmail, true);
                 
                 logger?.info('✅ [Email Access] Whitelisted email granted access', { 
                   email: cleanEmail, 
@@ -898,7 +898,7 @@ export const mastra = new Mastra({
                 
                 return c.json({ 
                   success: true, 
-                  message: 'Whitelisted email - access granted',
+                  message: 'Whitelisted email - premium access granted',
                   sessionToken,
                   isPremium: true // Whitelisted users get premium
                 });

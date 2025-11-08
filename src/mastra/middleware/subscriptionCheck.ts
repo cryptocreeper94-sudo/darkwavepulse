@@ -70,9 +70,10 @@ export async function checkSubscriptionLimit(userId: string, feature: 'search' |
     }
     
     // Free users have limits
+    // Free tier limits (updated Nov 2025)
     const limits = {
-      search: 10,
-      alert: 3
+      search: 20,  // Increased from 10 to 20 searches/day
+      alert: 3     // 3 price alerts/day
     };
     
     // Get or create usage record
