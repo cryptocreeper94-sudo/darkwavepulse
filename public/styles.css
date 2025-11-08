@@ -686,14 +686,33 @@ body::before {
   font-weight: 600;
 }
 
-/* Market Overview Table */
+/* Market Overview Table - Geometric Modern */
 .market-overview-container {
-  background: rgba(10, 0, 5, 0.6);
-  border: 1px solid rgba(168, 85, 247, 0.2);
-  border-radius: 12px;
-  padding: 16px;
+  background: linear-gradient(135deg, rgba(10, 0, 5, 0.7), rgba(26, 10, 31, 0.5));
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 16px;
+  padding: 18px;
   margin-bottom: 1.5rem;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.market-overview-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #FF006E, #A855F7, #FF006E);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .market-overview-header {
@@ -737,8 +756,9 @@ body::before {
 }
 
 .market-table tbody tr:hover {
-  background: rgba(168, 85, 247, 0.1);
-  transform: scale(1.01);
+  background: linear-gradient(90deg, rgba(255, 0, 110, 0.08), rgba(168, 85, 247, 0.08));
+  transform: translateX(4px);
+  border-left: 3px solid #FF006E;
 }
 
 .market-table td {
@@ -787,10 +807,15 @@ body::before {
   }
 }
 
-/* Trending Carousel */
+/* Trending Carousel - Compact Geometric */
 .trending-carousel {
   margin-bottom: 1.5rem;
   overflow: hidden;
+  background: linear-gradient(135deg, rgba(10, 0, 5, 0.6), rgba(26, 10, 31, 0.4));
+  border: 1px solid rgba(255, 0, 110, 0.2);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .trending-header {
