@@ -1800,13 +1800,111 @@ async function verifyAccessCode(code) {
       localStorage.setItem('darkwave_session', data.sessionToken);
       localStorage.setItem('darkwave_access', 'granted');
       state.accessGranted = true;
-      return true;
+      // Return full data object so we can check if premium
+      return { success: true, isPremium: data.isPremium, message: data.message };
     }
-    return false;
+    return { success: false };
   } catch (error) {
     console.error('Access verification error:', error);
-    return false;
+    return { success: false };
   }
+}
+
+function showPremiumWelcome(email) {
+  const welcomeModal = document.createElement('div');
+  welcomeModal.id = 'premiumWelcome';
+  welcomeModal.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      padding: 20px;
+    ">
+      <div style="
+        background: linear-gradient(135deg, #1a0000 0%, #0d0011 50%, #000000 100%);
+        border: 3px solid #8b0000;
+        border-radius: 20px;
+        padding: 40px 30px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 0 50px rgba(139, 0, 0, 0.8);
+        animation: fadeIn 0.5s ease;
+      ">
+        <div style="font-size: 60px; margin-bottom: 20px;">🎉</div>
+        <h2 style="
+          color: #fff;
+          margin-bottom: 15px;
+          font-size: 28px;
+          font-weight: bold;
+        ">Congratulations!</h2>
+        <p style="
+          color: #4ADE80;
+          margin-bottom: 30px;
+          font-size: 18px;
+          font-weight: 600;
+        ">You're a Premium Member</p>
+        
+        <div style="
+          background: rgba(26, 0, 0, 0.6);
+          border: 1px solid #8b0000;
+          border-radius: 12px;
+          padding: 25px;
+          margin-bottom: 30px;
+          text-align: left;
+        ">
+          <p style="color: #fff; font-size: 16px; font-weight: 600; margin-bottom: 15px; text-align: center;">
+            Your Premium Benefits:
+          </p>
+          <ul style="color: #ddd; font-size: 14px; line-height: 2; list-style: none; padding: 0;">
+            <li>✅ <strong>Unlimited</strong> technical analysis searches</li>
+            <li>✅ <strong>Advanced</strong> interactive charts & indicators</li>
+            <li>✅ <strong>Priority</strong> access to new features</li>
+            <li>✅ <strong>Exclusive</strong> DarkWave token airdrops</li>
+            <li>✅ <strong>Permanent</strong> access - never expires</li>
+            <li>✅ <strong>VIP</strong> support & community access</li>
+          </ul>
+        </div>
+        
+        <p style="
+          color: #999;
+          font-size: 13px;
+          margin-bottom: 25px;
+        ">Whitelisted: ${email.substring(0, 3)}***${email.substring(email.indexOf('@'))}</p>
+        
+        <button onclick="document.getElementById('premiumWelcome').remove()" style="
+          width: 100%;
+          padding: 15px;
+          background: linear-gradient(135deg, #8b0000 0%, #4b0000 100%);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">
+          Start Exploring 🚀
+        </button>
+      </div>
+    </div>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+    </style>
+  `;
+  
+  document.body.appendChild(welcomeModal);
+  if (tg) tg.HapticFeedback?.notificationOccurred('success');
 }
 
 function showAccessGate() {
@@ -1904,11 +2002,17 @@ function showAccessGate() {
     submit.disabled = true;
     error.style.display = 'none';
     
-    const isValid = await verifyAccessCode(code);
+    const result = await verifyAccessCode(code);
     
-    if (isValid) {
+    if (result.success) {
       document.getElementById('accessGate').remove();
       document.getElementById('app').style.display = 'block';
+      
+      // Show congratulations for whitelisted premium users
+      if (result.isPremium && result.message && result.message.includes('Whitelisted')) {
+        showPremiumWelcome(code);
+      }
+      
       if (tg) tg.HapticFeedback?.notificationOccurred('success');
     } else {
       error.style.display = 'block';

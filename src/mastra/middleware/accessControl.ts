@@ -4,17 +4,28 @@ import { sessions } from '../../db/schema.js';
 import { eq, lt } from 'drizzle-orm';
 
 // Session expiry durations
-const FREE_TIER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;  // 7 days for free tier
-const PREMIUM_DURATION_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days for whitelisted/premium
+const FREE_TIER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;     // 7 days for free tier
+const PREMIUM_DURATION_MS = 30 * 24 * 60 * 60 * 1000;      // 30 days for paid premium
+const WHITELIST_DURATION_MS = 10 * 365 * 24 * 60 * 60 * 1000; // 10 years for whitelisted (effectively permanent)
 
-export async function generateSessionToken(userId: string, email?: string, isPremium: boolean = false): Promise<string> {
+export async function generateSessionToken(userId: string, email?: string, isPremium: boolean = false, isWhitelisted: boolean = false): Promise<string> {
   if (!userId || userId === 'demo-user') {
     throw new Error('Valid userId required for session generation');
   }
   
   const token = randomBytes(32).toString('hex');
   const now = new Date();
-  const sessionDuration = isPremium ? PREMIUM_DURATION_MS : FREE_TIER_DURATION_MS;
+  
+  // Whitelisted users get permanent access (10 years)
+  let sessionDuration: number;
+  if (isWhitelisted) {
+    sessionDuration = WHITELIST_DURATION_MS;
+  } else if (isPremium) {
+    sessionDuration = PREMIUM_DURATION_MS;
+  } else {
+    sessionDuration = FREE_TIER_DURATION_MS;
+  }
+  
   const expiresAt = new Date(now.getTime() + sessionDuration);
   
   await db.insert(sessions).values({
