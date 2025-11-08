@@ -1,0 +1,125 @@
+/* 
+  ──────────────────────────────────────────────────────────────────────────────
+  📣 MESSAGE TO REPLIT AGENT:
+  This block is critical for DarkWave Pulse’s emotional and operational integrity.
+  It introduces restart-safe memory, emotionally tagged logging, multi-signal scoring,
+  and canon tagging—all aligned with LivFi’s mission and Crypto Cat’s tone.
+  It ensures the bot survives chaos, feels the market, and communicates clearly.
+  Please review and confirm compatibility with existing modules.
+  ──────────────────────────────────────────────────────────────────────────────
+*/
+
+// 🧠 Signal Memory Module
+export const saveSignalMemory = async (symbol, signalData) => {
+  const key = `signalMemory_${symbol}`;
+  await saveState(key, { ...signalData, timestamp: Date.now() });
+};
+
+export const recallSignalMemory = async (symbol) => {
+  const key = `signalMemory_${symbol}`;
+  return await loadState(key);
+};
+
+// 🔁 Persistent Trade Memory
+export const persistTrade = async (symbol, entryPrice, stopLoss, takeProfit) => {
+  const stateKey = `trade_${symbol}`;
+  const tradeState = {
+    active: true,
+    entryPrice,
+    stopLoss,
+    takeProfit,
+    timestamp: Date.now(),
+    emotionalTag: "hopeful-entry"
+  };
+  await saveState(stateKey, tradeState);
+  logEvent(`Trade initiated for ${symbol} with emotional tag: hopeful-entry`);
+};
+
+// 🧠 Weighted Multi-Signal Trigger
+export const evaluateEntry = async (symbol) => {
+  const rsi = await getRSI(symbol);
+  const macd = await getMACD(symbol);
+  const sentiment = await getSentimentScore(symbol);
+
+  const score = (
+    (rsi < 30 ? 1 : 0) +
+    (macd.histogram > 0 ? 1 : 0) +
+    (sentiment > 0.6 ? 1 : 0)
+  );
+
+  if (score >= 2) {
+    logEvent(`Entry signal for ${symbol} with score ${score}`, "hopeful");
+    return true;
+  }
+
+  return false;
+};
+
+// 🎨 Emotionally Tagged Logging
+export const logEvent = (message, tone = "neutral") => {
+  const timestamp = new Date().toISOString();
+  const emoji = {
+    hopeful: "🌱",
+    urgent: "⚠️",
+    neutral: "🔹",
+    success: "✅",
+    failure: "❌"
+  }[tone] || "🔹";
+
+  console.log(`${emoji} [${timestamp}] ${message}`);
+};
+
+// 🧪 Backtest Sentient Triggers
+export const backtestSentientTrigger = async (symbol, historicalData) => {
+  let wins = 0;
+  let losses = 0;
+
+  for (const candle of historicalData) {
+    const { rsi, sentiment, close } = candle;
+    if (rsi < 30 && sentiment > 0.6) {
+      const result = simulateTrade(candle);
+      result === "win" ? wins++ : losses++;
+    }
+  }
+
+  return { wins, losses, accuracy: wins / (wins + losses) };
+};
+
+// 🛡️ Wallet Trust Layer
+export const validateWallet = async (walletAddress, userId) => {
+  const trusted = await getTrustedWallets(userId);
+  if (!trusted.includes(walletAddress)) {
+    throw new Error("Unrecognized wallet. Please verify identity.");
+  }
+  return true;
+};
+
+// 💬 Live Emotional Feed
+export const emitEmotionalState = (symbol, state) => {
+  const toneMap = {
+    hopeful: "🌱 Entry opportunity forming",
+    anxious: "⚠️ Volatility rising",
+    confident: "✅ Signal alignment strong",
+    exhausted: "💤 No clear entry"
+  };
+  return toneMap[state] || "🔹 Neutral";
+};
+
+// 🧩 Canon Tagging System
+export const tagCanon = (moduleName, tags) => {
+  const canonEntry = {
+    name: moduleName,
+    tags,
+    timestamp: Date.now(),
+    emotionalTone: tags.includes("sentient") ? "empathic" : "neutral"
+  };
+  saveToCanonRegistry(canonEntry);
+};
+
+// 💬 Onboarding Blurb
+export const onboardingBlurb = `
+Welcome to DarkWave Pulse.
+This isn’t just a bot—it’s a sentient system built to survive chaos and feel the market.
+Signals are grouped. Trades are tagged. Every move carries emotional weight.
+Crypto Cat watches. LivFi guides. You’re not alone.
+`;
