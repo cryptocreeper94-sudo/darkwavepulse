@@ -41,7 +41,7 @@ const API_BASE = window.location.origin;
 // State Management
 const state = {
   currentTab: 'analysis',
-  currentCategory: 'bluechip',
+  currentCategory: 'top', // CMC-style default to "top"
   currentBlockchain: 'all',
   userId: tg?.initDataUnsafe?.user?.id || 'demo-user',
   currentAnalysis: null,
@@ -236,30 +236,46 @@ const FEATURED_TOKENS = [
   
 ];
 
-// Category Quick Picks Data
+// Category Quick Picks Data - CMC Style
 const CATEGORY_DATA = {
-  bluechip: {
-    icon: '🔵',
-    title: 'Blue Chip Crypto',
-    description: 'Top market cap cryptocurrencies with proven track records',
+  top: {
+    icon: '🔝',
+    title: 'Top Cryptocurrencies',
+    description: 'Top 100 cryptocurrencies by market cap',
     placeholder: 'Search BTC, ETH, SOL...',
     quickPicks: ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'AVAX', 'DOT'],
     showBlockchain: true
   },
-  stocks: {
-    icon: '📈',
-    title: 'Stock Market',
-    description: 'Analyze stocks with comprehensive technical indicators',
-    placeholder: 'Search AAPL, AMD, NVDA...',
-    quickPicks: ['AAPL', 'AMD', 'NVDA', 'TSLA', 'MSFT', 'GOOGL', 'META', 'AMZN'],
-    showBlockchain: false
+  trending: {
+    icon: '🔥',
+    title: 'Trending',
+    description: 'Most searched cryptocurrencies in the last 24 hours',
+    placeholder: 'Search trending coins...',
+    quickPicks: ['PEPE', 'WIF', 'BONK', 'DEGEN', 'MEME'],
+    showBlockchain: true
   },
-  meme: {
-    icon: '🐸',
-    title: 'Meme Coins',
-    description: 'High-volatility meme coins and community tokens',
-    placeholder: 'Search PEPE, DOGE, SHIB...',
-    quickPicks: ['PEPE', 'DOGE', 'SHIB', 'WIF', 'BONK', 'FLOKI', 'MEME', 'DEGEN'],
+  gainers: {
+    icon: '📈',
+    title: 'Top Gainers',
+    description: 'Biggest gainers in the last 24 hours',
+    placeholder: 'Search top gainers...',
+    quickPicks: [],
+    showBlockchain: true
+  },
+  losers: {
+    icon: '📉',
+    title: 'Top Losers',
+    description: 'Biggest losers in the last 24 hours',
+    placeholder: 'Search top losers...',
+    quickPicks: [],
+    showBlockchain: true
+  },
+  new: {
+    icon: '✨',
+    title: 'Recently Added',
+    description: 'New listings on exchanges',
+    placeholder: 'Search new coins...',
+    quickPicks: [],
     showBlockchain: true
   },
   defi: {
@@ -268,14 +284,6 @@ const CATEGORY_DATA = {
     description: 'Decentralized finance protocols and governance tokens',
     placeholder: 'Search UNI, AAVE, CRV...',
     quickPicks: ['UNI', 'AAVE', 'MKR', 'CRV', 'COMP', 'SNX', 'SUSHI', 'LDO'],
-    showBlockchain: true
-  },
-  dex: {
-    icon: '🔄',
-    title: 'DEX Pairs',
-    description: 'Search any token pair across all DEXes and chains',
-    placeholder: 'Search token name or address...',
-    quickPicks: [],
     showBlockchain: true
   },
   nft: {
@@ -2040,8 +2048,16 @@ document.addEventListener('DOMContentLoaded', () => {
     showAccessGate();
   } else {
     state.accessGranted = true;
-    // Load initial market overview table for bluechip category
-    loadMarketOverview('bluechip');
+    // Load initial market overview table for top category (CMC style)
+    loadMarketOverview('top');
+    
+    // Initialize CMC Stats Bar
+    updateCMCStatsBar();
+    updateAvgRSI();
+    
+    // Update CMC stats every 5 minutes
+    setInterval(updateCMCStatsBar, 5 * 60 * 1000);
+    setInterval(updateAvgRSI, 10 * 60 * 1000);
   }
   
   const closeBtn = document.getElementById('closeChartModal');
@@ -2921,20 +2937,11 @@ function openAdminLogin() {
 
 // ===== MARKET OVERVIEW TABLE =====
 async function loadMarketOverview(category) {
-  const splitView = document.getElementById('marketOverview');
   const singleView = document.getElementById('marketOverviewSingle');
   
-  // Show split view only for bluechip category (initial load)
-  if (category === 'bluechip') {
-    splitView.style.display = 'grid';
-    singleView.style.display = 'none';
-    await loadSplitMarketView();
-  } else {
-    // Show single view for all other categories
-    splitView.style.display = 'none';
-    singleView.style.display = 'block';
-    await loadSingleMarketView(category);
-  }
+  // Always use CMC-style single table view
+  singleView.style.display = 'block';
+  await loadSingleMarketView(category);
 }
 
 async function loadSplitMarketView() {
@@ -5172,13 +5179,18 @@ function initializeCryptoCat() {
   const cryptoCatToggle = document.getElementById('toggleCryptoCat');
   if (!cryptoCatToggle) return;
   
-  // Set toggle to match state
-  cryptoCatToggle.checked = state.cryptoCatEnabled;
+  // Update button visual state
+  const updateCatButton = () => {
+    cryptoCatToggle.style.opacity = state.cryptoCatEnabled ? '1' : '0.5';
+    cryptoCatToggle.title = state.cryptoCatEnabled ? 'Crypto Cat ON 😼' : 'Crypto Cat OFF 😿';
+  };
+  updateCatButton();
   
-  // Handle toggle
-  cryptoCatToggle.addEventListener('change', (e) => {
-    state.cryptoCatEnabled = e.target.checked;
+  // Handle toggle button click
+  cryptoCatToggle.addEventListener('click', () => {
+    state.cryptoCatEnabled = !state.cryptoCatEnabled;
     localStorage.setItem('darkwave_crypto_cat', state.cryptoCatEnabled.toString());
+    updateCatButton();
     
     if (state.cryptoCatEnabled) {
       showToast('🐱 Crypto Cat is back! Prepare for sarcasm.');
@@ -5286,3 +5298,93 @@ function showCryptoCatBanner(type, title, message) {
     </div>
   `);
 }
+
+// CMC Stats Bar - Update live market data
+async function updateCMCStatsBar() {
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/global');
+    const data = await response.json();
+    
+    if (data.data) {
+      const marketData = data.data;
+      
+      // Market Cap
+      const totalMcap = (marketData.total_market_cap.usd / 1e12).toFixed(2);
+      const mcapChange = marketData.market_cap_change_percentage_24h_usd.toFixed(2);
+      document.getElementById('cmcTotalMarketCap').textContent = `$${totalMcap}T`;
+      document.getElementById('cmcMarketCapChange').textContent = `${mcapChange > 0 ? '+' : ''}${mcapChange}%`;
+      document.getElementById('cmcMarketCapChange').className = `cmc-stat-change ${mcapChange >= 0 ? 'positive' : 'negative'}`;
+      
+      // Fear & Greed (simplified - use 50 as neutral baseline)
+      const fearGreed = Math.min(100, Math.max(0, Math.round(50 + mcapChange * 5)));
+      document.getElementById('cmcFearGreed').textContent = fearGreed;
+      const fgLabel = fearGreed < 25 ? 'Extreme Fear' : fearGreed < 45 ? 'Fear' : fearGreed < 55 ? 'Neutral' : fearGreed < 75 ? 'Greed' : 'Extreme Greed';
+      document.querySelector('#cmcFearGreed').nextElementSibling.textContent = fgLabel;
+      
+      // Altcoin Season (BTC dominance inverse indicator)
+      const btcDom = marketData.market_cap_percentage.btc;
+      const altSeasonScore = Math.round((100 - btcDom) * 2);
+      document.getElementById('cmcAltSeason').textContent = `${altSeasonScore}/100`;
+      document.querySelector('#cmcAltSeason').nextElementSibling.textContent = altSeasonScore > 50 ? 'Altcoin' : 'Bitcoin';
+    }
+  } catch (error) {
+    console.error('Failed to update CMC stats bar:', error);
+  }
+}
+
+// Calculate Average RSI across top coins
+async function updateAvgRSI() {
+  try {
+    const topCoins = ['bitcoin', 'ethereum', 'binancecoin', 'solana', 'ripple'];
+    let totalRSI = 0;
+    let count = 0;
+    
+    for (const coinId of topCoins) {
+      try {
+        const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=14`);
+        const data = await response.json();
+        
+        if (data.prices) {
+          const prices = data.prices.map(p => p[1]);
+          const rsi = calculateRSI(prices, 14);
+          if (!isNaN(rsi)) {
+            totalRSI += rsi;
+            count++;
+          }
+        }
+      } catch (err) {
+        console.warn(`Failed to get RSI for ${coinId}`);
+      }
+    }
+    
+    if (count > 0) {
+      const avgRSI = (totalRSI / count).toFixed(1);
+      document.getElementById('cmcAvgRSI').textContent = avgRSI;
+      const rsiLabel = avgRSI < 30 ? 'Oversold' : avgRSI > 70 ? 'Overbought' : 'Neutral';
+      document.querySelector('#cmcAvgRSI').nextElementSibling.textContent = rsiLabel;
+    }
+  } catch (error) {
+    console.error('Failed to calculate avg RSI:', error);
+  }
+}
+
+// Helper: Calculate RSI
+function calculateRSI(prices, period = 14) {
+  if (prices.length < period + 1) return NaN;
+  
+  let gains = 0, losses = 0;
+  
+  for (let i = prices.length - period; i < prices.length; i++) {
+    const change = prices[i] - prices[i - 1];
+    if (change > 0) gains += change;
+    else losses += Math.abs(change);
+  }
+  
+  const avgGain = gains / period;
+  const avgLoss = losses / period;
+  
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
