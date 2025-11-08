@@ -92,7 +92,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'conspiracy'
   },
   
   // Token #4: Vertigo I
@@ -104,7 +105,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'conspiracy'
   },
   
   // Token #5: Pumpaholic - 2025
@@ -140,7 +142,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'religious'
   },
   
   // Token #8: Yahuah
@@ -152,7 +155,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'religious'
   },
   
   // Token #9: Liquidation (Crypto Cat)
@@ -164,7 +168,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'cryptoCat'
   },
   
   // Token #10: Uncertainty
@@ -188,7 +193,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'cryptoCat'
   },
   
   // Token #12: Rhodium
@@ -212,7 +218,8 @@ const FEATURED_TOKENS = [
     platform: 'pumpfun',
     twitter: '',
     telegram: '',
-    featured: true
+    featured: true,
+    category: 'cryptoCat'
   },
   
   // Token #14: Catwifcash (Raydium)
@@ -3513,6 +3520,30 @@ function submitWhitelist(event, launchId, launchName) {
   }
 }
 
+// Category Configuration for Projects Page
+const CATEGORY_CONFIG = {
+  cryptoCat: {
+    title: 'Crypto Cat Series',
+    description: 'Collectible glossary tokens released monthly. Each coin represents a crypto term from A to Z, featuring unique artwork and limited edition drops. Support your local grumpy crypto cat and join early collectors who will unlock future airdrop eligibility.',
+    teaser: 'Limited edition releases coming soon. Stay tuned for exclusive drops and community airdrops.'
+  },
+  religious: {
+    title: 'Religious & Spiritual',
+    description: 'Educational tokens exploring spiritual beliefs and ancient wisdom. These tokens aim to share knowledge and connect communities around shared values and faith-based perspectives.',
+    teaser: 'New tokens in this series will expand the collection with thoughtful, educational content.'
+  },
+  conspiracy: {
+    title: 'Conspiracy Themed',
+    description: 'Thematic collectibles exploring alternative perspectives and hidden truths. Each token represents a unique concept designed to spark conversation and community engagement.',
+    teaser: 'More conspiracy-themed releases planned as the collection grows.'
+  },
+  general: {
+    title: 'Community Projects',
+    description: 'Additional projects and community-driven tokens that support our mission of building an honest, early-entry community where supporters can make a real difference.',
+    teaser: ''
+  }
+};
+
 // Render Projects Tab
 async function renderProjectsTab() {
   // Render launching soon section first
@@ -3554,7 +3585,16 @@ async function renderProjectsTab() {
     .filter(r => r.status === 'fulfilled')
     .map(r => r.value);
   
-  container.innerHTML = tokens.map(token => {
+  // Group tokens by category
+  const categorizedTokens = {
+    cryptoCat: tokens.filter(t => t.category === 'cryptoCat'),
+    conspiracy: tokens.filter(t => t.category === 'conspiracy'),
+    religious: tokens.filter(t => t.category === 'religious'),
+    general: tokens.filter(t => !t.category || t.category === 'general')
+  };
+  
+  // Helper function to render a token card
+  const renderTokenCard = (token) => {
     const data = token.liveData;
     const platformClass = token.platform === 'raydium' ? 'raydium' : 'pumpfun';
     const buyUrl = token.platform === 'raydium' 
@@ -3584,10 +3624,10 @@ async function renderProjectsTab() {
           
           <div class="project-actions">
             <button class="project-btn project-btn-primary" onclick="window.open('${buyUrl}', '_blank')">
-              💰 Buy on ${token.platform === 'raydium' ? 'Raydium' : 'Pump.fun'}
+              Buy on ${token.platform === 'raydium' ? 'Raydium' : 'Pump.fun'}
             </button>
-            ${token.twitter ? `<button class="project-btn project-btn-secondary" onclick="window.open('${token.twitter}', '_blank')">🐦 Twitter</button>` : ''}
-            ${token.telegram ? `<button class="project-btn project-btn-secondary" onclick="window.open('${token.telegram}', '_blank')">💬 Telegram</button>` : ''}
+            ${token.twitter ? `<button class="project-btn project-btn-secondary" onclick="window.open('${token.twitter}', '_blank')">Twitter</button>` : ''}
+            ${token.telegram ? `<button class="project-btn project-btn-secondary" onclick="window.open('${token.telegram}', '_blank')">Telegram</button>` : ''}
           </div>
         </div>
       `;
@@ -3637,25 +3677,78 @@ async function renderProjectsTab() {
         
         <div class="project-actions">
           <button class="project-btn project-btn-primary" onclick="window.open('${buyUrl}', '_blank')">
-            💰 Buy Now
+            Buy Now
           </button>
           <button class="project-btn project-btn-secondary" onclick="window.open('${data.dexUrl}', '_blank')">
-            📊 Chart
+            Chart
           </button>
           <button class="project-btn project-btn-secondary" onclick="addToHoldings('${data.symbol}')">
-            ⭐ Watch
+            Watch
           </button>
         </div>
         
         ${token.twitter || token.telegram ? `
           <div class="project-socials">
-            ${token.twitter ? `<button class="project-social-btn" onclick="window.open('${token.twitter}', '_blank')">🐦 Twitter</button>` : ''}
-            ${token.telegram ? `<button class="project-social-btn" onclick="window.open('${token.telegram}', '_blank')">📱 Telegram</button>` : ''}
+            ${token.twitter ? `<button class="project-social-btn" onclick="window.open('${token.twitter}', '_blank')">Twitter</button>` : ''}
+            ${token.telegram ? `<button class="project-social-btn" onclick="window.open('${token.telegram}', '_blank')">Telegram</button>` : ''}
           </div>
         ` : ''}
       </div>
     `;
-  }).join('');
+  };
+  
+  // Helper function to render a category section
+  const renderCategorySection = (categoryKey, categoryTokens) => {
+    if (categoryTokens.length === 0 && categoryKey !== 'general') return '';
+    
+    const config = CATEGORY_CONFIG[categoryKey];
+    if (!config) {
+      console.warn(`Unknown category: ${categoryKey}`);
+      return '';
+    }
+    
+    if (categoryTokens.length === 0) return '';
+    
+    return `
+      <section class="category-section" style="margin-bottom: 40px;">
+        <header style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--card-bg);">
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+            ${config.title}
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: ${config.teaser ? '12px' : '0'};">
+            ${config.description}
+          </p>
+          ${config.teaser ? `
+            <p style="color: var(--neon-pink); font-size: 0.9rem; font-style: italic;">
+              <strong>${config.teaser}</strong>
+            </p>
+          ` : ''}
+        </header>
+        <div class="category-tokens">
+          ${categoryTokens.map(renderTokenCard).join('')}
+        </div>
+      </section>
+    `;
+  };
+  
+  // Render all category sections in priority order
+  container.innerHTML = `
+    ${renderCategorySection('cryptoCat', categorizedTokens.cryptoCat)}
+    ${renderCategorySection('conspiracy', categorizedTokens.conspiracy)}
+    ${renderCategorySection('religious', categorizedTokens.religious)}
+    ${renderCategorySection('general', categorizedTokens.general)}
+    
+    ${tokens.length > 0 ? `
+      <footer style="margin-top: 60px; padding: 24px; background: rgba(255, 0, 110, 0.05); border-radius: 12px; border: 1px solid rgba(255, 0, 110, 0.2); text-align: center;">
+        <p style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 12px;">
+          Join the Community Early
+        </p>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+          We're building an honest community of early supporters. Get in early and make a real difference for yourself and help grow this project. Limited editions, exclusive airdrops, and community rewards are on the horizon.
+        </p>
+      </footer>
+    ` : ''}
+  `;
 }
 
 // Render Featured Banner
