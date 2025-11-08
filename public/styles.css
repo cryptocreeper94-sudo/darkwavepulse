@@ -32,11 +32,11 @@
   --shell-gutter: 16px; /* Mobile */
   --sidebar-width: 0px; /* Mobile: no sidebar */
   
-  /* Gradients - Maroon to Very Dark Purple to Black */
-  --gradient-primary: linear-gradient(135deg, #6B0000, #1A0A1F, #000000);
-  --gradient-card: linear-gradient(135deg, #150A10, #0A0005, #000000);
-  --gradient-glow: linear-gradient(135deg, rgba(107, 0, 0, 0.4), rgba(26, 10, 31, 0.4));
-  --button-glow: 0 0 15px rgba(42, 21, 48, 0.5), 0 0 30px rgba(42, 21, 48, 0.3);
+  /* Gradients - Dark Green to Black with Depth */
+  --gradient-primary: linear-gradient(135deg, #003300, #001a00, #000000);
+  --gradient-card: linear-gradient(135deg, #0a100a, #050a05, #000000);
+  --gradient-glow: linear-gradient(135deg, rgba(0, 51, 0, 0.4), rgba(0, 26, 0, 0.4));
+  --button-glow: 0 0 15px rgba(0, 40, 0, 0.5), 0 0 30px rgba(0, 40, 0, 0.3);
 }
 
 /* Light Mode Theme */
@@ -155,7 +155,7 @@ body {
   position: relative;
 }
 
-/* Clean Maroon to Black Gradient Background (Left to Right Sweep) */
+/* Subtle Dark Green to Black Gradient Background (Left to Right Sweep with Depth) */
 body::before {
   content: '';
   position: fixed;
@@ -163,7 +163,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #8B0000 0%, #6B0000 25%, #3D0000 50%, #1A0000 75%, #000000 100%);
+  background: linear-gradient(90deg, #004400 0%, #003300 25%, #002200 50%, #001100 75%, #000000 100%);
   z-index: -1;
   pointer-events: none;
 }
