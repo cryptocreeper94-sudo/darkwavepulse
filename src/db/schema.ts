@@ -52,3 +52,38 @@ export const trackedWallets = pgTable('tracked_wallets', {
   lastUpdated: timestamp('last_updated').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const tokenSubmissions = pgTable('token_submissions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  tokenName: varchar('token_name', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }).notNull(),
+  tokenContract: varchar('token_contract', { length: 255 }).notNull(),
+  tokenChain: varchar('token_chain', { length: 50 }).notNull(),
+  tokenDescription: text('token_description').notNull(),
+  tokenContact: varchar('token_contact', { length: 255 }),
+  tokenLogo: text('token_logo'), // Base64 encoded image data
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'approved' | 'rejected'
+  submittedBy: varchar('submitted_by', { length: 255 }).notNull(),
+  submittedAt: timestamp('submitted_at').defaultNow().notNull(),
+  reviewedBy: varchar('reviewed_by', { length: 255 }),
+  reviewedAt: timestamp('reviewed_at'),
+  rejectionReason: text('rejection_reason'), // Optional: why it was rejected
+});
+
+export const approvedTokens = pgTable('approved_tokens', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  address: varchar('address', { length: 255 }).notNull().unique(),
+  name: varchar('name', { length: 255 }).notNull(),
+  symbol: varchar('symbol', { length: 50 }).notNull(),
+  description: text('description'),
+  platform: varchar('platform', { length: 50 }).notNull().default('pumpfun'), // 'pumpfun' | 'raydium'
+  chain: varchar('chain', { length: 50 }).notNull().default('solana'),
+  logo: text('logo'), // Base64 encoded image or URL
+  twitter: varchar('twitter', { length: 255 }),
+  telegram: varchar('telegram', { length: 255 }),
+  website: varchar('website', { length: 255 }),
+  featured: boolean('featured').default(true),
+  displayOrder: integer('display_order').default(0), // For sorting
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
