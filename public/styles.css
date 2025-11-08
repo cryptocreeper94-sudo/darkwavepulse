@@ -138,6 +138,108 @@ body.theme-coinbase {
   --button-glow: var(--red-glow);
 }
 
+/* ===========================================
+   THEME 4: SAKURA (Pink Mood)
+   Soft & elegant
+   =========================================== */
+body.theme-sakura {
+  --primary-maroon: #FF69B4;
+  --deep-red: #FF1493;
+  --primary-red: #FF69B4;
+  --primary-purple: #C71585;
+  --glow-purple: #FF69B4;
+  --bg-dark: #1A0A14;
+  --bg-card: #2D1B2E;
+  --bg-card-hover: #3D2B3E;
+  --text-primary: #FFE4E1;
+  --text-secondary: #D8A7B1;
+  --accent-cyan: #FFC0CB;
+  --success-green: #FF69B4;
+  --warning-amber: #FFB6C1;
+  --danger-red: #FF1493;
+  
+  --digital-green: #FF69B4;
+  --neon-green: #FF69B4;
+  --neon-pink: #FF1493;
+  --digital-green-glow: 0 0 20px rgba(255, 105, 180, 0.6), 0 0 40px rgba(255, 105, 180, 0.3);
+  --neon-green-glow: 0 0 20px rgba(255, 105, 180, 0.6), 0 0 40px rgba(255, 105, 180, 0.3);
+  --neon-pink-glow: 0 0 25px rgba(255, 20, 147, 0.7), 0 0 50px rgba(255, 20, 147, 0.35);
+  --red-glow: 0 0 15px rgba(255, 105, 180, 0.5), 0 0 30px rgba(255, 105, 180, 0.25);
+  
+  --gradient-primary: linear-gradient(135deg, #FF1493, #FF69B4, #FFB6C1);
+  --gradient-card: linear-gradient(135deg, #2D1B2E, #1A0A14);
+  --gradient-glow: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 20, 147, 0.1));
+  --button-glow: var(--neon-pink-glow);
+}
+
+/* ===========================================
+   THEME 5: SUNSET (Orange Warmth)
+   Warm & energetic
+   =========================================== */
+body.theme-sunset {
+  --primary-maroon: #FF6B35;
+  --deep-red: #FF4500;
+  --primary-red: #FF6B35;
+  --primary-purple: #FF8C42;
+  --glow-purple: #FFA07A;
+  --bg-dark: #1A0F0A;
+  --bg-card: #2D1F1A;
+  --bg-card-hover: #3D2F2A;
+  --text-primary: #FFE6D5;
+  --text-secondary: #D4A574;
+  --accent-cyan: #FFB347;
+  --success-green: #FF8C42;
+  --warning-amber: #FFD700;
+  --danger-red: #FF4500;
+  
+  --digital-green: #FF6B35;
+  --neon-green: #FF8C42;
+  --neon-pink: #FF4500;
+  --digital-green-glow: 0 0 20px rgba(255, 107, 53, 0.6), 0 0 40px rgba(255, 107, 53, 0.3);
+  --neon-green-glow: 0 0 20px rgba(255, 140, 66, 0.6), 0 0 40px rgba(255, 140, 66, 0.3);
+  --neon-pink-glow: 0 0 25px rgba(255, 69, 0, 0.7), 0 0 50px rgba(255, 69, 0, 0.35);
+  --red-glow: 0 0 15px rgba(255, 107, 53, 0.5), 0 0 30px rgba(255, 107, 53, 0.25);
+  
+  --gradient-primary: linear-gradient(135deg, #FF4500, #FF6B35, #FFD700);
+  --gradient-card: linear-gradient(135deg, #2D1F1A, #1A0F0A);
+  --gradient-glow: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 215, 0, 0.1));
+  --button-glow: var(--neon-pink-glow);
+}
+
+/* ===========================================
+   THEME 6: OCEAN (Teal Calm)
+   Cool & refreshing
+   =========================================== */
+body.theme-ocean {
+  --primary-maroon: #00CED1;
+  --deep-red: #20B2AA;
+  --primary-red: #00CED1;
+  --primary-purple: #48D1CC;
+  --glow-purple: #7FFFD4;
+  --bg-dark: #0A1419;
+  --bg-card: #1A2832;
+  --bg-card-hover: #2A3842;
+  --text-primary: #E0F7FA;
+  --text-secondary: #80DEEA;
+  --accent-cyan: #00CED1;
+  --success-green: #00CED1;
+  --warning-amber: #FFD700;
+  --danger-red: #FF6B6B;
+  
+  --digital-green: #00CED1;
+  --neon-green: #48D1CC;
+  --neon-pink: #7FFFD4;
+  --digital-green-glow: 0 0 20px rgba(0, 206, 209, 0.6), 0 0 40px rgba(0, 206, 209, 0.3);
+  --neon-green-glow: 0 0 20px rgba(72, 209, 204, 0.6), 0 0 40px rgba(72, 209, 204, 0.3);
+  --neon-pink-glow: 0 0 25px rgba(127, 255, 212, 0.7), 0 0 50px rgba(127, 255, 212, 0.35);
+  --red-glow: 0 0 15px rgba(0, 206, 209, 0.5), 0 0 30px rgba(0, 206, 209, 0.25);
+  
+  --gradient-primary: linear-gradient(135deg, #20B2AA, #00CED1, #7FFFD4);
+  --gradient-card: linear-gradient(135deg, #1A2832, #0A1419);
+  --gradient-glow: linear-gradient(135deg, rgba(0, 206, 209, 0.2), rgba(127, 255, 212, 0.1));
+  --button-glow: var(--neon-green-glow);
+}
+
 /* Light Mode Theme */
 body.light {
   --primary-maroon: #DC143C;
@@ -170,6 +272,71 @@ body.light {
 body.light::before {
   background: linear-gradient(90deg, rgba(220, 20, 60, 0.2) 0%, rgba(178, 34, 34, 0.15) 25%, rgba(139, 0, 0, 0.1) 50%, rgba(89, 0, 0, 0.05) 75%, transparent 100%);
   opacity: 0.6;
+}
+
+/* ===========================================
+   WATERMARK PATTERNS - Subtle Background Art
+   =========================================== */
+
+/* Geometric Hexagon Pattern */
+body.theme-jupiter::after,
+body.theme-coinbase::after,
+body.theme-ocean::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 50px, var(--text-primary) 50px, var(--text-primary) 51px),
+    repeating-linear-gradient(60deg, transparent, transparent 50px, var(--text-primary) 50px, var(--text-primary) 51px),
+    repeating-linear-gradient(120deg, transparent, transparent 50px, var(--text-primary) 50px, var(--text-primary) 51px);
+}
+
+/* Paisley Swirl Pattern */
+body.theme-sakura::after,
+body.theme-sunset::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background-image: radial-gradient(circle at 25% 25%, var(--text-primary) 2%, transparent 2%),
+    radial-gradient(circle at 75% 75%, var(--text-primary) 2%, transparent 2%),
+    radial-gradient(circle at 50% 50%, var(--text-primary) 1.5%, transparent 1.5%);
+  background-size: 100px 100px, 100px 100px, 50px 50px;
+  background-position: 0 0, 50px 50px, 25px 25px;
+}
+
+/* Grid Pattern for Robinhood */
+body.theme-robinhood::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+  background-image: 
+    linear-gradient(var(--text-secondary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--text-secondary) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Ensure content stays above watermark */
+#app, .app-main, .tab-pane {
+  position: relative;
+  z-index: 1;
 }
 
 /* Tooltips for Technical Terms */
