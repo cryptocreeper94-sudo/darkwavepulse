@@ -3414,3 +3414,115 @@ body::before {
   transform: none;
   animation: none;
 }
+
+/* ========================================
+   PROFESSIONAL BADGE & BUTTON SYSTEM
+   ======================================== */
+
+/* Oval pill badges for categories/filters */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 20px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.pill-badge:hover {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+  transform: translateY(-1px);
+}
+
+.pill-badge.active {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+}
+
+/* Outline ghost badges */
+.outline-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.outline-pill:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.outline-pill.active {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
+}
+
+/* Icon circle buttons (for settings/actions) */
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-circle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+  transform: scale(1.1);
+}
+
+/* Floating effect utility */
+.floating {
+  animation: float-gentle 3s ease-in-out infinite;
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Glow utility classes */
+.glow-purple {
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+.glow-green {
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+}
+
+.glow-gold {
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
