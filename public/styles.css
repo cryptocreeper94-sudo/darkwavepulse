@@ -6,29 +6,29 @@
    =========================================== */
 :root, body.theme-jupiter {
   /* Jupiter Color Palette - Cyberpunk Teal/Purple */
-  --primary-maroon: #8B5CF6;
+  --primary-maroon: #FFFFFF;
   --deep-red: #7C3AED;
-  --primary-red: #8B5CF6;
-  --primary-purple: #6366F1;
+  --primary-red: #FFFFFF;
+  --primary-purple: #FFFFFF;
   --glow-purple: #818CF8;
   --bg-dark: #0F172A;
   --bg-card: #1E293B;
   --bg-card-hover: #334155;
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
-  --accent-cyan: #06B6D4;
+  --accent-cyan: #FFFFFF;
   --success-green: #10B981;
   --warning-amber: #F59E0B;
   --danger-red: #EF4444;
   
-  /* Jupiter Accent Colors */
-  --digital-green: #06B6D4;
-  --neon-green: #06B6D4;
-  --neon-pink: #8B5CF6;
-  --digital-green-glow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.3);
-  --neon-green-glow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.3);
-  --neon-pink-glow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.3);
-  --red-glow: 0 0 15px rgba(139, 92, 246, 0.5), 0 0 30px rgba(139, 92, 246, 0.3);
+  /* Jupiter Accent Colors - Pure White */
+  --digital-green: #FFFFFF;
+  --neon-green: #FFFFFF;
+  --neon-pink: #FFFFFF;
+  --digital-green-glow: 0 0 15px rgba(255, 255, 255, 0.2);
+  --neon-green-glow: 0 0 15px rgba(255, 255, 255, 0.2);
+  --neon-pink-glow: 0 0 15px rgba(255, 255, 255, 0.2);
+  --red-glow: 0 0 15px rgba(255, 255, 255, 0.2);
   
   /* Layout */
   --accent-border-width: 1.5px;
@@ -39,10 +39,10 @@
   --section-spacing: 12px;
   --card-padding: 14px;
   
-  /* Jupiter Gradients */
-  --gradient-primary: linear-gradient(135deg, #8B5CF6, #6366F1, #06B6D4);
+  /* Jupiter Gradients - Black/White Only */
+  --gradient-primary: linear-gradient(135deg, #1E293B, #0F172A);
   --gradient-card: linear-gradient(135deg, #1E293B, #0F172A);
-  --gradient-glow: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3));
+  --gradient-glow: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   --button-glow: var(--red-glow);
 }
 
@@ -62,7 +62,7 @@ body.theme-robinhood {
   --bg-card-hover: #E9ECEF;
   --text-primary: #1A1A1A;
   --text-secondary: #6C757D;
-  --accent-cyan: #17A2B8;
+  --accent-cyan: #FFFFFF;
   --success-green: #00C805;
   --warning-amber: #FFC107;
   --danger-red: #FF5733;
@@ -108,14 +108,14 @@ body.theme-coinbase {
   --bg-card-hover: #252C4D;
   --text-primary: #F5F7FA;
   --text-secondary: #8A8FA3;
-  --accent-cyan: #17A2B8;
+  --accent-cyan: #FFFFFF;
   --success-green: #05B169;
   --warning-amber: #F4A51C;
   --danger-red: #DF5F67;
   
   /* Coinbase Accent Colors */
-  --digital-green: #17A2B8;
-  --neon-green: #17A2B8;
+  --digital-green: #FFFFFF;
+  --neon-green: #FFFFFF;
   --neon-pink: #0052FF;
   --digital-green-glow: 0 0 18px rgba(23, 162, 184, 0.5), 0 0 36px rgba(23, 162, 184, 0.25);
   --neon-green-glow: 0 0 18px rgba(23, 162, 184, 0.5), 0 0 36px rgba(23, 162, 184, 0.25);
@@ -132,7 +132,7 @@ body.theme-coinbase {
   --card-padding: 16px;
   
   /* Coinbase Gradients */
-  --gradient-primary: linear-gradient(135deg, #0052FF, #1652F0, #17A2B8);
+  --gradient-primary: linear-gradient(135deg, #0052FF, #1652F0, #FFFFFF);
   --gradient-card: linear-gradient(135deg, #1A1F3A, #0A0E27);
   --gradient-glow: linear-gradient(135deg, rgba(0, 82, 255, 0.25), rgba(23, 162, 184, 0.25));
   --button-glow: var(--red-glow);
@@ -150,7 +150,7 @@ body.light {
   --bg-card-hover: #F0F0F0;
   --text-primary: #1A1A1A;
   --text-secondary: #4A5568;
-  --accent-cyan: #0891B2;
+  --accent-cyan: #E5E7EB;
   --success-green: #059669;
   --warning-amber: #D97706;
   --danger-red: #DC2626;
@@ -351,13 +351,13 @@ body::before {
 /* Subtle neon glow on hover for desktop */
 @media (min-width: 1024px) {
   .accent-hot:hover {
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.8), 0 0 60px rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
     transition: all 0.3s ease;
   }
   
   .accent-success:hover {
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.8), 0 0 60px rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
     transition: all 0.3s ease;
   }
@@ -402,13 +402,13 @@ body::before {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid var(--neon-green);
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--neon-green);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
 .status-pill::before {
@@ -804,7 +804,7 @@ body::before {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #06B6D4, #8B5CF6, #06B6D4);
+  background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -849,7 +849,7 @@ body::before {
 }
 
 .market-table tbody tr {
-  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
@@ -862,16 +862,16 @@ body::before {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), rgba(6, 182, 212, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), rgba(255, 255, 255, 0.4), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .market-table tbody tr:hover {
-  background: linear-gradient(90deg, rgba(6, 182, 212, 0.08), rgba(168, 85, 247, 0.08));
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(168, 85, 247, 0.08));
   transform: translateX(4px);
-  border-left: 3px solid #06B6D4;
-  border-bottom-color: rgba(6, 182, 212, 0.5);
+  border-left: 3px solid #FFFFFF;
+  border-bottom-color: rgba(255, 255, 255, 0.5);
 }
 
 .market-table tbody tr:hover::after {
@@ -929,7 +929,7 @@ body::before {
   margin-bottom: 12px;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(10, 0, 5, 0.3), rgba(26, 10, 31, 0.3));
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
@@ -982,7 +982,7 @@ body::before {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3), 0 4px 12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1013,7 +1013,7 @@ body::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s ease;
 }
 
@@ -1024,7 +1024,7 @@ body::before {
 .trending-item:hover {
   transform: translateY(-4px) scale(1.05);
   border-color: var(--digital-green);
-  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.5), 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.8);
   background: rgba(15, 15, 25, 0.9);
 }
 
@@ -1428,7 +1428,7 @@ body::before {
   flex: 1;
   min-width: 120px;
   background: rgba(0, 0, 0, 0.8);
-  border: 2px solid rgba(6, 182, 212, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   padding: 0.75rem 1rem;
   color: var(--text-primary);
@@ -1440,15 +1440,15 @@ body::before {
 }
 
 .action-btn:hover, .primary-btn:hover {
-  background: rgba(6, 182, 212, 0.2);
-  border-color: rgba(6, 182, 212, 0.8);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 20px rgba(6, 182, 212, 0.5), 0 8px 24px rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.5), 0 8px 24px rgba(0, 0, 0, 0.6);
   transform: translateY(-6px);
 }
 
 .primary-btn {
-  background: rgba(6, 182, 212, 0.15);
-  border: 2px solid rgba(6, 182, 212, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.2), 0 6px 20px rgba(0, 0, 0, 0.5);
   animation: float 3s ease-in-out infinite;
 }
@@ -2359,7 +2359,7 @@ body::before {
 }
 
 .project-platform-badge.raydium {
-  background: rgba(6, 182, 212, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: var(--accent-cyan);
 }
 
@@ -3117,7 +3117,7 @@ body::before {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #06B6D4, #8B5CF6, #06B6D4);
+  background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -3225,8 +3225,8 @@ body::before {
 }
 
 .launch-card {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(168, 85, 247, 0.1));
-  border: 2px solid rgba(6, 182, 212, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(168, 85, 247, 0.1));
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   padding: 16px;
   position: relative;
@@ -3242,15 +3242,15 @@ body::before {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #06B6D4, #8B5CF6, #06B6D4);
+  background: linear-gradient(90deg, #FFFFFF, #FFFFFF, #FFFFFF);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
 
 .launch-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(6, 182, 212, 0.6);
-  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
 }
 
 .launch-header {
@@ -3264,7 +3264,7 @@ body::before {
   height: 60px;
   border-radius: 12px;
   object-fit: cover;
-  border: 2px solid rgba(6, 182, 212, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   flex-shrink: 0;
 }
 
@@ -3379,23 +3379,23 @@ body::before {
 .launch-action-btn {
   width: 100%;
   padding: 12px;
-  background: rgba(6, 182, 212, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: 2px solid rgba(6, 182, 212, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(255, 255, 255, 0.3);
   animation: float 3s ease-in-out infinite;
 }
 
 .launch-action-btn:hover {
   transform: translateY(-6px) scale(1.02);
-  background: rgba(6, 182, 212, 0.3);
-  border-color: rgba(6, 182, 212, 0.9);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 20px rgba(6, 182, 212, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .launch-action-btn.joined {
@@ -3474,7 +3474,7 @@ body::before {
 .outline-pill.active {
   border-color: var(--neon-green);
   color: var(--neon-green);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
 /* Icon circle buttons (for settings/actions) */
@@ -3520,7 +3520,7 @@ body::before {
 }
 
 .glow-green {
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .glow-gold {
@@ -3550,5 +3550,5 @@ body::before {
   background: var(--neon-pink);
   color: white;
   border-color: var(--neon-pink);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
