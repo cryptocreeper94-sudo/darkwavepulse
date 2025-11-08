@@ -2517,6 +2517,112 @@ function openAdminLogin() {
 
 // ===== MARKET OVERVIEW TABLE =====
 async function loadMarketOverview(category) {
+  const splitView = document.getElementById('marketOverview');
+  const singleView = document.getElementById('marketOverviewSingle');
+  
+  // Show split view only for bluechip category (initial load)
+  if (category === 'bluechip') {
+    splitView.style.display = 'grid';
+    singleView.style.display = 'none';
+    await loadSplitMarketView();
+  } else {
+    // Show single view for all other categories
+    splitView.style.display = 'none';
+    singleView.style.display = 'block';
+    await loadSingleMarketView(category);
+  }
+}
+
+async function loadSplitMarketView() {
+  // Load both stocks and crypto side by side
+  await Promise.all([
+    loadStocksSplit(),
+    loadCryptoSplit(),
+    loadMarketSnapshots()
+  ]);
+}
+
+async function loadStocksSplit() {
+  const stocksBody = document.getElementById('stocksTableBody');
+  const stocks = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'JPM'];
+  
+  stocksBody.innerHTML = stocks.map((ticker) => {
+    return `
+      <tr onclick="analyzeAssetFromTable('${ticker}')" style="cursor: pointer;">
+        <td style="font-weight: 600; color: var(--text-primary);">${ticker}</td>
+        <td style="text-align: right; color: var(--text-secondary);">--</td>
+        <td style="text-align: right; color: var(--text-secondary);">--</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function loadCryptoSplit() {
+  const cryptoBody = document.getElementById('cryptoTableBody');
+  
+  try {
+    const cryptoIds = 'bitcoin,ethereum,solana,binancecoin,ripple,cardano,polkadot,avalanche-2,chainlink,polygon';
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cryptoIds}&order=market_cap_desc&per_page=10&sparkline=false`);
+    const data = await response.json();
+    
+    cryptoBody.innerHTML = data.slice(0, 10).map((coin) => {
+      const priceChange = coin.price_change_percentage_24h || 0;
+      const changeClass = priceChange >= 0 ? 'positive' : 'negative';
+      const changeSymbol = priceChange >= 0 ? '+' : '';
+      
+      return `
+        <tr onclick="analyzeAssetFromTable('${coin.symbol.toUpperCase()}')" style="cursor: pointer;">
+          <td>
+            <div style="font-weight: 600; color: var(--text-primary);">${coin.name}</div>
+            <div style="font-size: 0.7rem; color: var(--text-secondary);">${coin.symbol.toUpperCase()}</div>
+          </td>
+          <td style="text-align: right; font-weight: 600;">$${coin.current_price >= 1 ? coin.current_price.toFixed(2) : coin.current_price.toFixed(6)}</td>
+          <td style="text-align: right;" class="${changeClass}">${changeSymbol}${priceChange.toFixed(1)}%</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Error loading crypto split:', error);
+    cryptoBody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #999;">Failed to load</td></tr>';
+  }
+}
+
+async function loadMarketSnapshots() {
+  // Load market snapshot data
+  try {
+    // Fetch global crypto market data
+    const globalResponse = await fetch('https://api.coingecko.com/api/v3/global');
+    const globalData = await globalResponse.json();
+    
+    if (globalData && globalData.data) {
+      const btcDom = globalData.data.market_cap_percentage?.btc || 0;
+      const totalMcap = globalData.data.total_market_cap?.usd || 0;
+      const mcapChange = globalData.data.market_cap_change_percentage_24h_usd || 0;
+      
+      document.getElementById('btcDominance').textContent = `${btcDom.toFixed(1)}%`;
+      document.getElementById('btcDomChange').textContent = `${mcapChange >= 0 ? '+' : ''}${mcapChange.toFixed(1)}%`;
+      document.getElementById('btcDomChange').className = `market-stat-change ${mcapChange >= 0 ? 'positive' : 'negative'}`;
+      
+      document.getElementById('totalMcap').textContent = `$${(totalMcap / 1e12).toFixed(2)}T`;
+      document.getElementById('totalMcapChange').textContent = `${mcapChange >= 0 ? '+' : ''}${mcapChange.toFixed(1)}%`;
+      document.getElementById('totalMcapChange').className = `market-stat-change ${mcapChange >= 0 ? 'positive' : 'negative'}`;
+    }
+    
+    // Stock market data (using placeholders as Yahoo Finance requires API key)
+    document.getElementById('sp500Price').textContent = '$4,850';
+    document.getElementById('sp500Change').textContent = '+0.5%';
+    document.getElementById('sp500Change').className = 'market-stat-change positive';
+    
+    document.getElementById('nasdaqPrice').textContent = '$15,200';
+    document.getElementById('nasdaqChange').textContent = '+0.8%';
+    document.getElementById('nasdaqChange').className = 'market-stat-change positive';
+    
+  } catch (error) {
+    console.error('Error loading market snapshots:', error);
+  }
+}
+
+async function loadSingleMarketView(category) {
   const tableBody = document.getElementById('marketTableBody');
   const titleEl = document.getElementById('marketOverviewTitle');
   
@@ -2527,15 +2633,8 @@ async function loadMarketOverview(category) {
     let data = [];
     let title = '';
     
-    if (category === 'bluechip') {
-      title = '🔵 Top Blue Chip Crypto';
-      const cryptoIds = 'bitcoin,ethereum,solana,binancecoin,ripple,cardano,polkadot,avalanche-2,chainlink,polygon';
-      const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cryptoIds}&order=market_cap_desc&per_page=10&sparkline=false`);
-      data = await response.json();
-      renderCryptoTable(data);
-    } else if (category === 'stocks') {
+    if (category === 'stocks') {
       title = '📈 Top Stocks';
-      // Use popular stock tickers
       const stocks = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'JPM'];
       renderStocksTable(stocks);
     } else if (category === 'meme') {
