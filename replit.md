@@ -7,6 +7,7 @@ DarkWave-V2 is an advanced technical analysis bot built with the Mastra framewor
 - **Multi-Theme System**: Added Jupiter (DeFi Dark), Robinhood (Clean Light), and Coinbase (Professional Blue) themes with localStorage persistence
 - **UI Polish**: Removed excessive emojis from action buttons for more professional appearance
 - **Theme Switcher**: Settings tab now includes visual theme selector with instant switching
+- **Projects Page Category System**: Reorganized with four distinct sections (Crypto Cat Series, Conspiracy Themed, Religious/Spiritual, Community Projects) each with custom messaging and teasers for limited editions and future airdrops
 
 ## Future Features (Deferred)
 See `FUTURE_FEATURES.md` for detailed specs on planned features:
@@ -51,6 +52,7 @@ Pino logger (`@mastra/loggers`) is used for structured JSON logging with custom 
 -   **Trending Carousel**: Auto-scrolling animation for live prices and 24h changes.
 -   **Token Launchpad UI**: Launch card UI with neon gradient borders and shimmer animations.
 -   **Crypto Cat Mascot**: Toggleable grumpy guru with varied personality, body language, and sarcastic commentary, appearing in glossary tooltips and feature banners. Integrated with app state management and localStorage.
+-   **Category-Based Projects Page**: Token series organized by category tags (cryptoCat, conspiracy, religious, general) with dedicated sections, professional messaging, and teasers for limited editions and community airdrops. Each category has customizable title, description, and teaser fields in CATEGORY_CONFIG.
 
 ### Feature Specifications
 -   **DEX Pair Support**: Dexscreener integration for rug-risk detection and liquidity scoring.
