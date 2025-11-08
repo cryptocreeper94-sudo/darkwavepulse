@@ -39,20 +39,17 @@
   <header class="app-header banner-header">
     <img src="/darkwave-banner.png" alt="DarkWave-V2 Banner" class="header-banner-image">
     <div class="header-actions-overlay">
-      <button class="icon-btn" id="walletBtn"></button>
-      <button class="icon-btn" id="refreshBtn"></button>
-      <button class="icon-btn" id="settingsBtn"></button>
+      <button class="icon-btn" id="walletBtn" title="Wallet">💰</button>
+      <button class="icon-btn" id="refreshBtn" title="Refresh">🔄</button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
     </div>
   </header>
 
-  <!-- Desktop Experience Banner (only shows in Telegram) -->
-  <div id="desktopBanner" class="card text-center" style="display: none; margin: var(--space-md); padding: var(--space-md);">
-    <h3 style="margin: 0 0 var(--space-sm) 0;">Want the Full Desktop Experience?</h3>
-    <p style="margin: 0 0 var(--space-md) 0; color: var(--text-secondary);">Open in your browser for the best wide-screen view!</p>
-    <a id="webAppLink" href="#" target="_blank" class="btn btn-primary">
-      Open Full Version
+  <!-- Desktop Experience Banner (hidden - smaller compact version) -->
+  <div id="desktopBanner" class="card text-center" style="display: none; margin: var(--space-sm) var(--space-md); padding: var(--space-sm); font-size: var(--font-size-xs); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);">
+    <a id="webAppLink" href="#" target="_blank" style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+      🖥️ Open Full Desktop Version
     </a>
-    <p style="margin: var(--space-sm) 0 0 0; font-size: var(--font-size-xs); color: var(--text-tertiary);">Bookmark it for quick access!</p>
   </div>
 
   <!-- Main Content -->
