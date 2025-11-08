@@ -1661,6 +1661,14 @@ function changeChartType(type) {
 
 async function createLiveCandlestickChart(ticker, container, timeframe = '1m') {
   try {
+    // Show loading state
+    container.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary);">
+        <div class="spinner"></div>
+        <span style="margin-left: 12px;">Loading chart data...</span>
+      </div>
+    `;
+    
     // Fetch OHLC data from CoinGecko with appropriate timeframe
     const coinId = ticker.toLowerCase();
     const days = TIMEFRAME_CONFIG[timeframe].days;
@@ -1674,6 +1682,13 @@ async function createLiveCandlestickChart(ticker, container, timeframe = '1m') {
     const ohlcData = await response.json();
     
     if (!ohlcData || ohlcData.length === 0) {
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+          <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">No Chart Data Available</div>
+          <div style="font-size: 14px; opacity: 0.7;">Try a different timeframe or check back later</div>
+        </div>
+      `;
       return false;
     }
     
@@ -1743,6 +1758,14 @@ async function createLiveCandlestickChart(ticker, container, timeframe = '1m') {
     return true;
   } catch (error) {
     console.error('Candlestick chart error:', error);
+    container.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--error); text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Chart Loading Failed</div>
+        <div style="font-size: 14px; opacity: 0.7; color: var(--text-secondary);">Unable to fetch chart data. Please try again later.</div>
+        <div style="font-size: 12px; opacity: 0.5; color: var(--text-tertiary); margin-top: 8px;">${error.message}</div>
+      </div>
+    `;
     return false;
   }
 }
@@ -1754,10 +1777,28 @@ async function createSimplePriceChart(ticker, container, timeframe = '1m') {
     const days = TIMEFRAME_CONFIG[timeframe].days;
     const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
     
-    if (!response.ok) return false;
+    if (!response.ok) {
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+          <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Chart Data Unavailable</div>
+          <div style="font-size: 14px; opacity: 0.7;">API rate limit reached or token not found</div>
+        </div>
+      `;
+      return false;
+    }
     
     const data = await response.json();
-    if (!data || !data.prices || data.prices.length === 0) return false;
+    if (!data || !data.prices || data.prices.length === 0) {
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+          <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">No Price History</div>
+          <div style="font-size: 14px; opacity: 0.7;">This token doesn't have enough price data</div>
+        </div>
+      `;
+      return false;
+    }
     
     container.innerHTML = '';
     container.style.minHeight = '300px';
@@ -3549,7 +3590,7 @@ function renderGlossary(searchTerm = '', category = null) {
                 if (catData) {
                   return `
                     <div style="display: flex; gap: 10px; align-items: start; margin-bottom: 12px; background: rgba(255, 0, 110, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 0, 110, 0.2);">
-                      <img src="assets/crypto-cat.png" alt="Crypto Cat" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--neon-green); flex-shrink: 0;">
+                      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--neon-green); flex-shrink: 0;">
                       <div style="flex: 1;">
                         <div style="font-size: 0.7rem; color: var(--neon-green); font-weight: 700; margin-bottom: 4px;">🐱 CRYPTO CAT SAYS:</div>
                         <div style="font-size: 0.75rem; color: var(--neon-pink); font-style: italic; margin-bottom: 4px;">${catData.pose}</div>
@@ -5456,7 +5497,7 @@ function createCryptoCatAppearance(quoteKey, size = 'small') {
   
   return `
     <div style="display: flex; gap: 8px; align-items: center; margin: 10px 0; padding: 8px 12px; background: linear-gradient(135deg, rgba(255, 0, 110, 0.08), rgba(168, 85, 247, 0.08)); border-radius: 8px; border: 1px solid rgba(255, 0, 110, 0.25);">
-      <img src="assets/crypto-cat.png" alt="Crypto Cat" style="width: ${imgSize}; height: ${imgSize}; border-radius: 50%; border: 2px solid var(--neon-pink); flex-shrink: 0;">
+      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: ${imgSize}; height: ${imgSize}; border-radius: 50%; border: 2px solid var(--neon-pink); flex-shrink: 0;">
       <div style="flex: 1;">
         <div style="font-size: ${fontSize}; color: var(--text-primary); font-style: italic; line-height: 1.3; margin-bottom: 3px;">"${catData.quote}"</div>
         ${catData.hideSeek ? `<div style="font-size: calc(${fontSize} - 0.1rem); color: var(--text-secondary); opacity: 0.7; font-style: italic;">💭 ${catData.hideSeek}</div>` : ''}
@@ -5481,7 +5522,7 @@ function createCryptoCatTooltip(term, definition) {
   return `
     <div style="padding: 12px;">
       <div style="display: flex; gap: 12px; align-items: start; margin-bottom: 12px;">
-        <img src="assets/crypto-cat.png" alt="Crypto Cat" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
+        <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
         <div style="flex: 1;">
           <strong style="color: var(--neon-pink);">${term}</strong>
           <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: var(--text-secondary);">${definition}</p>
@@ -5509,7 +5550,7 @@ function showCryptoCatBanner(type, title, message) {
   
   showModal(`
     <div style="padding: 24px; text-align: center;">
-      <img src="assets/crypto-cat.png" alt="Crypto Cat" style="width: 100px; height: 100px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--neon-pink); animation: bounce 2s ease-in-out infinite;">
+      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 100px; height: 100px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--neon-pink); animation: bounce 2s ease-in-out infinite;">
       <h3 style="margin-bottom: 12px; color: var(--neon-pink);">${title}</h3>
       <p style="color: var(--text-secondary); margin-bottom: 16px;">${message}</p>
       ${catData ? `

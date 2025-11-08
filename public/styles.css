@@ -1189,6 +1189,8 @@ textarea::placeholder {
 .pirate-flag-banner {
   background: var(--bg-secondary) !important;
   border: 1px solid var(--border-primary) !important;
+  border-radius: var(--radius-lg) !important;
+  margin: var(--space-md) !important;
 }
 
 .pirate-flag-content h4,
@@ -1236,3 +1238,48 @@ option {
   color: var(--text-primary);
 }
 
+
+/* ===========================================
+   GLOBAL CONSISTENCY - Rounded Edges & Widths
+   =========================================== */
+
+/* Ensure all containers have rounded edges */
+.market-overview-container,
+.trending-carousel,
+.featured-banner {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Stats and category bars need horizontal scroll, not hidden */
+.cmc-stats-bar,
+.category-nav,
+.stats-bar {
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Full-width sections should be consistent */
+.market-overview-container,
+.trending-carousel,
+.pirate-flag-banner,
+.featured-banner {
+  width: calc(100% - 32px);
+  margin-left: var(--space-md);
+  margin-right: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+/* Ensure all tables have rounded corners */
+table {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Card consistency */
+.card,
+.wallet-card,
+.holding-card {
+  border-radius: var(--radius-lg) !important;
+}
