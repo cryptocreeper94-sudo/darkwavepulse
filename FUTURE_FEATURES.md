@@ -209,5 +209,62 @@ Animal charity token with mission-driven tokenomics. Will integrate with DarkWav
 
 ---
 
+---
+
+## 🎨 Limited Edition NFT/Token Collectibles (Priority: Future)
+**Status:** Future project - needs community first
+**Estimated Effort:** TBD
+
+### Project Description
+Limited run collectible NFTs tied to community milestones and achievements, with real utility.
+
+### Tier Structure
+**Founding Cat** (First 100 users)
+- Lifetime 50% discount on all premium features
+- Exclusive "OG" badge in bot
+
+**Presale Cat** (Presale participants)
+- Access to exclusive signals channel
+- Early beta feature access
+- Special role in community
+
+**Diamond Cat** (Hold $1000+ DWLP)
+- Governance voting rights on new features
+- Revenue share from premium subscriptions
+- VIP support channel
+
+**LivFi Guardian** (Support charity initiatives)
+- Special crossover mascot NFT
+- Charity donation tracking
+- Exclusive LivFi collaboration perks
+
+### Utility Ideas
+- Revenue share from bot premium subscriptions
+- Early access to new features (7 days before public)
+- Governance voting rights (weighted by rarity)
+- Access to exclusive "whale signals" channel
+- VIP support response (1 hour vs 24 hour)
+- Cross-project benefits (DarkWave + LivFi synergy)
+
+### Technical Platform
+- **Metaplex on Solana** (low mint cost ~$0.10 per NFT)
+- **Limited editions:** 100-500 per tier
+- **Dynamic metadata:** Updates based on holder activity
+- **Royalties:** 5% secondary sales go to LivFi charity wallet
+
+### Integration Points
+- Verify NFT ownership in Telegram bot
+- Grant premium access automatically
+- Track holder benefits in PostgreSQL
+- Create exclusive channels for holders
+
+### Notes
+- Requires established community first (500+ active users)
+- Coordinate with LivFi charity token launch
+- Consider cross-collection utility (own both = bonus perks)
+- Revisit Q1 2026 after DarkWave stabilizes
+
+---
+
 ## Other Future Features
 (Add more features here as they come up)
