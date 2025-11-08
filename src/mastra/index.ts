@@ -1188,6 +1188,61 @@ export const mastra = new Mastra({
           }
         },
       },
+      // Bot Detection API
+      {
+        path: "/api/bot-detection",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Bot Detection] Unauthorized request');
+            return sessionCheck.error;
+          }
+          
+          try {
+            const { tokenAddress, chain } = await c.req.json();
+            logger?.info('🤖 [Bot Detection] Analysis request', { tokenAddress, chain });
+            
+            // Run bot detection
+            const botAnalysis = await botDetectionTool.execute({
+              context: { tokenAddress, chain },
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            logger?.info('✅ [Bot Detection] Analysis complete', { 
+              tokenAddress, 
+              riskLevel: botAnalysis.riskLevel,
+              botPercentage: botAnalysis.botPercentage
+            });
+            
+            return c.json({ 
+              success: true, 
+              data: botAnalysis
+            });
+          } catch (error: any) {
+            logger?.error('❌ [Bot Detection] Analysis error', error);
+            return c.json({ 
+              success: false,
+              error: 'Bot detection failed',
+              data: {
+                botPercentage: 0,
+                riskLevel: 'Medium',
+                riskColor: 'yellow',
+                holderCount: 0,
+                topHolderConcentration: 0,
+                rugRiskIndicators: ['Unable to analyze - please check token address'],
+                confidence: 0,
+                details: 'Analysis unavailable. Proceed with extreme caution.'
+              }
+            }, 200); // Return 200 with safe defaults instead of error
+          }
+        }
+      },
       {
         path: "/api/chat",
         method: "POST",
