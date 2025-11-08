@@ -4,10 +4,11 @@ export const subscriptions = pgTable('subscriptions', {
   userId: varchar('user_id', { length: 255 }).primaryKey(),
   plan: varchar('plan', { length: 50 }).notNull().default('free'), // 'free' | 'premium'
   status: varchar('status', { length: 50 }).notNull().default('inactive'), // 'active' | 'inactive' | 'cancelled' | 'expired'
-  provider: varchar('provider', { length: 50 }), // 'stripe' | 'telegram_stars' | null
+  provider: varchar('provider', { length: 50 }), // 'stripe' | 'telegram_stars' | 'crypto' | null
   stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
   stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }),
   telegramPaymentId: varchar('telegram_payment_id', { length: 255 }),
+  cryptoPaymentId: varchar('crypto_payment_id', { length: 255 }), // Coinbase Commerce charge ID
   expiryDate: timestamp('expiry_date'),
   autoRenew: boolean('auto_renew').default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -119,5 +120,31 @@ export const approvedTokens = pgTable('approved_tokens', {
   featured: boolean('featured').default(true),
   displayOrder: integer('display_order').default(0), // For sorting
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Crypto Payments Tracking (Coinbase Commerce)
+export const cryptoPayments = pgTable('crypto_payments', {
+  id: varchar('id', { length: 255 }).primaryKey(), // UUID
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  coinbaseChargeId: varchar('coinbase_charge_id', { length: 255 }).notNull().unique(), // Coinbase Commerce charge ID
+  coinbaseChargeCode: varchar('coinbase_charge_code', { length: 255 }), // Charge code for URL
+  
+  // Payment Details
+  amountUSD: varchar('amount_usd', { length: 50 }).notNull(), // Amount in USD (e.g., "5.00")
+  cryptoCurrency: varchar('crypto_currency', { length: 50 }), // BTC, ETH, USDC, etc.
+  cryptoAmount: varchar('crypto_amount', { length: 100 }), // Amount in crypto
+  
+  // Status Tracking
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'completed' | 'failed' | 'expired'
+  hostedUrl: text('hosted_url'), // Coinbase Commerce payment page URL
+  expiresAt: timestamp('expires_at'), // When the payment request expires
+  
+  // Metadata
+  description: text('description'), // What the payment is for
+  metadata: text('metadata'), // JSON string for additional data
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'), // When payment was confirmed
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
