@@ -2251,6 +2251,249 @@ export const mastra = new Mastra({
           }
         },
       },
+      // Crypto Payment Endpoint (Coinbase Commerce)
+      {
+        path: "/api/crypto/create-charge",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            logger?.info('💰 [Crypto] Creating payment charge');
+            
+            // Check access session
+            const { checkAccessSession } = await import('./middleware/accessControl.js');
+            const sessionCheck = await checkAccessSession(c);
+            if (!sessionCheck.valid) {
+              return c.json({ error: 'Unauthorized - Invalid or expired session' }, 401);
+            }
+            
+            const { userId } = await c.req.json();
+            
+            if (!userId) {
+              return c.json({ error: 'User ID required' }, 400);
+            }
+            
+            // Get Coinbase Commerce API key from environment
+            const apiKey = process.env.COINBASE_COMMERCE_API_KEY;
+            if (!apiKey) {
+              logger?.error('❌ [Crypto] COINBASE_COMMERCE_API_KEY not configured');
+              return c.json({ error: 'Crypto payments not configured' }, 500);
+            }
+            
+            // Create charge via Coinbase Commerce API
+            const axios = await import('axios');
+            const chargeData = {
+              name: 'DarkWave-V2 Premium Subscription',
+              description: 'Monthly premium subscription ($5/month)',
+              local_price: {
+                amount: '5.00',
+                currency: 'USD'
+              },
+              pricing_type: 'fixed_price',
+              metadata: {
+                userId: userId,
+                plan: 'premium'
+              }
+            };
+            
+            logger?.info('📤 [Crypto] Sending charge request to Coinbase', { userId });
+            
+            const response = await axios.default.post(
+              'https://api.commerce.coinbase.com/charges',
+              chargeData,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'X-CC-Api-Key': apiKey,
+                  'X-CC-Version': '2018-03-22'
+                }
+              }
+            );
+            
+            const charge = response.data.data;
+            
+            logger?.info('✅ [Crypto] Charge created', { chargeId: charge.id, userId });
+            
+            // Save payment to database
+            const db = await import('../db/client.js').then(m => m.db);
+            const { cryptoPayments } = await import('../db/schema.js');
+            
+            const paymentId = `crypto_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+            
+            await db.insert(cryptoPayments).values({
+              id: paymentId,
+              userId: userId,
+              coinbaseChargeId: charge.id,
+              coinbaseChargeCode: charge.code,
+              amountUSD: '5.00',
+              status: 'pending',
+              hostedUrl: charge.hosted_url,
+              expiresAt: new Date(charge.expires_at),
+              description: 'Premium Subscription',
+              metadata: JSON.stringify({ plan: 'premium' }),
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            
+            logger?.info('💾 [Crypto] Payment record created', { paymentId, userId });
+            
+            return c.json({
+              success: true,
+              chargeId: charge.id,
+              hostedUrl: charge.hosted_url,
+              expiresAt: charge.expires_at,
+              addresses: charge.addresses
+            });
+            
+          } catch (error: any) {
+            logger?.error('❌ [Crypto] Failed to create charge', { error: error.message, response: error.response?.data });
+            return c.json({ error: 'Failed to create crypto payment' }, 500);
+          }
+        },
+      },
+      // Crypto Webhook (Coinbase Commerce payment confirmations)
+      {
+        path: "/api/crypto/webhook",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            logger?.info('🔔 [Crypto] Webhook received');
+            
+            const body = await c.req.json();
+            const event = body.event;
+            
+            if (!event) {
+              return c.json({ error: 'No event data' }, 400);
+            }
+            
+            logger?.info('📩 [Crypto] Processing event', { type: event.type, chargeId: event.data?.id });
+            
+            // Handle charge:confirmed event
+            if (event.type === 'charge:confirmed') {
+              const charge = event.data;
+              const chargeId = charge.id;
+              const userId = charge.metadata?.userId;
+              
+              if (!userId) {
+                logger?.warn('⚠️ [Crypto] No userId in charge metadata', { chargeId });
+                return c.json({ received: true });
+              }
+              
+              logger?.info('✅ [Crypto] Payment confirmed', { chargeId, userId });
+              
+              // Update payment status
+              const db = await import('../db/client.js').then(m => m.db);
+              const { cryptoPayments, subscriptions, whitelistedUsers } = await import('../db/schema.js');
+              const { eq } = await import('drizzle-orm');
+              
+              await db.update(cryptoPayments)
+                .set({ 
+                  status: 'completed',
+                  completedAt: new Date(),
+                  cryptoCurrency: charge.payments[0]?.network || 'unknown',
+                  cryptoAmount: charge.payments[0]?.value?.crypto?.amount || '0',
+                  updatedAt: new Date()
+                })
+                .where(eq(cryptoPayments.coinbaseChargeId, chargeId));
+              
+              // Grant subscription (30 days)
+              const expiryDate = new Date();
+              expiryDate.setDate(expiryDate.getDate() + 30);
+              
+              // Check if subscription exists
+              const [existingSub] = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId));
+              
+              if (existingSub) {
+                // Update existing subscription
+                await db.update(subscriptions)
+                  .set({
+                    plan: 'premium',
+                    status: 'active',
+                    provider: 'crypto',
+                    cryptoPaymentId: chargeId,
+                    expiryDate: expiryDate,
+                    autoRenew: false, // Crypto payments don't auto-renew
+                    updatedAt: new Date()
+                  })
+                  .where(eq(subscriptions.userId, userId));
+              } else {
+                // Create new subscription
+                await db.insert(subscriptions).values({
+                  userId: userId,
+                  plan: 'premium',
+                  status: 'active',
+                  provider: 'crypto',
+                  cryptoPaymentId: chargeId,
+                  expiryDate: expiryDate,
+                  autoRenew: false,
+                  createdAt: new Date(),
+                  updatedAt: new Date()
+                });
+              }
+              
+              // Add to whitelist
+              const [existingWhitelist] = await db.select().from(whitelistedUsers).where(eq(whitelistedUsers.userId, userId));
+              
+              if (!existingWhitelist) {
+                await db.insert(whitelistedUsers).values({
+                  userId: userId,
+                  reason: 'Premium subscriber (crypto payment)',
+                  expiresAt: expiryDate,
+                  createdAt: new Date(),
+                  updatedAt: new Date()
+                });
+              } else {
+                await db.update(whitelistedUsers)
+                  .set({
+                    expiresAt: expiryDate,
+                    updatedAt: new Date()
+                  })
+                  .where(eq(whitelistedUsers.userId, userId));
+              }
+              
+              logger?.info('🎉 [Crypto] Subscription activated', { userId, expiryDate });
+              
+              // Send admin notification
+              try {
+                const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+                const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+                
+                if (telegramToken && adminChatId) {
+                  const axios = await import('axios');
+                  const cryptoCurrency = charge.payments[0]?.network || 'Unknown';
+                  const cryptoAmount = charge.payments[0]?.value?.crypto?.amount || '0';
+                  
+                  const message = `💎 *New Crypto Payment!*\n\n` +
+                    `👤 User ID: \`${userId}\`\n` +
+                    `💰 Amount: $5.00 (${cryptoAmount} ${cryptoCurrency})\n` +
+                    `📅 Subscribed: ${new Date().toLocaleString()}\n` +
+                    `🔄 Auto-renewal: No (Manual crypto payment)\n` +
+                    `⏰ Expires: ${expiryDate.toLocaleDateString()}\n\n` +
+                    `💵 Monthly Revenue +$5`;
+                  
+                  await axios.default.post(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+                    chat_id: adminChatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                  });
+                  
+                  logger?.info('📱 [Telegram] Crypto payment notification sent', { userId });
+                }
+              } catch (telegramError: any) {
+                logger?.error('❌ [Telegram] Failed to send crypto notification', { error: telegramError.message });
+              }
+            }
+            
+            return c.json({ received: true });
+            
+          } catch (error: any) {
+            logger?.error('❌ [Crypto] Webhook error', { error: error.message });
+            return c.json({ error: 'Webhook processing failed' }, 500);
+          }
+        },
+      },
       // Feedback & Token Submission endpoint
       {
         path: "/api/submit-feedback",
