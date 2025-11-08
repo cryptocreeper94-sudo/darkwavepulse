@@ -1423,7 +1423,201 @@ function displayNFTAnalysis(nft) {
   analysisResult.appendChild(card);
 }
 
+// Live Chart State
+let liveChart = null;
+let chartRefreshInterval = null;
+
 async function loadChart(ticker) {
+  const chartContainer = document.getElementById('chartContainer');
+  if (!chartContainer) return;
+  
+  try {
+    // Clear existing chart and interval
+    if (liveChart) {
+      liveChart.remove();
+      liveChart = null;
+    }
+    if (chartRefreshInterval) {
+      clearInterval(chartRefreshInterval);
+      chartRefreshInterval = null;
+    }
+    
+    chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">📈 Loading live chart...</div>';
+    
+    // Try to load live candlestick chart
+    const success = await createLiveCandlestickChart(ticker, chartContainer);
+    
+    if (!success) {
+      // Fallback to static chart
+      await loadStaticChart(ticker, chartContainer);
+    } else {
+      // Set up auto-refresh every 5 minutes
+      chartRefreshInterval = setInterval(async () => {
+        console.log(`Refreshing chart for ${ticker}...`);
+        await createLiveCandlestickChart(ticker, chartContainer);
+      }, 5 * 60 * 1000); // 5 minutes
+    }
+  } catch (error) {
+    console.error('Chart error:', error);
+    chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">Chart unavailable</div>';
+  }
+}
+
+async function createLiveCandlestickChart(ticker, container) {
+  try {
+    // Fetch OHLC data from CoinGecko (free tier, 30-day data)
+    const coinId = ticker.toLowerCase();
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=30`);
+    
+    if (!response.ok) {
+      console.warn(`CoinGecko OHLC not available for ${ticker}, trying market chart...`);
+      return await createSimplePriceChart(ticker, container);
+    }
+    
+    const ohlcData = await response.json();
+    
+    if (!ohlcData || ohlcData.length === 0) {
+      return false;
+    }
+    
+    // Clear container and create chart
+    container.innerHTML = '';
+    container.style.minHeight = '300px';
+    container.style.background = 'rgba(0,0,0,0.3)';
+    
+    // Initialize chart
+    const chart = LightweightCharts.createChart(container, {
+      width: container.clientWidth,
+      height: 300,
+      layout: {
+        background: { color: 'transparent' },
+        textColor: '#d1d5db',
+      },
+      grid: {
+        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
+      },
+      crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal,
+      },
+      rightPriceScale: {
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      },
+      timeScale: {
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        timeVisible: true,
+        secondsVisible: false,
+      },
+    });
+    
+    const candlestickSeries = chart.addCandlestickSeries({
+      upColor: '#00ff88',
+      downColor: '#ff0066',
+      borderDownColor: '#ff0066',
+      borderUpColor: '#00ff88',
+      wickDownColor: '#ff0066',
+      wickUpColor: '#00ff88',
+    });
+    
+    // Format OHLC data for chart
+    const formattedData = ohlcData.map(item => ({
+      time: Math.floor(item[0] / 1000), // Convert to seconds
+      open: item[1],
+      high: item[2],
+      low: item[3],
+      close: item[4]
+    }));
+    
+    candlestickSeries.setData(formattedData);
+    chart.timeScale().fitContent();
+    
+    // Handle resize
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries.length === 0 || entries[0].target !== container) return;
+      const newRect = entries[0].contentRect;
+      chart.applyOptions({ width: newRect.width });
+    });
+    resizeObserver.observe(container);
+    
+    // Store chart reference
+    liveChart = chart;
+    
+    console.log(`✅ Live candlestick chart loaded for ${ticker}`);
+    return true;
+  } catch (error) {
+    console.error('Candlestick chart error:', error);
+    return false;
+  }
+}
+
+async function createSimplePriceChart(ticker, container) {
+  try {
+    // Fallback: Simple price line chart using market_chart endpoint
+    const coinId = ticker.toLowerCase();
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=30`);
+    
+    if (!response.ok) return false;
+    
+    const data = await response.json();
+    if (!data || !data.prices || data.prices.length === 0) return false;
+    
+    container.innerHTML = '';
+    container.style.minHeight = '300px';
+    
+    const chart = LightweightCharts.createChart(container, {
+      width: container.clientWidth,
+      height: 300,
+      layout: {
+        background: { color: 'transparent' },
+        textColor: '#d1d5db',
+      },
+      grid: {
+        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
+      },
+      crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal,
+      },
+      rightPriceScale: {
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      },
+      timeScale: {
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        timeVisible: true,
+      },
+    });
+    
+    const lineSeries = chart.addLineSeries({
+      color: '#00ff88',
+      lineWidth: 2,
+    });
+    
+    const formattedData = data.prices.map(([timestamp, price]) => ({
+      time: Math.floor(timestamp / 1000),
+      value: price
+    }));
+    
+    lineSeries.setData(formattedData);
+    chart.timeScale().fitContent();
+    
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries.length === 0 || entries[0].target !== container) return;
+      const newRect = entries[0].contentRect;
+      chart.applyOptions({ width: newRect.width });
+    });
+    resizeObserver.observe(container);
+    
+    liveChart = chart;
+    
+    console.log(`✅ Live price chart loaded for ${ticker}`);
+    return true;
+  } catch (error) {
+    console.error('Simple chart error:', error);
+    return false;
+  }
+}
+
+async function loadStaticChart(ticker, chartContainer) {
   try {
     const response = await fetch(`${API_BASE}/api/chart`, {
       method: 'POST',
@@ -1432,26 +1626,24 @@ async function loadChart(ticker) {
     });
     
     const data = await response.json();
-    const chartContainer = document.getElementById('chartContainer');
     
-    if (data.success && data.chartUrl && chartContainer) {
+    if (data.success && data.chartUrl) {
       chartContainer.innerHTML = `<img src="${data.chartUrl}" style="width: 100%; border-radius: 8px; cursor: pointer; display: block;" alt="Price Chart" />`;
       
-      // Add click handler to both container and image for full clickability
       chartContainer.onclick = () => openChartModal(data.chartUrl, ticker);
       const img = chartContainer.querySelector('img');
       if (img) {
         img.onclick = () => openChartModal(data.chartUrl, ticker);
       }
       
-      // Store chart URL for modal
       state.currentChartUrl = data.chartUrl;
       state.currentChartTicker = ticker;
     } else {
       chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">Chart unavailable</div>';
     }
   } catch (error) {
-    console.error('Chart error:', error);
+    console.error('Static chart error:', error);
+    chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">Chart unavailable</div>';
   }
 }
 
