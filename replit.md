@@ -16,7 +16,9 @@ The application uses a workflow-based architecture to process user messages thro
 
 **New in v2.5**: Comprehensive subscription notification system and admin dashboard. When users subscribe via Stripe, admin receives instant notifications via Telegram (formatted alerts) and Email (HTML formatted with revenue tracking). Admin dashboard at /admin provides real-time subscriber metrics, whitelist management, and revenue tracking. All admin actions are logged for security and traceability.
 
-**Security Note**: Current implementation uses browser-generated unique user IDs for session isolation. For production Telegram Mini App deployment, implement Telegram initData HMAC-SHA256 signature validation to cryptographically verify user identity and prevent ID spoofing. Admin dashboard protected by ADMIN_ACCESS_CODE environment variable.
+**New in v2.6**: Professional token submission system with comprehensive project presentation capabilities. Projects can submit tokens with social media links (website, Twitter/X, Telegram, Discord), upload documents (whitepaper, tokenomics, audit reports), and display trust indicators (doxxed team, locked liquidity). Admin approval workflow with robust three-layer file validation prevents XSS/injection attacks by verifying data URI format, decoding base64 payloads, and checking magic bytes to ensure file signatures match declared MIME types (prevents HTML/JS disguised as PDFs). Size limits: 2MB for logos, 5MB for PDFs. Production-ready security implementation.
+
+**Security Note**: Current implementation uses browser-generated unique user IDs for session isolation. For production Telegram Mini App deployment, implement Telegram initData HMAC-SHA256 signature validation to cryptographically verify user identity and prevent ID spoofing. Admin dashboard protected by ADMIN_ACCESS_CODE environment variable. File upload validation uses three-layer security: data URI parsing, base64 decoding with size verification, and magic byte signature checking to prevent malicious file uploads.
 
 ## User Preferences
 
