@@ -99,10 +99,53 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--gradient-primary);
+  background: #000000;
   color: var(--text-primary);
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+/* Animated Background Layer */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 20% 30%, rgba(139, 0, 0, 0.4) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 70%, rgba(26, 10, 31, 0.5) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(107, 0, 0, 0.3) 0%, transparent 70%);
+  background-size: 200% 200%;
+  animation: floatGlow 30s ease-in-out infinite;
+  opacity: 0.4;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes floatGlow {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  75% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Desktop: Max-width centered layout */
+@media (min-width: 1024px) {
+  #app {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
 }
 
 /* Live Market Ticker */
@@ -311,10 +354,17 @@ body {
   color: var(--text-secondary);
 }
 
+.tab-btn:hover:not(.active) {
+  background: rgba(26, 10, 31, 0.3);
+  transform: translateY(-2px);
+  color: var(--text-primary);
+}
+
 .tab-btn.active {
   background: var(--gradient-primary);
   color: white;
   box-shadow: 0 4px 15px rgba(107, 0, 0, 0.4);
+  transform: scale(1.05);
 }
 
 .tab-icon {
@@ -333,6 +383,62 @@ body {
 
 .tab-content {
   padding: 1rem;
+}
+
+/* Desktop: Card grouping and spacing */
+@media (min-width: 1024px) {
+  .tab-content {
+    padding: 1.5rem;
+  }
+  
+  /* Group sections into cohesive cards */
+  .category-nav,
+  .trending-carousel,
+  .featured-banner {
+    background: rgba(10, 0, 5, 0.6) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.15) !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    margin: 15px 0 20px 0 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.3s ease;
+  }
+  
+  .category-nav:hover,
+  .trending-carousel:hover,
+  .featured-banner:hover {
+    border-color: rgba(255, 215, 0, 0.3) !important;
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.1) !important;
+  }
+  
+  /* Upgrade banner gets special gold treatment */
+  .upgrade-banner {
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2)) !important;
+    backdrop-filter: blur(10px);
+    border: 2px solid #FFD700 !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    margin: 15px 0 20px 0 !important;
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2) !important;
+    transition: all 0.3s ease;
+  }
+  
+  .upgrade-banner:hover {
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.1) !important;
+    transform: translateY(-2px);
+  }
+  
+  /* Submit token banner styling */
+  #analysis > div[style*="rgba(74, 222, 128"] {
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.2)) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px !important;
+    padding: 24px !important;
+    margin: 15px 0 20px 0 !important;
+    box-shadow: 0 8px 32px rgba(74, 222, 128, 0.15) !important;
+    transition: all 0.3s ease;
+  }
 }
 
 .tab-pane {
@@ -377,15 +483,28 @@ body {
   color: var(--text-secondary);
 }
 
+.category-btn:hover:not(.active) {
+  background: rgba(255, 215, 0, 0.05);
+  border-color: rgba(255, 215, 0, 0.3);
+  transform: translateY(-2px);
+  color: var(--text-primary);
+}
+
 .category-btn.active {
   background: linear-gradient(135deg, rgba(26, 10, 31, 0.2), rgba(107, 0, 0, 0.2));
   border-color: var(--primary-purple);
   color: white;
   box-shadow: 0 0 15px rgba(26, 10, 31, 0.3);
+  transform: scale(1.05);
 }
 
 .category-icon {
   font-size: 1.3rem;
+  transition: transform 0.3s ease;
+}
+
+.category-btn:hover .category-icon {
+  transform: scale(1.2);
 }
 
 .category-label {
@@ -633,6 +752,19 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Desktop: Group search in card */
+@media (min-width: 1024px) {
+  .search-container {
+    background: rgba(10, 0, 5, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
 .search-input {
   flex: 1;
   background: var(--bg-card);
@@ -728,6 +860,23 @@ body {
   border: 1px solid rgba(107, 0, 0, 0.2);
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
   animation: slideUp 0.4s ease;
+  transition: all 0.3s ease;
+}
+
+/* Desktop: Enhanced analysis cards with hover effects */
+@media (min-width: 1024px) {
+  .analysis-card {
+    background: rgba(10, 0, 5, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 2rem;
+  }
+  
+  .analysis-card:hover {
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.15), 0 8px 30px rgba(0,0,0,0.5);
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes slideUp {
