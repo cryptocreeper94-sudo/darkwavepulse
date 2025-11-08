@@ -1230,16 +1230,16 @@ export const mastra = new Mastra({
               success: false,
               error: 'Bot detection failed',
               data: {
-                botPercentage: 0,
-                riskLevel: 'Medium',
-                riskColor: 'yellow',
+                botPercentage: 100,
+                riskLevel: 'Extreme',
+                riskColor: 'red',
                 holderCount: 0,
                 topHolderConcentration: 0,
-                rugRiskIndicators: ['Unable to analyze - please check token address'],
+                rugRiskIndicators: ['⚠️ ANALYSIS FAILED - Cannot verify safety', 'Assume extreme risk until verified'],
                 confidence: 0,
-                details: 'Analysis unavailable. Proceed with extreme caution.'
+                details: 'Analysis unavailable. DO NOT TRADE until you can verify token safety independently.'
               }
-            }, 200); // Return 200 with safe defaults instead of error
+            }, 200); // Return 200 with EXTREME risk on error for safety
           }
         }
       },

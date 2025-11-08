@@ -41,29 +41,30 @@ Returns:
     logger?.info(`🤖 [BotDetection] Analyzing ${chain} token: ${tokenAddress}`);
 
     try {
-      // For DEX pairs, use Dexscreener API which has holder data
-      const isDexPair = tokenAddress.includes('/') || chain.toLowerCase() === 'dex';
+      // For Solana/DEX pairs, always use Dexscreener analysis
+      // Solana addresses are base58 strings (32-44 chars), not URLs with slashes
+      const isSolanaOrDex = chain.toLowerCase() === 'solana' || chain.toLowerCase() === 'dex';
       
-      if (isDexPair || chain.toLowerCase() === 'solana') {
+      if (isSolanaOrDex || tokenAddress.length > 20) {
         return await analyzeDexPair(tokenAddress, chain, logger);
       }
 
-      // For direct token addresses, use blockchain-specific analysis
+      // For other chains, use blockchain-specific analysis (not implemented yet)
       return await analyzeTokenHolders(tokenAddress, chain, logger);
 
     } catch (error: any) {
       logger?.error(`❌ [BotDetection] Error:`, error.message);
       
-      // Return safe defaults on error
+      // CRITICAL: Return EXTREME risk on errors for safety
       return {
-        botPercentage: 0,
-        riskLevel: "Medium" as const,
-        riskColor: "yellow",
+        botPercentage: 100,
+        riskLevel: "Extreme" as const,
+        riskColor: "red",
         holderCount: 0,
         topHolderConcentration: 0,
-        rugRiskIndicators: ["Unable to fetch holder data - proceed with caution"],
+        rugRiskIndicators: ["⚠️ ANALYSIS FAILED - Cannot verify safety", "Assume extreme risk until verified"],
         confidence: 0,
-        details: `Could not analyze holders: ${error.message}. Use extreme caution.`,
+        details: `Analysis unavailable: ${error.message}. DO NOT TRADE until you can verify token safety independently.`,
       };
     }
   },
@@ -91,11 +92,11 @@ async function analyzeDexPair(pairAddress: string, chain: string, logger: any) {
   // Check liquidity (low liquidity = higher rug risk)
   const liquidity = pair.liquidity?.usd || 0;
   if (liquidity < 1000) {
-    indicators.push("⚠️ Very low liquidity (<$1K) - high rug risk");
-    botScore += 30;
+    indicators.push("⚠️ Very low liquidity (<$1K) - extreme rug risk");
+    botScore += 40;
   } else if (liquidity < 10000) {
-    indicators.push("⚠️ Low liquidity (<$10K)");
-    botScore += 15;
+    indicators.push("⚠️ Low liquidity (<$10K) - high rug risk");
+    botScore += 30;
   }
 
   // Check if LP is locked/burned
