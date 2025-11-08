@@ -93,6 +93,18 @@
         <span class="tab-icon">💰</span>
         <span class="tab-label">Wallet</span>
       </button>
+      <button class="tab-btn" data-tab="chat">
+        <span class="tab-icon">🤖</span>
+        <span class="tab-label">AI Chat</span>
+      </button>
+      <button class="tab-btn" data-tab="news">
+        <span class="tab-icon">📰</span>
+        <span class="tab-label">News</span>
+      </button>
+      <button class="tab-btn" data-tab="compare">
+        <span class="tab-icon">⚖️</span>
+        <span class="tab-label">Compare</span>
+      </button>
       <button class="tab-btn" data-tab="feedback">
         <span class="tab-icon">💬</span>
         <span class="tab-label">Feedback</span>
@@ -297,6 +309,80 @@
         </div>
       </div>
 
+      <!-- AI Chat Tab -->
+      <div id="chat" class="tab-pane">
+        <div class="section-header">
+          <h2>🤖 AI Trading Assistant</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Ask questions, get explanations, or discuss trading strategies</p>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="chat-messages"></div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+          <input 
+            type="text" 
+            id="chatInput" 
+            class="chat-input" 
+            placeholder="Ask about trading, indicators, or market analysis..."
+          />
+          <button class="chat-send-btn" id="chatSendBtn">
+            <span>📤</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- News Tab -->
+      <div id="news" class="tab-pane">
+        <div class="section-header">
+          <h2>📰 Market News</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Real-time crypto, stock & financial news with sentiment analysis</p>
+        </div>
+
+        <!-- News Filters -->
+        <div class="news-filters">
+          <button class="news-filter-btn active" data-filter="all">All</button>
+          <button class="news-filter-btn" data-filter="crypto">🪙 Crypto</button>
+          <button class="news-filter-btn" data-filter="rising">📈 Rising</button>
+          <button class="news-filter-btn" data-filter="hot">🔥 Hot</button>
+          <button class="news-filter-btn" data-filter="bullish">🟢 Bullish</button>
+          <button class="news-filter-btn" data-filter="bearish">🔴 Bearish</button>
+        </div>
+
+        <!-- News Feed -->
+        <div id="newsFeed" class="news-feed">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Compare Assets Tab -->
+      <div id="compare" class="tab-pane">
+        <div class="section-header">
+          <h2>⚖️ Compare Assets</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Side-by-side comparison of 2-3 assets</p>
+        </div>
+
+        <!-- Asset Selection -->
+        <div class="compare-selection">
+          <div class="compare-input-group">
+            <input type="text" id="compareAsset1" class="compare-input" placeholder="Asset 1 (e.g., BTC)">
+            <button class="compare-add-btn" onclick="addToComparison(1)">Add</button>
+          </div>
+          <div class="compare-input-group">
+            <input type="text" id="compareAsset2" class="compare-input" placeholder="Asset 2 (e.g., ETH)">
+            <button class="compare-add-btn" onclick="addToComparison(2)">Add</button>
+          </div>
+          <div class="compare-input-group">
+            <input type="text" id="compareAsset3" class="compare-input" placeholder="Asset 3 (optional)">
+            <button class="compare-add-btn" onclick="addToComparison(3)">Add</button>
+          </div>
+        </div>
+
+        <!-- Comparison Results -->
+        <div id="comparisonResults" class="comparison-results"></div>
+      </div>
+
       <!-- Settings Tab -->
       <div id="settings" class="tab-pane">
         <div class="section-header">
@@ -316,6 +402,20 @@
             <button id="upgradeBtn" class="action-btn" style="width: 100%; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold;">
               👑 Upgrade to Premium
             </button>
+          </div>
+          
+          <div class="settings-section">
+            <h3>🎨 Appearance</h3>
+            <div class="toggle-row">
+              <span>Dark Mode</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleDarkMode" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">
+              Switch to light mode for better visibility in bright environments
+            </p>
           </div>
           
           <div class="settings-section">

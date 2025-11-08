@@ -3638,4 +3638,362 @@ document.addEventListener('DOMContentLoaded', () => {
     // Wait 2 seconds after page load to show email modal
     setTimeout(showEmailModal, 2000);
   }
+  
+  // Initialize new features
+  initializeChat();
+  initializeNews();
+  initializeCompare();
 });
+
+// ===== AI CHAT FUNCTIONALITY =====
+let chatHistory = [];
+
+function initializeChat() {
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+  
+  if (!chatInput || !chatSendBtn) return;
+  
+  // Handle send message
+  chatSendBtn.addEventListener('click', () => sendChatMessage());
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+  });
+  
+  // Welcome message
+  addChatMessage('assistant', '👋 Hi! I\'m your AI trading assistant. Ask me about:\n\n• Technical indicators (RSI, MACD, etc.)\n• Trading strategies\n• Market analysis\n• Term explanations\n• Investment advice\n\nWhat would you like to know?');
+}
+
+function addChatMessage(role, content) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message chat-message-${role}`;
+  
+  const avatar = document.createElement('div');
+  avatar.className = 'chat-avatar';
+  avatar.textContent = role === 'user' ? '👤' : '🤖';
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = content;
+  
+  messageDiv.appendChild(avatar);
+  messageDiv.appendChild(bubble);
+  chatMessages.appendChild(messageDiv);
+  
+  // Scroll to bottom
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const chatInput = document.getElementById('chatInput');
+  const message = chatInput.value.trim();
+  
+  if (!message) return;
+  
+  // Add user message
+  addChatMessage('user', message);
+  chatInput.value = '';
+  
+  // Add to history
+  chatHistory.push({ role: 'user', content: message });
+  
+  try {
+    // Call backend AI endpoint
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Session-Token': localStorage.getItem('sessionToken') || ''
+      },
+      body: JSON.stringify({
+        message,
+        history: chatHistory.slice(-10), // Last 10 messages
+        userId: state.userId || 'demo-user'
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.reply) {
+      addChatMessage('assistant', data.reply);
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    } else {
+      addChatMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+    }
+  } catch (error) {
+    console.error('Chat error:', error);
+    addChatMessage('assistant', '❌ Connection error. Please try again.');
+  }
+}
+
+// ===== NEWS FEED FUNCTIONALITY =====
+let newsCache = { data: null, timestamp: 0 };
+const NEWS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+function initializeNews() {
+  const newsFilterBtns = document.querySelectorAll('.news-filter-btn');
+  
+  newsFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update active state
+      newsFilterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Fetch filtered news
+      const filter = btn.dataset.filter;
+      fetchNews(filter);
+    });
+  });
+  
+  // Load initial news
+  fetchNews('all');
+}
+
+async function fetchNews(filter = 'all') {
+  const newsFeed = document.getElementById('newsFeed');
+  if (!newsFeed) return;
+  
+  // Check cache
+  const now = Date.now();
+  if (newsCache.data && (now - newsCache.timestamp < NEWS_CACHE_DURATION) && filter === 'all') {
+    displayNews(newsCache.data, filter);
+    return;
+  }
+  
+  newsFeed.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  
+  try {
+    // Use CryptoPanic API (free tier)
+    const url = `https://cryptopanic.com/api/free/v1/posts/?auth_token=free&filter=${filter}&public=true`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.results) {
+      // Cache the data
+      newsCache = { data: data.results, timestamp: now };
+      displayNews(data.results, filter);
+    } else {
+      newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news available</p>';
+    }
+  } catch (error) {
+    console.error('News fetch error:', error);
+    newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load news. Please try again.</p>';
+  }
+}
+
+function displayNews(newsItems, filter) {
+  const newsFeed = document.getElementById('newsFeed');
+  if (!newsFeed) return;
+  
+  newsFeed.innerHTML = '';
+  
+  // Filter news items based on selected filter
+  let filtered = newsItems;
+  if (filter !== 'all') {
+    filtered = newsItems.filter(item => {
+      if (filter === 'bullish') return item.votes?.positive > item.votes?.negative;
+      if (filter === 'bearish') return item.votes?.negative > item.votes?.positive;
+      return true;
+    });
+  }
+  
+  filtered.slice(0, 20).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.onclick = () => window.open(item.url, '_blank');
+    
+    // Determine sentiment
+    let sentiment = 'neutral';
+    let sentimentText = 'Neutral';
+    if (item.votes) {
+      const pos = item.votes.positive || 0;
+      const neg = item.votes.negative || 0;
+      if (pos > neg && pos > 5) {
+        sentiment = 'positive';
+        sentimentText = 'Bullish';
+      } else if (neg > pos && neg > 5) {
+        sentiment = 'negative';
+        sentimentText = 'Bearish';
+      }
+    }
+    
+    const timeAgo = getTimeAgo(item.published_at);
+    const source = item.source?.title || 'Unknown';
+    
+    card.innerHTML = `
+      <div class="news-header">
+        <span class="news-source">${source}</span>
+        <span class="news-sentiment ${sentiment}">${sentimentText}</span>
+      </div>
+      <div class="news-title">${item.title}</div>
+      <div class="news-meta">
+        <span>📅 ${timeAgo}</span>
+        <span class="news-votes">👍 ${item.votes?.positive || 0} 👎 ${item.votes?.negative || 0}</span>
+      </div>
+    `;
+    
+    newsFeed.appendChild(card);
+  });
+}
+
+function getTimeAgo(dateString) {
+  const now = new Date();
+  const past = new Date(dateString);
+  const seconds = Math.floor((now - past) / 1000);
+  
+  if (seconds < 60) return 'Just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+// ===== ASSET COMPARISON FUNCTIONALITY =====
+const comparisonAssets = [];
+
+async function addToComparison(slot) {
+  const input = document.getElementById(`compareAsset${slot}`);
+  const ticker = input.value.trim().toUpperCase();
+  
+  if (!ticker) {
+    showToast('❌ Please enter a ticker symbol');
+    return;
+  }
+  
+  if (comparisonAssets.length >= 3) {
+    showToast('❌ Maximum 3 assets for comparison');
+    return;
+  }
+  
+  // Check if already added
+  if (comparisonAssets.find(a => a.ticker === ticker)) {
+    showToast('ℹ️ Asset already added');
+    return;
+  }
+  
+  showToast('🔍 Fetching ' + ticker + '...');
+  
+  try {
+    // Fetch analysis data
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker, userId })
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      showToast('❌ ' + data.error);
+      return;
+    }
+    
+    comparisonAssets.push(data);
+    input.value = '';
+    displayComparison();
+    showToast('✅ Added ' + ticker);
+  } catch (error) {
+    console.error('Comparison fetch error:', error);
+    showToast('❌ Failed to fetch data');
+  }
+}
+
+function displayComparison() {
+  const container = document.getElementById('comparisonResults');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  comparisonAssets.forEach((asset, index) => {
+    const card = document.createElement('div');
+    card.className = 'compare-asset-card';
+    
+    const priceChange = asset.priceChange || 0;
+    const priceChangeClass = priceChange >= 0 ? 'positive' : 'negative';
+    const signal = asset.recommendation || 'HOLD';
+    const signalEmoji = signal.includes('BUY') ? '🟢' : signal.includes('SELL') ? '🔴' : '🟡';
+    
+    card.innerHTML = `
+      <div class="compare-asset-header">
+        <div class="compare-asset-ticker">${asset.ticker}</div>
+        <div class="compare-asset-price">$${asset.price?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || '0.00'}</div>
+        <div class="price-change ${priceChangeClass}">
+          ${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%
+        </div>
+      </div>
+      <div class="compare-metrics">
+        <div class="compare-metric">
+          <span class="compare-metric-label">Signal</span>
+          <span class="compare-metric-value">${signalEmoji} ${signal}</span>
+        </div>
+        <div class="compare-metric">
+          <span class="compare-metric-label">RSI</span>
+          <span class="compare-metric-value" style="color: ${asset.rsi > 70 ? '#E63946' : asset.rsi < 30 ? '#4ADE80' : '#fff'}">${asset.rsi?.toFixed(1) || 'N/A'}</span>
+        </div>
+        <div class="compare-metric">
+          <span class="compare-metric-label">MACD</span>
+          <span class="compare-metric-value">${asset.macd?.value?.toFixed(2) || 'N/A'}</span>
+        </div>
+        <div class="compare-metric">
+          <span class="compare-metric-label">24h High</span>
+          <span class="compare-metric-value">$${asset.high24h?.toLocaleString() || 'N/A'}</span>
+        </div>
+        <div class="compare-metric">
+          <span class="compare-metric-label">24h Low</span>
+          <span class="compare-metric-value">$${asset.low24h?.toLocaleString() || 'N/A'}</span>
+        </div>
+        <div class="compare-metric">
+          <span class="compare-metric-label">Volume</span>
+          <span class="compare-metric-value">$${asset.volume?.toLocaleString() || 'N/A'}</span>
+        </div>
+      </div>
+      <button class="action-btn" style="margin-top: 1rem; width: 100%;" onclick="removeFromComparison(${index})">
+        ❌ Remove
+      </button>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+function removeFromComparison(index) {
+  comparisonAssets.splice(index, 1);
+  displayComparison();
+  showToast('✅ Asset removed');
+}
+
+function initializeCompare() {
+  // Already handled by onclick attributes in HTML
+}
+
+// ===== DARK MODE FUNCTIONALITY =====
+function initializeDarkMode() {
+  const darkModeToggle = document.getElementById('toggleDarkMode');
+  if (!darkModeToggle) return;
+  
+  // Load saved preference
+  const savedTheme = localStorage.getItem('darkwave_theme') || 'dark';
+  document.body.classList.add(savedTheme);
+  darkModeToggle.checked = (savedTheme === 'dark');
+  
+  // Handle toggle
+  darkModeToggle.addEventListener('change', (e) => {
+    const newTheme = e.target.checked ? 'dark' : 'light';
+    document.body.classList.remove('dark', 'light');
+    document.body.classList.add(newTheme);
+    localStorage.setItem('darkwave_theme', newTheme);
+    
+    showToast(newTheme === 'dark' ? '🌙 Dark mode enabled' : '☀️ Light mode enabled');
+    
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+  });
+}
+
+// Initialize dark mode
+initializeDarkMode();
