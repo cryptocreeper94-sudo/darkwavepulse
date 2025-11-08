@@ -200,7 +200,7 @@ body::before {
   #app {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--shell-padding);
+    padding: 32px var(--shell-padding) 0; /* Preserve top padding for ticker */
     position: relative;
   }
   

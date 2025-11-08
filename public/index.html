@@ -359,9 +359,9 @@
           <button class="news-filter-btn" data-filter="bearish">🔴 Bearish</button>
         </div>
 
-        <!-- News Feed -->
-        <div id="newsFeed" class="news-feed">
-          <div class="loading-spinner"><div class="spinner"></div></div>
+        <!-- News Feed (Responsive Grid) -->
+        <div id="newsFeed" class="news-feed content-grid">
+          <div class="loading-spinner grid-full"><div class="spinner"></div></div>
         </div>
       </div>
 
@@ -372,24 +372,24 @@
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Side-by-side comparison of 2-3 assets</p>
         </div>
 
-        <!-- Asset Selection -->
-        <div class="compare-selection">
-          <div class="compare-input-group">
+        <!-- Asset Selection (Responsive Grid) -->
+        <div class="compare-selection content-grid">
+          <div class="compare-input-group glass-card">
             <input type="text" id="compareAsset1" class="compare-input" placeholder="Asset 1 (e.g., BTC)">
-            <button class="compare-add-btn" onclick="addToComparison(1)">Add</button>
+            <button class="compare-add-btn accent-hot" onclick="addToComparison(1)">Add</button>
           </div>
-          <div class="compare-input-group">
+          <div class="compare-input-group glass-card">
             <input type="text" id="compareAsset2" class="compare-input" placeholder="Asset 2 (e.g., ETH)">
-            <button class="compare-add-btn" onclick="addToComparison(2)">Add</button>
+            <button class="compare-add-btn accent-hot" onclick="addToComparison(2)">Add</button>
           </div>
-          <div class="compare-input-group">
+          <div class="compare-input-group glass-card">
             <input type="text" id="compareAsset3" class="compare-input" placeholder="Asset 3 (optional)">
-            <button class="compare-add-btn" onclick="addToComparison(3)">Add</button>
+            <button class="compare-add-btn accent-success" onclick="addToComparison(3)">Add</button>
           </div>
         </div>
 
-        <!-- Comparison Results -->
-        <div id="comparisonResults" class="comparison-results"></div>
+        <!-- Comparison Results (Responsive Grid) -->
+        <div id="comparisonResults" class="comparison-results content-grid"></div>
       </div>
 
       <!-- Settings Tab -->
