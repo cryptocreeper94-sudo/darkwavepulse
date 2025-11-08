@@ -1135,6 +1135,80 @@ export const mastra = new Mastra({
         },
       },
       {
+        path: "/api/chat",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          logger?.info('🤖 [AI Chat] Chat request received');
+          
+          // Check access session
+          const { checkAccessSession } = await import('./middleware/accessControl.js');
+          const sessionCheck = await checkAccessSession(c);
+          if (!sessionCheck.valid) {
+            logger?.warn('🚫 [Access Control] Unauthorized chat request');
+            return sessionCheck.error;
+          }
+          
+          try {
+            const { message, history, userId } = await c.req.json();
+            logger?.info('🤖 [AI Chat] Processing message', { 
+              userId,
+              messageLength: message?.length,
+              historyLength: history?.length || 0
+            });
+            
+            if (!message || message.trim().length === 0) {
+              return c.json({ error: 'Message is required' }, 400);
+            }
+            
+            // Get the DarkWave agent
+            const darkwaveAgent = mastra.getAgent('darkwave');
+            if (!darkwaveAgent) {
+              logger?.error('🚨 [AI Chat] DarkWave agent not found');
+              return c.json({ error: 'AI agent not available' }, 500);
+            }
+            
+            // Build conversation history for context
+            const messages = [
+              {
+                role: 'system' as const,
+                content: 'You are a helpful AI trading assistant. Answer questions about trading, technical indicators, market analysis, and investment strategies. Be concise but informative. Use emojis sparingly for clarity.'
+              },
+              ...(history || []).map((msg: any) => ({
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content
+              })),
+              {
+                role: 'user' as const,
+                content: message
+              }
+            ];
+            
+            logger?.info('🤖 [AI Chat] Generating response');
+            
+            // Use generateLegacy for compatibility with AI SDK v4
+            const response = await darkwaveAgent.generateLegacy(messages, {
+              maxTokens: 500
+            });
+            
+            const reply = response.text || 'I apologize, but I couldn\'t generate a response. Please try again.';
+            
+            logger?.info('✅ [AI Chat] Response generated', { 
+              replyLength: reply.length 
+            });
+            
+            return c.json({ reply });
+            
+          } catch (error: any) {
+            logger?.error('❌ [AI Chat] Error', { error: error.message, stack: error.stack });
+            return c.json({ 
+              error: 'Chat error occurred',
+              reply: 'Sorry, I encountered an error. Please try again in a moment.' 
+            }, 500);
+          }
+        },
+      },
+      {
         path: "/api/holdings",
         method: "GET",
         createHandler: async ({ mastra }) => async (c: any) => {
