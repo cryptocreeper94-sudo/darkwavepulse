@@ -5206,12 +5206,15 @@ function initializeThemeSwitcher() {
       
       // Show toast
       const themeNames = {
-        jupiter: 'Jupiter',
-        robinhood: 'Robinhood',
-        coinbase: 'Coinbase'
+        jupiter: 'Electric Night',
+        robinhood: 'Clean Green',
+        coinbase: 'Pro Blue',
+        sakura: 'Sakura Pink',
+        sunset: 'Sunset Warmth',
+        ocean: 'Ocean Calm'
       };
       
-      showToast(`${themeNames[newTheme]} theme activated`);
+      showToast(`✨ ${themeNames[newTheme]} theme activated`);
       
       if (tg) tg.HapticFeedback?.impactOccurred('medium');
     });
