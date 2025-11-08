@@ -148,3 +148,52 @@ export const cryptoPayments = pgTable('crypto_payments', {
   completedAt: timestamp('completed_at'), // When payment was confirmed
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// Token Launches - For upcoming IDOs/Presales
+export const tokenLaunches = pgTable('token_launches', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  tokenId: varchar('token_id', { length: 255 }).notNull(), // Links to approvedTokens
+  
+  // Launch Details
+  launchDate: timestamp('launch_date').notNull(),
+  launchPrice: varchar('launch_price', { length: 100 }), // e.g., "$0.01"
+  totalSupply: varchar('total_supply', { length: 100 }),
+  initialMarketCap: varchar('initial_market_cap', { length: 100 }),
+  
+  // Whitelist Configuration
+  maxWhitelistSpots: integer('max_whitelist_spots').default(1000),
+  currentWhitelistCount: integer('current_whitelist_count').default(0),
+  whitelistEnabled: boolean('whitelist_enabled').default(true),
+  whitelistCloseDate: timestamp('whitelist_close_date'),
+  
+  // Allocation Details
+  minAllocation: varchar('min_allocation', { length: 100 }), // Min investment (e.g., "0.1 SOL")
+  maxAllocation: varchar('max_allocation', { length: 100 }), // Max investment (e.g., "5 SOL")
+  acceptedCurrencies: text('accepted_currencies'), // JSON array: ["SOL", "USDC"]
+  
+  // Launch Status
+  status: varchar('status', { length: 50 }).notNull().default('upcoming'), // 'upcoming' | 'live' | 'completed' | 'cancelled'
+  featured: boolean('featured').default(true),
+  displayOrder: integer('display_order').default(0),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Launch Whitelist - Users who signed up for launches
+export const launchWhitelist = pgTable('launch_whitelist', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  launchId: varchar('launch_id', { length: 255 }).notNull(), // Links to tokenLaunches
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  walletAddress: varchar('wallet_address', { length: 255 }).notNull(),
+  chain: varchar('chain', { length: 50 }).notNull().default('solana'),
+  
+  // Allocation
+  allocatedAmount: varchar('allocated_amount', { length: 100 }), // Amount they'll be able to invest
+  contributedAmount: varchar('contributed_amount', { length: 100 }), // Amount they actually invested
+  
+  // Status
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'approved' | 'participated' | 'claimed'
+  signedUpAt: timestamp('signed_up_at').defaultNow().notNull(),
+  approvedAt: timestamp('approved_at'),
+});
