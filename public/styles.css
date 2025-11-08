@@ -924,6 +924,34 @@ a:hover {
   color: var(--text-primary);
 }
 
+/* Crypto Cat Toggle - Make it prominent */
+.crypto-cat-toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crypto-cat-btn {
+  background: linear-gradient(135deg, #FF006E, #8B5CF6);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-full);
+  padding: 8px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.crypto-cat-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 0, 110, 0.5);
+}
+
+.crypto-cat-btn img {
+  display: block;
+}
+
 /* Toast Notifications */
 .toast {
   position: fixed;
