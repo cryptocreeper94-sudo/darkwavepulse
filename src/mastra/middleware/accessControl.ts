@@ -3,17 +3,19 @@ import { db } from '../../db/client.js';
 import { sessions } from '../../db/schema.js';
 import { eq, lt } from 'drizzle-orm';
 
-// Session expiry: 30 days
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+// Session expiry durations
+const FREE_TIER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;  // 7 days for free tier
+const PREMIUM_DURATION_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days for whitelisted/premium
 
-export async function generateSessionToken(userId: string, email?: string): Promise<string> {
+export async function generateSessionToken(userId: string, email?: string, isPremium: boolean = false): Promise<string> {
   if (!userId || userId === 'demo-user') {
     throw new Error('Valid userId required for session generation');
   }
   
   const token = randomBytes(32).toString('hex');
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + SESSION_DURATION_MS);
+  const sessionDuration = isPremium ? PREMIUM_DURATION_MS : FREE_TIER_DURATION_MS;
+  const expiresAt = new Date(now.getTime() + sessionDuration);
   
   await db.insert(sessions).values({
     token,
