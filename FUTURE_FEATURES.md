@@ -211,6 +211,88 @@ Animal charity token with mission-driven tokenomics. Will integrate with DarkWav
 
 ---
 
+## 🤖 Bot Holder Detection & Rug Risk Analysis (Priority: HIGH - Post-Launch v2)
+**Status:** Planning - needs API research
+**Estimated Effort:** 8-12 hours
+
+### Project Description
+Show users what percentage of a token's holders are likely bots, especially critical for memecoins and newly launched tokens. Color-coded visual indicator helps identify rug pulls and liquidity traps before users get wrecked.
+
+### Key Features
+**Bot Detection Metrics:**
+- % of top 50 holders that are bots
+- Color-coded risk indicator:
+  - 🟢 Green (0-20%): Safe - mostly real holders
+  - 🟡 Yellow (20-50%): Caution - some bot activity
+  - 🟠 Orange (50-75%): High Risk - heavy bot presence
+  - 🔴 Red (75-100%): DANGER - likely rug pull setup
+
+**Detection Signals:**
+- Wallets created within same 1-hour window
+- Similar balance patterns across wallets
+- No transaction history before token purchase
+- Coordinated buy/sell behavior
+- Wallet clustering patterns
+
+**Display:**
+- Show on every DEX pair analysis
+- Prominent badge in token search results
+- Detailed breakdown for premium users
+- Historical bot % tracking (did it increase suddenly?)
+
+### Potential Data Sources
+1. **Helius API (Solana)** - Wallet metadata, creation dates, transaction history
+2. **Bubblemaps** - Visual wallet clustering (may require paid API)
+3. **Custom Analysis** - Analyze on-chain data ourselves:
+   - Query wallet creation timestamps
+   - Analyze holder distribution patterns
+   - Detect coordinated activity
+4. **Dexscreener** - Basic holder count (free)
+
+### Implementation Approach
+**Phase 1: Basic Detection**
+- Fetch top 50 holders via blockchain explorers
+- Check wallet creation dates (bunched = bots)
+- Calculate bot percentage
+- Display color-coded badge
+
+**Phase 2: Advanced Analysis**
+- Transaction pattern analysis
+- Wallet clustering detection
+- Risk score algorithm (not just bot %, but behavior)
+- Alert when bot % suddenly increases
+
+**Phase 3: Real-Time Monitoring**
+- Track bot % changes over time
+- Alert users if their holdings show increasing bot activity
+- Database of known bot wallet addresses
+
+### Technical Considerations
+- **Rate Limits:** Cache results for 5-15 minutes to avoid API hammering
+- **Cost:** Some APIs (Bubblemaps) may be paid - evaluate ROI
+- **Accuracy:** No detection is 100% - always show confidence level
+- **Legal:** Label as "estimated bot detection" not definitive
+
+### User Education Component
+Add to glossary:
+- **Bot Holders:** Explain what they are, why they matter
+- **Rug Pull Indicators:** Bot % is ONE signal, teach others too
+- **False Positives:** Legitimate coordinated buys can look like bots
+
+### Integration Points
+- Show in DEX pair analysis results
+- Add filter in Scanner tool ("exclude >50% bot coins")
+- Alert in portfolio tracking ("Warning: XYZ token bot % increased to 80%")
+- Include in token submission review (auto-flag high bot % submissions)
+
+### Notes
+- This directly supports "conviction trading" message - helps users avoid traps
+- Massive competitive advantage - most TA bots don't show this
+- Could save users thousands by preventing rug pull losses
+- Consider making this a premium-only feature (data costs money)
+
+---
+
 ## 🎨 Limited Edition NFT/Token Collectibles (Priority: Future)
 **Status:** Future project - needs community first
 **Estimated Effort:** TBD
