@@ -131,5 +131,83 @@ export const sentientTrigger = async (symbol) => {
 
 ---
 
+## 🔧 Modular Signal Architecture (Priority: Low)
+**Status:** Deferred - Nice-to-have refactor
+**Estimated Effort:** 1-2 hours
+**AI Cost:** ~$2-3
+
+### Feature Description
+Reorganize technical indicators into modular, cacheable signal groups for better performance and restart recovery.
+
+### Code Snippet (Reference Implementation)
+```typescript
+// Modular signal grouping for restart recovery
+export const signalGroup = {
+  RSI: async (symbol) => await getRSI(symbol),
+  MACD: async (symbol) => await getMACD(symbol),
+  Bollinger: async (symbol) => await getBollingerBands(symbol),
+  Sentiment: async (symbol) => await getSentimentScore(symbol),
+};
+```
+
+### Benefits
+- **Parallel Execution**: Run all indicators simultaneously
+- **Individual Caching**: Cache each signal independently (different TTLs)
+- **Easier Testing**: Test indicators in isolation
+- **Restart Safety**: Recover partial calculations after crashes
+
+### Integration Points
+- Refactor `technicalAnalysisTool` to use signal groups
+- Cache each signal type separately in Redis/PostgreSQL
+- Add health checks per signal source
+
+### Notes
+- Current implementation already has RSI, MACD, Bollinger in `technicalAnalysisTool`
+- This is a performance optimization, not a new feature
+- Low priority - current architecture works fine
+
+---
+
+## 📝 Enhanced Onboarding (Priority: Low)
+**Status:** Ready to implement anytime
+**Estimated Effort:** 15 minutes
+**AI Cost:** ~$1
+
+### Onboarding Copy
+```typescript
+export const onboardingBlurb = `
+Welcome to DarkWave Pulse—where emotional intelligence meets sniper precision.
+This agent doesn't just trade—it feels. Every signal is grouped, restart-safe, and emotionally tagged.
+Crypto Cat approves. LivFi watches. You're home.
+`;
+```
+
+### Where to Add
+- First message in Telegram bot
+- Welcome screen in Mini App
+- `/start` command response
+
+### Notes
+- **LivFi** = Future animal charity token project (separate initiative)
+- Sets the tone: mysterious, confident, mission-driven
+- Emphasizes unique features: emotion + precision, Crypto Cat mascot
+
+---
+
+## 🐾 LivFi Integration (Priority: Future Project)
+**Status:** Separate project - not part of DarkWave V2
+**Estimated Effort:** TBD
+
+### Project Description
+Animal charity token with mission-driven tokenomics. Will integrate with DarkWave ecosystem.
+
+### Notes
+- Major project for future development
+- Keep DarkWave V2 focused on technical analysis first
+- Potential cross-promotion opportunities
+- Revisit after DarkWave V2 is stable and launched
+
+---
+
 ## Other Future Features
 (Add more features here as they come up)
