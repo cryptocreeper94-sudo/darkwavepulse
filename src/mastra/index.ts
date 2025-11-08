@@ -2278,6 +2278,119 @@ export const mastra = new Mastra({
             
             logger?.info('💬 [Feedback] Received submission', { type, userId, hasImage: !!tokenLogo, hasDocs: !!(whitepaper || tokenomics || auditReport) });
             
+            // SERVER-SIDE FILE VALIDATION: Validate uploaded files to prevent abuse
+            const validateFile = (file: any, maxSizeMB: number, allowedTypes: string[], fileLabel: string) => {
+              if (!file) return null;
+              
+              // Validate structure
+              if (!file.data || typeof file.data !== 'string') {
+                throw new Error(`${fileLabel}: Invalid file structure`);
+              }
+              
+              // Validate base64 data URI format and EXTRACT actual MIME type from data URI
+              if (!file.data.startsWith('data:')) {
+                throw new Error(`${fileLabel}: Invalid base64 format - must be a data URI`);
+              }
+              
+              // Extract MIME type from the data URI itself (not the client-supplied mimeType field)
+              const dataUriMatch = file.data.match(/^data:([^;]+);base64,/);
+              if (!dataUriMatch) {
+                throw new Error(`${fileLabel}: Invalid data URI format`);
+              }
+              
+              const actualMimeType = dataUriMatch[1].toLowerCase();
+              
+              // Validate MIME type against allowed types (using EXTRACTED type, not client claim)
+              const normalizedAllowedTypes = allowedTypes.map(t => t.toLowerCase());
+              if (!normalizedAllowedTypes.includes(actualMimeType)) {
+                throw new Error(`${fileLabel}: Invalid file type '${actualMimeType}'. Allowed: ${allowedTypes.join(', ')}`);
+              }
+              
+              // Extract and validate base64 payload
+              const base64Data = file.data.split(',')[1];
+              if (!base64Data) {
+                throw new Error(`${fileLabel}: Missing base64 data`);
+              }
+              
+              // Attempt to decode base64 to verify it's valid
+              let buffer: Buffer;
+              try {
+                buffer = Buffer.from(base64Data, 'base64');
+              } catch (decodeError) {
+                throw new Error(`${fileLabel}: Invalid base64 encoding`);
+              }
+              
+              // MAGIC BYTE VALIDATION: Verify actual file content matches declared MIME type
+              const verifyFileSignature = (buf: Buffer, mimeType: string): boolean => {
+                // PDF signature: %PDF- (25 50 44 46 2D)
+                if (mimeType === 'application/pdf') {
+                  return buf.slice(0, 4).toString() === '%PDF';
+                }
+                
+                // PNG signature: 89 50 4E 47 0D 0A 1A 0A
+                if (mimeType === 'image/png') {
+                  return buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47;
+                }
+                
+                // JPEG signature: FF D8 FF
+                if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
+                  return buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF;
+                }
+                
+                // GIF signature: GIF87a or GIF89a
+                if (mimeType === 'image/gif') {
+                  const sig = buf.slice(0, 6).toString();
+                  return sig === 'GIF87a' || sig === 'GIF89a';
+                }
+                
+                // WEBP signature: RIFF....WEBP
+                if (mimeType === 'image/webp') {
+                  return buf.slice(0, 4).toString() === 'RIFF' && buf.slice(8, 12).toString() === 'WEBP';
+                }
+                
+                return false;
+              };
+              
+              if (!verifyFileSignature(buffer, actualMimeType)) {
+                throw new Error(`${fileLabel}: File content does not match declared type '${actualMimeType}'. File may be corrupted or malicious.`);
+              }
+              
+              // Calculate actual file size
+              const sizeInBytes = buffer.length;
+              const sizeInMB = sizeInBytes / (1024 * 1024);
+              
+              if (sizeInMB > maxSizeMB) {
+                throw new Error(`${fileLabel}: File too large (${sizeInMB.toFixed(2)}MB). Max: ${maxSizeMB}MB`);
+              }
+              
+              logger?.info(`✅ [Validation] ${fileLabel} passed all checks`, { sizeInMB: sizeInMB.toFixed(2), mimeType: actualMimeType, signatureVerified: true });
+              return file;
+            };
+            
+            // Validate all uploaded files
+            if (type === 'token') {
+              try {
+                // Validate logo (max 2MB, image only)
+                if (tokenLogo) {
+                  validateFile(tokenLogo, 2, ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'], 'Token Logo');
+                }
+                
+                // Validate documents (max 5MB, PDF only)
+                if (whitepaper) {
+                  validateFile(whitepaper, 5, ['application/pdf'], 'Whitepaper');
+                }
+                if (tokenomics) {
+                  validateFile(tokenomics, 5, ['application/pdf'], 'Tokenomics');
+                }
+                if (auditReport) {
+                  validateFile(auditReport, 5, ['application/pdf'], 'Audit Report');
+                }
+              } catch (validationError: any) {
+                logger?.warn('⚠️ [Validation] File validation failed', { error: validationError.message, userId });
+                return c.json({ error: validationError.message }, 400);
+              }
+            }
+            
             // Get admin email from environment
             const adminEmail = process.env.ADMIN_EMAIL;
             if (!adminEmail) {
