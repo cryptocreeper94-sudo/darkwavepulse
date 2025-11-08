@@ -712,7 +712,7 @@ export const mastra = new Mastra({
             return c.json({ error: 'Submission not found' }, 404);
           }
           
-          // Create approved token
+          // Create approved token with all comprehensive fields
           const tokenId = `tok_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           await db.insert(approvedTokens).values({
             id: tokenId,
@@ -723,6 +723,24 @@ export const mastra = new Mastra({
             chain: submission.tokenChain.toLowerCase(),
             platform: 'pumpfun', // Default, can be updated later
             logo: submission.tokenLogo,
+            
+            // Social Links
+            website: submission.website,
+            twitter: submission.twitter,
+            telegram: submission.telegram,
+            discord: submission.discord,
+            
+            // Documentation
+            whitepaper: submission.whitepaper,
+            tokenomics: submission.tokenomics,
+            auditReport: submission.auditReport,
+            
+            // Project Qualifiers
+            hasWhitepaper: submission.hasWhitepaper,
+            hasAudit: submission.hasAudit,
+            isDoxxedTeam: submission.isDoxxedTeam,
+            hasLockedLiquidity: submission.hasLockedLiquidity,
+            
             featured: true,
             displayOrder: 0,
           }).onConflictDoNothing();
@@ -2248,9 +2266,17 @@ export const mastra = new Mastra({
             }
             
             const body = await c.req.json();
-            const { type, userId, suggestion, tokenName, tokenSymbol, tokenContract, tokenChain, tokenDescription, tokenContact, tokenLogo } = body;
+            const { 
+              type, userId, suggestion, tokenName, tokenSymbol, tokenContract, tokenChain, tokenDescription, tokenContact, tokenLogo,
+              // Social Links
+              website, twitter, telegram, discord,
+              // Documentation
+              whitepaper, tokenomics, auditReport,
+              // Project Qualifiers
+              hasWhitepaper, hasAudit, isDoxxedTeam, hasLockedLiquidity
+            } = body;
             
-            logger?.info('💬 [Feedback] Received submission', { type, userId, hasImage: !!tokenLogo });
+            logger?.info('💬 [Feedback] Received submission', { type, userId, hasImage: !!tokenLogo, hasDocs: !!(whitepaper || tokenomics || auditReport) });
             
             // Get admin email from environment
             const adminEmail = process.env.ADMIN_EMAIL;
@@ -2333,6 +2359,24 @@ export const mastra = new Mastra({
                   tokenDescription,
                   tokenContact: tokenContact || 'Not provided',
                   tokenLogo: tokenLogo?.data || null,
+                  
+                  // Social Links
+                  website: website || null,
+                  twitter: twitter || null,
+                  telegram: telegram || null,
+                  discord: discord || null,
+                  
+                  // Documentation
+                  whitepaper: whitepaper?.data || null,
+                  tokenomics: tokenomics?.data || null,
+                  auditReport: auditReport?.data || null,
+                  
+                  // Project Qualifiers
+                  hasWhitepaper: hasWhitepaper || false,
+                  hasAudit: hasAudit || false,
+                  isDoxxedTeam: isDoxxedTeam || false,
+                  hasLockedLiquidity: hasLockedLiquidity || false,
+                  
                   status: 'pending',
                   submittedBy: userId,
                 });

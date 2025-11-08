@@ -3152,8 +3152,13 @@ loadWallet = async function() {
 
 // ===== FEEDBACK & TOKEN SUBMISSION =====
 
-// Store uploaded token logo
+// Store uploaded token logo and documents
 let uploadedTokenLogo = null;
+let uploadedDocuments = {
+  whitepaper: null,
+  tokenomics: null,
+  audit: null
+};
 
 // Handle token logo upload
 function handleTokenLogoUpload(input) {
@@ -3192,6 +3197,42 @@ function handleTokenLogoUpload(input) {
   reader.readAsDataURL(file);
 }
 
+// Handle document upload (whitepaper, tokenomics, audit)
+function handleDocumentUpload(input, docType) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  // Check file size (max 5MB for PDFs)
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('⚠️ Document too large. Please use a file under 5MB.');
+    input.value = '';
+    return;
+  }
+  
+  // Check file type
+  if (file.type !== 'application/pdf') {
+    showToast('⚠️ Please upload a PDF file.');
+    input.value = '';
+    return;
+  }
+  
+  // Read file as base64
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedDocuments[docType] = {
+      filename: file.name,
+      mimeType: file.type,
+      data: e.target.result
+    };
+    
+    // Show preview
+    document.getElementById(`${docType}Preview`).style.display = 'block';
+    showToast(`✅ ${docType.charAt(0).toUpperCase() + docType.slice(1)} uploaded!`);
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  };
+  reader.readAsDataURL(file);
+}
+
 async function submitFeedback(event, type) {
   event.preventDefault();
   
@@ -3217,7 +3258,24 @@ async function submitFeedback(event, type) {
       tokenChain: document.getElementById('tokenChain').value,
       tokenDescription: document.getElementById('tokenDescription').value,
       tokenContact: document.getElementById('tokenContact').value || 'Not provided',
-      tokenLogo: uploadedTokenLogo // Include image data
+      tokenLogo: uploadedTokenLogo, // Include image data
+      
+      // Social Links
+      website: document.getElementById('tokenWebsite').value || null,
+      twitter: document.getElementById('tokenTwitter').value || null,
+      telegram: document.getElementById('tokenTelegram').value || null,
+      discord: document.getElementById('tokenDiscord').value || null,
+      
+      // Documentation
+      whitepaper: uploadedDocuments.whitepaper || null,
+      tokenomics: uploadedDocuments.tokenomics || null,
+      auditReport: uploadedDocuments.audit || null,
+      
+      // Project Qualifiers
+      hasWhitepaper: document.getElementById('hasWhitepaper').checked,
+      hasAudit: document.getElementById('hasAudit').checked,
+      isDoxxedTeam: document.getElementById('isDoxxedTeam').checked,
+      hasLockedLiquidity: document.getElementById('hasLockedLiquidity').checked
     };
     successMessage = '✅ Token submitted for review! We\'ll evaluate it soon!';
   }
@@ -3240,10 +3298,14 @@ async function submitFeedback(event, type) {
       if (tg) tg.HapticFeedback?.notificationOccurred('success');
       document.getElementById(formId).reset();
       
-      // Clear token logo after submission
+      // Clear token logo and documents after submission
       if (type === 'token') {
         uploadedTokenLogo = null;
+        uploadedDocuments = { whitepaper: null, tokenomics: null, audit: null };
         document.getElementById('logoPreview').style.display = 'none';
+        document.getElementById('whitepaperPreview').style.display = 'none';
+        document.getElementById('tokenomicsPreview').style.display = 'none';
+        document.getElementById('auditPreview').style.display = 'none';
       }
     } else {
       const error = await response.json();

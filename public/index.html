@@ -562,12 +562,141 @@
               ></textarea>
             </div>
 
+            <!-- Social Links Section -->
+            <div style="margin: 25px 0; padding: 15px; background: rgba(74, 222, 128, 0.05); border-left: 3px solid #4ADE80; border-radius: 8px;">
+              <h4 style="margin: 0 0 15px 0; color: #4ADE80; font-size: 0.95rem;">🌐 Social Links & Website</h4>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Website URL (optional)</label>
+                <input 
+                  type="url"
+                  id="tokenWebsite"
+                  placeholder="https://yourproject.com"
+                  style="width: 100%; padding: 10px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem;"
+                />
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Twitter/X Handle (optional)</label>
+                <input 
+                  type="text"
+                  id="tokenTwitter"
+                  placeholder="@yourproject or https://x.com/yourproject"
+                  style="width: 100%; padding: 10px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem;"
+                />
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Telegram Channel/Group (optional)</label>
+                <input 
+                  type="text"
+                  id="tokenTelegram"
+                  placeholder="https://t.me/yourproject"
+                  style="width: 100%; padding: 10px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem;"
+                />
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Discord Server (optional)</label>
+                <input 
+                  type="text"
+                  id="tokenDiscord"
+                  placeholder="https://discord.gg/yourproject"
+                  style="width: 100%; padding: 10px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem;"
+                />
+              </div>
+            </div>
+
+            <!-- Documentation Upload Section -->
+            <div style="margin: 25px 0; padding: 15px; background: rgba(168, 85, 247, 0.05); border-left: 3px solid #A855F7; border-radius: 8px;">
+              <h4 style="margin: 0 0 15px 0; color: #A855F7; font-size: 0.95rem;">📄 Project Documentation</h4>
+              <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Upload documents to help users evaluate your project (PDF, max 5MB each)</p>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Whitepaper (optional)</label>
+                <input 
+                  type="file"
+                  id="whitepaperUpload"
+                  accept=".pdf,application/pdf"
+                  onchange="handleDocumentUpload(this, 'whitepaper')"
+                  style="width: 100%; padding: 8px; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 6px; background: rgba(0,0,0,0.2); color: #ccc; font-size: 0.85rem;"
+                />
+                <div id="whitepaperPreview" style="display: none; margin-top: 6px; color: #A855F7; font-size: 0.85rem;">✅ Whitepaper ready</div>
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Tokenomics Document (optional)</label>
+                <input 
+                  type="file"
+                  id="tokenomicsUpload"
+                  accept=".pdf,application/pdf"
+                  onchange="handleDocumentUpload(this, 'tokenomics')"
+                  style="width: 100%; padding: 8px; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 6px; background: rgba(0,0,0,0.2); color: #ccc; font-size: 0.85rem;"
+                />
+                <div id="tokenomicsPreview" style="display: none; margin-top: 6px; color: #A855F7; font-size: 0.85rem;">✅ Tokenomics ready</div>
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Audit Report (optional)</label>
+                <input 
+                  type="file"
+                  id="auditUpload"
+                  accept=".pdf,application/pdf"
+                  onchange="handleDocumentUpload(this, 'audit')"
+                  style="width: 100%; padding: 8px; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 6px; background: rgba(0,0,0,0.2); color: #ccc; font-size: 0.85rem;"
+                />
+                <div id="auditPreview" style="display: none; margin-top: 6px; color: #A855F7; font-size: 0.85rem;">✅ Audit report ready</div>
+              </div>
+            </div>
+
+            <!-- Project Qualifiers Section -->
+            <div style="margin: 25px 0; padding: 15px; background: rgba(255, 215, 0, 0.05); border-left: 3px solid #FFD700; border-radius: 8px;">
+              <h4 style="margin: 0 0 15px 0; color: #FFD700; font-size: 0.95rem;">✅ Project Trust Indicators</h4>
+              <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Check all that apply to your project</p>
+              
+              <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+                <input 
+                  type="checkbox"
+                  id="hasWhitepaper"
+                  style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;"
+                />
+                <span style="color: #ccc; font-size: 0.9rem;">📄 Has published whitepaper</span>
+              </label>
+              
+              <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+                <input 
+                  type="checkbox"
+                  id="hasAudit"
+                  style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;"
+                />
+                <span style="color: #ccc; font-size: 0.9rem;">🔐 Smart contract has been audited</span>
+              </label>
+              
+              <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+                <input 
+                  type="checkbox"
+                  id="isDoxxedTeam"
+                  style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;"
+                />
+                <span style="color: #ccc; font-size: 0.9rem;">👥 Team is fully doxxed (identities public)</span>
+              </label>
+              
+              <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+                <input 
+                  type="checkbox"
+                  id="hasLockedLiquidity"
+                  style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;"
+                />
+                <span style="color: #ccc; font-size: 0.9rem;">🔒 Liquidity is locked (proof of lock)</span>
+              </label>
+            </div>
+
             <div style="margin-bottom: 15px;">
-              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Contact (optional)</label>
+              <label style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 8px;">Contact Email (optional)</label>
               <input 
-                type="text"
+                type="email"
                 id="tokenContact"
-                placeholder="Twitter, Telegram, Email..."
+                placeholder="team@yourproject.com"
                 style="width: 100%; padding: 12px; border: 2px solid rgba(74, 222, 128, 0.3); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 1rem;"
               />
             </div>

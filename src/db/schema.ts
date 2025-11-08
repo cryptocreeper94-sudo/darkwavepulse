@@ -62,6 +62,25 @@ export const tokenSubmissions = pgTable('token_submissions', {
   tokenDescription: text('token_description').notNull(),
   tokenContact: varchar('token_contact', { length: 255 }),
   tokenLogo: text('token_logo'), // Base64 encoded image data
+  
+  // Social Links
+  website: varchar('website', { length: 500 }),
+  twitter: varchar('twitter', { length: 255 }),
+  telegram: varchar('telegram', { length: 255 }),
+  discord: varchar('discord', { length: 255 }),
+  
+  // Documentation (Base64 encoded PDF data or URLs)
+  whitepaper: text('whitepaper'),
+  tokenomics: text('tokenomics'),
+  auditReport: text('audit_report'),
+  
+  // Project Qualifiers (Yes/No checkboxes)
+  hasWhitepaper: boolean('has_whitepaper').default(false),
+  hasAudit: boolean('has_audit').default(false),
+  isDoxxedTeam: boolean('is_doxxed_team').default(false),
+  hasLockedLiquidity: boolean('has_locked_liquidity').default(false),
+  
+  // Review Status
   status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'approved' | 'rejected'
   submittedBy: varchar('submitted_by', { length: 255 }).notNull(),
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
@@ -79,9 +98,24 @@ export const approvedTokens = pgTable('approved_tokens', {
   platform: varchar('platform', { length: 50 }).notNull().default('pumpfun'), // 'pumpfun' | 'raydium'
   chain: varchar('chain', { length: 50 }).notNull().default('solana'),
   logo: text('logo'), // Base64 encoded image or URL
+  
+  // Social Links
+  website: varchar('website', { length: 500 }),
   twitter: varchar('twitter', { length: 255 }),
   telegram: varchar('telegram', { length: 255 }),
-  website: varchar('website', { length: 255 }),
+  discord: varchar('discord', { length: 255 }),
+  
+  // Documentation
+  whitepaper: text('whitepaper'),
+  tokenomics: text('tokenomics'),
+  auditReport: text('audit_report'),
+  
+  // Project Qualifiers
+  hasWhitepaper: boolean('has_whitepaper').default(false),
+  hasAudit: boolean('has_audit').default(false),
+  isDoxxedTeam: boolean('is_doxxed_team').default(false),
+  hasLockedLiquidity: boolean('has_locked_liquidity').default(false),
+  
   featured: boolean('featured').default(true),
   displayOrder: integer('display_order').default(0), // For sorting
   createdAt: timestamp('created_at').defaultNow().notNull(),
