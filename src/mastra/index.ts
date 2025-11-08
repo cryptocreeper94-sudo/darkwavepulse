@@ -313,7 +313,8 @@ export const mastra = new Mastra({
           const allTokenSubmissions = await db.select().from(tokenSubmissions).orderBy(desc(tokenSubmissions.submittedAt));
           
           const premiumCount = allSubscribers.filter(s => s.plan === 'premium' && s.status === 'active').length;
-          const monthlyRevenue = premiumCount * 5;
+          const basicCount = allSubscribers.filter(s => s.plan === 'basic' && s.status === 'active').length;
+          const monthlyRevenue = (premiumCount * 5) + (basicCount * 2);
           
           const html = `
             <!DOCTYPE html>
@@ -352,12 +353,16 @@ export const mastra = new Mastra({
                       <div class="stat-label">Total Users</div>
                     </div>
                     <div class="stat-card">
+                      <div class="stat-value">${basicCount}</div>
+                      <div class="stat-label">Basic ($2/mo)</div>
+                    </div>
+                    <div class="stat-card">
                       <div class="stat-value">${premiumCount}</div>
-                      <div class="stat-label">Premium Subscribers</div>
+                      <div class="stat-label">Premium ($5/mo)</div>
                     </div>
                     <div class="stat-card">
                       <div class="stat-value">$${monthlyRevenue}</div>
-                      <div class="stat-label">Monthly Revenue</div>
+                      <div class="stat-label">Monthly Revenue (MRR)</div>
                     </div>
                     <div class="stat-card">
                       <div class="stat-value">${allWhitelisted.length}</div>
@@ -366,7 +371,7 @@ export const mastra = new Mastra({
                   </div>
                   
                   <div class="section">
-                    <h2>💎 Premium Subscribers</h2>
+                    <h2>💳 Active Subscribers (Basic + Premium)</h2>
                     <table>
                       <thead>
                         <tr>
@@ -379,7 +384,7 @@ export const mastra = new Mastra({
                         </tr>
                       </thead>
                       <tbody>
-                        ${allSubscribers.filter(s => s.plan === 'premium').map(sub => `
+                        ${allSubscribers.filter(s => (s.plan === 'premium' || s.plan === 'basic') && s.status === 'active').map(sub => `
                           <tr>
                             <td>${sub.userId}</td>
                             <td>${sub.plan.toUpperCase()}</td>
@@ -2226,13 +2231,14 @@ export const mastra = new Mastra({
             if (event.type === 'checkout.session.completed') {
               const session = event.data.object;
               const userId = session.metadata?.telegramUserId;
+              const plan = session.metadata?.plan || 'premium'; // Default to premium if not specified
               
               if (!userId) {
                 logger?.warn('⚠️ [Stripe] No userId in session metadata');
                 return c.json({ received: true });
               }
               
-              logger?.info('💳 [Stripe] Activating premium for user', { userId });
+              logger?.info(`💳 [Stripe] Activating ${plan} plan for user`, { userId, plan });
               
               // Calculate expiry (1 month from now)
               const expiryDate = new Date();
@@ -2241,7 +2247,7 @@ export const mastra = new Mastra({
               // Update or create subscription
               await db.insert(subscriptions).values({
                 userId,
-                plan: 'premium',
+                plan: plan as 'basic' | 'premium',
                 status: 'active',
                 provider: 'stripe',
                 stripeCustomerId: session.customer as string,
@@ -2251,7 +2257,7 @@ export const mastra = new Mastra({
               }).onConflictDoUpdate({
                 target: subscriptions.userId,
                 set: {
-                  plan: 'premium',
+                  plan: plan as 'basic' | 'premium',
                   status: 'active',
                   provider: 'stripe',
                   stripeCustomerId: session.customer as string,
@@ -2262,7 +2268,7 @@ export const mastra = new Mastra({
                 }
               });
               
-              logger?.info('✅ [Stripe] Premium activated', { userId });
+              logger?.info(`✅ [Stripe] ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan activated`, { userId, plan });
               
               // 🎯 AUTO-WHITELIST: Add customer email to whitelist for unlimited access
               try {

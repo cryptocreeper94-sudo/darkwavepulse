@@ -63,16 +63,16 @@ export async function checkSubscriptionLimit(userId: string, feature: 'search' |
       .where(eq(subscriptions.userId, userId));
     
     const isPremium = subscription?.plan === 'premium' && subscription?.status === 'active';
+    const isBasic = subscription?.plan === 'basic' && subscription?.status === 'active';
     
     // Premium users have unlimited access
     if (isPremium) {
       return { allowed: true, isPremium: true };
     }
     
-    // Free users have limits
-    // Free tier limits (updated Nov 2025)
+    // Basic and Free tier limits (updated Nov 2025)
     const limits = {
-      search: 20,  // Increased from 10 to 20 searches/day
+      search: 20,  // 20 searches/day for both Basic ($2/mo) and Free trial (7 days)
       alert: 3     // 3 price alerts/day
     };
     
@@ -124,6 +124,7 @@ export async function checkSubscriptionLimit(userId: string, feature: 'search' |
       .set({ ...updateField, updatedAt: now })
       .where(eq(userUsage.userId, userId));
     
+    // Basic and Free tiers both have same limits, just return allowed
     return { allowed: true, isPremium: false };
   } catch (error) {
     // SECURITY: Fail closed on errors to prevent bypass
