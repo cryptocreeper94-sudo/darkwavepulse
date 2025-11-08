@@ -3526,3 +3526,29 @@ body::before {
 .glow-gold {
   box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
 }
+
+/* Chart Control Buttons */
+.timeframe-btn, .chart-type-btn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeframe-btn:hover, .chart-type-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.timeframe-btn.active, .chart-type-btn.active {
+  background: var(--neon-pink);
+  color: white;
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}

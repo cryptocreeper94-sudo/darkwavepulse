@@ -1142,6 +1142,29 @@ function displayAnalysis(data) {
       </div>
     </div>
     
+    <!-- Chart Controls -->
+    <div style="margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">Timeframe:</div>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <button class="timeframe-btn active" data-timeframe="1m" onclick="changeChartTimeframe('1m')">1M</button>
+          <button class="timeframe-btn" data-timeframe="5m" onclick="changeChartTimeframe('5m')">5M</button>
+          <button class="timeframe-btn" data-timeframe="1h" onclick="changeChartTimeframe('1h')">1H</button>
+          <button class="timeframe-btn" data-timeframe="1d" onclick="changeChartTimeframe('1d')">1D</button>
+          <button class="timeframe-btn" data-timeframe="7d" onclick="changeChartTimeframe('7d')">7D</button>
+          <button class="timeframe-btn" data-timeframe="30d" onclick="changeChartTimeframe('30d')">30D</button>
+          <button class="timeframe-btn" data-timeframe="ytd" onclick="changeChartTimeframe('ytd')">YTD</button>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">Chart Type:</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="chart-type-btn active" data-type="candle" onclick="changeChartType('candle')">Candlestick</button>
+          <button class="chart-type-btn" data-type="line" onclick="changeChartType('line')">Line</button>
+        </div>
+      </div>
+    </div>
+    
     <div class="chart-container" id="chartContainer" style="margin: 15px 0; min-height: 200px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
       <div>📈 Loading chart...</div>
     </div>
@@ -1426,10 +1449,26 @@ function displayNFTAnalysis(nft) {
 // Live Chart State
 let liveChart = null;
 let chartRefreshInterval = null;
+let currentChartTimeframe = '1m'; // 1m, 5m, 1h, 1d, 7d, 30d, ytd
+let currentChartType = 'candle'; // candle or line
+let currentChartTicker = null;
+
+// Timeframe configuration: days for API + refresh interval
+const TIMEFRAME_CONFIG = {
+  '1m': { days: 1, interval: 60 * 1000, label: '1 Minute' }, // Refresh every 1 min
+  '5m': { days: 1, interval: 5 * 60 * 1000, label: '5 Minutes' }, // Refresh every 5 min
+  '1h': { days: 7, interval: 5 * 60 * 1000, label: '1 Hour' }, // Refresh every 5 min
+  '1d': { days: 30, interval: 5 * 60 * 1000, label: '1 Day' }, // Refresh every 5 min
+  '7d': { days: 30, interval: 10 * 60 * 1000, label: '7 Days' }, // Refresh every 10 min
+  '30d': { days: 90, interval: 10 * 60 * 1000, label: '30 Days' }, // Refresh every 10 min
+  'ytd': { days: 365, interval: 15 * 60 * 1000, label: 'Year to Date' } // Refresh every 15 min
+};
 
 async function loadChart(ticker) {
   const chartContainer = document.getElementById('chartContainer');
   if (!chartContainer) return;
+  
+  currentChartTicker = ticker;
   
   try {
     // Clear existing chart and interval
@@ -1444,18 +1483,27 @@ async function loadChart(ticker) {
     
     chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">📈 Loading live chart...</div>';
     
-    // Try to load live candlestick chart
-    const success = await createLiveCandlestickChart(ticker, chartContainer);
+    // Try to load chart based on type
+    const success = currentChartType === 'candle' 
+      ? await createLiveCandlestickChart(ticker, chartContainer, currentChartTimeframe)
+      : await createSimplePriceChart(ticker, chartContainer, currentChartTimeframe);
     
     if (!success) {
       // Fallback to static chart
       await loadStaticChart(ticker, chartContainer);
     } else {
-      // Set up auto-refresh every 5 minutes
+      // Set up auto-refresh based on timeframe
+      const refreshInterval = TIMEFRAME_CONFIG[currentChartTimeframe].interval;
       chartRefreshInterval = setInterval(async () => {
-        console.log(`Refreshing chart for ${ticker}...`);
-        await createLiveCandlestickChart(ticker, chartContainer);
-      }, 5 * 60 * 1000); // 5 minutes
+        console.log(`Refreshing ${currentChartTimeframe} chart for ${ticker}...`);
+        if (currentChartType === 'candle') {
+          await createLiveCandlestickChart(ticker, chartContainer, currentChartTimeframe);
+        } else {
+          await createSimplePriceChart(ticker, chartContainer, currentChartTimeframe);
+        }
+      }, refreshInterval);
+      
+      console.log(`✅ Chart auto-refresh set to ${refreshInterval / 1000}s for ${currentChartTimeframe}`);
     }
   } catch (error) {
     console.error('Chart error:', error);
@@ -1463,15 +1511,52 @@ async function loadChart(ticker) {
   }
 }
 
-async function createLiveCandlestickChart(ticker, container) {
+// Change chart timeframe
+function changeChartTimeframe(timeframe) {
+  currentChartTimeframe = timeframe;
+  
+  // Update button states
+  document.querySelectorAll('.timeframe-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.timeframe === timeframe) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Reload chart with new timeframe
+  if (currentChartTicker) {
+    loadChart(currentChartTicker);
+  }
+}
+
+// Change chart type
+function changeChartType(type) {
+  currentChartType = type;
+  
+  // Update button states
+  document.querySelectorAll('.chart-type-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.type === type) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Reload chart with new type
+  if (currentChartTicker) {
+    loadChart(currentChartTicker);
+  }
+}
+
+async function createLiveCandlestickChart(ticker, container, timeframe = '1m') {
   try {
-    // Fetch OHLC data from CoinGecko (free tier, 30-day data)
+    // Fetch OHLC data from CoinGecko with appropriate timeframe
     const coinId = ticker.toLowerCase();
-    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=30`);
+    const days = TIMEFRAME_CONFIG[timeframe].days;
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`);
     
     if (!response.ok) {
       console.warn(`CoinGecko OHLC not available for ${ticker}, trying market chart...`);
-      return await createSimplePriceChart(ticker, container);
+      return await createSimplePriceChart(ticker, container, timeframe);
     }
     
     const ohlcData = await response.json();
@@ -1550,11 +1635,12 @@ async function createLiveCandlestickChart(ticker, container) {
   }
 }
 
-async function createSimplePriceChart(ticker, container) {
+async function createSimplePriceChart(ticker, container, timeframe = '1m') {
   try {
     // Fallback: Simple price line chart using market_chart endpoint
     const coinId = ticker.toLowerCase();
-    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=30`);
+    const days = TIMEFRAME_CONFIG[timeframe].days;
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
     
     if (!response.ok) return false;
     
