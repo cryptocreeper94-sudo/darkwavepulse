@@ -19,6 +19,10 @@ export const subscriptionTool = createTool({
       "verify_payment",
     ]),
     userId: z.string().describe("Telegram user ID"),
+    plan: z
+      .enum(["basic", "premium"])
+      .optional()
+      .describe("Subscription plan: basic ($2/mo, 20 searches/day) or premium ($5/mo, unlimited). Defaults to premium"),
     returnUrl: z
       .string()
       .optional()
@@ -40,7 +44,7 @@ export const subscriptionTool = createTool({
   }),
   execute: async ({ context, mastra, runtimeContext }) => {
     const logger = mastra?.getLogger();
-    const { action, userId, returnUrl } = context;
+    const { action, userId, plan = "premium", returnUrl } = context;
     
     logger?.info("💳 [SubscriptionTool] Starting execution", {
       action,
@@ -77,6 +81,22 @@ export const subscriptionTool = createTool({
             });
           }
 
+          // Pricing based on plan
+          const planConfig = {
+            basic: {
+              name: "DarkWave-V2 Basic",
+              description: "20 searches/day, advanced charts, price alerts",
+              amount: 200, // $2.00
+            },
+            premium: {
+              name: "DarkWave-V2 Premium",
+              description: "Unlimited searches, advanced charts, price alerts, and priority support",
+              amount: 500, // $5.00
+            },
+          };
+
+          const selectedPlan = planConfig[plan];
+
           // Create checkout session
           const session = await stripe.checkout.sessions.create({
             customer: customerId,
@@ -86,11 +106,10 @@ export const subscriptionTool = createTool({
                 price_data: {
                   currency: "usd",
                   product_data: {
-                    name: "DarkWave-V2 Premium",
-                    description:
-                      "Unlimited searches, advanced charts, price alerts, and priority support",
+                    name: selectedPlan.name,
+                    description: selectedPlan.description,
                   },
-                  unit_amount: 500, // $5.00
+                  unit_amount: selectedPlan.amount,
                   recurring: {
                     interval: "month",
                   },
@@ -103,6 +122,7 @@ export const subscriptionTool = createTool({
             cancel_url: returnUrl,
             metadata: {
               telegramUserId: userId,
+              plan: plan, // Store which plan they selected
             },
           });
 

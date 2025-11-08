@@ -2,7 +2,7 @@ import { pgTable, varchar, timestamp, boolean, text, integer } from 'drizzle-orm
 
 export const subscriptions = pgTable('subscriptions', {
   userId: varchar('user_id', { length: 255 }).primaryKey(),
-  plan: varchar('plan', { length: 50 }).notNull().default('free'), // 'free' | 'premium'
+  plan: varchar('plan', { length: 50 }).notNull().default('free'), // 'free' | 'basic' | 'premium'
   status: varchar('status', { length: 50 }).notNull().default('inactive'), // 'active' | 'inactive' | 'cancelled' | 'expired'
   provider: varchar('provider', { length: 50 }), // 'stripe' | 'telegram_stars' | 'crypto' | null
   stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),

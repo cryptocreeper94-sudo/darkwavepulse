@@ -4,10 +4,13 @@
 DarkWave-V2 is an advanced technical analysis bot built with the Mastra framework, providing comprehensive cryptocurrency, stock market, and NFT analysis. It integrates with Telegram to deliver real-time buy/sell signals based on technical indicators like RSI, MACD, moving averages, and Bollinger Bands. The system uses a workflow-based architecture, processes user messages via an AI agent, and stores conversation history and user watchlists in PostgreSQL for personalized interactions. Key features include DEX pair and meme coin support with rug-risk detection, NFT collection analysis, a live trending carousel, database-backed session management, and multi-chain wallet tracking. It also incorporates a comprehensive subscription notification system with an admin dashboard, a professional token submission system with robust validation, and cryptocurrency payment integration via Coinbase Commerce. A unique "Crypto Cat" mascot provides interactive commentary, and a "Launching Soon" section with a countdown and presale platform design for the DarkWave token (DWLP) is included. The project aims to launch the DarkWave token on December 25, 2025, with a whitepaper outlining its mission, tokenomics, utility, and roadmap.
 
 ## Recent Changes (November 2025)
+- **3-Tier Pricing System**: Implemented Free Trial (7 days, 20 searches/day), Basic ($2/mo, 20 searches/day), Premium ($5/mo, unlimited)
+- **Dual Access Methods**: Users can enter "lucky 777" for free trial OR whitelisted email for instant premium access
 - **Multi-Theme System**: Added Jupiter (DeFi Dark), Robinhood (Clean Light), and Coinbase (Professional Blue) themes with localStorage persistence
 - **UI Polish**: Removed excessive emojis from action buttons for more professional appearance
 - **Theme Switcher**: Settings tab now includes visual theme selector with instant switching
 - **Projects Page Category System**: Reorganized with four distinct sections (Crypto Cat Series, Conspiracy Themed, Religious/Spiritual, Community Projects) each with custom messaging and teasers for limited editions and future airdrops
+- **Live Interactive Charts**: FREE candlestick and line charts with 7 timeframes (1M-YTD) and smart auto-refresh rates
 
 ## Future Features (Deferred)
 See `FUTURE_FEATURES.md` for detailed specs on planned features:
@@ -69,7 +72,8 @@ Pino logger (`@mastra/loggers`) is used for structured JSON logging with custom 
 
 ### System Design Choices
 -   **Security**: Browser-generated unique user IDs for session isolation. Admin dashboard protected by `ADMIN_ACCESS_CODE`. File upload validation with three-layer security (data URI parsing, base64 decoding, magic byte signature checking).
--   **Access Control**: Dual-method access system supporting both access code ("lucky 777" for free tier) and email whitelist (for premium tier). Whitelisted emails automatically grant premium access when entered at login.
+-   **Access Control**: Dual-method access system supporting both access code ("lucky 777" for 7-day free trial) and email whitelist (for instant premium access). Whitelisted emails automatically grant premium access when entered at login.
+-   **Pricing Model**: Three tiers - Free Trial (7 days, 20 searches/day), Basic ($2/mo, 20 searches/day unlimited time), Premium ($5/mo, unlimited everything). After trial expires, users must upgrade to Basic or Premium.
 -   **Performance**: 5-minute browser caching for live data to minimize API calls.
 
 ## External Dependencies
