@@ -5388,12 +5388,19 @@ const CRYPTO_CAT_QUOTES = {
 
 function initializeCryptoCat() {
   const cryptoCatToggle = document.getElementById('toggleCryptoCat');
+  const settingsToggle = document.getElementById('toggleCryptoCatSettings');
+  
   if (!cryptoCatToggle) return;
   
   // Update button visual state
   const updateCatButton = () => {
     cryptoCatToggle.style.opacity = state.cryptoCatEnabled ? '1' : '0.5';
     cryptoCatToggle.title = state.cryptoCatEnabled ? 'Crypto Cat ON 😼' : 'Crypto Cat OFF 😿';
+    
+    // Sync settings toggle if it exists
+    if (settingsToggle) {
+      settingsToggle.checked = state.cryptoCatEnabled;
+    }
   };
   updateCatButton();
   
@@ -5416,6 +5423,15 @@ function initializeCryptoCat() {
     
     if (tg) tg.HapticFeedback?.impactOccurred('medium');
   });
+  
+  // Also listen to settings toggle
+  if (settingsToggle) {
+    settingsToggle.addEventListener('change', () => {
+      state.cryptoCatEnabled = settingsToggle.checked;
+      localStorage.setItem('darkwave_crypto_cat', state.cryptoCatEnabled.toString());
+      updateCatButton();
+    });
+  }
 }
 
 // Initialize crypto cat
