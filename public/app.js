@@ -672,6 +672,9 @@ async function loadTabContent(tabName) {
     case 'analysis':
       await renderFeaturedBanner();
       break;
+    case 'chat':
+      initChat();
+      break;
   }
 }
 
@@ -5490,5 +5493,104 @@ function calculateRSI(prices, period = 14) {
   if (avgLoss === 0) return 100;
   const rs = avgGain / avgLoss;
   return 100 - (100 / (1 + rs));
+}
+
+// ===== AI CHAT FUNCTIONALITY =====
+function initChat() {
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+  
+  // Show welcome message if chat is empty
+  if (!chatMessages.innerHTML || chatMessages.children.length === 0) {
+    addChatMessage('assistant', `😼 Meow! Crypto Cat here. I'm your grumpy trading guru with decades of market wisdom (in cat years, of course).
+
+Ask me about:
+• Technical analysis & indicators
+• Trading strategies & risk management  
+• Crypto, stocks, or NFT explanations
+• Market trends & sentiment
+
+No BS. No fluff. Just straight talk from a cat who's seen it all. Fire away! 🐾`);
+  }
+  
+  // Wire up send button
+  chatSendBtn.onclick = () => sendChatMessage();
+  chatInput.onkeypress = (e) => {
+    if (e.key === 'Enter') sendChatMessage();
+  };
+}
+
+async function sendChatMessage() {
+  const chatInput = document.getElementById('chatInput');
+  const message = chatInput.value.trim();
+  
+  if (!message) return;
+  
+  // Add user message
+  addChatMessage('user', message);
+  chatInput.value = '';
+  
+  // Show typing indicator
+  addChatMessage('typing', '');
+  
+  try {
+    const response = await fetch('/api/agents/DarkWave-V2/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: `[CHAT MODE - Respond as Crypto Cat: grumpy, sarcastic trading guru with personality] ${message}`
+        }],
+        userId: state.userId
+      })
+    });
+    
+    const data = await response.json();
+    
+    // Remove typing indicator
+    const typingMsg = document.querySelector('.chat-message.typing');
+    if (typingMsg) typingMsg.remove();
+    
+    // Add assistant response
+    if (data.text) {
+      addChatMessage('assistant', data.text);
+    } else {
+      addChatMessage('assistant', '😾 Hmm, my cat brain is buffering. Try again, human.');
+    }
+  } catch (error) {
+    console.error('Chat error:', error);
+    const typingMsg = document.querySelector('.chat-message.typing');
+    if (typingMsg) typingMsg.remove();
+    addChatMessage('assistant', '😿 Ugh, connection issues. Even cats have bad days. Try again?');
+  }
+}
+
+function addChatMessage(role, content) {
+  const chatMessages = document.getElementById('chatMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${role}`;
+  
+  if (role === 'typing') {
+    messageDiv.innerHTML = `
+      <div class="chat-bubble typing">
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    `;
+  } else {
+    const avatar = role === 'assistant' ? '😼' : '👤';
+    messageDiv.innerHTML = `
+      <div class="chat-avatar">${avatar}</div>
+      <div class="chat-bubble ${role}">
+        ${content.replace(/\n/g, '<br>')}
+      </div>
+    `;
+  }
+  
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
