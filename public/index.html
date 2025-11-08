@@ -495,27 +495,29 @@
       <div id="compare" class="tab-pane">
         <div class="section-header">
           <h2>Compare Assets</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Side-by-side comparison of 2-3 assets</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Side-by-side comparison of 2-3 assets with comprehensive analysis</p>
         </div>
 
-        <!-- Asset Selection (Responsive Grid) -->
-        <div class="compare-selection content-grid">
-          <div class="compare-input-group glass-card">
-            <input type="text" id="compareAsset1" class="compare-input" placeholder="Asset 1 (e.g., BTC)">
-            <button class="compare-add-btn accent-hot" onclick="addToComparison(1)">Add</button>
+        <!-- Asset Selection - Centered Layout -->
+        <div class="compare-selection-container">
+          <div class="compare-inputs-wrapper">
+            <input type="text" id="compareAsset1" class="compare-input-centered" placeholder="Asset 1 (e.g., BTC)">
+            <input type="text" id="compareAsset2" class="compare-input-centered" placeholder="Asset 2 (e.g., ETH)">
+            <input type="text" id="compareAsset3" class="compare-input-centered" placeholder="Asset 3 (optional)">
           </div>
-          <div class="compare-input-group glass-card">
-            <input type="text" id="compareAsset2" class="compare-input" placeholder="Asset 2 (e.g., ETH)">
-            <button class="compare-add-btn accent-hot" onclick="addToComparison(2)">Add</button>
-          </div>
-          <div class="compare-input-group glass-card">
-            <input type="text" id="compareAsset3" class="compare-input" placeholder="Asset 3 (optional)">
-            <button class="compare-add-btn accent-success" onclick="addToComparison(3)">Add</button>
+          
+          <div class="compare-actions">
+            <button class="action-btn compare-btn" onclick="compareAssets()">
+              🔍 Compare Assets
+            </button>
+            <button class="action-btn clear-btn" onclick="clearComparison()">
+              🔄 Clear All
+            </button>
           </div>
         </div>
 
-        <!-- Comparison Results (Responsive Grid) -->
-        <div id="comparisonResults" class="comparison-results content-grid"></div>
+        <!-- Comparison Results -->
+        <div id="comparisonResults" class="comparison-results-grid"></div>
       </div>
 
       <!-- Settings Tab -->
@@ -637,6 +639,21 @@
             <button class="action-btn" id="addAlertBtn" style="width: 100%; margin-top: 12px;">
               + Add Price Alert
             </button>
+          </div>
+
+          <!-- Admin Access Button (Settings Tab) -->
+          <div class="settings-section elevated-card" style="margin-top: 24px; text-align: center; border: 2px solid rgba(59, 130, 246, 0.3);">
+            <h3 style="font-size: 1rem; margin-bottom: 12px; color: #60A5FA;">⚙️ Admin Dashboard</h3>
+            <button 
+              onclick="openAdminLogin()" 
+              class="action-btn"
+              style="width: 100%; background: rgba(59, 130, 246, 0.2); border: 1px solid #3B82F6; color: #3B82F6;"
+            >
+              Access Admin Panel
+            </button>
+            <p style="margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+              Manage subscribers, whitelist, and view analytics
+            </p>
           </div>
         </div>
 
@@ -1398,26 +1415,6 @@
       Join our community for updates, tips & exclusive alpha!
     </p>
     
-    <!-- Discreet Admin Button -->
-    <div style="margin-top: 30px; text-align: center;">
-      <button 
-        onclick="openAdminLogin()" 
-        style="
-          background: transparent;
-          border: none;
-          color: #555;
-          font-size: 0.7rem;
-          cursor: pointer;
-          opacity: 0.4;
-          transition: opacity 0.3s;
-          padding: 5px 10px;
-        "
-        onmouseover="this.style.opacity='0.7'"
-        onmouseout="this.style.opacity='0.4'"
-      >
-        ⚙
-      </button>
-    </div>
   </div>
   </div>
 
