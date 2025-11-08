@@ -1305,8 +1305,8 @@ function displayAnalysis(data) {
     </div>
     
     ${data.spikeScore?.prediction ? `
-      <div style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, rgba(166, 85, 247, 0.1), rgba(230, 57, 70, 0.1)); border-radius: 8px; border-left: 3px solid #A855F7;">
-        <div style="font-weight: 700; margin-bottom: 5px; color: #A855F7;">🔮 AI Prediction</div>
+      <div style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, rgba(166, 85, 247, 0.1), rgba(230, 57, 70, 0.1)); border-radius: 8px; border-left: 3px solid #FFFFFF;">
+        <div style="font-weight: 700; margin-bottom: 5px; color: #FFFFFF;">🔮 AI Prediction</div>
         <div style="font-size: 0.9rem;">${data.spikeScore.prediction}</div>
       </div>
     ` : ''}
@@ -1829,7 +1829,7 @@ function showPremiumWelcome(email) {
     ">
       <div style="
         background: #000000;
-        border: 2px solid rgba(6, 182, 212, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.5);
         border-radius: 20px;
         padding: 40px 30px;
         max-width: 500px;
@@ -2305,7 +2305,7 @@ async function loadLimitOrders() {
           <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <span style="font-weight: 600; color: ${typeColor};">${order.type.toUpperCase()} ${order.ticker}</span>
-              <span style="font-size: 0.85rem; padding: 3px 8px; border-radius: 10px; background: rgba(168, 85, 247, 0.2); color: #A855F7;">${order.status}</span>
+              <span style="font-size: 0.85rem; padding: 3px 8px; border-radius: 10px; background: rgba(168, 85, 247, 0.2); color: #FFFFFF;">${order.status}</span>
             </div>
             <div style="font-size: 0.85rem; color: var(--text-secondary);">
               Target: $${order.targetPrice} | Amount: ${order.amount}
@@ -3813,7 +3813,7 @@ function joinWhitelist(launchId, launchName) {
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
           Join the whitelist for <strong>${launchName}</strong> with a premium subscription
         </p>
-        <button class="subscribe-button" onclick="closeModal(); switchTab('subscribe')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF006E, #A855F7); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
+        <button class="subscribe-button" onclick="closeModal(); switchTab('subscribe')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #FF006E, #FFFFFF); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
           Subscribe Now
         </button>
       </div>
@@ -3856,7 +3856,7 @@ function joinWhitelist(launchId, launchName) {
           <button type="button" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.1); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; font-weight: 600; cursor: pointer;">
             Cancel
           </button>
-          <button type="submit" style="flex: 2; padding: 12px; background: linear-gradient(135deg, #FF006E, #A855F7); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
+          <button type="submit" style="flex: 2; padding: 12px; background: linear-gradient(135deg, #FF006E, #FFFFFF); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
             Join Whitelist
           </button>
         </div>
@@ -5280,7 +5280,7 @@ function showCryptoCatBanner(type, title, message) {
           <div style="font-size: 0.95rem; color: var(--text-primary); font-style: italic;">"${catData.quote}"</div>
         </div>
       ` : ''}
-      <button onclick="closeModal()" style="padding: 12px 32px; background: linear-gradient(135deg, #FF006E, #A855F7); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
+      <button onclick="closeModal()" style="padding: 12px 32px; background: linear-gradient(135deg, #FF006E, #FFFFFF); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
         Got it!
       </button>
     </div>
