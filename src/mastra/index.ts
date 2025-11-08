@@ -526,6 +526,118 @@ export const mastra = new Mastra({
           return c.redirect(`/admin?code=${adminCode}`);
         }
       },
+      // Admin API: Get all token submissions
+      {
+        path: "/api/admin/token-submissions",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const expectedCode = process.env.ADMIN_ACCESS_CODE || 'Lucky777Admin';
+          const adminCode = c.req.query('code') || c.req.header('X-Admin-Code');
+          
+          if (adminCode !== expectedCode) {
+            logger?.warn('⚠️ [Admin] Unauthorized token submissions request');
+            return c.json({ error: 'Unauthorized' }, 401);
+          }
+          
+          const { db } = await import('../db/client.js');
+          const { tokenSubmissions } = await import('../db/schema.js');
+          const { desc } = await import('drizzle-orm');
+          
+          const submissions = await db.select().from(tokenSubmissions).orderBy(desc(tokenSubmissions.submittedAt));
+          
+          logger?.info('✅ [Admin] Token submissions retrieved', { count: submissions.length });
+          return c.json({ submissions });
+        }
+      },
+      // Admin API: Approve token submission
+      {
+        path: "/api/admin/approve-token",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const expectedCode = process.env.ADMIN_ACCESS_CODE || 'Lucky777Admin';
+          const adminCode = c.req.header('X-Admin-Code');
+          
+          if (adminCode !== expectedCode) {
+            logger?.warn('⚠️ [Admin] Unauthorized token approval attempt');
+            return c.json({ error: 'Unauthorized' }, 401);
+          }
+          
+          const { submissionId } = await c.req.json();
+          
+          const { db } = await import('../db/client.js');
+          const { tokenSubmissions, approvedTokens } = await import('../db/schema.js');
+          const { eq } = await import('drizzle-orm');
+          
+          // Get the submission
+          const [submission] = await db.select().from(tokenSubmissions).where(eq(tokenSubmissions.id, submissionId)).limit(1);
+          
+          if (!submission) {
+            return c.json({ error: 'Submission not found' }, 404);
+          }
+          
+          // Create approved token
+          const tokenId = `tok_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          await db.insert(approvedTokens).values({
+            id: tokenId,
+            address: submission.tokenContract,
+            name: submission.tokenName,
+            symbol: submission.tokenSymbol,
+            description: submission.tokenDescription,
+            chain: submission.tokenChain.toLowerCase(),
+            platform: 'pumpfun', // Default, can be updated later
+            logo: submission.tokenLogo,
+            featured: true,
+            displayOrder: 0,
+          }).onConflictDoNothing();
+          
+          // Update submission status
+          await db.update(tokenSubmissions)
+            .set({ 
+              status: 'approved',
+              reviewedBy: 'admin',
+              reviewedAt: new Date()
+            })
+            .where(eq(tokenSubmissions.id, submissionId));
+          
+          logger?.info('✅ [Admin] Token approved', { submissionId, tokenContract: submission.tokenContract });
+          return c.json({ success: true, message: 'Token approved and published' });
+        }
+      },
+      // Admin API: Reject token submission
+      {
+        path: "/api/admin/reject-token",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const expectedCode = process.env.ADMIN_ACCESS_CODE || 'Lucky777Admin';
+          const adminCode = c.req.header('X-Admin-Code');
+          
+          if (adminCode !== expectedCode) {
+            logger?.warn('⚠️ [Admin] Unauthorized token rejection attempt');
+            return c.json({ error: 'Unauthorized' }, 401);
+          }
+          
+          const { submissionId, reason } = await c.req.json();
+          
+          const { db } = await import('../db/client.js');
+          const { tokenSubmissions } = await import('../db/schema.js');
+          const { eq } = await import('drizzle-orm');
+          
+          await db.update(tokenSubmissions)
+            .set({ 
+              status: 'rejected',
+              reviewedBy: 'admin',
+              reviewedAt: new Date(),
+              rejectionReason: reason || 'Does not meet listing criteria'
+            })
+            .where(eq(tokenSubmissions.id, submissionId));
+          
+          logger?.info('✅ [Admin] Token rejected', { submissionId, reason });
+          return c.json({ success: true, message: 'Token rejected' });
+        }
+      },
       // Mini App Backend API Routes
       // Access Code Verification
       {
@@ -2068,6 +2180,32 @@ export const mastra = new Mastra({
               textContent = `New Token Submission\n\nSubmitted by: ${userId}\nSubmitted: ${new Date().toLocaleString()}\n\nToken Details:\nName: ${tokenName}\nSymbol: ${tokenSymbol}\nContract: ${tokenContract}\nBlockchain: ${tokenChain}\nContact: ${tokenContact}\n${tokenLogo ? '\nToken Logo: Included (see email attachment)\n' : ''}\nWhy List This Token:\n${tokenDescription}`;
             } else {
               return c.json({ error: 'Invalid submission type' }, 400);
+            }
+            
+            // Save token submission to database (for admin approval)
+            if (type === 'token') {
+              try {
+                const { db } = await import('../db/client.js');
+                const { tokenSubmissions } = await import('../db/schema.js');
+                const submissionId = `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
+                await db.insert(tokenSubmissions).values({
+                  id: submissionId,
+                  tokenName,
+                  tokenSymbol,
+                  tokenContract,
+                  tokenChain,
+                  tokenDescription,
+                  tokenContact: tokenContact || 'Not provided',
+                  tokenLogo: tokenLogo?.data || null,
+                  status: 'pending',
+                  submittedBy: userId,
+                });
+                
+                logger?.info('✅ [Feedback] Token submission saved to database', { submissionId });
+              } catch (dbError: any) {
+                logger?.error('❌ [Feedback] Failed to save to database', { error: dbError.message });
+              }
             }
             
             // Send email to admin
