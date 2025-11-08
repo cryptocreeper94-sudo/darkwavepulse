@@ -1106,6 +1106,107 @@ async function searchAsset(query) {
   
   // Load chart in background
   loadChart(query);
+  
+  // Check for bot/rug risk on meme coins (tokens with very low prices or DEX pairs)
+  if (data.price < 0.01 || query.includes('/') || query.length > 20) {
+    checkBotRisk(query, data.ticker);
+  }
+}
+
+// Bot Detection API Call
+async function checkBotRisk(tokenAddress, ticker) {
+  try {
+    const response = await fetch(`${API_BASE}/api/bot-detection`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ 
+        tokenAddress: tokenAddress,
+        chain: 'solana' // Default to Solana, can be enhanced to detect chain
+      })
+    });
+    
+    const result = await response.json();
+    if (result.success && result.data) {
+      displayBotRiskBadge(result.data, ticker);
+    }
+  } catch (error) {
+    console.error('Bot detection failed:', error);
+    // Silent fail - don't interrupt user experience
+  }
+}
+
+// Display Bot Risk Badge
+function displayBotRiskBadge(botData, ticker) {
+  const analysisCard = document.querySelector('.analysis-card');
+  if (!analysisCard) return;
+  
+  // Get risk color emoji
+  const riskEmoji = {
+    'Safe': '🟢',
+    'Low': '🟡',
+    'Medium': '🟠',
+    'High': '🔴',
+    'Extreme': '⚫'
+  }[botData.riskLevel] || '🟡';
+  
+  // Create bot risk badge
+  const botRiskHTML = `
+    <div class="bot-risk-banner" style="
+      margin: 15px 0;
+      padding: 15px;
+      background: ${botData.riskLevel === 'Extreme' || botData.riskLevel === 'High' ? 'rgba(230, 57, 70, 0.2)' : 'rgba(74, 222, 128, 0.1)'};
+      border: 2px solid ${botData.riskLevel === 'Extreme' ? '#E63946' : botData.riskLevel === 'High' ? '#FF6B35' : botData.riskLevel === 'Medium' ? '#FFA500' : '#4ADE80'};
+      border-radius: 8px;
+      animation: slideDown 0.4s ease-out;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div style="font-weight: bold; font-size: 1rem;">
+          ${riskEmoji} Rug Risk Analysis
+        </div>
+        <div style="
+          padding: 6px 12px;
+          background: ${botData.riskLevel === 'Extreme' ? '#E63946' : botData.riskLevel === 'High' ? '#FF6B35' : botData.riskLevel === 'Medium' ? '#FFA500' : '#4ADE80'};
+          border-radius: 6px;
+          font-weight: bold;
+          font-size: 0.85rem;
+        ">
+          ${botData.riskLevel.toUpperCase()} RISK
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 8px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">Bot/Rug Score:</div>
+        <div style="font-size: 1.2rem; font-weight: bold; color: ${botData.riskLevel === 'Extreme' || botData.riskLevel === 'High' ? '#E63946' : '#4ADE80'};">
+          ${botData.botPercentage}% ${botData.riskLevel === 'Extreme' ? '⚠️ AVOID' : botData.riskLevel === 'High' ? '⚠️ CAUTION' : '✓'}
+        </div>
+      </div>
+      
+      ${botData.rugRiskIndicators.length > 0 ? `
+        <div style="font-size: 0.8rem; margin-top: 10px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Red Flags Detected:</div>
+          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary);">
+            ${botData.rugRiskIndicators.map(flag => `<li>${flag}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+      
+      <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; font-style: italic;">
+        ${botData.details}
+      </div>
+      
+      ${botData.riskLevel === 'Extreme' ? `
+        <div style="margin-top: 12px; padding: 10px; background: rgba(230, 57, 70, 0.3); border-radius: 6px; font-weight: bold; text-align: center; color: #E63946;">
+          ⛔ DO NOT BUY - EXTREME RUG RISK
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  // Insert after analysis header
+  const analysisHeader = analysisCard.querySelector('.analysis-header');
+  if (analysisHeader) {
+    analysisHeader.insertAdjacentHTML('afterend', botRiskHTML);
+  }
 }
 
 // Search for NFT collections
