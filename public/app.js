@@ -3221,7 +3221,7 @@ let countdownIntervals = [];
 const UPCOMING_LAUNCHES = [
   {
     id: '1',
-    name: 'DarkWave',
+    name: 'DarkWave Token',
     symbol: 'DWLP',
     logo: '/darkwave-coin.png', // Official DWLP token logo
     launchDate: new Date('2025-12-25T00:00:00Z'), // Christmas Day 2025 - REAL LAUNCH DATE
@@ -3232,9 +3232,27 @@ const UPCOMING_LAUNCHES = [
     currentWhitelistCount: 0, // Will be fetched from database
     minAllocation: '100 DWLP ($1)',
     maxAllocation: '500,000 DWLP ($5,000)',
-    description: 'The official DarkWave utility token - Staking rewards, subscription discounts, governance rights, and revenue sharing from the platform',
+    description: 'The native DarkWave utility token powering the ecosystem. Early holders get lifetime premium discounts, exclusive signals access, governance voting, and revenue sharing. Launch includes presale bonuses for whitelist members.',
     presaleStart: new Date('2025-12-01T00:00:00Z'), // Dec 1 presale start
     whitepaper: 'whitepaper.html'
+  },
+  {
+    id: '2',
+    name: 'DarkWave v2.0',
+    symbol: 'UPDATE',
+    logo: '/darkwave-coin.png',
+    launchDate: new Date('2026-01-15T00:00:00Z'), // January 2026
+    launchPrice: 'FREE',
+    totalSupply: 'Platform Upgrade',
+    initialMarketCap: 'For All Users',
+    maxWhitelistSpots: null,
+    currentWhitelistCount: null,
+    minAllocation: null,
+    maxAllocation: null,
+    description: 'Next-gen predictive trading intelligence. Multi-signal scoring combines RSI, MACD, and sentiment for higher accuracy. Emotional AI system learns from market patterns. Track record monitoring shows signal performance. Advanced learning tools help you master technical analysis. The bot that feels the market.',
+    presaleStart: null,
+    whitepaper: null,
+    isFeature: true // Flag to render differently
   }
 ];
 
