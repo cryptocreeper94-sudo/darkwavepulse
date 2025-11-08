@@ -891,11 +891,11 @@ export const mastra = new Mastra({
                   return c.json({ success: false, message: 'Email whitelist has expired' }, 401);
                 }
                 
-                // Generate session token with email attached (30-day premium)
+                // Generate session token with email attached (permanent access for whitelisted)
                 const { generateSessionToken } = await import('./middleware/accessControl.js');
-                const sessionToken = await generateSessionToken(userId.trim(), cleanEmail, true);
+                const sessionToken = await generateSessionToken(userId.trim(), cleanEmail, true, true);
                 
-                logger?.info('✅ [Email Access] Whitelisted email granted access', { 
+                logger?.info('✅ [Email Access] Whitelisted email granted permanent access', { 
                   email: cleanEmail, 
                   userId: userId.trim(),
                   reason: whitelistEntry.reason || 'Whitelisted'
@@ -903,7 +903,7 @@ export const mastra = new Mastra({
                 
                 return c.json({ 
                   success: true, 
-                  message: 'Whitelisted email - premium access granted',
+                  message: 'Whitelisted email - permanent premium access granted',
                   sessionToken,
                   isPremium: true // Whitelisted users get premium
                 });
