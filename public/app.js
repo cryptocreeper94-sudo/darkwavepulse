@@ -4,7 +4,19 @@
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
-  tg.expand();
+  tg.expand(); // Maximize viewport on mobile
+  
+  // Request fullscreen mode (Telegram Mini Apps 2.0 feature)
+  // This removes Telegram's top/bottom bars for a more immersive experience
+  if (tg.requestFullscreen && typeof tg.requestFullscreen === 'function') {
+    try {
+      tg.requestFullscreen();
+      console.log('✅ Fullscreen mode requested');
+    } catch (err) {
+      console.log('ℹ️ Fullscreen not available on this platform');
+    }
+  }
+  
   tg.enableClosingConfirmation();
 }
 
