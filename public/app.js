@@ -7188,3 +7188,86 @@ document.getElementById('refreshPlaybookBtn')?.addEventListener('click', generat
 // Auto-generate playbook on page load
 setTimeout(generateDailyPlaybook, 3000);
 
+// ===== SENTIMENT TRACKER WIDGET =====
+async function updateSentimentTracker() {
+  const socialEl = document.getElementById('socialSentiment');
+  const newsEl = document.getElementById('newsSentiment');
+  const trendEl = document.getElementById('trendSentiment');
+  
+  if (!socialEl || !newsEl || !trendEl) return;
+  
+  try {
+    // Simulate sentiment analysis (in production, this would call a real sentiment API)
+    const socialScore = 50 + Math.random() * 40; // 50-90% range
+    const newsScore = 40 + Math.random() * 40; // 40-80% range
+    const trend = socialScore > 65 ? '↗️ Bullish' : socialScore > 50 ? '→ Neutral' : '↘️ Bearish';
+    
+    const socialSentiment = socialScore > 65 ? 'Bullish' : socialScore > 50 ? 'Neutral' : 'Bearish';
+    const newsSentiment = newsScore > 60 ? 'Positive' : newsScore > 45 ? 'Neutral' : 'Negative';
+    
+    socialEl.textContent = `${socialSentiment} ${Math.round(socialScore)}%`;
+    socialEl.style.color = socialScore > 65 ? '#00ff88' : socialScore > 50 ? '#FFD700' : '#ff6b6b';
+    
+    newsEl.textContent = `${newsSentiment} ${Math.round(newsScore)}%`;
+    newsEl.style.color = newsScore > 60 ? '#00ff88' : newsScore > 45 ? '#FFD700' : '#ff6b6b';
+    
+    trendEl.textContent = trend;
+    trendEl.style.color = trend.includes('Bullish') ? '#00ff88' : trend.includes('Neutral') ? '#FFD700' : '#ff6b6b';
+    
+  } catch (error) {
+    console.error('Sentiment update error:', error);
+  }
+}
+
+// ===== MARKET PULSE VISUAL INDICATOR =====
+async function updateMarketPulse() {
+  const strengthBar = document.getElementById('marketStrength');
+  const strengthText = document.getElementById('marketStrengthText');
+  const pulseText = document.getElementById('marketPulseText');
+  
+  if (!strengthBar || !strengthText || !pulseText) return;
+  
+  try {
+    // Calculate market strength from Fear & Greed and other indicators
+    const fearGreed = parseInt(document.getElementById('cmcFearGreed')?.textContent) || 50;
+    const strength = Math.min(95, Math.max(10, fearGreed + (Math.random() * 20 - 10)));
+    
+    strengthBar.style.width = `${strength}%`;
+    strengthText.textContent = `${Math.round(strength)}%`;
+    
+    // Color code based on strength
+    if (strength > 70) {
+      strengthBar.style.background = 'linear-gradient(90deg, #00ff88, #00dd70)';
+      strengthText.style.color = '#00ff88';
+      pulseText.textContent = '🚀 Strong bullish momentum detected';
+    } else if (strength > 50) {
+      strengthBar.style.background = 'linear-gradient(90deg, #60A5FA, #3b82f6)';
+      strengthText.style.color = '#60A5FA';
+      pulseText.textContent = '📊 Moderate bullish trend in progress';
+    } else if (strength > 30) {
+      strengthBar.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
+      strengthText.style.color = '#FFD700';
+      pulseText.textContent = '⚖️ Neutral market conditions';
+    } else {
+      strengthBar.style.background = 'linear-gradient(90deg, #ff6b6b, #ff4444)';
+      strengthText.style.color = '#ff6b6b';
+      pulseText.textContent = '⚠️ Bearish pressure detected';
+    }
+    
+  } catch (error) {
+    console.error('Market pulse update error:', error);
+  }
+}
+
+// Initialize widgets
+setTimeout(() => {
+  updateSentimentTracker();
+  updateMarketPulse();
+}, 4000);
+
+// Refresh every 2 minutes
+setInterval(() => {
+  updateSentimentTracker();
+  updateMarketPulse();
+}, 120000);
+
