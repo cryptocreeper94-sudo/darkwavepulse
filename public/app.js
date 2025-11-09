@@ -1299,46 +1299,12 @@ function displayAnalysis(data) {
       </div>
     </div>
     
-    <!-- Chart Controls -->
-    <div style="margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <div style="font-size: 0.85rem; color: var(--text-secondary);">Timeframe:</div>
-        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-          <button class="timeframe-btn active" data-timeframe="1m" onclick="changeChartTimeframe('1m')">1M</button>
-          <button class="timeframe-btn" data-timeframe="5m" onclick="changeChartTimeframe('5m')">5M</button>
-          <button class="timeframe-btn" data-timeframe="1h" onclick="changeChartTimeframe('1h')">1H</button>
-          <button class="timeframe-btn" data-timeframe="1d" onclick="changeChartTimeframe('1d')">1D</button>
-          <button class="timeframe-btn" data-timeframe="7d" onclick="changeChartTimeframe('7d')">7D</button>
-          <button class="timeframe-btn" data-timeframe="30d" onclick="changeChartTimeframe('30d')">30D</button>
-          <button class="timeframe-btn" data-timeframe="ytd" onclick="changeChartTimeframe('ytd')">YTD</button>
-        </div>
+    <!-- Chart Preview (Small, Click to Expand) -->
+    <div class="chart-preview-container" onclick="openChartModal()" style="margin: 15px 0; height: 150px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative; cursor: pointer; border: 2px solid rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+      <div id="chartPreview" class="chart-container" style="height: 100%; width: 100%;"></div>
+      <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(37, 99, 235, 0.9); color: #FFF; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">
+        📊 Tap to Enlarge
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-        <div style="font-size: 0.85rem; color: var(--text-secondary);">Chart Type:</div>
-        <div style="display: flex; gap: 8px;">
-          <button class="chart-type-btn active" data-type="candle" onclick="changeChartType('candle')">Candlestick</button>
-          <button class="chart-type-btn" data-type="line" onclick="changeChartType('line')">Line</button>
-          <button class="chart-type-btn" data-type="bar" onclick="changeChartType('bar')">Bar</button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="chart-container" id="chartContainer" style="margin: 15px 0; min-height: 300px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative;">
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);">📈 Loading chart...</div>
-    </div>
-    
-    <!-- Drawing Tools -->
-    <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-      <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 8px;">Drawing Tools:</span>
-      <button class="tool-btn" onclick="enableTrendline()" title="Draw Trendline">
-        📐 Trendline
-      </button>
-      <button class="tool-btn" onclick="enableHorizontalLine()" title="Draw Horizontal Line">
-        ➖ H-Line
-      </button>
-      <button class="tool-btn" onclick="clearDrawings()" title="Clear All Drawings">
-        🗑️ Clear
-      </button>
     </div>
     
     ${data.sentiment ? `
@@ -1730,8 +1696,8 @@ const TIMEFRAME_CONFIG = {
 };
 
 async function loadChart(ticker) {
-  const chartContainer = document.getElementById('chartContainer');
-  if (!chartContainer) return;
+  const chartPreview = document.getElementById('chartPreview');
+  if (!chartPreview) return;
   
   currentChartTicker = ticker;
   
@@ -1746,40 +1712,17 @@ async function loadChart(ticker) {
       chartRefreshInterval = null;
     }
     
-    chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">📈 Loading live chart...</div>';
+    chartPreview.innerHTML = '<div style="padding: 20px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; height: 100%;">📈 Loading...</div>';
     
-    // Try to load chart based on type
-    let success;
-    if (currentChartType === 'candle') {
-      success = await createLiveCandlestickChart(ticker, chartContainer, currentChartTimeframe);
-    } else if (currentChartType === 'bar') {
-      success = await createBarChart(ticker, chartContainer, currentChartTimeframe);
-    } else {
-      success = await createSimplePriceChart(ticker, chartContainer, currentChartTimeframe);
-    }
+    // Load a simple line chart for the preview (faster and cleaner on mobile)
+    let success = await createSimplePriceChart(ticker, chartPreview, currentChartTimeframe);
     
     if (!success) {
-      // Fallback to static chart
-      await loadStaticChart(ticker, chartContainer);
-    } else {
-      // Set up auto-refresh based on timeframe
-      const refreshInterval = TIMEFRAME_CONFIG[currentChartTimeframe].interval;
-      chartRefreshInterval = setInterval(async () => {
-        console.log(`Refreshing ${currentChartTimeframe} chart for ${ticker}...`);
-        if (currentChartType === 'candle') {
-          await createLiveCandlestickChart(ticker, chartContainer, currentChartTimeframe);
-        } else if (currentChartType === 'bar') {
-          await createBarChart(ticker, chartContainer, currentChartTimeframe);
-        } else {
-          await createSimplePriceChart(ticker, chartContainer, currentChartTimeframe);
-        }
-      }, refreshInterval);
-      
-      console.log(`✅ Chart auto-refresh set to ${refreshInterval / 1000}s for ${currentChartTimeframe}`);
+      chartPreview.innerHTML = '<div style="padding: 20px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; height: 100%;">Chart unavailable</div>';
     }
   } catch (error) {
-    console.error('Chart error:', error);
-    chartContainer.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">Chart unavailable</div>';
+    console.error('Preview chart error:', error);
+    chartPreview.innerHTML = '<div style="padding: 20px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; height: 100%;">Chart unavailable</div>';
   }
 }
 
@@ -1795,9 +1738,19 @@ function changeChartTimeframe(timeframe) {
     }
   });
   
-  // Reload chart with new timeframe
-  if (currentChartTicker) {
-    loadChart(currentChartTicker);
+  // Reload chart in modal if it's open
+  const modal = document.getElementById('chartModal');
+  if (modal && modal.style.display === 'flex' && currentChartTicker) {
+    const fullContainer = document.getElementById('chartContainerFull');
+    if (fullContainer) {
+      if (currentChartType === 'candle') {
+        createLiveCandlestickChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'line') {
+        createSimplePriceChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'bar') {
+        createBarChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      }
+    }
   }
 }
 
@@ -1813,9 +1766,19 @@ function changeChartType(type) {
     }
   });
   
-  // Reload chart with new type
-  if (currentChartTicker) {
-    loadChart(currentChartTicker);
+  // Reload chart in modal if it's open
+  const modal = document.getElementById('chartModal');
+  if (modal && modal.style.display === 'flex' && currentChartTicker) {
+    const fullContainer = document.getElementById('chartContainerFull');
+    if (fullContainer) {
+      if (currentChartType === 'candle') {
+        createLiveCandlestickChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'line') {
+        createSimplePriceChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'bar') {
+        createBarChart(currentChartTicker, fullContainer, currentChartTimeframe);
+      }
+    }
   }
 }
 
@@ -1961,11 +1924,13 @@ async function createSimplePriceChart(ticker, container, timeframe = '1m') {
     }
     
     container.innerHTML = '';
-    container.style.minHeight = '300px';
+    
+    // Use container's actual height (respects 150px preview or 350px modal)
+    const chartHeight = container.clientHeight || container.getBoundingClientRect().height || 300;
     
     const chart = LightweightCharts.createChart(container, {
       width: container.clientWidth,
-      height: 300,
+      height: chartHeight,
       layout: {
         background: { color: 'transparent' },
         textColor: '#d1d5db',
@@ -2155,15 +2120,34 @@ async function loadStaticChart(ticker, chartContainer) {
   }
 }
 
-// Chart Modal Functions
+// Chart Modal Functions  
 function openChartModal(chartUrl, ticker) {
   const modal = document.getElementById('chartModal');
-  const modalImage = document.getElementById('chartModalImage');
   const modalTitle = document.getElementById('chartModalTitle');
   
-  modalImage.src = chartUrl;
-  modalTitle.textContent = `${ticker.toUpperCase()} - Price Chart`;
-  modal.classList.add('active');
+  // Use current ticker if available, fallback to parameter
+  const chartTicker = currentChartTicker || ticker;
+  
+  if (chartTicker) {
+    modalTitle.textContent = `${chartTicker.toUpperCase()} - Price Chart`;
+    
+    // Load full chart in modal
+    const fullContainer = document.getElementById('chartContainerFull');
+    if (fullContainer) {
+      if (currentChartType === 'candle') {
+        createLiveCandlestickChart(chartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'line') {
+        createSimplePriceChart(chartTicker, fullContainer, currentChartTimeframe);
+      } else if (currentChartType === 'bar') {
+        createBarChart(chartTicker, fullContainer, currentChartTimeframe);
+      } else {
+        // Default to candlestick
+        createLiveCandlestickChart(chartTicker, fullContainer, currentChartTimeframe);
+      }
+    }
+  }
+  
+  modal.style.display = 'flex';
   
   if (tg) {
     tg.HapticFeedback?.impactOccurred('medium');
@@ -2175,7 +2159,7 @@ function openChartModal(chartUrl, ticker) {
 
 function closeChartModal() {
   const modal = document.getElementById('chartModal');
-  modal.classList.remove('active');
+  modal.style.display = 'none';
   
   // Re-enable background scrolling
   document.body.style.overflow = '';
