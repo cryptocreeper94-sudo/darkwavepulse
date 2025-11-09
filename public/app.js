@@ -2220,21 +2220,20 @@ function showAccessGate() {
 
 // Modal Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Check access code first
+  // Always load market data first (for better UX)
+  loadMarketOverview('top');
+  updateCMCStatsBar();
+  updateAvgRSI();
+  
+  // Update CMC stats every 5 minutes
+  setInterval(updateCMCStatsBar, 5 * 60 * 1000);
+  setInterval(updateAvgRSI, 10 * 60 * 1000);
+  
+  // Check access code after data starts loading
   if (!checkAccessCode()) {
     showAccessGate();
   } else {
     state.accessGranted = true;
-    // Load initial market overview table for top category (CMC style)
-    loadMarketOverview('top');
-    
-    // Initialize CMC Stats Bar
-    updateCMCStatsBar();
-    updateAvgRSI();
-    
-    // Update CMC stats every 5 minutes
-    setInterval(updateCMCStatsBar, 5 * 60 * 1000);
-    setInterval(updateAvgRSI, 10 * 60 * 1000);
   }
   
   const closeBtn = document.getElementById('closeChartModal');
@@ -5467,8 +5466,14 @@ function initializeCryptoCat() {
   
   // Update button visual state
   const updateCatButton = () => {
-    cryptoCatToggle.style.opacity = state.cryptoCatEnabled ? '1' : '0.5';
+    cryptoCatToggle.setAttribute('data-active', state.cryptoCatEnabled.toString());
     cryptoCatToggle.title = state.cryptoCatEnabled ? 'Crypto Cat ON 😼' : 'Crypto Cat OFF 😿';
+    
+    // Update label text
+    const label = cryptoCatToggle.querySelector('.crypto-cat-label');
+    if (label) {
+      label.textContent = state.cryptoCatEnabled ? 'ON' : 'OFF';
+    }
     
     // Sync settings toggle if it exists
     if (settingsToggle) {
