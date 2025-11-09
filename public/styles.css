@@ -1532,7 +1532,7 @@ table {
 
 /* Tablet and below (768px) */
 @media (max-width: 768px) {
-  /* Container adjustments */
+  /* Container adjustments - force with !important to override inline styles */
   .category-nav,
   .tab-nav,
   .market-overview-container,
@@ -1545,12 +1545,17 @@ table {
   .glossary-content,
   .quick-picks-section,
   .analysis-result,
-  .cmc-stats-bar {
-    width: calc(100% - 16px);
-    margin-left: 8px;
-    margin-right: 8px;
-    padding-left: 8px;
-    padding-right: 8px;
+  .cmc-stats-bar,
+  .card,
+  .content-grid-thirds,
+  div[class*="grid"],
+  div[class*="container"] {
+    width: calc(100% - 16px) !important;
+    max-width: 100% !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 
   /* CMC Stats Bar - Horizontal scroll with smaller items */
