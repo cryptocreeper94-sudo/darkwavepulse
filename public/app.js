@@ -1321,20 +1321,20 @@ function displayAnalysis(data) {
       </div>
     </div>
     
-    <div class="chart-container" id="chartContainer-${data.ticker}" style="margin: 15px 0; min-height: 300px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative;">
+    <div class="chart-container" id="chartContainer" style="margin: 15px 0; min-height: 300px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative;">
       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);">📈 Loading chart...</div>
     </div>
     
     <!-- Drawing Tools -->
     <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
       <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 8px;">Drawing Tools:</span>
-      <button class="tool-btn" onclick="enableTrendline('${data.ticker}')" title="Draw Trendline">
+      <button class="tool-btn" onclick="enableTrendline()" title="Draw Trendline">
         📐 Trendline
       </button>
-      <button class="tool-btn" onclick="enableHorizontalLine('${data.ticker}')" title="Draw Horizontal Line">
+      <button class="tool-btn" onclick="enableHorizontalLine()" title="Draw Horizontal Line">
         ➖ H-Line
       </button>
-      <button class="tool-btn" onclick="clearDrawings('${data.ticker}')" title="Clear All Drawings">
+      <button class="tool-btn" onclick="clearDrawings()" title="Clear All Drawings">
         🗑️ Clear
       </button>
     </div>
@@ -5783,6 +5783,71 @@ function calculateRSI(prices, period = 14) {
   if (avgLoss === 0) return 100;
   const rs = avgGain / avgLoss;
   return 100 - (100 / (1 + rs));
+}
+
+// ===== CHART DRAWING TOOLS =====
+let chartDrawings = [];
+let drawingMode = null; // 'trendline' | 'horizontal' | null
+let drawingStart = null;
+
+function enableTrendline() {
+  drawingMode = 'trendline';
+  showToast('📐 Click two points on the chart to draw a trendline');
+  document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function enableHorizontalLine() {
+  drawingMode = 'horizontal';
+  showToast('➖ Click on the chart to draw a horizontal line');
+  document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function clearDrawings() {
+  chartDrawings = [];
+  drawingMode = null;
+  drawingStart = null;
+  
+  // Clear active state from all tool buttons
+  document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+  
+  // Reload the chart to remove drawings
+  if (currentChartTicker) {
+    loadChart(currentChartTicker);
+  }
+  
+  showToast('🗑️ All drawings cleared');
+}
+
+// Chart click handler for drawing tools (this would be integrated with lightweight-charts events)
+function handleChartClick(price, time) {
+  if (!drawingMode) return;
+  
+  if (drawingMode === 'trendline') {
+    if (!drawingStart) {
+      drawingStart = { price, time };
+      showToast('📐 Click second point to complete trendline');
+    } else {
+      chartDrawings.push({
+        type: 'trendline',
+        start: drawingStart,
+        end: { price, time }
+      });
+      drawingStart = null;
+      drawingMode = null;
+      document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+      showToast('✅ Trendline added');
+    }
+  } else if (drawingMode === 'horizontal') {
+    chartDrawings.push({
+      type: 'horizontal',
+      price: price
+    });
+    drawingMode = null;
+    document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+    showToast('✅ Horizontal line added');
+  }
 }
 
 // ===== AI CHAT FUNCTIONALITY =====
