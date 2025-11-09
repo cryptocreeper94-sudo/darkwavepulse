@@ -3347,9 +3347,30 @@ table {
 
 .stats-dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
   margin: 20px 0;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .stats-dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 2x2 grid for perfect full-screen layout */
+@media (min-width: 1024px) {
+  .stats-dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 24px auto;
+    max-width: 1400px;
+  }
+  
+  .stats-widget {
+    min-height: 280px;
+  }
 }
 
 .stats-widget {
@@ -3636,18 +3657,35 @@ table {
   line-height: 1.4;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .stats-dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-  
+/* Mobile optimizations */
+@media (max-width: 767px) {
   .stats-widget {
     padding: 16px;
   }
   
   .widget-header h3 {
     font-size: 0.9rem;
+  }
+  
+  .gauge-svg {
+    max-width: 160px;
+  }
+}
+
+/* Large desktop: Even more spacious */
+@media (min-width: 1440px) {
+  .stats-dashboard-grid {
+    max-width: 1600px;
+    gap: 32px;
+  }
+  
+  .stats-widget {
+    padding: 28px;
+    min-height: 320px;
+  }
+  
+  .widget-header h3 {
+    font-size: 1.1rem;
   }
 }
 
