@@ -6133,6 +6133,72 @@ function initializeThemeSwitcher() {
 // Initialize theme switcher
 initializeThemeSwitcher();
 
+// ===== STAT EXPLANATION MODALS =====
+
+function openStatModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+}
+
+function closeStatModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+  }
+}
+
+// Make global for onclick handlers
+window.openStatModal = openStatModal;
+window.closeStatModal = closeStatModal;
+
+// Make stat items clickable
+function initializeStatClickers() {
+  const stats = document.querySelectorAll('.cmc-stat-item');
+  if (stats.length >= 4) {
+    // Fear & Greed (first stat)
+    stats[0].addEventListener('click', () => {
+      openStatModal('fearGreedModal');
+      console.log('😸 Want to learn about Fear & Greed? I'll explain it... if I feel like it.');
+    });
+    
+    // Altcoin Season (second stat)
+    stats[1].addEventListener('click', () => {
+      openStatModal('altSeasonModal');
+      console.log('😸 Altcoin season? More like alt-COIN-TOSS season. Let me explain.');
+    });
+    
+    // Avg RSI (third stat - after logo)
+    stats[2].addEventListener('click', () => {
+      openStatModal('avgRsiModal');
+      console.log('😸 RSI? Fancy way of saying "overbought" or "oversold." Here\'s the breakdown.');
+    });
+    
+    // Market Cap (fourth stat)
+    stats[3].addEventListener('click', () => {
+      openStatModal('marketCapModal');
+      console.log('😸 Market cap is just price × supply. Not rocket science, humans.');
+    });
+  }
+}
+
+// Close modals on background click
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('stat-modal')) {
+    closeStatModal(e.target.id);
+  }
+});
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStatClickers);
+} else {
+  initializeStatClickers();
+}
+
 // ===== CRYPTO CAT MASCOT FUNCTIONALITY =====
 
 const CRYPTO_CAT_QUOTES = {
@@ -6208,17 +6274,17 @@ const CRYPTO_CAT_QUOTES = {
   'hideseek_12': { quote: "I'm not saying you're obsessed, but you've checked the app 23 times today.", mood: "concerned", pose: "*counting on paws*", hideSeek: "24 now" },
 };
 
-// Crypto Cat Pose Image Mapping
+// Crypto Cat Pose Image Mapping - Fixed paths
 const CAT_POSE_IMAGES = {
-  'sideeye': '/attached_assets/generated_images/Grumpy_cat_sideeye_pose_5e52df88.png',
-  'neutral': '/attached_assets/generated_images/Grumpy_cat_neutral_pose_ba4a1b4d.png',
-  'arms-crossed': '/attached_assets/generated_images/Grumpy_cat_arms_crossed_f8e46099.png',
-  'thumbs-up': '/attached_assets/generated_images/Grumpy_cat_thumbs_up_e77056f4.png',
-  'pointing': '/attached_assets/generated_images/Grumpy_cat_pointing_pose_6bbe6ae8.png',
-  'walking': '/attached_assets/generated_images/Grumpy_cat_walking_pose_4be44c5b.png',
-  'fist-pump': '/attached_assets/generated_images/Grumpy_cat_fist_pump_e028a55a.png',
-  'angry': '/attached_assets/generated_images/Grumpy_cat_angry_pose_63318575.png',
-  'facepalm': '/attached_assets/generated_images/Grumpy_cat_facepalm_pose_2fdc5a6a.png',
+  'sideeye': '/crypto-cat-poses/sideeye.png',
+  'neutral': '/crypto-cat-poses/neutral.png',
+  'arms-crossed': '/crypto-cat-poses/crossed.png',
+  'thumbs-up': '/crypto-cat-poses/thumbsup.png',
+  'pointing': '/crypto-cat-poses/pointing.png',
+  'walking': '/crypto-cat-poses/walking.png',
+  'fist-pump': '/crypto-cat-poses/fist.png',
+  'angry': '/crypto-cat-poses/angry.png',
+  'facepalm': '/crypto-cat-poses/facepalm.png',
   'default': '/crypto-cat-mascot.png'
 };
 

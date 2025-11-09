@@ -40,7 +40,10 @@
   <main class="app-main">
     <!-- Header with Wave Banner -->
     <header class="app-header wave-banner-header">
-      <img src="/darkwave-wave-banner.png" alt="DarkWave-V2" class="wave-banner-image">
+      <div class="wave-banner-bg" style="background-image: url('/darkwave-wave-banner.png');">
+        <h1 class="wave-banner-title">DarkWave Pulse</h1>
+        <p class="wave-banner-subtitle">Professional Trading Analysis</p>
+      </div>
       <div class="header-actions-overlay">
         <button class="icon-btn premium-btn" id="subscribeBtn" title="Subscribe" onclick="openSubscriptionPage()" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; border: 2px solid #FFF; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑</button>
         <button class="icon-btn" id="adminBtn" title="Admin" onclick="openAdminLogin()" style="background: linear-gradient(135deg, #FF006E, #8B5CF6); font-weight: bold;">🔐</button>
@@ -322,7 +325,7 @@
                 </div>
               </div>
               <div class="cat-commentary">
-                <img src="/crypto-cat-poses/smirk.png" alt="Cat" class="cat-mini-icon">
+                <img src="/crypto-cat-poses/sideeye.png" alt="Cat" class="cat-mini-icon">
                 <span id="catSignalTake">"These humans never learn. Buy high, sell low, repeat." - Crypto Cat</span>
               </div>
             </div>
@@ -891,7 +894,7 @@
 
           <!-- Visual Image - Center Column -->
           <div class="elevated-card stagger-tall" style="padding: 0; overflow: hidden;">
-            <img src="/attached_assets/stock_images/cryptocurrency_bitco_54a12c6f.jpg" 
+            <img src="/crypto-stock.jpg" 
                  alt="Crypto Trading" 
                  style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
           </div>
@@ -1726,6 +1729,95 @@
     </div>
     <div class="cat-message" id="catMessage">
       Loading wisdom...
+    </div>
+  </div>
+
+  <!-- Stat Explanation Modals -->
+  <div id="fearGreedModal" class="stat-modal">
+    <div class="stat-modal-content">
+      <button class="stat-modal-close" onclick="closeStatModal('fearGreedModal')">&times;</button>
+      <div class="stat-modal-header">
+        <div class="stat-modal-icon">⚡</div>
+        <h2 class="stat-modal-title">Fear & Greed Index</h2>
+      </div>
+      <div class="stat-modal-body">
+        <p>The Fear & Greed Index measures market emotions on a scale of 0-100. It combines volatility, market momentum, social media sentiment, surveys, dominance, and trends to show whether investors are too greedy or too fearful.</p>
+        <p><strong>0-24: Extreme Fear</strong> - Market panic, potential buying opportunity</p>
+        <p><strong>25-49: Fear</strong> - Investors worried, cautious sentiment</p>
+        <p><strong>50-74: Greed</strong> - Optimistic market, watch for overvaluation</p>
+        <p><strong>75-100: Extreme Greed</strong> - Euphoria, potential market top</p>
+      </div>
+      <div class="stat-modal-cat">
+        <img src="/crypto-cat-poses/sideeye.png" alt="Crypto Cat" class="stat-modal-cat-icon">
+        <div class="stat-modal-cat-text">
+          "When everyone's greedy, I'm selling. When everyone's scared, I'm buying. It's really that simple, but you humans never learn." - Crypto Cat
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="altSeasonModal" class="stat-modal">
+    <div class="stat-modal-content">
+      <button class="stat-modal-close" onclick="closeStatModal('altSeasonModal')">&times;</button>
+      <div class="stat-modal-header">
+        <div class="stat-modal-icon">🌊</div>
+        <h2 class="stat-modal-title">Altcoin Season Index</h2>
+      </div>
+      <div class="stat-modal-body">
+        <p>The Altcoin Season Index shows whether it's "Bitcoin Season" or "Altcoin Season" by measuring how many of the top 50 altcoins outperformed Bitcoin in the last 90 days.</p>
+        <p><strong>0-25: Bitcoin Season</strong> - BTC dominates, alts underperform</p>
+        <p><strong>26-74: Mixed Season</strong> - Balanced performance</p>
+        <p><strong>75-100: Altcoin Season</strong> - Alts are pumping hard!</p>
+      </div>
+      <div class="stat-modal-cat">
+        <img src="/crypto-cat-poses/fist.png" alt="Crypto Cat" class="stat-modal-cat-icon">
+        <div class="stat-modal-cat-text">
+          "Altcoin season is when your portfolio goes 10x... right before it crashes 90%. Timing is everything, and yours is terrible." - Crypto Cat
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="avgRsiModal" class="stat-modal">
+    <div class="stat-modal-content">
+      <button class="stat-modal-close" onclick="closeStatModal('avgRsiModal')">&times;</button>
+      <div class="stat-modal-header">
+        <div class="stat-modal-icon">📈</div>
+        <h2 class="stat-modal-title">Average RSI (Top 100)</h2>
+      </div>
+      <div class="stat-modal-body">
+        <p>The Relative Strength Index (RSI) measures momentum on a scale of 0-100. We average the RSI of the top 100 cryptocurrencies to gauge overall market momentum.</p>
+        <p><strong>0-30: Oversold</strong> - Market potentially undervalued, bounce likely</p>
+        <p><strong>30-70: Neutral</strong> - Healthy market conditions</p>
+        <p><strong>70-100: Overbought</strong> - Market potentially overheated, correction coming</p>
+      </div>
+      <div class="stat-modal-cat">
+        <img src="/crypto-cat-poses/pointing.png" alt="Crypto Cat" class="stat-modal-cat-icon">
+        <div class="stat-modal-cat-text">
+          "RSI over 70? That's when amateurs FOMO in. RSI under 30? That's when they panic sell. I do the opposite, which is why I'm rich and you're... well, here." - Crypto Cat
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="marketCapModal" class="stat-modal">
+    <div class="stat-modal-content">
+      <button class="stat-modal-close" onclick="closeStatModal('marketCapModal')">&times;</button>
+      <div class="stat-modal-header">
+        <div class="stat-modal-icon">💎</div>
+        <h2 class="stat-modal-title">Total Market Cap</h2>
+      </div>
+      <div class="stat-modal-body">
+        <p>Total cryptocurrency market capitalization represents the combined value of all cryptocurrencies. It's calculated by multiplying each coin's price by its circulating supply.</p>
+        <p>A rising market cap indicates overall market growth and increasing investor confidence. A declining market cap suggests bearish sentiment and potential downtrends.</p>
+        <p><strong>Track the 24h change</strong> to see if money is flowing into or out of crypto as a whole.</p>
+      </div>
+      <div class="stat-modal-cat">
+        <img src="/crypto-cat-poses/thumbsup.png" alt="Crypto Cat" class="stat-modal-cat-icon">
+        <div class="stat-modal-cat-text">
+          "Market cap is up 5%? Cool. Wake me up when it's at 50% so I can start planning my exit. You'll still be HODLing at -80%." - Crypto Cat
+        </div>
+      </div>
     </div>
   </div>
 
