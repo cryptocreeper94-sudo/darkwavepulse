@@ -517,8 +517,6 @@ a:hover {
   display: flex;
   gap: var(--space-xs);
   padding: var(--space-md);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
   overflow-x: auto;
 }
 
@@ -561,10 +559,7 @@ a:hover {
   display: flex;
   gap: var(--space-sm);
   padding: var(--space-md);
-  background: var(--bg-secondary);
   overflow-x: auto;
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-md);
 }
 
 .category-btn {
@@ -906,12 +901,6 @@ a:hover {
   display: flex;
   gap: var(--space-lg);
   padding: var(--space-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-lg);
-  width: calc(100% - 32px);
-  margin: var(--space-md) auto;
-  box-shadow: var(--shadow-md);
   overflow-x: auto;
 }
 
@@ -1278,18 +1267,48 @@ option {
    GLOBAL CONSISTENCY - Rounded Edges & Widths
    =========================================== */
 
-/* Ensure all containers have rounded edges */
+/* Unified container system with neon blue frame */
+.cmc-stats-bar,
+.category-nav,
+.tab-nav,
 .market-overview-container,
 .trending-carousel,
 .featured-banner,
-.pirate-flag-banner {
+.pirate-flag-banner,
+.search-container,
+.blockchain-filter {
   border-radius: var(--radius-lg);
-  overflow: hidden;
   width: calc(100% - 32px);
+  max-width: 1200px;
   margin: var(--space-md) auto;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-md);
+  border: 2px solid transparent;
+  border-left: 4px solid var(--primary);
+  box-shadow: 
+    var(--shadow-md),
+    -4px 0 12px rgba(59, 130, 246, 0.3);
+  position: relative;
+}
+
+/* Add glow effect to frame */
+.cmc-stats-bar::before,
+.category-nav::before,
+.tab-nav::before,
+.market-overview-container::before,
+.trending-carousel::before,
+.featured-banner::before,
+.pirate-flag-banner::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, var(--primary) 0%, transparent 50%, var(--primary) 100%);
+  border-radius: var(--radius-lg);
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Stats and category bars need horizontal scroll, not hidden */
