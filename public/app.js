@@ -3836,10 +3836,21 @@ function renderGlossary(searchTerm = '', category = null) {
   
   const groupKeys = Object.keys(grouped).sort();
   
-  // Crypto Cat hide-and-seek banner at top
+  // Crypto Cat "BORED ANYWAY" dominant banner at top (using sideeye pose for attitude)
   const cryptoCatBanner = state.cryptoCatEnabled ? `
-    <div style="margin: -16px -16px 20px -16px; overflow: hidden; border-radius: 12px 12px 0 0;">
-      <img src="assets/crypto-cat-banner.jpg" alt="Crypto Cat - Your Next 1000x Frenemy" style="width: 100%; height: auto; display: block;">
+    <div style="margin: -16px -16px 24px -16px; background: linear-gradient(135deg, #FF006E 0%, #A855F7 100%); padding: 24px; border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--neon-pink); box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);">
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <img src="${CAT_POSE_IMAGES['sideeye']}" alt="Crypto Cat - Bored Anyway" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid white; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));">
+        <div style="flex: 1;">
+          <div style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 8px; text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);">CRYPTO CAT'S GLOSSARY</div>
+          <div style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.95); font-style: italic; margin-bottom: 12px;">"Learning crypto terms? BORED ANYWAY... but I'll explain them with attitude."</div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <span style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: white; border: 1px solid rgba(255, 255, 255, 0.3);">🙄 Sarcasm Included</span>
+            <span style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: white; border: 1px solid rgba(255, 255, 255, 0.3);">😼 Smartass Commentary</span>
+            <span style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: white; border: 1px solid rgba(255, 255, 255, 0.3);">💅 Brutal Honesty</span>
+          </div>
+        </div>
+      </div>
     </div>
   ` : '';
   
@@ -3871,9 +3882,10 @@ function renderGlossary(searchTerm = '', category = null) {
               ${(() => {
                 const catData = state.cryptoCatEnabled ? getCryptoCatQuote(term.term) : null;
                 if (catData) {
+                  const catImage = getCatPoseImage(catData.mood);
                   return `
                     <div style="display: flex; gap: 10px; align-items: start; margin-bottom: 12px; background: rgba(255, 0, 110, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 0, 110, 0.2);">
-                      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--neon-green); flex-shrink: 0;">
+                      <img src="${catImage}" alt="Crypto Cat ${catData.mood}" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--neon-green); flex-shrink: 0;">
                       <div style="flex: 1;">
                         <div style="font-size: 0.7rem; color: var(--neon-green); font-weight: 700; margin-bottom: 4px;">🐱 CRYPTO CAT SAYS:</div>
                         <div style="font-size: 0.75rem; color: var(--neon-pink); font-style: italic; margin-bottom: 4px;">${catData.pose}</div>
@@ -5708,7 +5720,180 @@ const CRYPTO_CAT_QUOTES = {
   'wallet_tracking': { quote: "Track your portfolio losses in real-time. Technological progress!", mood: "proud", pose: "*chest puffed out proudly*" },
   'market_overview': { quote: "Fresh data for your doom scrolling pleasure. You're welcome.", mood: "serving", pose: "*presenting data like a waiter*" },
   'price_alerts': { quote: "I'll notify you when things go south. Which is basically always.", mood: "resigned", pose: "*shrugging with phone*" },
+  
+  // Hide-and-Seek Random Popups (appears randomly throughout app)
+  'hideseek_1': { quote: "Found you scrolling again! Don't you have charts to stare at?", mood: "playful", pose: "*peeking from behind corner*", hideSeek: "I've been watching you refresh that price 47 times..." },
+  'hideseek_2': { quote: "Psst! I'm hiding in the code. Bet you can't find all my spots!", mood: "mischievous", pose: "*tail poking out*", hideSeek: "There are 7 hiding spots. Good luck!" },
+  'hideseek_3': { quote: "Surprise! Miss me? Of course you did.", mood: "smug", pose: "*appearing dramatically*", hideSeek: "I saw you checking your losses again..." },
+  'hideseek_4': { quote: "Still trading? Bold strategy. I'm just here for the chaos.", mood: "entertained", pose: "*munching popcorn*", hideSeek: "This is better than Netflix" },
+  'hideseek_5': { quote: "Quick question: When moon? Asking for a friend.", mood: "sarcastic", pose: "*checking imaginary watch*", hideSeek: "Spoiler: Not today" },
+  'hideseek_6': { quote: "I've analyzed your trading strategy. Conclusion: Coin flips might be more effective.", mood: "analytical", pose: "*reviewing clipboard*", hideSeek: "But hey, what do I know? I'm just a cat." },
+  'hideseek_7': { quote: "Plot twist: I'M the whale manipulating your favorite token.", mood: "villainous", pose: "*evil laugh pose*", hideSeek: "Just kidding... or am I?" },
+  'hideseek_8': { quote: "Taking a break from judging your trades to say hi!", mood: "friendly-ish", pose: "*waving paw*", hideSeek: "Back to judging now" },
+  'hideseek_9': { quote: "Did someone say 'technical analysis'? I only do emotional analysis.", mood: "honest", pose: "*shrugging*", hideSeek: "Current emotion: entertained by your choices" },
+  'hideseek_10': { quote: "Checking in! How's your portfolio doing? Never mind, I can see your face.", mood: "observant", pose: "*staring knowingly*", hideSeek: "The charts don't lie, but I might..." },
+  'hideseek_11': { quote: "Random fact: 90% of day traders lose money. But you're different, right?", mood: "educational", pose: "*teacher pose*", hideSeek: "Right...?" },
+  'hideseek_12': { quote: "I'm not saying you're obsessed, but you've checked the app 23 times today.", mood: "concerned", pose: "*counting on paws*", hideSeek: "24 now" },
 };
+
+// Crypto Cat Pose Image Mapping
+const CAT_POSE_IMAGES = {
+  'sideeye': '/attached_assets/generated_images/Grumpy_cat_sideeye_pose_5e52df88.png',
+  'neutral': '/attached_assets/generated_images/Grumpy_cat_neutral_pose_ba4a1b4d.png',
+  'arms-crossed': '/attached_assets/generated_images/Grumpy_cat_arms_crossed_f8e46099.png',
+  'thumbs-up': '/attached_assets/generated_images/Grumpy_cat_thumbs_up_e77056f4.png',
+  'pointing': '/attached_assets/generated_images/Grumpy_cat_pointing_pose_6bbe6ae8.png',
+  'walking': '/attached_assets/generated_images/Grumpy_cat_walking_pose_4be44c5b.png',
+  'fist-pump': '/attached_assets/generated_images/Grumpy_cat_fist_pump_e028a55a.png',
+  'angry': '/attached_assets/generated_images/Grumpy_cat_angry_pose_63318575.png',
+  'facepalm': '/attached_assets/generated_images/Grumpy_cat_facepalm_pose_2fdc5a6a.png',
+  'default': '/crypto-cat-mascot.png'
+};
+
+// Map moods to specific pose images
+function getCatPoseImage(mood) {
+  const moodToPose = {
+    'playful': 'fist-pump',
+    'mischievous': 'sideeye',
+    'smug': 'thumbs-up',
+    'entertained': 'neutral',
+    'sarcastic': 'sideeye',
+    'analytical': 'neutral',
+    'villainous': 'angry',
+    'friendly-ish': 'thumbs-up',
+    'honest': 'neutral',
+    'observant': 'sideeye',
+    'educational': 'pointing',
+    'concerned': 'facepalm',
+    'eye-roll': 'sideeye',
+    'grumpy': 'arms-crossed',
+    'annoyed': 'arms-crossed',
+    'amused': 'neutral',
+    'knowing': 'sideeye',
+    'sympathetic-ish': 'neutral',
+    'skeptical': 'sideeye',
+    'judging': 'arms-crossed',
+    'bitter': 'angry',
+    'warning': 'pointing',
+    'mocking': 'sideeye',
+    'frustrated': 'facepalm',
+    'unimpressed': 'sideeye',
+    'wise': 'neutral',
+    'experienced': 'neutral',
+    'cynical': 'arms-crossed',
+    'dismissive': 'sideeye',
+    'bored': 'neutral',
+    'cautiously-optimistic': 'thumbs-up',
+    'resigned': 'facepalm',
+    'confused': 'facepalm',
+    'urgent': 'pointing',
+    'approving': 'thumbs-up',
+    'sarcastic-cheerful': 'thumbs-up',
+    'dripping-sarcasm': 'sideeye',
+    'sympathetic': 'neutral',
+    'philosophical': 'neutral',
+    'impressed': 'thumbs-up',
+    'competitive': 'fist-pump',
+    'helpful-ish': 'thumbs-up',
+    'proud': 'fist-pump',
+    'serving': 'walking'
+  };
+  
+  const poseKey = moodToPose[mood] || 'neutral';
+  return CAT_POSE_IMAGES[poseKey] || CAT_POSE_IMAGES.default;
+}
+
+// Random Hide-and-Seek Popup System
+let hideSeekTimer = null;
+
+function startHideAndSeek() {
+  if (!state.cryptoCatEnabled) {
+    if (hideSeekTimer) clearInterval(hideSeekTimer);
+    return;
+  }
+  
+  // Clear existing timer
+  if (hideSeekTimer) clearInterval(hideSeekTimer);
+  
+  // Show random popup every 2-5 minutes
+  const scheduleNextPopup = () => {
+    const randomDelay = (Math.random() * 180000) + 120000; // 2-5 minutes in ms
+    
+    setTimeout(() => {
+      if (state.cryptoCatEnabled) {
+        showRandomHideSeekPopup();
+        scheduleNextPopup(); // Schedule next one
+      }
+    }, randomDelay);
+  };
+  
+  scheduleNextPopup();
+}
+
+function showRandomHideSeekPopup() {
+  const hideSeekQuotes = [
+    'hideseek_1', 'hideseek_2', 'hideseek_3', 'hideseek_4',
+    'hideseek_5', 'hideseek_6', 'hideseek_7', 'hideseek_8',
+    'hideseek_9', 'hideseek_10', 'hideseek_11', 'hideseek_12'
+  ];
+  
+  const randomKey = hideSeekQuotes[Math.floor(Math.random() * hideSeekQuotes.length)];
+  const catData = getCryptoCatQuote(randomKey);
+  
+  if (!catData) return;
+  
+  // Get the correct pose image based on mood
+  const catImage = getCatPoseImage(catData.mood);
+  
+  // Create floating popup
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 350px;
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.95), rgba(168, 85, 247, 0.95));
+    border: 2px solid var(--neon-pink);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(255, 0, 110, 0.4);
+    z-index: 10000;
+    animation: slideInRight 0.5s ease-out, bounce 1s ease-in-out 0.5s 3;
+    cursor: pointer;
+  `;
+  
+  popup.innerHTML = `
+    <div style="display: flex; gap: 12px; align-items: start;">
+      <img src="${catImage}" alt="Crypto Cat ${catData.mood}" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; flex-shrink: 0; animation: wiggle 0.5s ease-in-out infinite;">
+      <div style="flex: 1;">
+        <div style="font-size: 0.75rem; color: white; font-weight: 700; margin-bottom: 4px;">🐱 CRYPTO CAT FOUND YOU!</div>
+        <div style="font-size: 0.8rem; color: #FFE5F0; font-style: italic; margin-bottom: 6px;">${catData.pose}</div>
+        <div style="font-size: 0.9rem; color: white; line-height: 1.4; margin-bottom: 6px;">"${catData.quote}"</div>
+        ${catData.hideSeek ? `<div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); font-style: italic;">💭 ${catData.hideSeek}</div>` : ''}
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1;">×</button>
+    </div>
+  `;
+  
+  popup.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'BUTTON') {
+      popup.style.animation = 'slideOutRight 0.5s ease-in';
+      setTimeout(() => popup.remove(), 500);
+    }
+  });
+  
+  document.body.appendChild(popup);
+  
+  // Auto-remove after 8 seconds
+  setTimeout(() => {
+    if (popup.parentElement) {
+      popup.style.animation = 'slideOutRight 0.5s ease-in';
+      setTimeout(() => popup.remove(), 500);
+    }
+  }, 8000);
+  
+  if (tg) tg.HapticFeedback?.impactOccurred('medium');
+}
 
 function initializeCryptoCat() {
   const cryptoCatToggle = document.getElementById('toggleCryptoCat');
@@ -5736,8 +5921,10 @@ function initializeCryptoCat() {
     
     if (state.cryptoCatEnabled) {
       showToast('🐱 Crypto Cat is back! Prepare for sarcasm.');
+      startHideAndSeek(); // Start random popups
     } else {
       showToast('😿 Crypto Cat will miss you...');
+      if (hideSeekTimer) clearInterval(hideSeekTimer); // Stop random popups
     }
     
     // Re-render glossary if we're on the learn tab
@@ -5761,6 +5948,11 @@ function initializeCryptoCat() {
 // Initialize crypto cat
 initializeCryptoCat();
 
+// Start hide-and-seek if enabled
+if (state.cryptoCatEnabled) {
+  startHideAndSeek();
+}
+
 // Function to get Crypto Cat's commentary
 function getCryptoCatQuote(term) {
   if (!state.cryptoCatEnabled) return null;
@@ -5775,12 +5967,13 @@ function createCryptoCatAppearance(quoteKey, size = 'small') {
   const catData = getCryptoCatQuote(quoteKey);
   if (!catData) return '';
   
+  const catImage = getCatPoseImage(catData.mood);
   const imgSize = size === 'small' ? '30px' : size === 'medium' ? '50px' : '70px';
   const fontSize = size === 'small' ? '0.75rem' : size === 'medium' ? '0.85rem' : '0.95rem';
   
   return `
     <div style="display: flex; gap: 8px; align-items: center; margin: 10px 0; padding: 8px 12px; background: linear-gradient(135deg, rgba(255, 0, 110, 0.08), rgba(168, 85, 247, 0.08)); border-radius: 8px; border: 1px solid rgba(255, 0, 110, 0.25);">
-      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: ${imgSize}; height: ${imgSize}; border-radius: 50%; border: 2px solid var(--neon-pink); flex-shrink: 0;">
+      <img src="${catImage}" alt="Crypto Cat ${catData.mood}" style="width: ${imgSize}; height: ${imgSize}; border-radius: 50%; border: 2px solid var(--neon-pink); flex-shrink: 0;">
       <div style="flex: 1;">
         <div style="font-size: ${fontSize}; color: var(--text-primary); font-style: italic; line-height: 1.3; margin-bottom: 3px;">"${catData.quote}"</div>
         ${catData.hideSeek ? `<div style="font-size: calc(${fontSize} - 0.1rem); color: var(--text-secondary); opacity: 0.7; font-style: italic;">💭 ${catData.hideSeek}</div>` : ''}
@@ -5801,11 +5994,12 @@ function createCryptoCatTooltip(term, definition) {
   }
   
   const catData = getCryptoCatQuote(term);
+  const catImage = catData ? getCatPoseImage(catData.mood) : CAT_POSE_IMAGES.default;
   
   return `
     <div style="padding: 12px;">
       <div style="display: flex; gap: 12px; align-items: start; margin-bottom: 12px;">
-        <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
+        <img src="${catImage}" alt="Crypto Cat ${catData ? catData.mood : ''}" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
         <div style="flex: 1;">
           <strong style="color: var(--neon-pink);">${term}</strong>
           <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: var(--text-secondary);">${definition}</p>
@@ -5830,10 +6024,11 @@ function showCryptoCatBanner(type, title, message) {
   }
   
   const catData = getCryptoCatQuote(type);
+  const catImage = catData ? getCatPoseImage(catData.mood) : CAT_POSE_IMAGES.default;
   
   showModal(`
     <div style="padding: 24px; text-align: center;">
-      <img src="/crypto-cat-mascot.png" alt="Crypto Cat" style="width: 100px; height: 100px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--neon-pink); animation: bounce 2s ease-in-out infinite;">
+      <img src="${catImage}" alt="Crypto Cat ${catData ? catData.mood : ''}" style="width: 100px; height: 100px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--neon-pink); animation: bounce 2s ease-in-out infinite;">
       <h3 style="margin-bottom: 12px; color: var(--neon-pink);">${title}</h3>
       <p style="color: var(--text-secondary); margin-bottom: 16px;">${message}</p>
       ${catData ? `
