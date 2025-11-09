@@ -898,17 +898,42 @@ a:hover {
 
 /* CMC Stats Bar */
 .cmc-stats-bar {
-  display: flex;
-  gap: var(--space-lg);
-  padding: var(--space-md);
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .cmc-stat-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-xs);
+  padding: var(--space-lg);
+  background: var(--bg-secondary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.4),
+    0 0 30px rgba(59, 130, 246, 0.2),
+    inset 0 0 15px rgba(59, 130, 246, 0.1);
+  transition: all var(--transition-base);
   white-space: nowrap;
+}
+
+.cmc-stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 20px rgba(59, 130, 246, 0.6),
+    0 0 40px rgba(59, 130, 246, 0.3),
+    inset 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.stat-emoji {
+  font-size: 2rem;
+  margin-bottom: var(--space-xs);
 }
 
 .cmc-stat-label {
@@ -916,12 +941,19 @@ a:hover {
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .cmc-stat-value {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-bold);
+  color: var(--primary);
+  text-align: center;
+}
+
+.cmc-stat-change {
+  font-size: var(--font-size-sm);
+  text-align: center;
 }
 
 /* Crypto Cat Toggle - Make it prominent */
@@ -1294,7 +1326,6 @@ option {
    =========================================== */
 
 /* Unified container system - all same size */
-.cmc-stats-bar,
 .category-nav,
 .tab-nav,
 .market-overview-container,
@@ -1306,7 +1337,8 @@ option {
 .content-grid,
 .glossary-content,
 .quick-picks-section,
-.analysis-result {
+.analysis-result,
+.cmc-stats-bar {
   width: 100%;
   max-width: 1200px;
   margin-left: auto;
@@ -1314,8 +1346,7 @@ option {
   margin-bottom: var(--space-md);
 }
 
-/* Add consistent styling to containers that need it */
-.cmc-stats-bar,
+/* Add consistent styling to containers that need it (excluding stats bar which has custom styling) */
 .category-nav,
 .tab-nav,
 .market-overview-container,
