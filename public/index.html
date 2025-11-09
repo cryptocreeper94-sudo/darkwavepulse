@@ -1821,6 +1821,60 @@
     </div>
   </div>
 
+  <!-- Chart Enlarge Modal -->
+  <div id="chartModal" class="stat-modal" style="z-index: 10000;">
+    <div class="stat-modal-content" style="max-width: 95vw; width: 600px; max-height: 90vh; overflow-y: auto;">
+      <button class="stat-modal-close" onclick="closeChartModal()">&times;</button>
+      <div class="stat-modal-header" style="margin-bottom: 16px;">
+        <div class="stat-modal-icon">📊</div>
+        <h2 class="stat-modal-title" id="chartModalTitle">Price Chart</h2>
+      </div>
+      
+      <!-- Chart Controls -->
+      <div style="margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary);">Timeframe:</div>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            <button class="timeframe-btn active" data-timeframe="1m" onclick="changeChartTimeframe('1m')">1M</button>
+            <button class="timeframe-btn" data-timeframe="5m" onclick="changeChartTimeframe('5m')">5M</button>
+            <button class="timeframe-btn" data-timeframe="1h" onclick="changeChartTimeframe('1h')">1H</button>
+            <button class="timeframe-btn" data-timeframe="1d" onclick="changeChartTimeframe('1d')">1D</button>
+            <button class="timeframe-btn" data-timeframe="7d" onclick="changeChartTimeframe('7d')">7D</button>
+            <button class="timeframe-btn" data-timeframe="30d" onclick="changeChartTimeframe('30d')">30D</button>
+            <button class="timeframe-btn" data-timeframe="ytd" onclick="changeChartTimeframe('ytd')">YTD</button>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary);">Chart Type:</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="chart-type-btn active" data-type="candle" onclick="changeChartType('candle')">Candlestick</button>
+            <button class="chart-type-btn" data-type="line" onclick="changeChartType('line')">Line</button>
+            <button class="chart-type-btn" data-type="bar" onclick="changeChartType('bar')">Bar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Full Chart Container -->
+      <div class="chart-container" id="chartContainerFull" style="margin: 15px 0; min-height: 350px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);">📈 Loading chart...</div>
+      </div>
+      
+      <!-- Drawing Tools -->
+      <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 8px;">Drawing Tools:</span>
+        <button class="tool-btn" onclick="enableTrendline()" title="Draw Trendline">
+          📐 Trendline
+        </button>
+        <button class="tool-btn" onclick="enableHorizontalLine()" title="Draw Horizontal Line">
+          ➖ H-Line
+        </button>
+        <button class="tool-btn" onclick="clearDrawings()" title="Clear All Drawings">
+          🗑️ Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="/app.js?v=2024110719"></script>
   <script type="module">
     // Load Dashboard Widgets module

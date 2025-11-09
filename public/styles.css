@@ -2597,6 +2597,13 @@ table {
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
 }
 
+/* Chart Preview Hover Effect */
+.chart-preview-container:hover {
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
 /* ==========================================
    CRYPTO CAT HIDE-AND-SEEK ANIMATIONS
    ========================================== */
