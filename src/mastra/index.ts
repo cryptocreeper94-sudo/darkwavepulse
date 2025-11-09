@@ -8,6 +8,7 @@ import { Memory } from "@mastra/memory";
 import { PostgresStore } from "@mastra/pg";
 import { NonRetriableError } from "inngest";
 import { z } from "zod";
+import { desc } from "drizzle-orm";
 
 import { sharedPostgresStorage } from "./storage";
 import { inngest, inngestServe } from "./inngest";
@@ -310,7 +311,6 @@ export const mastra = new Mastra({
           // Fetch all subscribers, whitelisted users, and token submissions
           const { db } = await import('../db/client.js');
           const { subscriptions, whitelistedUsers, tokenSubmissions } = await import('../db/schema.js');
-          const { desc } = await import('drizzle-orm');
           
           const allSubscribers = await db.select().from(subscriptions);
           const allWhitelisted = await db.select().from(whitelistedUsers);
@@ -707,7 +707,6 @@ export const mastra = new Mastra({
           
           const { db } = await import('../db/client.js');
           const { tokenSubmissions } = await import('../db/schema.js');
-          const { desc } = await import('drizzle-orm');
           
           const submissions = await db.select().from(tokenSubmissions).orderBy(desc(tokenSubmissions.submittedAt));
           

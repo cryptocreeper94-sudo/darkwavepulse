@@ -1014,6 +1014,18 @@ searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') performSearch();
 });
 
+// Reset Search Button
+document.getElementById('resetSearchBtn')?.addEventListener('click', () => {
+  searchInput.value = '';
+  document.getElementById('analysisResult').innerHTML = `
+    <div class="welcome-card">
+      <h2>Blue Chip Crypto</h2>
+      <p>Top market cap cryptocurrencies with proven track records</p>
+    </div>
+  `;
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+});
+
 async function performSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
