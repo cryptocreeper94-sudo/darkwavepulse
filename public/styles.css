@@ -954,7 +954,7 @@ a:hover {
 
 .cmc-stats-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-sm);
   padding: 0;
   background: transparent;
