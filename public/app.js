@@ -5402,22 +5402,30 @@ async function fetchNews(filter = 'all') {
   newsFeed.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
   
   try {
-    // Use CryptoPanic API (free tier)
-    const url = `https://cryptopanic.com/api/free/v1/posts/?auth_token=free&filter=${filter}&public=true`;
-    
-    const response = await fetch(url);
+    // Use CoinGecko trending data as market news
+    const response = await fetch(`https://api.coingecko.com/api/v3/search/trending`);
     const data = await response.json();
     
-    if (data.results) {
-      // Cache the data
-      newsCache = { data: data.results, timestamp: now };
-      displayNews(data.results, filter);
+    if (data.coins) {
+      // Transform trending coins into news format
+      const newsItems = data.coins.map((coin, index) => ({
+        id: coin.item.id,
+        title: `${coin.item.name} (${coin.item.symbol}) - #${index + 1} Trending`,
+        url: `https://www.coingecko.com/en/coins/${coin.item.id}`,
+        published_at: new Date().toISOString(),
+        source: { title: 'CoinGecko' },
+        votes: { positive: coin.item.score || 10, negative: 0 },
+        description: `Market Cap Rank: #${coin.item.market_cap_rank || 'N/A'} | 24h Price Change: ${coin.item.data?.price_change_percentage_24h?.usd?.toFixed(2) || 'N/A'}%`
+      }));
+      
+      newsCache = { data: newsItems, timestamp: now };
+      displayNews(newsItems, filter);
     } else {
-      newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No news available</p>';
+      newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">📰 News feed temporarily unavailable</p>';
     }
   } catch (error) {
     console.error('News fetch error:', error);
-    newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load news. Please try again.</p>';
+    newsFeed.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">⚠️ Unable to load news. Please try again later.</p>';
   }
 }
 
