@@ -1,73 +1,7 @@
 # DarkWave-V2 Technical Analysis Bot
 
 ## Overview
-DarkWave-V2 is an advanced technical analysis bot built with the Mastra framework, providing comprehensive cryptocurrency, stock market, and NFT analysis. It integrates with Telegram to deliver real-time buy/sell signals based on technical indicators like RSI, MACD, moving averages, and Bollinger Bands. The system uses a workflow-based architecture, processes user messages via an AI agent, and stores conversation history and user watchlists in PostgreSQL for personalized interactions. Key features include DEX pair and meme coin support with rug-risk detection, NFT collection analysis, a live trending carousel, database-backed session management, and multi-chain wallet tracking. It also incorporates a comprehensive subscription notification system with an admin dashboard, a professional token submission system with robust validation, and cryptocurrency payment integration via Coinbase Commerce. A unique "Crypto Cat" mascot provides interactive commentary, and a "Launching Soon" section with a countdown and presale platform design for the DarkWave token (DWLP) is included. The project aims to launch the DarkWave token on December 25, 2025, with a whitepaper outlining its mission, tokenomics, utility, and roadmap.
-
-## 🎄 CRITICAL: December 25, 2025 - DWLP Token Launch
-**47 DAYS REMAINING**
-- Target: Christmas Day launch for DarkWave Pulse (DWLP) token
-- Status: Building educational features & polish for investor confidence
-- Daily checkpoint: Review progress toward launch readiness
-- Key deliverables needed: Complete glossary, professional UI, bot detection live
-
-## Recent Changes (November 2025)
-- **Complete Interactive Glossary with Crypto Cat** (November 9, 2025):
-  - **System**: 143 crypto/finance terms across 7 blocks (A-Z)
-  - **Dual Modes**: Smartass (Crypto Cat personality) + Plain (educational)
-  - **Categories**: Crypto, Finance, NFT, Regulation, Security, Tech, Crypto Slang, Stocks, DarkWave
-  - **Features**: Real-time search, category filters, sass/plain toggle, recent terms tracking
-  - **UI**: 9 Crypto Cat poses (neutral, angry, pointing, sideeye, walking, fist, thumbsup, crossed, facepalm)
-  - **Integration**: Dedicated Glossary tab, modal cards, mobile-optimized, theme-compatible
-  - **Emotion Tags**: 10 tags for contextual cat selection (regret, celebration, caution, danger, etc.)
-  - **Storage**: localStorage persistence for sass mode preference and recent term history
-  - **Performance**: Lazy loading, search debouncing, virtual scrolling for 143 terms
-  - **Purpose**: Educational depth for token launch, investor confidence, onboarding new users
-  
-- **Bot Detection System - LIVE FOR SAFETY** (November 8, 2025):
-  - **Backend**: `botDetectionTool` analyzes DEX pairs for rug risk using Dexscreener API
-  - **Frontend**: Automatic bot/rug detection in Mini App for tokens with price <$0.01 or long addresses (Solana DEX pairs)
-  - **Risk Scoring**: <$1K liquidity (+40), <$10K liquidity (+30), no socials (+25), new pairs (+30), extreme volatility (+25)
-  - **Color-coded Levels**: 🟢 Safe (<20%), 🟡 Low (20-40%), 🟠 Medium (40-60%), 🔴 High (60-80%), ⚫ Extreme (>80%)
-  - **Safety Features**: 
-    - Extreme risk tokens show "⛔ DO NOT BUY - EXTREME RUG RISK" warning
-    - Error handling defaults to EXTREME risk (fail-safe for live trading)
-    - Red flags list displayed (low liquidity, new pair, suspicious pumps, no social links)
-  - **UI Integration**: Risk badge animates into analysis results with full breakdown of detected issues
-  - **Agent Integration**: Telegram bot automatically runs bot detection before DEX/meme coin analysis
-  - Uses Dexscreener public API (no API key required)
-  - Approved for live trading by architect review
-  - Future enhancement: Helius/Alchemy integration for detailed on-chain holder analysis
-  
-## Recent Changes (November 2025 - UI)
-- **CoinMarketCap-Style Market Overview Transformation** (November 8, 2025):
-  - Complete redesign of market overview with professional CMC-inspired layout
-  - 9-column data table: Rank, Name/Icon, Price, 1h%, 24h%, 7d%, Volume, Market Cap, 7d Sparkline Chart
-  - 7 distinct category tabs: Top (market cap), Trending (volume), Gainers (24h+), Losers (24h-), New (gecko trending), DeFi (curated), NFTs
-  - Live 7-day sparkline charts with color-coded green/red performance indicators
-  - CMC stats bar with auto-refreshing Market Cap, Fear & Greed Index, Altcoin Season Index, Average RSI
-  - Each category fetches unique CoinGecko datasets with 1h/24h/7d percentage changes
-  - Crypto Cat toggle button upgraded with visual feedback (opacity changes, title updates, localStorage persistence)
-  - Removed legacy split-view layout for unified professional table experience
-  - Real-time coin logo integration for visual recognition
-- **Crypto.com-Style Design Overhaul**: Complete UI redesign with premium multi-dimensional aesthetic
-  - Solid dark navy backgrounds (#0A0E27, #1A1F3A) replacing gradients for clean professional look
-  - Three-column responsive grid system for sophisticated staggered layouts
-  - Depth system with elevated cards, recessed panels, box shadows, and inset glows
-  - Angular dividers with geometric accent elements
-  - Strategic use of emojis for visual interest without excess
-- **Visual Content Integration**: 5 crypto/finance stock images downloaded and integrated throughout interface
-- **News Headlines Section**: Live market headlines interspersed in three-column layout with depth styling
-- **Affiliate Monetization**: Exchange partner section with Kraken, Coinbase, and Binance affiliate links
-- **Enhanced Color Scheme**: Electric blue (#3B82F6, #60A5FA) accents with gold (#FBBF24) and purple (#8B5CF6) highlights
-- **3-Tier Pricing System**: Implemented Free Trial (7 days, 20 searches/day), Basic ($2/mo, 20 searches/day), Premium ($5/mo, unlimited)
-- **Dual Access Methods**: Users can enter "lucky 777" for free trial OR whitelisted email for instant premium access
-- **Multi-Theme System**: Added Jupiter (DeFi Dark), Robinhood (Clean Light), and Coinbase (Professional Blue) themes with localStorage persistence
-- **Projects Page Category System**: Reorganized with four distinct sections (Crypto Cat Series, Conspiracy Themed, Religious/Spiritual, Community Projects) each with custom messaging and teasers for limited editions and future airdrops
-- **Live Interactive Charts**: FREE candlestick and line charts with 7 timeframes (1M-YTD) and smart auto-refresh rates
-
-## Future Features (Deferred)
-See `FUTURE_FEATURES.md` for detailed specs on planned features:
-- **TP/SL Trade Manager**: Restart-safe take profit/stop loss monitoring (requires wallet integration + testing)
+DarkWave-V2 is an advanced technical analysis bot built with the Mastra framework, offering comprehensive cryptocurrency, stock market, and NFT analysis. It integrates with Telegram to deliver real-time buy/sell signals based on technical indicators. The system features DEX pair and meme coin support with rug-risk detection, NFT collection analysis, a live trending carousel, database-backed session management, and multi-chain wallet tracking. It also includes a subscription notification system, a professional token submission system, and cryptocurrency payment integration via Coinbase Commerce. A "Crypto Cat" mascot provides interactive commentary. The project aims to launch the DarkWave (DWLP) token on December 25, 2025, with a whitepaper detailing its mission, tokenomics, utility, and roadmap.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -75,88 +9,64 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Agent Framework (Mastra Core)
-The application is built on Mastra, an agent framework for AI applications. It utilizes an agent-based architecture for an AI assistant (DarkWave-V2) capable of calling tools, maintaining memory, and processing natural language. Workflow orchestration is handled by `createWorkflow` and `createStep` for deterministic execution. A modular tool system (`createTool`) encapsulates specific functionalities with Zod schemas for typed inputs/outputs. Memory persistence uses `@mastra/memory` with `PostgresStore` for conversation context and user data.
+The application uses the Mastra framework for an AI agent (DarkWave-V2) capable of calling tools, maintaining memory, and processing natural language. Workflow orchestration is handled by `createWorkflow` and `createStep` for deterministic execution. A modular tool system (`createTool`) encapsulates specific functionalities with Zod schemas for typed inputs/outputs. Memory persistence uses `@mastra/memory` with `PostgresStore` for conversation context and user data.
 
 ### Language Model Integration
-The system integrates with OpenAI's GPT-4o-mini via Replit AI Integrations for cost-effective analysis, using the `generateLegacy` method from `@ai-sdk/openai` for compatibility.
+The system integrates with OpenAI's GPT-4o-mini via Replit AI Integrations using the `generateLegacy` method from `@ai-sdk/openai`.
 
 ### Tool Architecture
-The system employs eight specialized tools:
-1.  **Market Data Tool**: Fetches historical OHLCV data from CoinGecko (crypto) and Yahoo Finance (stocks).
-2.  **Technical Analysis Tool**: Calculates indicators like RSI, MACD, EMAs, SMAs, and Bollinger Bands using the `technicalindicators` library.
-3.  **Holdings Tool**: Manages user watchlists.
-4.  **Scanner Tool**: Scans top assets for strong buy signals.
-5.  **Chart Generator Tool**: Creates visual price charts with EMA overlays via QuickChart.io.
-6.  **Dexscreener Tool**: Searches DEX pairs across various chains.
-7.  **DEX Analysis Tool**: Provides specialized technical analysis for DEX pairs, including rug-risk detection and liquidity scoring.
-8.  **NFT Tool**: Analyzes popular NFT collections, displaying floor price, volume, market cap, and other data.
-Each tool uses Zod schemas for validation, clear descriptions for AI agent use, logging, and error handling.
+The system employs eight specialized tools: Market Data, Technical Analysis, Holdings, Scanner, Chart Generator, Dexscreener, DEX Analysis (including rug-risk detection), and NFT Tool. Each tool uses Zod schemas for validation, clear descriptions for AI agent use, logging, and error handling.
 
 ### Workflow Design
-The `darkwaveWorkflow` is a single-step workflow that receives Telegram messages, invokes the DarkWave-V2 agent with conversation history, and returns formatted analysis responses, allowing the agent to autonomously decide tool usage.
+The `darkwaveWorkflow` processes Telegram messages, invokes the DarkWave-V2 agent with conversation history, and returns formatted analysis responses, allowing the agent to autonomously decide tool usage.
 
 ### Message Processing Pipeline
-The pipeline involves Telegram webhooks → Inngest workflow → Mastra agent → Tools → Response formatting. Inngest (`@mastra/inngest`) provides event-driven workflow execution with retry logic and step memoization.
+The pipeline involves Telegram webhooks → Inngest workflow → Mastra agent → Tools → Response formatting. Inngest (`@mastra/inngest`) provides event-driven workflow execution with retry logic.
 
 ### Type Safety & Validation
 The project uses TypeScript with strict mode and ES2022 target. Zod schemas provide runtime validation for all tool inputs/outputs and workflow data.
 
 ### Logging & Observability
-Pino logger (`@mastra/loggers`) is used for structured JSON logging with custom formatters, including trace context for relevant information like ticker symbols and user IDs.
+Pino logger (`@mastra/loggers`) is used for structured JSON logging with custom formatters, including trace context.
 
 ### UI/UX Decisions
--   **Trending Carousel**: Auto-scrolling animation for live prices and 24h changes.
--   **Token Launchpad UI**: Launch card UI with neon gradient borders and shimmer animations.
--   **Crypto Cat Mascot**: Toggleable grumpy guru with varied personality, body language, and sarcastic commentary, appearing in glossary tooltips and feature banners. Integrated with app state management and localStorage.
--   **Category-Based Projects Page**: Token series organized by category tags (cryptoCat, conspiracy, religious, general) with dedicated sections, professional messaging, and teasers for limited editions and community airdrops. Each category has customizable title, description, and teaser fields in CATEGORY_CONFIG.
+The UI features a CoinMarketCap-style market overview with a 9-column data table and 7 distinct category tabs. It incorporates a Crypto.com-style design overhaul with dark navy backgrounds, a three-column responsive grid, elevated cards, and angular dividers. Visual content integration includes stock images and a live news headlines section. An enhanced color scheme uses electric blue accents with gold and purple highlights. The system includes a multi-theme system (Jupiter, Robinhood, Coinbase) and live interactive charts. The Crypto Cat mascot is toggleable with varied personality, body language, and sarcastic commentary in glossary tooltips and feature banners. Projects are organized into category-based pages.
 
 ### Feature Specifications
--   **DEX Pair Support**: Dexscreener integration for rug-risk detection and liquidity scoring.
--   **NFT Collection Analysis**: Curated database of popular collections, searchable by name or contract address.
--   **Live Trending Carousel**: Fetches data from CoinGecko and Dexscreener with 5-minute browser caching.
--   **Database-backed Session Management**: 30-day expiry for user sessions.
--   **Tracked Wallets**: Read-only, multi-chain support (Solana, Ethereum, Polygon, Arbitrum, Base, BSC) with automatic balance fetching.
--   **Subscription Notification System**: Telegram and email notifications for Stripe and Coinbase Commerce payments.
--   **Admin Dashboard**: `/admin` provides subscriber metrics, whitelist management, and revenue tracking.
--   **Token Submission System**: Allows projects to submit tokens with social links, documents, and trust indicators. Features robust three-layer file validation (data URI, base64 decoding, magic bytes) for security.
--   **Cryptocurrency Payment Integration**: Coinbase Commerce for BTC, ETH, USDC, LTC, DOGE, BCH, granting 30-day premium access. Webhook signature verification for security.
--   **DarkWave Token Launchpad**: Live countdown, whitelist signup, premium-gated access, integration with existing payment systems.
--   **DarkWave Whitepaper**: Covers mission, tokenomics (100M fixed supply, 25% presale, 10% dev), utility (discounts, staking, governance), deflationary mechanisms, revenue model, presale structure, roadmap, and risk disclosures.
+Key features include DEX pair support with rug-risk detection and liquidity scoring, NFT collection analysis, a live trending carousel, and database-backed session management. It supports tracked, multi-chain wallets (Solana, Ethereum, Polygon, Arbitrum, Base, BSC). A subscription notification system, admin dashboard, and a professional token submission system with robust three-layer file validation are implemented. Cryptocurrency payments are integrated via Coinbase Commerce. A DarkWave Token Launchpad features a live countdown, whitelist signup, and premium-gated access. The system also includes a "Bot Detection System" for DEX pair rug risk analysis.
 
 ### System Design Choices
--   **Security**: Browser-generated unique user IDs for session isolation. Admin dashboard protected by `ADMIN_ACCESS_CODE`. File upload validation with three-layer security (data URI parsing, base64 decoding, magic byte signature checking).
--   **Access Control**: Dual-method access system supporting both access code ("lucky 777" for 7-day free trial) and email whitelist (for permanent premium access). Whitelisted emails automatically grant permanent premium access when entered at login - no expiration unless manually removed from whitelist.
--   **Pricing Model**: Three tiers - Free Trial (7 days, 20 searches/day), Basic ($2/mo, 20 searches/day unlimited time), Premium ($5/mo, unlimited everything). After trial expires, users must upgrade to Basic or Premium.
--   **Performance**: 5-minute browser caching for live data to minimize API calls.
+Security is addressed with browser-generated unique user IDs and an admin dashboard protected by an `ADMIN_ACCESS_CODE`. File upload validation employs data URI parsing, base64 decoding, and magic byte signature checking. Access control is managed through a dual-method system supporting an access code ("lucky 777" for free trial) and an email whitelist for premium access. The pricing model includes Free Trial, Basic, and Premium tiers. Performance is optimized with 5-minute browser caching for live data.
 
 ## External Dependencies
 
 ### AI & LLM Services
--   **OpenAI GPT-4o-mini**: Accessed via Replit AI Integrations.
--   **Vercel AI SDK** (`ai`, `@ai-sdk/openai`): Unified interface for LLM interactions.
+-   OpenAI GPT-4o-mini (via Replit AI Integrations)
+-   Vercel AI SDK (`ai`, `@ai-sdk/openai`)
 
 ### Market Data APIs
--   **CoinGecko API**: Free cryptocurrency market data.
--   **Yahoo Finance (via axios)**: Free stock market data.
--   **Dexscreener API**: Free DEX pair data (300 requests/minute limit).
--   **QuickChart.io**: Free Chart.js image generation for price charts.
--   **Helius API**: For Solana wallet balance fetching.
--   **Alchemy API**: For EVM chain wallet balance fetching.
+-   CoinGecko API
+-   Yahoo Finance (via axios)
+-   Dexscreener API
+-   QuickChart.io
+-   Helius API (for Solana wallet balance)
+-   Alchemy API (for EVM chain wallet balance)
+-   Alpha Vantage (fallback for stock data)
 
 ### Database & Storage
--   **PostgreSQL** (`@mastra/pg`): Primary database for conversation memory, user holdings, and workflow state.
+-   PostgreSQL (`@mastra/pg`)
 
 ### Infrastructure & Deployment
--   **Inngest** (`inngest`, `@mastra/inngest`): Serverless workflow engine.
--   **Stripe**: For subscription payments.
--   **Coinbase Commerce**: For cryptocurrency payments.
+-   Inngest (`inngest`, `@mastra/inngest`)
+-   Stripe
+-   Coinbase Commerce
 
 ### Messaging Platform
--   **Telegram Bot API**: For webhook-based message processing (requires `TELEGRAM_BOT_TOKEN`).
+-   Telegram Bot API
 
 ### Technical Analysis Libraries
--   **technicalindicators**: For calculating various technical indicators.
+-   technicalindicators
 
 ### Supporting Libraries
--   **axios**: HTTP client.
--   **zod**: Schema validation.
+-   axios
+-   zod
