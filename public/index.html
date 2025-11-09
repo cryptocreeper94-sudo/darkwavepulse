@@ -49,12 +49,6 @@
       </div>
     </header>
 
-    <!-- Desktop Experience Banner (hidden - smaller compact version) -->
-    <div id="desktopBanner" class="card text-center" style="display: none; margin: var(--space-sm) var(--space-md); padding: var(--space-sm); font-size: var(--font-size-xs); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);">
-      <a id="webAppLink" href="#" target="_blank" style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-        🖥️ Open Full Desktop Version
-      </a>
-    </div>
     <!-- Trust Status Pill -->
     <div class="card flex justify-between items-center" style="width: calc(100% - 32px); margin: var(--space-md) auto; padding: var(--space-md);">
       <span class="status-pill">Live Trading Data</span>
@@ -262,6 +256,7 @@
         <div class="search-container">
           <input type="text" id="searchInput" class="search-input" placeholder="Search ticker...">
           <button class="search-btn" id="searchBtn"></button>
+          <button class="reset-btn" id="resetSearchBtn" title="Clear search">✕</button>
         </div>
 
         <!-- Quick Picks (Dynamic per category) -->
@@ -286,7 +281,10 @@
       <div id="holdings" class="tab-pane">
         <div class="section-header">
           <h2>Your Watchlist</h2>
-          <button class="action-btn" id="scanBtn">Scan Market</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="action-btn" onclick="switchTab('analysis')">← Analysis</button>
+            <button class="action-btn" id="scanBtn">Scan Market</button>
+          </div>
         </div>
         <div id="holdingsList" class="holdings-list">
           <div class="empty-state">
@@ -301,9 +299,12 @@
       <div id="wallet" class="tab-pane">
         <div class="section-header">
           <h2>Tracked Wallets</h2>
-          <button class="btn btn-secondary" id="clearAllWalletsBtn" style="border-color: var(--danger);">
-            Clear All
-          </button>
+          <div style="display: flex; gap: 8px;">
+            <button class="action-btn" onclick="switchTab('analysis')">← Analysis</button>
+            <button class="btn btn-secondary" id="clearAllWalletsBtn" style="border-color: var(--danger);">
+              Clear All
+            </button>
+          </div>
         </div>
         <div id="walletContent" class="wallet-content">
           <!-- Add Wallet Section -->
@@ -430,6 +431,7 @@
       <div id="settings" class="tab-pane">
         <div class="section-header">
           <h2>Settings</h2>
+          <button class="action-btn" onclick="switchTab('analysis')">← Analysis</button>
         </div>
         <div class="settings-content">
           <!-- Subscription Section -->
@@ -796,7 +798,10 @@
       <div id="projects" class="tab-pane">
         <div class="section-header">
           <h2>Featured Projects</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Discover innovative tokens with real potential</p>
+          <div style="flex: 1;">
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">Discover innovative tokens with real potential</p>
+          </div>
+          <button class="action-btn" onclick="switchTab('analysis')">← Analysis</button>
         </div>
 
         <!-- Launching Soon Section -->
