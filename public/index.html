@@ -203,7 +203,15 @@
           </div>
           <div class="newspaper-box">
             <div class="newspaper-header">📊 MARKET PULSE</div>
-            <div class="newspaper-content" id="marketPulse">Analyzing market conditions...</div>
+            <div class="newspaper-content" id="marketPulse">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <div style="width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div id="marketStrength" style="width: 65%; height: 100%; background: linear-gradient(90deg, #00ff88, #60A5FA); transition: width 0.5s ease;"></div>
+                </div>
+                <span id="marketStrengthText" style="font-size: 0.75rem; color: #00ff88; font-weight: bold;">65%</span>
+              </div>
+              <div id="marketPulseText">Analyzing market conditions...</div>
+            </div>
           </div>
           <div class="newspaper-box">
             <div class="newspaper-header">😼 CAT'S TAKE</div>
@@ -216,6 +224,14 @@
           <div class="newspaper-box">
             <div class="newspaper-header">🎯 SUPPORT/RESISTANCE</div>
             <div class="newspaper-content" id="srLevels"><strong>BTC:</strong> Support $95k | Resistance $102k<br><strong>ETH:</strong> Support $3.4k | Resistance $3.7k</div>
+          </div>
+          <div class="newspaper-box">
+            <div class="newspaper-header">📊 SENTIMENT TRACKER</div>
+            <div class="newspaper-content" id="sentimentTracker">
+              <div style="margin-bottom: 4px;"><strong style="color: #00ff88;">Social:</strong> <span id="socialSentiment">Bullish 68%</span></div>
+              <div style="margin-bottom: 4px;"><strong style="color: #60A5FA;">News:</strong> <span id="newsSentiment">Neutral 52%</span></div>
+              <div><strong style="color: #FFD700;">Trend:</strong> <span id="trendSentiment">↗️ Improving</span></div>
+            </div>
           </div>
         </div>
 
