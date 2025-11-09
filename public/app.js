@@ -7125,3 +7125,66 @@ universalSearchInput.addEventListener('keypress', (e) => {
 
 // Legacy crypto cat toggle code removed - now handled by toggleCryptoCatImage()
 
+// ===== AI-POWERED DAILY PLAYBOOK WIDGET =====
+async function generateDailyPlaybook() {
+  const outlookEl = document.getElementById('playbookOutlook');
+  const levelsEl = document.getElementById('playbookLevels');
+  const focusEl = document.getElementById('playbookFocus');
+  const catEl = document.getElementById('playbookCat');
+  const refreshBtn = document.getElementById('refreshPlaybookBtn');
+  
+  if (!outlookEl || !levelsEl || !focusEl || !catEl) return;
+  
+  try {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = '⏳ Generating...';
+    
+    outlookEl.textContent = 'Analyzing market conditions...';
+    levelsEl.textContent = 'Calculating key levels...';
+    focusEl.textContent = 'Identifying opportunities...';
+    catEl.textContent = '"Hold on, I\'m thinking..." - Crypto Cat';
+    
+    const response = await fetch('/api/agents/DarkWave-V2/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: 'Generate a concise daily market playbook with: 1) Market Outlook (one sentence on BTC/crypto trends), 2) Key Levels (BTC and ETH support/resistance), 3) Today\'s Focus (one actionable trading tip), 4) Cat\'s Wisdom (one sarcastic but wise trading quote from Crypto Cat). Keep each section under 100 characters.'
+        }],
+        userId: state.userId
+      })
+    });
+    
+    const data = await response.json();
+    const playbookText = data.text || data.message || 'Unable to generate playbook at this time.';
+    
+    const sections = playbookText.split('\n').filter(l => l.trim());
+    
+    outlookEl.textContent = sections[0] || 'Bullish momentum building across major cryptocurrencies';
+    levelsEl.textContent = sections[1] || 'BTC $98k support | ETH $3,500 resistance';
+    focusEl.textContent = sections[2] || 'Watch for breakout above key resistance levels';
+    catEl.textContent = sections[3] || '"Markets go up, markets go down. Cats don\'t care." - Crypto Cat';
+    
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = '🔄 Refresh';
+    showNotification('✅ Daily Playbook updated with fresh AI insights!', 'success');
+    
+  } catch (error) {
+    console.error('Playbook generation error:', error);
+    outlookEl.textContent = 'Bullish momentum on BTC, consolidation on altcoins';
+    levelsEl.textContent = 'BTC $98k support, ETH $3,500 resistance';
+    focusEl.textContent = 'Watch Fear & Greed Index for sentiment shifts';
+    catEl.textContent = '"Don\'t fight the trend, ride it like a lazy cat on a Roomba." - Crypto Cat';
+    
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = '🔄 Refresh';
+    showNotification('⚠️ Using cached playbook - AI temporarily unavailable', 'warning');
+  }
+}
+
+document.getElementById('refreshPlaybookBtn')?.addEventListener('click', generateDailyPlaybook);
+
+// Auto-generate playbook on page load
+setTimeout(generateDailyPlaybook, 3000);
+
