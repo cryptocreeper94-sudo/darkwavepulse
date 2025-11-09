@@ -35,7 +35,7 @@ export interface MarketOverviewItem {
 }
 
 /**
- * Fetch stock market overview data from Alpha Vantage
+ * Fetch stock market overview data from Finnhub (60 calls/min - much faster than Alpha Vantage!)
  */
 export async function fetchStocksOverview(category: string, logger?: any): Promise<MarketOverviewItem[]> {
   logger?.info('📊 [MarketOverview] Fetching stocks', { category });
@@ -56,60 +56,69 @@ export async function fetchStocksOverview(category: string, logger?: any): Promi
     return [];
   }
   
-  const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+  const apiKey = process.env.FINNHUB_API_KEY;
   
   if (!apiKey) {
-    logger?.error('❌ [MarketOverview] Alpha Vantage API key not found');
+    logger?.error('❌ [MarketOverview] Finnhub API key not found');
     return [];
   }
   
   try {
-    // Alpha Vantage GLOBAL_QUOTE for top stocks (more reliable than batch)
-    // Due to rate limits, fetch only top 10 stocks
     const normalized: MarketOverviewItem[] = [];
-    const topTickers = tickers.slice(0, 10);
+    const topTickers = tickers.slice(0, 20); // Can fetch 20 stocks quickly (60 calls/min limit)
     
-    logger?.info('🌐 [MarketOverview] Fetching from Alpha Vantage', { count: topTickers.length });
+    logger?.info('🌐 [MarketOverview] Fetching from Finnhub', { count: topTickers.length });
     
-    for (let i = 0; i < topTickers.length; i++) {
-      try {
-        const symbol = topTickers[i];
-        const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`;
-        
-        const response = await axios.get(url, { timeout: 10000 });
-        const quote = response.data?.['Global Quote'];
-        
-        if (quote && quote['05. price']) {
-          normalized.push({
-            rank: i + 1,
-            symbol: quote['01. symbol'] || symbol,
-            name: symbol, // Alpha Vantage doesn't return company name in GLOBAL_QUOTE
-            price: parseFloat(quote['05. price']) || 0,
-            change_1h: 0,
-            change_24h: parseFloat(quote['10. change percent']?.replace('%', '')) || 0,
-            change_7d: 0,
-            market_cap: 0, // Not available without OVERVIEW endpoint
-            volume_24h: parseInt(quote['06. volume']) || 0,
-            sparkline_7d: []
-          });
+    // Fetch all stocks in parallel batches to stay under rate limit
+    const batchSize = 5;
+    for (let i = 0; i < topTickers.length; i += batchSize) {
+      const batch = topTickers.slice(i, i + batchSize);
+      
+      await Promise.all(batch.map(async (symbol) => {
+        try {
+          // Get quote data
+          const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`;
+          const quoteResp = await axios.get(quoteUrl, { timeout: 10000 });
+          const quote = quoteResp.data;
           
-          logger?.info(`✅ [MarketOverview] Fetched ${symbol}`, { 
-            price: quote['05. price'],
-            change: quote['10. change percent']
+          // Get company profile for name and market cap
+          const profileUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${apiKey}`;
+          const profileResp = await axios.get(profileUrl, { timeout: 10000 });
+          const profile = profileResp.data;
+          
+          if (quote && quote.c) { // c = current price
+            const price = quote.c;
+            const changePercent = quote.dp || 0; // dp = percent change
+            
+            normalized.push({
+              rank: normalized.length + 1,
+              symbol: symbol,
+              name: profile?.name || symbol,
+              price: price,
+              change_1h: 0, // Finnhub doesn't provide 1h change for stocks
+              change_24h: changePercent,
+              change_7d: 0,
+              market_cap: profile?.marketCapitalization ? profile.marketCapitalization * 1000000 : 0,
+              volume_24h: quote.v || 0, // v = volume
+              sparkline_7d: []
+            });
+            
+            logger?.info(`✅ [MarketOverview] Fetched ${symbol}`, { 
+              price,
+              change: changePercent 
+            });
+          }
+        } catch (err: any) {
+          logger?.warn('⚠️ [MarketOverview] Failed to fetch stock', { 
+            symbol,
+            error: err.message 
           });
         }
-        
-        // Rate limiting: Alpha Vantage free tier = 5 calls/min, 500 calls/day
-        // Wait 13 seconds between calls to stay under limit
-        if (i < topTickers.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 13000));
-        }
-        
-      } catch (err: any) {
-        logger?.warn('⚠️ [MarketOverview] Failed to fetch stock', { 
-          symbol: topTickers[i],
-          error: err.message 
-        });
+      }));
+      
+      // Wait 1 second between batches to respect rate limit (60 calls/min = 1 call/second)
+      if (i + batchSize < topTickers.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
     
@@ -139,7 +148,7 @@ export async function fetchStocksOverview(category: string, logger?: any): Promi
     return normalized;
     
   } catch (error: any) {
-    logger?.error('❌ [MarketOverview] Alpha Vantage error', { 
+    logger?.error('❌ [MarketOverview] Finnhub error', { 
       error: error.message,
       category 
     });
