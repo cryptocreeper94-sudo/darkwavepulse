@@ -1650,37 +1650,43 @@ table {
   }
 
   .cmc-stat-item {
-    padding: 12px 8px;
-    min-width: 140px;
+    padding: 8px 6px;
+    min-width: 70px;
+    gap: 2px;
   }
 
   .stat-emoji {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
+    font-size: 1rem;
+    margin-bottom: 1px;
   }
 
   .cmc-stat-label {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
   }
 
   .cmc-stat-value {
-    font-size: 1rem;
-  }
-
-  .cmc-stat-change {
     font-size: 0.75rem;
   }
 
-  /* Stats Container - Stack on mobile */
+  .cmc-stat-change {
+    font-size: 0.6rem;
+  }
+
+  /* Stats Container - Keep horizontal, make compact */
   .cmc-stats-container {
-    flex-direction: column;
-    gap: var(--space-md);
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cmc-stats-bar {
+    grid-template-columns: repeat(4, minmax(70px, 1fr));
+    gap: 6px;
   }
 
   .darkwave-logo {
-    width: 70px;
-    height: 70px;
-    align-self: center;
+    width: 50px;
+    height: 50px;
   }
 
   /* Asset Class Toggle - Stack vertically on mobile */
@@ -1817,31 +1823,32 @@ table {
 
 /* Small mobile (480px and below) */
 @media (max-width: 480px) {
-  /* Even more compact on small phones */
+  /* Even more compact on small phones - tight side-by-side */
   .cmc-stats-bar {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(4, minmax(65px, 1fr));
+    gap: 4px;
   }
 
   .cmc-stat-item {
-    padding: 10px 6px;
-    min-width: 120px;
+    padding: 6px 4px;
+    min-width: 65px;
+    gap: 1px;
   }
 
   .stat-emoji {
-    font-size: 1.2rem;
-  }
-
-  .cmc-stat-label {
-    font-size: 0.6rem;
-  }
-
-  .cmc-stat-value {
     font-size: 0.9rem;
   }
 
-  .cmc-stat-change {
+  .cmc-stat-label {
+    font-size: 0.5rem;
+  }
+
+  .cmc-stat-value {
     font-size: 0.7rem;
+  }
+
+  .cmc-stat-change {
+    font-size: 0.55rem;
   }
 
   /* Very small buttons */
