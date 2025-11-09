@@ -6115,9 +6115,12 @@ function initializeThemeSwitcher() {
         jupiter: 'Electric Night',
         robinhood: 'Clean Green',
         coinbase: 'Pro Blue',
-        sakura: 'Sakura Pink',
-        sunset: 'Sunset Warmth',
-        ocean: 'Ocean Calm'
+        sakura: 'Cherry Blossom',
+        sunset: 'Pastel Dreams',
+        ocean: 'Ocean Waves',
+        cyberglitch: 'Cyber Glitch',
+        neongrid: 'Neon Grid',
+        galaxy: 'Galaxy'
       };
       
       showToast(`✨ ${themeNames[newTheme]} theme activated`);

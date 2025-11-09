@@ -318,6 +318,173 @@ body.theme-ocean::before {
 }
 
 /* ===========================================
+   THEME 7: CYBER GLITCH (Masculine - Digital Matrix)
+   Computer/Robot inside the machine feel
+   =========================================== */
+
+body.theme-cyberglitch {
+  /* Core Colors */
+  --primary: #00FF41;
+  --primary-hover: #00DD35;
+  --primary-light: #39FF70;
+  
+  /* Backgrounds */
+  --bg-primary: #0D0D0D;
+  --bg-secondary: #1A1A1A;
+  --bg-tertiary: #272727;
+  --bg-hover: #343434;
+  
+  /* Text */
+  --text-primary: #00FF41;
+  --text-secondary: #39FF70;
+  --text-tertiary: #70FF9A;
+  
+  /* Borders */
+  --border-primary: #00FF41;
+  --border-secondary: #39FF70;
+  
+  /* Status Colors */
+  --success: #00FF41;
+  --success-bg: rgba(0, 255, 65, 0.1);
+  --danger: #FF0040;
+  --danger-bg: rgba(255, 0, 64, 0.1);
+  --warning: #FFD700;
+  --warning-bg: rgba(255, 215, 0, 0.1);
+  --info: #00FFFF;
+  --info-bg: rgba(0, 255, 255, 0.1);
+}
+
+body.theme-cyberglitch::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px),
+    radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(255, 0, 64, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: glitchPulse 4s ease-in-out infinite;
+}
+
+@keyframes glitchPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.6; }
+}
+
+/* ===========================================
+   THEME 8: NEON GRID (Masculine - Electric Energy)
+   High-tech geometric patterns
+   =========================================== */
+
+body.theme-neongrid {
+  /* Core Colors */
+  --primary: #FF00FF;
+  --primary-hover: #DD00DD;
+  --primary-light: #FF39FF;
+  
+  /* Backgrounds */
+  --bg-primary: #0A0014;
+  --bg-secondary: #150028;
+  --bg-tertiary: #20003C;
+  --bg-hover: #2B0050;
+  
+  /* Text */
+  --text-primary: #F0E0FF;
+  --text-secondary: #D4B0FF;
+  --text-tertiary: #B880FF;
+  
+  /* Borders */
+  --border-primary: #20003C;
+  --border-secondary: #2B0050;
+  
+  /* Status Colors */
+  --success: #00FFFF;
+  --success-bg: rgba(0, 255, 255, 0.1);
+  --danger: #FF0080;
+  --danger-bg: rgba(255, 0, 128, 0.1);
+  --warning: #FFFF00;
+  --warning-bg: rgba(255, 255, 0, 0.1);
+  --info: #FF00FF;
+  --info-bg: rgba(255, 0, 255, 0.1);
+}
+
+body.theme-neongrid::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 0, 255, 0.02) 35px, rgba(255, 0, 255, 0.02) 70px),
+    repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(0, 255, 255, 0.02) 35px, rgba(0, 255, 255, 0.02) 70px),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===========================================
+   THEME 9: GALAXY (Neutral - Cosmic Purple)
+   Deep space gradients with stars
+   =========================================== */
+
+body.theme-galaxy {
+  /* Core Colors */
+  --primary: #9D7FEA;
+  --primary-hover: #7E5FD7;
+  --primary-light: #BC9FF5;
+  
+  /* Backgrounds */
+  --bg-primary: #0E0619;
+  --bg-secondary: #1A0F2E;
+  --bg-tertiary: #261843;
+  --bg-hover: #322158;
+  
+  /* Text */
+  --text-primary: #F0E5FF;
+  --text-secondary: #D4C0F0;
+  --text-tertiary: #B89BD8;
+  
+  /* Borders */
+  --border-primary: #261843;
+  --border-secondary: #322158;
+  
+  /* Status Colors */
+  --success: #9D7FEA;
+  --success-bg: rgba(157, 127, 234, 0.1);
+  --danger: #FF6B9D;
+  --danger-bg: rgba(255, 107, 157, 0.1);
+  --warning: #FFD95A;
+  --warning-bg: rgba(255, 217, 90, 0.1);
+  --info: #BC9FF5;
+  --info-bg: rgba(188, 159, 245, 0.1);
+}
+
+body.theme-galaxy::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 15% 25%, rgba(157, 127, 234, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(188, 159, 245, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
+    radial-gradient(1px 1px at 20% 30%, white, transparent),
+    radial-gradient(1px 1px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 80% 40%, white, transparent);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 250px 250px, 250px 250px, 250px 250px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===========================================
    BASE STYLES - CLEAN RESET
    =========================================== */
 
