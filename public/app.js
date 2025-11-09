@@ -2485,7 +2485,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (confirmed) {
         console.log('🗑️ Resetting wallet session...');
-        console.log('😿 Crypto Cat is sad: Wallet session being wiped. Starting fresh!');
+        console.log('😿 Resetting your wallet? Fine. Let\'s pretend that last portfolio never happened.');
         
         // Clear wallet-related data from localStorage
         const keysToRemove = [];
@@ -2771,7 +2771,7 @@ document.getElementById('connectWalletBtn')?.addEventListener('click', async () 
       body: JSON.stringify({ address: input, userId: state.userId })
     });
     showToast('Wallet connected! ✅');
-    console.log('😸 Crypto Cat is curious: Wallet connected! Let\'s see what you\'re holding...');
+    console.log('😸 Wallet connected? Let me see what garbage you\'re holding this time...');
     if (tg) tg.HapticFeedback?.notificationOccurred('success');
     document.getElementById('walletAddressInput').value = '';
     await loadWallet();
@@ -2788,7 +2788,7 @@ document.getElementById('disconnectWalletBtn')?.addEventListener('click', async 
       body: JSON.stringify({ userId: state.userId })
     });
     showToast('Wallet disconnected');
-    console.log('😿 Crypto Cat is bored: Wallet disconnected. No more peeking at your bags.');
+    console.log('😿 Disconnecting? Can\'t handle me judging your portfolio? Typical.');
     if (tg) tg.HapticFeedback?.notificationOccurred('warning');
     await loadWallet();
   } catch (error) {
@@ -3065,7 +3065,7 @@ async function initiateCheckout() {
       }
       
       showToast('Opening checkout... Complete payment to activate Premium!');
-      console.log('💃 Crypto Cat is dancing: Premium checkout initiated! Show me the money!');
+      console.log('💃 Finally! A premium payment. About time you invested in something that matters.');
       document.querySelector('.modal-backdrop')?.remove();
     } else {
       showToast('Error creating checkout session. Please try again.');
@@ -3102,7 +3102,7 @@ async function initiateCryptoPayment() {
       }
       
       showToast('Opening crypto payment... Complete payment to activate Premium!', 5000);
-      console.log('💃 Crypto Cat is dancing: Crypto payment started! This is what I live for!');
+      console.log('💃 Crypto payment? Now we\'re talking my language. Don\'t mess this up.');
       
       // Show waiting modal
       showCryptoWaitingModal();
@@ -5690,7 +5690,7 @@ async function submitFeedback(event, type) {
         const successMsg = document.getElementById('tokenSuccessMessage');
         if (successMsg) {
           successMsg.style.display = 'block';
-          console.log('😸 Crypto Cat is purring: Token accepted and under review!');
+          console.log('😸 *purr* Your token looks interesting. I\'ll review it when I feel like it, human.');
           // Auto-hide after 8 seconds
           setTimeout(() => {
             successMsg.style.display = 'none';
