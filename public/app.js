@@ -6226,6 +6226,104 @@ No BS. No fluff. Just straight talk from a cat who's seen it all. Fire away! �
   };
 }
 
+// ===== FLOATING CHAT WIDGET =====
+const chatToggleBtn = document.getElementById('chatToggleBtn');
+const chatDialogue = document.getElementById('chatDialogue');
+const closeChatBtn = document.getElementById('closeChatBtn');
+const floatingChatInput = document.getElementById('floatingChatInput');
+const floatingChatSendBtn = document.getElementById('floatingChatSendBtn');
+const floatingChatMessages = document.getElementById('floatingChatMessages');
+
+// Toggle chat dialogue
+if (chatToggleBtn) {
+  chatToggleBtn.addEventListener('click', () => {
+    const isHidden = chatDialogue.style.display === 'none';
+    chatDialogue.style.display = isHidden ? 'flex' : 'none';
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+}
+
+// Close chat dialogue
+if (closeChatBtn) {
+  closeChatBtn.addEventListener('click', () => {
+    chatDialogue.style.display = 'none';
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+}
+
+// Send floating chat message
+if (floatingChatSendBtn) {
+  floatingChatSendBtn.addEventListener('click', () => sendFloatingChatMessage());
+}
+
+if (floatingChatInput) {
+  floatingChatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendFloatingChatMessage();
+    }
+  });
+}
+
+async function sendFloatingChatMessage() {
+  const message = floatingChatInput.value.trim();
+  
+  if (!message) return;
+  
+  // Add user message to floating chat
+  addFloatingChatMessage('user', message);
+  floatingChatInput.value = '';
+  
+  // Show typing indicator
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'typing-indicator';
+  typingDiv.innerHTML = '<span></span><span></span><span></span>';
+  floatingChatMessages.appendChild(typingDiv);
+  floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+  
+  try {
+    // Call the Mastra API for chat
+    const response = await fetch('/api/agents/darkwave-v2/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: message }],
+        userId: getUserId()
+      })
+    });
+    
+    if (!response.ok) throw new Error('Chat API error');
+    
+    const data = await response.json();
+    const botReply = data.text || 'Sorry, I encountered an error. Please try again.';
+    
+    // Remove typing indicator
+    typingDiv.remove();
+    
+    // Add bot response
+    addFloatingChatMessage('bot', botReply);
+  } catch (error) {
+    console.error('Floating chat error:', error);
+    typingDiv.remove();
+    addFloatingChatMessage('bot', '⚠️ Connection error. Please try again.');
+  }
+}
+
+function addFloatingChatMessage(role, content) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${role}-message`;
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'message-content';
+  contentDiv.textContent = content;
+  
+  messageDiv.appendChild(contentDiv);
+  floatingChatMessages.appendChild(messageDiv);
+  floatingChatMessages.scrollTop = floatingChatMessages.scrollHeight;
+}
+
 async function sendChatMessage() {
   const chatInput = document.getElementById('chatInput');
   const message = chatInput.value.trim();
