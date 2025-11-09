@@ -5469,12 +5469,6 @@ function initializeCryptoCat() {
     cryptoCatToggle.setAttribute('data-active', state.cryptoCatEnabled.toString());
     cryptoCatToggle.title = state.cryptoCatEnabled ? 'Crypto Cat ON 😼' : 'Crypto Cat OFF 😿';
     
-    // Update label text
-    const label = cryptoCatToggle.querySelector('.crypto-cat-label');
-    if (label) {
-      label.textContent = state.cryptoCatEnabled ? 'ON' : 'OFF';
-    }
-    
     // Sync settings toggle if it exists
     if (settingsToggle) {
       settingsToggle.checked = state.cryptoCatEnabled;
