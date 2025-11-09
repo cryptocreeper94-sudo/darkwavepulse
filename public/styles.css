@@ -896,6 +896,54 @@ a:hover {
   transform: translateX(24px);
 }
 
+/* Asset Class Navigation (Stocks vs Crypto) */
+.asset-class-nav {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin: var(--space-lg) auto;
+  padding: var(--space-sm);
+  max-width: 600px;
+}
+
+.asset-class-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.asset-class-btn:hover {
+  border-color: var(--primary);
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+}
+
+.asset-class-btn.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.asset-icon {
+  font-size: 1.5rem;
+}
+
+.asset-label {
+  font-size: var(--font-size-base);
+}
+
 /* CMC Stats Bar */
 .cmc-stats-bar {
   display: grid;
@@ -1588,6 +1636,26 @@ table {
 
   .cmc-stat-change {
     font-size: 0.75rem;
+  }
+
+  /* Asset Class Toggle - Stack vertically on mobile */
+  .asset-class-nav {
+    flex-direction: column;
+    gap: 8px;
+    max-width: 100%;
+    padding: 8px;
+  }
+
+  .asset-class-btn {
+    padding: 12px 16px;
+  }
+
+  .asset-icon {
+    font-size: 1.2rem;
+  }
+
+  .asset-label {
+    font-size: 0.9rem;
   }
 
   /* Buttons - Make them smaller */
