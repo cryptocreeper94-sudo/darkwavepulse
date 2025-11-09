@@ -162,114 +162,159 @@ body.theme-coinbase {
 }
 
 /* ===========================================
-   THEME 4: SAKURA PINK (Soft Mood)
-   Elegant pink aesthetic
+   THEME 4: CHERRY BLOSSOM (Feminine - Soft Pink Flow)
+   Organic pink gradients with white depth
    =========================================== */
 
 body.theme-sakura {
   /* Core Colors */
-  --primary: #FF69B4;
-  --primary-hover: #FF1493;
-  --primary-light: #FFB6C1;
+  --primary: #FFB7D5;
+  --primary-hover: #FF69B4;
+  --primary-light: #FFD6E8;
   
   /* Backgrounds */
-  --bg-primary: #1A0A14;
-  --bg-secondary: #2D1B2E;
-  --bg-tertiary: #3D2B3E;
-  --bg-hover: #4D3B4E;
+  --bg-primary: #1A0D15;
+  --bg-secondary: #2A1D25;
+  --bg-tertiary: #3A2D35;
+  --bg-hover: #4A3D45;
   
   /* Text */
-  --text-primary: #FFE4E1;
-  --text-secondary: #D8A7B1;
-  --text-tertiary: #B88A94;
+  --text-primary: #FFF5F8;
+  --text-secondary: #E8C5D6;
+  --text-tertiary: #C89BB0;
   
   /* Borders */
-  --border-primary: #3D2B3E;
-  --border-secondary: #4D3B4E;
+  --border-primary: #3A2D35;
+  --border-secondary: #4A3D45;
   
   /* Status Colors */
-  --success: #FF69B4;
-  --success-bg: rgba(255, 105, 180, 0.1);
-  --danger: #FF1493;
-  --danger-bg: rgba(255, 20, 147, 0.1);
-  --warning: #FFB6C1;
-  --warning-bg: rgba(255, 182, 193, 0.1);
-  --info: #FF69B4;
-  --info-bg: rgba(255, 105, 180, 0.1);
+  --success: #FFB7D5;
+  --success-bg: rgba(255, 183, 213, 0.1);
+  --danger: #FF6B9D;
+  --danger-bg: rgba(255, 107, 157, 0.1);
+  --warning: #FFD6E8;
+  --warning-bg: rgba(255, 214, 232, 0.1);
+  --info: #FFB7D5;
+  --info-bg: rgba(255, 183, 213, 0.1);
+}
+
+body.theme-sakura::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 240, 245, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ===========================================
-   THEME 5: SUNSET WARMTH (Orange Vibe)
-   Warm energetic aesthetic
+   THEME 5: PASTEL DREAMS (Feminine - Lavender/Mint)
+   Soft watercolor blend effect
    =========================================== */
 
 body.theme-sunset {
   /* Core Colors */
-  --primary: #FF6B35;
-  --primary-hover: #FF4500;
-  --primary-light: #FF8C42;
+  --primary: #D4A5D8;
+  --primary-hover: #B388B5;
+  --primary-light: #E8D5EA;
   
   /* Backgrounds */
-  --bg-primary: #1A0F0A;
-  --bg-secondary: #2D1F1A;
-  --bg-tertiary: #3D2F2A;
-  --bg-hover: #4D3F3A;
+  --bg-primary: #12101A;
+  --bg-secondary: #1E1C2A;
+  --bg-tertiary: #2A283A;
+  --bg-hover: #36344A;
   
   /* Text */
-  --text-primary: #FFE6D5;
-  --text-secondary: #D4A574;
-  --text-tertiary: #B48A5A;
+  --text-primary: #F5F0FF;
+  --text-secondary: #D4BFDF;
+  --text-tertiary: #B39EBF;
   
   /* Borders */
-  --border-primary: #3D2F2A;
-  --border-secondary: #4D3F3A;
+  --border-primary: #2A283A;
+  --border-secondary: #36344A;
   
   /* Status Colors */
-  --success: #FF8C42;
-  --success-bg: rgba(255, 140, 66, 0.1);
-  --danger: #FF4500;
-  --danger-bg: rgba(255, 69, 0, 0.1);
-  --warning: #FFD700;
-  --warning-bg: rgba(255, 215, 0, 0.1);
-  --info: #FF6B35;
-  --info-bg: rgba(255, 107, 53, 0.1);
+  --success: #A8E6CF;
+  --success-bg: rgba(168, 230, 207, 0.1);
+  --danger: #FFB6C1;
+  --danger-bg: rgba(255, 182, 193, 0.1);
+  --warning: #FFE4B5;
+  --warning-bg: rgba(255, 228, 181, 0.1);
+  --info: #D4A5D8;
+  --info-bg: rgba(212, 165, 216, 0.1);
+}
+
+body.theme-sunset::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(135deg, rgba(212, 165, 216, 0.06) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(168, 230, 207, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ===========================================
-   THEME 6: OCEAN CALM (Teal Zen)
-   Cool refreshing aesthetic
+   THEME 6: OCEAN WAVES (Neutral - Teal Flow)
+   Natural flowing wave gradients
    =========================================== */
 
 body.theme-ocean {
   /* Core Colors */
-  --primary: #00CED1;
-  --primary-hover: #20B2AA;
-  --primary-light: #48D1CC;
+  --primary: #4DD0E1;
+  --primary-hover: #26C6DA;
+  --primary-light: #80DEEA;
   
   /* Backgrounds */
   --bg-primary: #0A1419;
-  --bg-secondary: #1A2832;
-  --bg-tertiary: #2A3842;
-  --bg-hover: #3A4852;
+  --bg-secondary: #152229;
+  --bg-tertiary: #203039;
+  --bg-hover: #2B3E49;
   
   /* Text */
   --text-primary: #E0F7FA;
-  --text-secondary: #80DEEA;
-  --text-tertiary: #4DD0E1;
+  --text-secondary: #B2EBF2;
+  --text-tertiary: #80DEEA;
   
   /* Borders */
-  --border-primary: #2A3842;
-  --border-secondary: #3A4852;
+  --border-primary: #203039;
+  --border-secondary: #2B3E49;
   
   /* Status Colors */
-  --success: #00CED1;
-  --success-bg: rgba(0, 206, 209, 0.1);
-  --danger: #FF6B6B;
-  --danger-bg: rgba(255, 107, 107, 0.1);
-  --warning: #FFD700;
-  --warning-bg: rgba(255, 215, 0, 0.1);
-  --info: #48D1CC;
-  --info-bg: rgba(72, 209, 204, 0.1);
+  --success: #4DD0E1;
+  --success-bg: rgba(77, 208, 225, 0.1);
+  --danger: #FF8A80;
+  --danger-bg: rgba(255, 138, 128, 0.1);
+  --warning: #FFD54F;
+  --warning-bg: rgba(255, 213, 79, 0.1);
+  --info: #80DEEA;
+  --info-bg: rgba(128, 222, 234, 0.1);
+}
+
+body.theme-ocean::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(180deg, rgba(77, 208, 225, 0.05) 0%, transparent 30%),
+    linear-gradient(0deg, rgba(38, 198, 218, 0.03) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 60%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ===========================================
