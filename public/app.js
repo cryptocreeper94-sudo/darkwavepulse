@@ -2471,6 +2471,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
   
+  // Wallet Session Reset Button Handler
+  const resetSessionBtn = document.getElementById('resetSessionBtn');
+  if (resetSessionBtn) {
+    resetSessionBtn.addEventListener('click', () => {
+      // Confirmation dialog to prevent accidental data loss
+      const confirmed = confirm(
+        '⚠️ Reset Wallet Session?\n\n' +
+        'This will clear all wallet data and reload the app.\n' +
+        'You will need to reconnect your wallet.\n\n' +
+        'Are you sure you want to continue?'
+      );
+      
+      if (confirmed) {
+        console.log('🗑️ Resetting wallet session...');
+        
+        // Clear wallet-related data from localStorage
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('wallet') || key.includes('address'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // Show toast and reload
+        showToast('🗑️ Wallet session cleared. Reloading...');
+        if (tg) tg.HapticFeedback?.notificationOccurred('success');
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        console.log('❌ Wallet session reset cancelled');
+      }
+    });
+    console.log('✅ Wallet session reset button initialized');
+  }
+  
   // Update CMC stats every 5 minutes
   setInterval(() => {
     updateCMCStatsBar();
@@ -5641,6 +5680,16 @@ async function submitFeedback(event, type) {
         document.getElementById('whitepaperPreview').style.display = 'none';
         document.getElementById('tokenomicsPreview').style.display = 'none';
         document.getElementById('auditPreview').style.display = 'none';
+        
+        // Show success feedback message (Crypto Cat purring!)
+        const successMsg = document.getElementById('tokenSuccessMessage');
+        if (successMsg) {
+          successMsg.style.display = 'block';
+          // Auto-hide after 8 seconds
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 8000);
+        }
       }
     } else {
       const error = await response.json();

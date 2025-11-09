@@ -45,6 +45,7 @@
         <button class="icon-btn premium-btn" id="subscribeBtn" title="Subscribe" onclick="openSubscriptionPage()" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; border: 2px solid #FFF; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑</button>
         <button class="icon-btn" id="adminBtn" title="Admin" onclick="openAdminLogin()" style="background: linear-gradient(135deg, #FF006E, #8B5CF6); font-weight: bold;">🔐</button>
         <button class="icon-btn" id="walletBtn" title="Wallet">💰</button>
+        <button class="icon-btn" id="resetSessionBtn" title="Reset Wallet Session" style="background: linear-gradient(135deg, #EF4444, #DC2626); font-weight: bold;">🗑️</button>
         <button class="icon-btn" id="refreshBtn" title="Refresh">🔄</button>
         <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
       </div>
@@ -1416,6 +1417,13 @@
             >
               Submit Token for Review
             </button>
+            
+            <!-- Success Feedback Message -->
+            <div id="tokenSuccessMessage" style="display: none; margin-top: 16px; padding: 14px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1)); border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 8px; text-align: center;">
+              <span style="font-size: 1.5rem;">✅</span>
+              <p style="color: #10B981; font-weight: bold; margin: 8px 0 4px 0; font-size: 1rem;">Crypto Cat is purring: Token accepted!</p>
+              <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; margin: 0;">Your submission is being reviewed by the admin team.</p>
+            </div>
           </form>
         </div>
 
