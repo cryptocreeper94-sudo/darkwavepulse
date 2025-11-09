@@ -292,6 +292,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  /* Soundwave background for depth */
+  background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)), url('/darkwave-wave-banner.png');
+  background-attachment: fixed;
+  background-size: 100% auto;
+  background-position: center top;
+  background-repeat: repeat-y;
 }
 
 /* ===========================================
@@ -557,7 +563,8 @@ a:hover {
   padding: var(--space-md);
   background: var(--bg-secondary);
   overflow-x: auto;
-  border-bottom: 1px solid var(--border-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .category-btn {
@@ -900,7 +907,11 @@ a:hover {
   gap: var(--space-lg);
   padding: var(--space-md);
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  width: calc(100% - 32px);
+  margin: var(--space-md) auto;
+  box-shadow: var(--shadow-md);
   overflow-x: auto;
 }
 
@@ -933,23 +944,47 @@ a:hover {
 }
 
 .crypto-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: linear-gradient(135deg, #FF006E, #8B5CF6);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-full);
-  padding: 8px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
   animation: pulse 2s ease-in-out infinite;
 }
 
+/* OFF state */
+.crypto-cat-btn[data-active="false"] {
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+  box-shadow: none;
+  opacity: 0.6;
+  animation: none;
+}
+
 .crypto-cat-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(255, 0, 110, 0.5);
+}
+
+.crypto-cat-btn[data-active="false"]:hover {
+  opacity: 0.8;
+  box-shadow: var(--shadow-sm);
 }
 
 .crypto-cat-btn img {
   display: block;
+}
+
+.crypto-cat-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
 }
 
 /* Toast Notifications */
@@ -1246,30 +1281,28 @@ option {
 /* Ensure all containers have rounded edges */
 .market-overview-container,
 .trending-carousel,
-.featured-banner {
+.featured-banner,
+.pirate-flag-banner {
   border-radius: var(--radius-lg);
   overflow: hidden;
+  width: calc(100% - 32px);
+  margin: var(--space-md) auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
 }
 
 /* Stats and category bars need horizontal scroll, not hidden */
-.cmc-stats-bar,
 .category-nav,
 .stats-bar {
   border-radius: var(--radius-lg);
   overflow-x: auto;
   overflow-y: hidden;
+  width: calc(100% - 32px);
+  margin: var(--space-md) auto;
 }
 
-/* Full-width sections should be consistent */
-.market-overview-container,
-.trending-carousel,
-.pirate-flag-banner,
-.featured-banner {
-  width: calc(100% - 32px);
-  margin-left: var(--space-md);
-  margin-right: var(--space-md);
-  margin-bottom: var(--space-md);
-}
+/* Full-width sections should be consistent - widths consolidated above */
 
 /* Ensure all tables have rounded corners */
 table {
