@@ -1109,6 +1109,24 @@ export const mastra = new Mastra({
             const high24h = Math.max(...recentPrices.map((p: any) => p.high));
             const low24h = Math.min(...recentPrices.map((p: any) => p.low));
             
+            // Step 3: Get social sentiment (crypto only, graceful fallback)
+            let sentimentData = null;
+            if (marketData.type === 'crypto') {
+              try {
+                logger?.info('📱 [Mini App] Fetching social sentiment', { ticker });
+                const sentiment = await sentimentTool.execute({
+                  context: { ticker },
+                  mastra,
+                  runtimeContext: { resourceId: userId || 'demo-user' } as any
+                });
+                sentimentData = sentiment;
+                logger?.info('✅ [Mini App] Social sentiment retrieved', { ticker, score: sentiment.sentimentScore });
+              } catch (error: any) {
+                logger?.warn('⚠️ [Mini App] Sentiment fetch failed (non-critical)', { ticker, error: error.message });
+                // Graceful fallback - continue without sentiment
+              }
+            }
+            
             // Return ALL structured data for Mini App including advanced predictive metrics
             return c.json({
               ticker: ticker.toUpperCase(),
@@ -1116,6 +1134,9 @@ export const mastra = new Mastra({
               priceChange: analysis.priceChangePercent24h || marketData.priceChangePercent24h || 0, // PERCENTAGE
               priceChangeDollar: analysis.priceChange24h || marketData.priceChange24h || 0, // DOLLAR AMOUNT
               recommendation: analysis.recommendation || 'HOLD',
+              
+              // Social sentiment (optional, crypto only)
+              sentiment: sentimentData,
               
               // Core indicators
               rsi: analysis.rsi || 50,
