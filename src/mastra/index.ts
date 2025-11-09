@@ -323,6 +323,34 @@ export const mastra = new Mastra({
           return c.text('styles.css not found', 404);
         }
       },
+      {
+        path: "/darkwave-logo.jpg",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const url = await import('url');
+          
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possiblePaths = [
+            path.join(process.cwd(), 'public', 'darkwave-logo.jpg'),
+            path.join(__dirname, '..', '..', 'public', 'darkwave-logo.jpg'),
+            path.join(__dirname, '..', '..', '..', 'public', 'darkwave-logo.jpg'),
+          ];
+          
+          for (const filePath of possiblePaths) {
+            try {
+              const image = await fs.readFile(filePath);
+              c.header('Content-Type', 'image/jpeg');
+              return c.body(image);
+            } catch (err) {
+              continue;
+            }
+          }
+          
+          return c.text('Logo not found', 404);
+        }
+      },
       // Admin Dashboard - View subscribers and manage whitelist
       {
         path: "/admin",
