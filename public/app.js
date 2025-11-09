@@ -72,6 +72,7 @@ const state = {
   currentTab: 'analysis',
   currentCategory: 'top', // CMC-style default to "top"
   currentBlockchain: 'all',
+  assetClass: 'crypto', // 'crypto' or 'stocks'
   userId: tg?.initDataUnsafe?.user?.id || 'demo-user',
   currentAnalysis: null,
   trendingCache: {}, // Cache for trending data
@@ -2494,6 +2495,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeChartModal();
     }
+  });
+  
+  // Asset Class Toggle (Stocks vs Crypto)
+  document.querySelectorAll('.asset-class-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const assetClass = btn.dataset.asset;
+      
+      // Update active state
+      document.querySelectorAll('.asset-class-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update state
+      state.assetClass = assetClass;
+      
+      // Reload market data with new filter
+      loadMarketOverview(state.currentCategory);
+      
+      // Update stats bar labels
+      if (assetClass === 'stocks') {
+        document.querySelector('[data-asset="stocks"] .asset-label').textContent = 'Stocks';
+        showToast('📊 Switched to Stocks mode');
+      } else {
+        document.querySelector('[data-asset="crypto"] .asset-label').textContent = 'Cryptocurrency';
+        showToast('🪙 Switched to Crypto mode');
+      }
+      
+      if (tg) tg.HapticFeedback?.impactOccurred('light');
+    });
   });
 });
 
