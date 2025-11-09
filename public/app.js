@@ -1321,9 +1321,79 @@ function displayAnalysis(data) {
       </div>
     </div>
     
-    <div class="chart-container" id="chartContainer" style="margin: 15px 0; min-height: 200px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
-      <div>📈 Loading chart...</div>
+    <div class="chart-container" id="chartContainer-${data.ticker}" style="margin: 15px 0; min-height: 300px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative;">
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);">📈 Loading chart...</div>
     </div>
+    
+    <!-- Drawing Tools -->
+    <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 8px;">Drawing Tools:</span>
+      <button class="tool-btn" onclick="enableTrendline('${data.ticker}')" title="Draw Trendline">
+        📐 Trendline
+      </button>
+      <button class="tool-btn" onclick="enableHorizontalLine('${data.ticker}')" title="Draw Horizontal Line">
+        ➖ H-Line
+      </button>
+      <button class="tool-btn" onclick="clearDrawings('${data.ticker}')" title="Clear All Drawings">
+        🗑️ Clear
+      </button>
+    </div>
+    
+    ${data.sentiment ? `
+    <!-- Social Sentiment Section -->
+    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+      <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span>📱 SOCIAL SENTIMENT</span>
+        <span style="font-size: 1.2rem; margin-left: auto;">${data.sentiment.sentimentLevel}</span>
+      </h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;">
+        ${data.sentiment.socialMetrics.twitterFollowers ? `
+        <div style="background: rgba(29, 155, 240, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(29, 155, 240, 0.3);">
+          <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 4px;">🐦 Twitter</div>
+          <div style="font-weight: 600; color: #1DA1F2;">${formatVolume(data.sentiment.socialMetrics.twitterFollowers)}</div>
+        </div>
+        ` : ''}
+        
+        ${data.sentiment.socialMetrics.redditSubscribers ? `
+        <div style="background: rgba(255, 69, 0, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 69, 0, 0.3);">
+          <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 4px;">🔶 Reddit</div>
+          <div style="font-weight: 600; color: #FF4500;">${formatVolume(data.sentiment.socialMetrics.redditSubscribers)}</div>
+        </div>
+        ` : ''}
+        
+        ${data.sentiment.socialMetrics.telegramUsers ? `
+        <div style="background: rgba(36, 161, 222, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(36, 161, 222, 0.3);">
+          <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 4px;">✈️ Telegram</div>
+          <div style="font-weight: 600; color: #24A1DE;">${formatVolume(data.sentiment.socialMetrics.telegramUsers)}</div>
+        </div>
+        ` : ''}
+        
+        ${data.sentiment.socialMetrics.githubStars ? `
+        <div style="background: rgba(138, 85, 255, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(138, 85, 255, 0.3);">
+          <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 4px;">⭐ GitHub</div>
+          <div style="font-weight: 600; color: #8A55FF;">${formatVolume(data.sentiment.socialMetrics.githubStars)}</div>
+        </div>
+        ` : ''}
+      </div>
+      
+      <div style="padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 0.85rem; color: var(--text-secondary);">Sentiment Score</span>
+          <span style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">${data.sentiment.sentimentScore}/100</span>
+        </div>
+        <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+          <div style="height: 100%; width: ${data.sentiment.sentimentScore}%; background: linear-gradient(90deg, #3B82F6, #10B981); transition: width 0.5s;"></div>
+        </div>
+      </div>
+      
+      ${data.sentiment.analysis ? `
+      <div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+        ${data.sentiment.analysis}
+      </div>
+      ` : ''}
+    </div>
+    ` : ''}
     
     <div style="margin-top: 20px;">
       <h3 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">📊 CORE INDICATORS</h3>
