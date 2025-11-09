@@ -2462,8 +2462,23 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCMCStatsBar();
   updateAvgRSI();
   
+  // Initialize Dashboard Widgets after CMC stats are loaded
+  setTimeout(() => {
+    if (window.DashboardWidgets) {
+      window.DashboardWidgets.init();
+      window.DashboardWidgets.syncWithCMC();
+      console.log('✅ Dashboard Widgets initialized and synced');
+    }
+  }, 1000);
+  
   // Update CMC stats every 5 minutes
-  setInterval(updateCMCStatsBar, 5 * 60 * 1000);
+  setInterval(() => {
+    updateCMCStatsBar();
+    // Sync dashboard widgets with updated CMC stats
+    if (window.DashboardWidgets) {
+      window.DashboardWidgets.syncWithCMC();
+    }
+  }, 5 * 60 * 1000);
   setInterval(updateAvgRSI, 10 * 60 * 1000);
   
   // Check access code after data starts loading

@@ -191,46 +191,139 @@
           </div>
         </div>
 
-        <!-- Newspaper-Style Info Boxes Grid -->
-        <div class="newspaper-grid">
-          <div class="newspaper-box">
-            <div class="newspaper-header">💰 WHALE ALERT</div>
-            <div class="newspaper-content" id="whaleAlert">Tracking large transactions...</div>
-          </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">🔥 HOT RIGHT NOW</div>
-            <div class="newspaper-content" id="hotNow">Loading trending assets...</div>
-          </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">📊 MARKET PULSE</div>
-            <div class="newspaper-content" id="marketPulse">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <div style="width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
-                  <div id="marketStrength" style="width: 65%; height: 100%; background: linear-gradient(90deg, #00ff88, #60A5FA); transition: width 0.5s ease;"></div>
-                </div>
-                <span id="marketStrengthText" style="font-size: 0.75rem; color: #00ff88; font-weight: bold;">65%</span>
-              </div>
-              <div id="marketPulseText">Analyzing market conditions...</div>
+        <!-- Professional Stats Dashboard -->
+        <div class="stats-dashboard-grid">
+          <!-- Fear & Greed Circular Gauge -->
+          <div class="stats-widget fear-greed-widget">
+            <div class="widget-header">
+              <h3>Fear & Greed Index</h3>
+              <span class="widget-update-time" id="fearGreedUpdate">Live</span>
+            </div>
+            <div class="fear-greed-gauge">
+              <svg viewBox="0 0 200 120" class="gauge-svg">
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#EF4444" />
+                    <stop offset="50%" style="stop-color:#FFD700" />
+                    <stop offset="100%" style="stop-color:#10B981" />
+                  </linearGradient>
+                </defs>
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round"/>
+                <circle cx="100" cy="100" r="60" fill="rgba(37, 99, 235, 0.1)" stroke="#2563EB" stroke-width="2"/>
+                <text x="100" y="90" text-anchor="middle" font-size="36" font-weight="bold" fill="#FFF" id="fearGreedValue">24</text>
+                <text x="100" y="110" text-anchor="middle" font-size="14" id="fearGreedLabel">Fear</text>
+              </svg>
+            </div>
+            <div class="gauge-scale">
+              <span class="gauge-tick fear">0</span>
+              <span class="gauge-tick warning">25</span>
+              <span class="gauge-tick neutral">50</span>
+              <span class="gauge-tick greed">75</span>
+              <span class="gauge-tick extreme-greed">100</span>
             </div>
           </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">😼 CAT'S TAKE</div>
-            <div class="newspaper-content" id="catTake">Crypto Cat says: "Stop chasing pumps, human!"</div>
+
+          <!-- Market Cycle Indicators -->
+          <div class="stats-widget cycle-widget">
+            <div class="widget-header">
+              <h3>Market Cycle Indicators</h3>
+            </div>
+            <div class="cycle-indicators">
+              <div class="cycle-bar">
+                <div class="cycle-label">
+                  <span>Accumulation</span>
+                  <span class="cycle-percent" id="accumPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="accumBar" style="width: 0%; background: linear-gradient(90deg, #2563EB, #60A5FA);"></div>
+                </div>
+              </div>
+              <div class="cycle-bar">
+                <div class="cycle-label">
+                  <span>Distribution</span>
+                  <span class="cycle-percent" id="distPercent">100%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="distBar" style="width: 100%; background: linear-gradient(90deg, #EF4444, #F59E0B);"></div>
+                </div>
+              </div>
+              <div class="cycle-bar">
+                <div class="cycle-label">
+                  <span>Altcoin Season</span>
+                  <span class="cycle-percent" id="altseasonPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="altseasonBar" style="width: 0%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">⚡ FLASH UPDATES</div>
-            <div class="newspaper-content" id="flashUpdates"><strong>BTC Dominance:</strong> 56.2%<br><strong>24h Liquidations:</strong> $89M<br><strong>Gas (ETH):</strong> 12 gwei</div>
+
+          <!-- ETF Trackers -->
+          <div class="stats-widget etf-widget">
+            <div class="widget-header">
+              <h3>ETF Trackers</h3>
+              <span class="widget-update-time">Nov 6, 2025</span>
+            </div>
+            <div class="etf-list">
+              <div class="etf-item">
+                <span class="etf-name">All ETFs</span>
+                <div class="etf-data">
+                  <span class="etf-amount" id="allEtf">$605.00M</span>
+                  <span class="etf-trend positive">↗</span>
+                </div>
+              </div>
+              <div class="etf-item">
+                <span class="etf-name">Bitcoin ETF</span>
+                <div class="etf-data">
+                  <span class="etf-amount" id="btcEtf">$558.40M</span>
+                  <span class="etf-trend positive">↗</span>
+                </div>
+              </div>
+              <div class="etf-item">
+                <span class="etf-name">Ethereum ETF</span>
+                <div class="etf-data">
+                  <span class="etf-amount negative" id="ethEtf">-$46.60M</span>
+                  <span class="etf-trend negative">↘</span>
+                </div>
+              </div>
+            </div>
+            <div class="etf-chart">
+              <canvas id="etfSparkline" width="300" height="60"></canvas>
+            </div>
           </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">🎯 SUPPORT/RESISTANCE</div>
-            <div class="newspaper-content" id="srLevels"><strong>BTC:</strong> Support $95k | Resistance $102k<br><strong>ETH:</strong> Support $3.4k | Resistance $3.7k</div>
-          </div>
-          <div class="newspaper-box">
-            <div class="newspaper-header">📊 SENTIMENT TRACKER</div>
-            <div class="newspaper-content" id="sentimentTracker">
-              <div style="margin-bottom: 4px;"><strong style="color: #00ff88;">Social:</strong> <span id="socialSentiment">Bullish 68%</span></div>
-              <div style="margin-bottom: 4px;"><strong style="color: #60A5FA;">News:</strong> <span id="newsSentiment">Neutral 52%</span></div>
-              <div><strong style="color: #FFD700;">Trend:</strong> <span id="trendSentiment">↗️ Improving</span></div>
+
+          <!-- AI Buy/Sell Signals with Crypto Cat -->
+          <div class="stats-widget signals-widget">
+            <div class="widget-header">
+              <h3>AI Buy/Sell Signals</h3>
+              <button class="widget-refresh" id="refreshSignals" title="Refresh signals">🔄</button>
+            </div>
+            <div class="signals-content">
+              <div class="signal-item buy-signal">
+                <div class="signal-icon">📈</div>
+                <div class="signal-text">
+                  <strong>BUY</strong>
+                  <span id="buySignalAsset">BTC @ $98,500</span>
+                </div>
+                <div class="signal-confidence">
+                  <span id="buyConfidence">78%</span>
+                </div>
+              </div>
+              <div class="signal-item sell-signal">
+                <div class="signal-icon">📉</div>
+                <div class="signal-text">
+                  <strong>SELL</strong>
+                  <span id="sellSignalAsset">ETH @ $3,620</span>
+                </div>
+                <div class="signal-confidence">
+                  <span id="sellConfidence">65%</span>
+                </div>
+              </div>
+              <div class="cat-commentary">
+                <img src="/crypto-cat-poses/smirk.png" alt="Cat" class="cat-mini-icon">
+                <span id="catSignalTake">"These humans never learn. Buy high, sell low, repeat." - Crypto Cat</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1613,4 +1706,19 @@
   </div>
 
   <script src="/app.js?v=2024110719"></script>
+  <script type="module">
+    // Load Dashboard Widgets module
+    import { DashboardWidgets } from './dashboardWidgets.js';
+    window.DashboardWidgets = DashboardWidgets;
+    
+    // Initialize widgets when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => DashboardWidgets.init());
+    } else {
+      DashboardWidgets.init();
+    }
+    
+    // Sync with CMC stats every 2 minutes
+    setInterval(() => DashboardWidgets.syncWithCMC(), 120000);
+  </script>
 </body>

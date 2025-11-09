@@ -3340,7 +3340,317 @@ table {
   opacity: 0.9;
 }
 
+/* ============================================
+   PROFESSIONAL STATS DASHBOARD
+   Clean, easy-to-read trading interface
+   ============================================ */
+
+.stats-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stats-widget {
+  background: linear-gradient(135deg, var(--info-bg), rgba(29, 78, 216, 0.05));
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all var(--transition-base);
+}
+
+.stats-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px var(--info-bg),
+    0 0 0 2px var(--primary-hover);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.widget-update-time {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-normal);
+}
+
+.widget-refresh {
+  background: transparent;
+  border: none;
+  color: #60A5FA;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.widget-refresh:hover {
+  transform: scale(1.2);
+  color: #2563EB;
+}
+
+/* Fear & Greed Gauge */
+.fear-greed-gauge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.gauge-svg {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgba(37, 99, 235, 0.3));
+}
+
+.gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-semibold);
+  margin-top: var(--space-sm);
+  padding: 0 var(--space-sm);
+}
+
+.gauge-tick.fear { color: var(--danger); }
+.gauge-tick.warning { color: var(--warning); }
+.gauge-tick.neutral { color: #FFD700; }
+.gauge-tick.greed { color: #84CC16; }
+.gauge-tick.extreme-greed { color: var(--success); }
+
+/* Market Cycle Indicators */
+.cycle-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cycle-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cycle-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-medium);
+}
+
+.cycle-percent {
+  font-weight: var(--font-bold);
+  color: var(--primary-light);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+}
+
+/* ETF Trackers */
+.etf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.etf-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.etf-item:hover {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.etf-name {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.etf-data {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.etf-amount {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.etf-amount.negative {
+  color: var(--danger);
+}
+
+.etf-trend {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.etf-trend.positive {
+  color: var(--success);
+}
+
+.etf-trend.negative {
+  color: var(--danger);
+}
+
+.etf-chart {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+#etfSparkline {
+  width: 100%;
+  height: auto;
+}
+
+/* AI Buy/Sell Signals */
+.signals-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.signal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.signal-item.buy-signal {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+  border: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.signal-item.sell-signal {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+  border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.signal-item:hover {
+  transform: translateX(4px);
+}
+
+.signal-icon {
+  font-size: 1.5rem;
+}
+
+.signal-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.signal-text strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #FFF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.signal-text span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.signal-confidence {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.cat-commentary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.cat-mini-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cat-commentary span {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-style: italic;
+  line-height: 1.4;
+}
+
 /* Mobile Responsive */
+@media (max-width: 768px) {
+  .stats-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-widget {
+    padding: 16px;
+  }
+  
+  .widget-header h3 {
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 600px) {
   .ai-agent-box {
     width: calc(100vw - 40px);
