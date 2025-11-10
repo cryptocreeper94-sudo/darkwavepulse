@@ -3718,8 +3718,10 @@ export const mastra = new Mastra({
           const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
           const possibleBasePaths = [
             path.join(process.cwd(), 'public'),
+            path.resolve(process.cwd(), '..', '..', 'public'), // Repo root for bundled output
             path.join(__dirname, '..', '..', 'public'),
             path.join(__dirname, '..', '..', '..', 'public'),
+            path.join(__dirname, '..', '..', '..', '..', 'public'),
           ];
           
           // Try each base path
