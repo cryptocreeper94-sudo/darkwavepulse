@@ -2091,6 +2091,9 @@ a:hover {
   color: white;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .unified-market-nav .asset-class-btn:hover {
@@ -2118,6 +2121,9 @@ a:hover {
   color: white;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .unified-market-nav .category-btn:hover {
