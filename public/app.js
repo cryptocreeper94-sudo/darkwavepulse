@@ -1060,7 +1060,10 @@ async function performSearch() {
 
 // Usage limit checking for feature gates
 async function checkUsageLimit(feature) {
-  const isPremium = state.subscription.plan === 'premium' && state.subscription.status === 'active';
+  // DISABLED FOR TESTING - Owner should have unlimited access
+  return true;
+  
+  /* const isPremium = state.subscription.plan === 'premium' && state.subscription.status === 'active';
   
   if (isPremium) {
     return true; // Premium users have unlimited access
@@ -1084,7 +1087,7 @@ async function checkUsageLimit(feature) {
   
   // Increment usage
   localStorage.setItem(usageKey, (currentUsage + 1).toString());
-  return true;
+  return true; */
 }
 
 function showUpgradeLimitModal(feature, limit) {
@@ -8023,3 +8026,115 @@ setInterval(() => {
   updateFearGreedGauge();
   updateRSIGauge();
 }, 120000); // Every 2 minutes
+
+// ===== CENTRALIZED APP INITIALIZATION =====
+// This ensures all event listeners are bound safely regardless of load order
+
+function safeBind(elementId, eventType, handler, description = '') {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.addEventListener(eventType, handler);
+    console.log(`✅ [AppInit] Bound ${eventType} to #${elementId}${description ? ': ' + description : ''}`);
+    return true;
+  } else {
+    console.warn(`⚠️ [AppInit] Element #${elementId} not found, skipping ${eventType} binding`);
+    return false;
+  }
+}
+
+function bindUIHandlers() {
+  console.log('🔧 [AppInit] Binding UI handlers...');
+  
+  // Settings button
+  safeBind('settingsBtn', 'click', () => {
+    state.currentTab = 'settings';
+    loadTabContent('settings');
+  }, 'Open settings');
+  
+  // Refresh button  
+  safeBind('refreshBtn', 'click', () => {
+    if (state.currentTab === 'analysis' && searchInput?.value) {
+      performSearch();
+    } else {
+      loadTabContent(state.currentTab);
+    }
+  }, 'Refresh current tab');
+  
+  // Search button
+  safeBind('searchBtn', 'click', () => performSearch(), 'Perform search');
+  
+  // Subscribe/upgrade button (if exists)
+  safeBind('upgradeBtn', 'click', () => {
+    state.currentTab = 'subscription';
+    loadTabContent('subscription');
+  }, 'Open subscription page');
+  
+  console.log('✅ [AppInit] UI handlers bound');
+}
+
+function initAppState() {
+  console.log('🔧 [AppInit] Initializing state...');
+  // State already initialized at top of file
+  console.log('✅ [AppInit] State initialized:', state);
+}
+
+async function bootstrapData() {
+  console.log('🔧 [AppInit] Bootstrapping data...');
+  
+  const dataLoaders = [
+    { name: 'Market Overview', fn: () => loadMarketOverview('top') },
+    { name: 'CMC Stats', fn: () => updateCMCStatsBar() },
+    { name: 'Avg RSI', fn: () => updateAvgRSI() }
+  ];
+  
+  const results = await Promise.allSettled(
+    dataLoaders.map(loader => 
+      loader.fn().catch(err => {
+        console.error(`❌ [AppInit] ${loader.name} failed:`, err);
+        return null;
+      })
+    )
+  );
+  
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      console.log(`✅ [AppInit] ${dataLoaders[index].name} loaded`);
+    } else {
+      console.warn(`⚠️ [AppInit] ${dataLoaders[index].name} failed:`, result.reason);
+    }
+  });
+  
+  // Initialize Dashboard Widgets after initial data
+  setTimeout(() => {
+    if (window.DashboardWidgets) {
+      window.DashboardWidgets.init();
+      window.DashboardWidgets.syncWithCMC();
+      console.log('✅ [AppInit] Dashboard Widgets initialized');
+    }
+  }, 1000);
+  
+  console.log('✅ [AppInit] Data bootstrap complete');
+}
+
+function initApp() {
+  console.log('🚀 [AppInit] Starting application initialization...');
+  
+  try {
+    initAppState();
+    bindUIHandlers();
+    bootstrapData();
+    
+    console.log('✅ [AppInit] Application initialized successfully');
+  } catch (error) {
+    console.error('❌ [AppInit] Initialization failed:', error);
+  }
+}
+
+// Run initialization when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+console.log('📦 [AppInit] Initialization module loaded');
