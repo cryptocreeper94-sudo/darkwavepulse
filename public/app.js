@@ -439,34 +439,135 @@ async function loadChartData(ticker, timeframe, type) {
   }
 }
 
-function renderChart(data, type) {
+function renderChart(chartData, type) {
   const container = document.getElementById('chartContainer');
   container.innerHTML = '';
   
-  if (window.LightweightCharts) {
-    currentChart = LightweightCharts.createChart(container, {
-      width: container.clientWidth,
-      height: 500,
-      layout: {
-        background: { color: 'transparent' },
-        textColor: '#9CA3AF'
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.1)' }
-      }
-    });
-    
-    if (type === 'candlestick') {
-      const series = currentChart.addCandlestickSeries();
-      series.setData(data);
-    } else {
-      const series = currentChart.addLineSeries({ color: '#3B82F6' });
-      series.setData(data.map(d => ({ time: d.time, value: d.close })));
+  if (!window.LightweightCharts || !chartData) return;
+  
+  currentChart = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: 500,
+    layout: {
+      background: { color: 'transparent' },
+      textColor: '#9CA3AF'
+    },
+    grid: {
+      vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
+      horzLines: { color: 'rgba(255, 255, 255, 0.1)' }
+    },
+    rightPriceScale: {
+      borderColor: 'rgba(255, 255, 255, 0.1)'
+    },
+    timeScale: {
+      borderColor: 'rgba(255, 255, 255, 0.1)'
     }
-    
-    currentChart.timeScale().fitContent();
+  });
+  
+  // Main price series
+  let mainSeries;
+  if (type === 'candlestick') {
+    mainSeries = currentChart.addCandlestickSeries({
+      upColor: '#10B981',
+      downColor: '#EF4444',
+      borderUpColor: '#10B981',
+      borderDownColor: '#EF4444',
+      wickUpColor: '#10B981',
+      wickDownColor: '#EF4444'
+    });
+    mainSeries.setData(chartData.prices || chartData);
+  } else {
+    mainSeries = currentChart.addLineSeries({ 
+      color: '#3B82F6',
+      lineWidth: 2
+    });
+    const priceData = (chartData.prices || chartData).map(d => ({ 
+      time: d.time, 
+      value: d.close || d.value 
+    }));
+    mainSeries.setData(priceData);
   }
+  
+  // Add EMA 9 (fast - bright green)
+  if (chartData.ema9 && chartData.ema9.length > 0) {
+    const ema9Series = currentChart.addLineSeries({
+      color: '#22C55E',
+      lineWidth: 1,
+      title: 'EMA 9'
+    });
+    ema9Series.setData(chartData.ema9);
+  }
+  
+  // Add EMA 21 (medium - orange)
+  if (chartData.ema21 && chartData.ema21.length > 0) {
+    const ema21Series = currentChart.addLineSeries({
+      color: '#F59E0B',
+      lineWidth: 1,
+      title: 'EMA 21'
+    });
+    ema21Series.setData(chartData.ema21);
+  }
+  
+  // Add EMA 50 (slow - blue)
+  if (chartData.ema50 && chartData.ema50.length > 0) {
+    const ema50Series = currentChart.addLineSeries({
+      color: '#3B82F6',
+      lineWidth: 2,
+      title: 'EMA 50'
+    });
+    ema50Series.setData(chartData.ema50);
+  }
+  
+  // Add EMA 200 (very slow - purple)
+  if (chartData.ema200 && chartData.ema200.length > 0) {
+    const ema200Series = currentChart.addLineSeries({
+      color: '#A855F7',
+      lineWidth: 2,
+      title: 'EMA 200'
+    });
+    ema200Series.setData(chartData.ema200);
+  }
+  
+  // Add SMA 50 (dashed yellow)
+  if (chartData.sma50 && chartData.sma50.length > 0) {
+    const sma50Series = currentChart.addLineSeries({
+      color: '#FBBF24',
+      lineWidth: 1,
+      lineStyle: 2, // Dashed
+      title: 'SMA 50'
+    });
+    sma50Series.setData(chartData.sma50);
+  }
+  
+  // Add SMA 200 (dashed red)
+  if (chartData.sma200 && chartData.sma200.length > 0) {
+    const sma200Series = currentChart.addLineSeries({
+      color: '#EF4444',
+      lineWidth: 2,
+      lineStyle: 2, // Dashed
+      title: 'SMA 200'
+    });
+    sma200Series.setData(chartData.sma200);
+  }
+  
+  // Add Bollinger Bands (light semi-transparent)
+  if (chartData.bollingerUpper && chartData.bollingerLower) {
+    const upperBand = currentChart.addLineSeries({
+      color: 'rgba(239, 68, 68, 0.5)',
+      lineWidth: 1,
+      title: 'BB Upper'
+    });
+    upperBand.setData(chartData.bollingerUpper);
+    
+    const lowerBand = currentChart.addLineSeries({
+      color: 'rgba(16, 185, 129, 0.5)',
+      lineWidth: 1,
+      title: 'BB Lower'
+    });
+    lowerBand.setData(chartData.bollingerLower);
+  }
+  
+  currentChart.timeScale().fitContent();
 }
 
 function changeTimeframe(timeframe) {
