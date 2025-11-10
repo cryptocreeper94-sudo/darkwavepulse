@@ -44,11 +44,7 @@
         <p class="wave-banner-subtitle" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); margin: 0; font-size: 0.85rem;">Professional Trading Analysis</p>
       </div>
       <div class="header-actions-overlay">
-        <button class="icon-btn premium-btn" id="subscribeBtn" title="Subscribe" onclick="openSubscriptionPage()" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; border: 2px solid #FFF; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑</button>
         <button class="icon-btn" id="adminBtn" title="Admin" onclick="openAdminLogin()" style="background: linear-gradient(135deg, #FF006E, #8B5CF6); font-weight: bold;">🔐</button>
-        <button class="icon-btn" id="walletBtn" title="Wallet">💰</button>
-        <button class="icon-btn" id="resetSessionBtn" title="Reset Wallet Session" style="background: linear-gradient(135deg, #EF4444, #DC2626); font-weight: bold;">🗑️</button>
-        <button class="icon-btn" id="refreshBtn" title="Refresh">🔄</button>
         <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
       </div>
     </header>
@@ -93,8 +89,14 @@
       <span style="font-size: var(--font-size-xs); color: var(--text-secondary);">Premium Active</span>
     </div>
     
-    <!-- Web3 Search with Crypto Cat Toggle (Right-aligned) -->
-    <div style="display: flex; align-items: center; gap: 12px; max-width: 600px; margin-left: auto; margin-right: 16px; padding: 8px 0;">
+    <!-- Web3 Search with Action Buttons (Right-aligned) -->
+    <div style="display: flex; align-items: center; gap: 12px; max-width: 800px; margin-left: auto; margin-right: 16px; padding: 8px 0;">
+      <!-- Action Buttons -->
+      <button class="icon-btn premium-btn" id="subscribeBtn" title="Subscribe" onclick="openSubscriptionPage()" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; border: 2px solid #FFF; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑</button>
+      <button class="icon-btn" id="walletBtn" title="Wallet">💰</button>
+      <button class="icon-btn" id="resetSessionBtn" title="Reset Wallet Session" style="background: linear-gradient(135deg, #EF4444, #DC2626); font-weight: bold;">🗑️</button>
+      <button class="icon-btn" id="refreshBtn" title="Refresh">🔄</button>
+      
       <!-- Crypto Cat Toggle (Compact) -->
       <div class="cat-toggle-compact" id="catImageToggle" onclick="toggleCryptoCatImage()" title="Toggle Crypto Cat">
         <img src="/crypto-cat-poses/fist.png" alt="Crypto Cat" class="cat-toggle-image-compact" id="catToggleImage" />
