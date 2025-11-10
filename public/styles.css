@@ -3637,9 +3637,9 @@ table {
 }
 
 .ai-agent-box {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
+  position: absolute;
+  bottom: 60px;
+  right: 0;
   width: 350px;
   max-width: calc(100vw - 40px);
   height: 500px;
@@ -3655,6 +3655,7 @@ table {
   clip-path: polygon(
     0% 2%, 2% 0%, 98% 0%, 100% 2%, 100% 98%, 98% 100%, 2% 100%, 0% 98%
   );
+  z-index: 10;
 }
 
 .ai-agent-header {
