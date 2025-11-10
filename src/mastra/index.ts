@@ -3655,6 +3655,76 @@ export const mastra = new Mastra({
           return c.text('JavaScript not found', 404);
         },
       },
+      // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
+      {
+        path: "/*",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const url = await import('url');
+          
+          // Get requested path and sanitize it
+          const requestPath = c.req.path.substring(1); // Remove leading slash
+          
+          // Skip API routes (already handled above)
+          if (requestPath.startsWith('api/') || requestPath === 'admin' || requestPath.startsWith('webhooks/')) {
+            return c.text('Not found', 404);
+          }
+          
+          // Security: prevent directory traversal
+          if (requestPath.includes('..') || requestPath.includes('~')) {
+            return c.text('Invalid path', 400);
+          }
+          
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possibleBasePaths = [
+            path.join(process.cwd(), 'public'),
+            path.join(__dirname, '..', '..', 'public'),
+            path.join(__dirname, '..', '..', '..', 'public'),
+          ];
+          
+          // Try each base path
+          for (const basePath of possibleBasePaths) {
+            try {
+              const filePath = path.join(basePath, requestPath);
+              const fileContent = await fs.readFile(filePath);
+              
+              // Detect content type based on extension
+              const ext = path.extname(requestPath).toLowerCase();
+              const contentTypes: Record<string, string> = {
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.gif': 'image/gif',
+                '.svg': 'image/svg+xml',
+                '.webp': 'image/webp',
+                '.ico': 'image/x-icon',
+                '.css': 'text/css',
+                '.js': 'application/javascript',
+                '.json': 'application/json',
+                '.html': 'text/html',
+                '.txt': 'text/plain',
+                '.pdf': 'application/pdf',
+                '.woff': 'font/woff',
+                '.woff2': 'font/woff2',
+                '.ttf': 'font/ttf',
+                '.eot': 'application/vnd.ms-fontobject',
+              };
+              
+              const contentType = contentTypes[ext] || 'application/octet-stream';
+              c.header('Content-Type', contentType);
+              c.header('Cache-Control', 'public, max-age=300'); // 5 min cache
+              return c.body(fileContent);
+            } catch (err) {
+              continue; // Try next base path
+            }
+          }
+          
+          // File not found in any path, return 404
+          return c.text('File not found', 404);
+        }
+      },
     ],
   },
   logger:

@@ -45,6 +45,12 @@
         <p class="wave-banner-subtitle">Professional Trading Analysis</p>
       </div>
       <div class="header-actions-overlay">
+        <!-- Crypto Cat Toggle (Compact) -->
+        <div class="cat-toggle-compact" id="catImageToggle" onclick="toggleCryptoCatImage()" title="Toggle Crypto Cat">
+          <img src="/crypto-cat-poses/fist.png" alt="Crypto Cat" class="cat-toggle-image-compact" id="catToggleImage" />
+          <span class="cat-status-indicator active" id="catToggleStatus">ON</span>
+        </div>
+        
         <button class="icon-btn premium-btn" id="subscribeBtn" title="Subscribe" onclick="openSubscriptionPage()" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; border: 2px solid #FFF; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑</button>
         <button class="icon-btn" id="adminBtn" title="Admin" onclick="openAdminLogin()" style="background: linear-gradient(135deg, #FF006E, #8B5CF6); font-weight: bold;">🔐</button>
         <button class="icon-btn" id="walletBtn" title="Wallet">💰</button>
@@ -127,17 +133,6 @@
       <button class="category-btn" data-category="bluechip" onclick="selectCategory('bluechip')">
         💎 Blue Chip
       </button>
-    </div>
-
-    <!-- Crypto Cat Master Toggle (Persists Across Pages) -->
-    <div class="cat-toggle-container">
-      <div class="cat-image-toggle" id="catImageToggle" onclick="toggleCryptoCatImage()">
-        <img src="/crypto-cat-poses/fist.png" alt="Crypto Cat" class="cat-toggle-image" id="catToggleImage" />
-        <div class="cat-toggle-status" id="catToggleStatus">
-          <span class="status-indicator active">ON</span>
-          <span class="cat-toggle-text" id="catModeText">Crypto Cat</span>
-        </div>
-      </div>
     </div>
 
     <!-- Tab Navigation -->
