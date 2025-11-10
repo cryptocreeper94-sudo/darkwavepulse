@@ -6157,25 +6157,25 @@ function initializeStatClickers() {
     // Fear & Greed (first stat)
     stats[0].addEventListener('click', () => {
       openStatModal('fearGreedModal');
-      console.log('😸 Want to learn about Fear & Greed? I'll explain it... if I feel like it.');
+      console.log('Fear & Greed Index modal opened');
     });
     
     // Altcoin Season (second stat)
     stats[1].addEventListener('click', () => {
       openStatModal('altSeasonModal');
-      console.log('😸 Altcoin season? More like alt-COIN-TOSS season. Let me explain.');
+      console.log('Altcoin Season modal opened');
     });
     
     // Avg RSI (third stat - after logo)
     stats[2].addEventListener('click', () => {
       openStatModal('avgRsiModal');
-      console.log('😸 RSI? Fancy way of saying "overbought" or "oversold." Here\'s the breakdown.');
+      console.log('Avg RSI modal opened');
     });
     
     // Market Cap (fourth stat)
     stats[3].addEventListener('click', () => {
       openStatModal('marketCapModal');
-      console.log('😸 Market cap is just price × supply. Not rocket science, humans.');
+      console.log('Market Cap modal opened');
     });
   }
 }
@@ -7557,10 +7557,13 @@ function closeDetailedAnalysis() {
 }
 
 // ===== CATEGORY NAVIGATION =====
-let currentCategory = 'trending';
+// Note: currentCategory already declared at line 4277, using that variable
 
 function selectCategory(category) {
-  currentCategory = category;
+  // Use existing currentCategory variable declared earlier
+  if (typeof currentCategory !== 'undefined') {
+    currentCategory = category;
+  }
   
   // Update button states
   document.querySelectorAll('.category-btn').forEach(btn => {
@@ -7822,3 +7825,133 @@ function updateCatModeUI() {
 setTimeout(() => {
   updateCatModeUI();
 }, 1000);
+
+// ===== SVG CIRCULAR GAUGE COMPONENT =====
+function createCircularGauge(value, max, label, colorStops) {
+  const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+  
+  // Determine color based on value thresholds
+  let gaugeColor = '#3B82F6'; // default blue
+  if (colorStops) {
+    for (const stop of colorStops) {
+      if (value >= stop.min && value <= stop.max) {
+        gaugeColor = stop.color;
+        break;
+      }
+    }
+  }
+  
+  // Calculate 270-degree arc (from -135° to 135°)
+  const radius = 70;
+  const circumference = 2 * Math.PI * radius;
+  const arcLength = circumference * 0.75; // 270 degrees = 75% of circle
+  const dashLength = (percentage / 100) * arcLength; // Actual fill length based on percentage
+  const backgroundOffset = circumference * 0.125; // Start at -135°
+  const valueOffset = backgroundOffset; // Same starting point for value arc
+  
+  return `
+    <svg viewBox="0 0 200 200" class="circular-gauge">
+      <!-- Background arc (270 degrees) -->
+      <circle cx="100" cy="100" r="${radius}" 
+              fill="none" 
+              stroke="rgba(255,255,255,0.1)" 
+              stroke-width="20" 
+              stroke-linecap="round"
+              stroke-dasharray="${arcLength} ${circumference}"
+              stroke-dashoffset="${backgroundOffset}"
+              transform="rotate(-135 100 100)"/>
+      
+      <!-- Value arc (scales with percentage) -->
+      <circle cx="100" cy="100" r="${radius}" 
+              fill="none" 
+              stroke="${gaugeColor}" 
+              stroke-width="20" 
+              stroke-linecap="round"
+              stroke-dasharray="${dashLength} ${circumference}"
+              stroke-dashoffset="${valueOffset}"
+              transform="rotate(-135 100 100)"
+              style="filter: drop-shadow(0 0 8px ${gaugeColor}80); transition: stroke-dasharray 0.5s ease;"/>
+      
+      <!-- Center value -->
+      <text x="100" y="100" text-anchor="middle" fill="#FFF" font-size="42" font-weight="bold">
+        ${Math.round(value)}
+      </text>
+      
+      <!-- Label -->
+      <text x="100" y="130" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="16">
+        ${label}
+      </text>
+    </svg>
+  `;
+}
+
+// Update Fear & Greed gauge
+function updateFearGreedGauge() {
+  const fearGreedValue = parseInt(document.getElementById('cmcFearGreed')?.textContent) || 50;
+  const container = document.querySelector('.fear-greed-widget');
+  
+  if (container) {
+    const colorStops = [
+      { min: 0, max: 24, color: '#FF4444' },     // Extreme Fear
+      { min: 25, max: 44, color: '#FF8844' },    // Fear
+      { min: 45, max: 55, color: '#FFD700' },    // Neutral
+      { min: 56, max: 75, color: '#00FF88' },    // Greed
+      { min: 76, max: 100, color: '#00DD66' }    // Extreme Greed
+    ];
+    
+    const label = fearGreedValue < 25 ? 'Extreme Fear' : 
+                  fearGreedValue < 45 ? 'Fear' : 
+                  fearGreedValue < 55 ? 'Neutral' :
+                  fearGreedValue < 75 ? 'Greed' : 'Extreme Greed';
+    
+    container.innerHTML = `
+      <div class="gauge-card" onclick="openStatModal('fearGreedModal')" style="cursor: pointer;">
+        <h3 style="margin: 0 0 16px 0; color: var(--primary); font-size: 1rem;">📊 Fear & Greed</h3>
+        ${createCircularGauge(fearGreedValue, 100, label, colorStops)}
+        <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+          Click for details
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Update RSI gauge
+function updateRSIGauge() {
+  const rsiValue = parseFloat(document.getElementById('cmcAvgRSI')?.textContent) || 50;
+  const container = document.querySelector('.rsi-widget');
+  
+  if (container) {
+    const colorStops = [
+      { min: 0, max: 30, color: '#00FF88' },     // Oversold (opportunity)
+      { min: 31, max: 69, color: '#FFD700' },    // Neutral
+      { min: 70, max: 100, color: '#FF4444' }    // Overbought (warning)
+    ];
+    
+    const label = rsiValue < 30 ? 'Oversold' : 
+                  rsiValue > 70 ? 'Overbought' : 'Neutral';
+    
+    container.innerHTML = `
+      <div class="gauge-card" onclick="openStatModal('avgRsiModal')" style="cursor: pointer;">
+        <h3 style="margin: 0 0 16px 0; color: var(--primary); font-size: 1rem;">📈 Avg RSI</h3>
+        ${createCircularGauge(rsiValue, 100, label, colorStops)}
+        <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+          Click for details
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Initialize gauges
+setTimeout(() => {
+  updateFearGreedGauge();
+  updateRSIGauge();
+  console.log('✅ Circular gauges initialized');
+}, 2000);
+
+// Update gauges periodically
+setInterval(() => {
+  updateFearGreedGauge();
+  updateRSIGauge();
+}, 120000); // Every 2 minutes
