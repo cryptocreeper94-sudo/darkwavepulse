@@ -4375,49 +4375,56 @@ table {
 .category-btn {
   flex-shrink: 0;
   padding: 10px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  /* Brilliant Blue Gradient */
+  background: linear-gradient(135deg, #2563EB, #1E40AF);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 50px;
-  color: var(--text-primary);
+  color: #FFFFFF;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
-  /* 3D Raised Button Effect */
+  /* 3D Raised Button Effect with Strong White Glow */
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.2),
-    0 4px 8px rgba(0, 0, 0, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 0 16px rgba(255, 255, 255, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2);
   transform: translateZ(0);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .category-btn:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2));
-  border-color: rgba(59, 130, 246, 0.6);
+  /* Brighter Blue on Hover */
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  border-color: rgba(255, 255, 255, 0.8);
   transform: translateY(-3px) translateZ(4px);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.25),
-    0 8px 16px rgba(59, 130, 246, 0.3),
+    0 8px 16px rgba(59, 130, 246, 0.5),
+    0 0 24px rgba(255, 255, 255, 0.6),
     0 12px 24px rgba(0, 0, 0, 0.15),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+    inset 0 1px 3px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .category-btn.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(37, 99, 235, 0.4));
-  border-color: var(--primary);
+  /* Brightest Blue for Active State */
+  background: linear-gradient(135deg, #60A5FA, #3B82F6);
+  border-color: rgba(255, 255, 255, 0.9);
   color: #FFFFFF;
-  /* Active State - Pressed In Effect */
+  /* Active State - Pressed In Effect with Strong Glow */
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(59, 130, 246, 0.6),
+    0 0 28px rgba(59, 130, 246, 0.8),
+    0 0 16px rgba(255, 255, 255, 0.7),
     inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 -1px 2px rgba(255, 255, 255, 0.2);
+    inset 0 -1px 2px rgba(255, 255, 255, 0.3);
   transform: translateY(0) scale(0.98);
 }
 
@@ -4864,5 +4871,223 @@ select {
     transform: translateX(0) translateZ(0);
     opacity: 1;
   }
+}
+
+
+/* ==========================================
+   COMPACT CRYPTO CAT TOGGLE IN HEADER
+   ========================================== */
+.cat-toggle-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(147, 51, 234, 0.2));
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  /* 3D Depth */
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    0 0 12px rgba(255, 255, 255, 0.3),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+}
+
+.cat-toggle-compact:hover {
+  transform: translateY(-2px) translateZ(2px);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    0 0 20px rgba(255, 255, 255, 0.5),
+    var(--depth-highlight-strong);
+}
+
+.cat-toggle-image-compact {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.cat-status-indicator {
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.3);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cat-status-indicator.inactive {
+  background: rgba(107, 114, 128, 0.3);
+  color: #9CA3AF;
+  border-color: rgba(107, 114, 128, 0.5);
+}
+
+
+/* ==========================================
+   ENHANCED WHITE OUTLINES & GLOWS SYSTEM-WIDE
+   ========================================== */
+
+/* Enhance all cards with strong white outlines */
+.card {
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    0 0 16px rgba(255, 255, 255, 0.3),
+    var(--depth-highlight-strong),
+    var(--depth-inset) !important;
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    0 0 24px rgba(255, 255, 255, 0.5),
+    var(--depth-highlight-strong),
+    var(--depth-inset) !important;
+}
+
+/* Enhance category navigation container */
+.category-nav-container {
+  border: 3px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    0 16px 32px rgba(0, 0, 0, 0.15),
+    0 24px 48px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(255, 255, 255, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Enhance wave banner */
+.wave-banner-bg {
+  border: 3px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    0 0 24px rgba(255, 255, 255, 0.4),
+    var(--depth-highlight),
+    var(--depth-inset) !important;
+}
+
+/* Enhance all banners */
+.featured-banner,
+.pirate-flag-banner,
+.search-container,
+.blockchain-filter {
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    0 0 16px rgba(255, 255, 255, 0.3),
+    var(--depth-highlight),
+    var(--depth-inset) !important;
+}
+
+.featured-banner:hover,
+.pirate-flag-banner:hover,
+.search-container:hover,
+.blockchain-filter:hover {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    0 0 24px rgba(255, 255, 255, 0.5),
+    var(--depth-highlight-strong),
+    var(--depth-inset) !important;
+}
+
+/* Enhance modals with strong white glow */
+.modal-content {
+  border: 3px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-lg),
+    0 0 32px rgba(255, 255, 255, 0.5),
+    var(--depth-highlight-strong),
+    var(--depth-inset) !important;
+}
+
+/* Enhance gauge cards */
+.gauge-card {
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.18),
+    0 16px 32px rgba(0, 0, 0, 0.12),
+    0 0 16px rgba(255, 255, 255, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.gauge-card:hover {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(59, 130, 246, 0.3),
+    0 24px 48px rgba(0, 0, 0, 0.2),
+    0 32px 64px rgba(0, 0, 0, 0.15),
+    0 0 28px rgba(255, 255, 255, 0.5),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Enhance AI agent box */
+.ai-agent-box {
+  border: 3px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 12px 24px rgba(0, 0, 0, 0.25),
+    0 24px 48px rgba(0, 0, 0, 0.2),
+    0 36px 72px rgba(0, 0, 0, 0.15),
+    0 0 24px rgba(255, 255, 255, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Enhance icon buttons with white glow */
+.icon-btn {
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    0 0 10px rgba(255, 255, 255, 0.2),
+    var(--depth-highlight),
+    var(--depth-inset) !important;
+}
+
+.icon-btn:hover {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-sm),
+    0 0 16px rgba(255, 255, 255, 0.4),
+    var(--depth-highlight-strong) !important;
 }
 
