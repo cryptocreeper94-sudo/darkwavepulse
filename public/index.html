@@ -61,17 +61,28 @@
         🤖 AI
       </button>
       <div class="ai-agent-box" id="aiAgentBox" style="display: none;">
-        <div class="ai-agent-header">
-          <h3>💬 DarkWave AI Assistant</h3>
+        <!-- Crypto Cat AI Header with Image -->
+        <div class="crypto-cat-ai-header">
+          <div class="crypto-cat-ai-avatar">
+            <img src="/crypto-cat-poses/pointing.png" alt="Crypto Cat" class="crypto-cat-ai-image" />
+          </div>
+          <div class="crypto-cat-ai-title">
+            <h3>🐱 Crypto Cat AI</h3>
+            <p class="crypto-cat-ai-mode" id="aiCatMode">Smartass Mode</p>
+          </div>
           <button class="close-btn-sm" onclick="toggleAIAgent()">✕</button>
         </div>
+        
+        <!-- AI Messages Area -->
         <div class="ai-agent-messages" id="aiAgentMessages">
-          <div class="ai-message">
-            <strong>🤖 DarkWave:</strong> Hello! I can help you analyze tokens, explain metrics, or answer any trading questions. Ask me anything!
+          <div class="ai-message crypto-cat-welcome">
+            <strong>Crypto Cat:</strong> Sup. I'm your AI trading advisor. Ask me about tokens, trading strategies, or technical indicators. I'll give it to you straight.
           </div>
         </div>
+        
+        <!-- Input Area -->
         <div class="ai-agent-input-area">
-          <input type="text" id="aiAgentInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendAIMessage()" />
+          <input type="text" id="aiAgentInput" placeholder="Ask Crypto Cat anything..." onkeypress="if(event.key==='Enter') sendAIMessage()" />
           <button class="ai-send-btn" onclick="sendAIMessage()">➤</button>
         </div>
       </div>

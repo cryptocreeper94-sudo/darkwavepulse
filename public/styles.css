@@ -48,6 +48,41 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 3D DEPTH SYSTEM - Multi-layer shadows for realistic floating effects */
+  /* Contact Shadow (directly under element) */
+  --depth-contact-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --depth-contact-md: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --depth-contact-lg: 0 4px 8px rgba(0, 0, 0, 0.25);
+  
+  /* Ambient Shadow (diffuse glow around element) */
+  --depth-ambient-sm: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --depth-ambient-md: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --depth-ambient-lg: 0 16px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Depth Shadow (creates distance from background) */
+  --depth-shadow-sm: 0 8px 16px rgba(0, 0, 0, 0.08);
+  --depth-shadow-md: 0 16px 32px rgba(0, 0, 0, 0.12);
+  --depth-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.15);
+  
+  /* Far Shadow (extreme depth) */
+  --depth-far-sm: 0 16px 24px rgba(0, 0, 0, 0.05);
+  --depth-far-md: 0 24px 48px rgba(0, 0, 0, 0.08);
+  --depth-far-lg: 0 36px 72px rgba(0, 0, 0, 0.1);
+  
+  /* Highlight (inner top light reflection) */
+  --depth-highlight: inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  --depth-highlight-strong: inset 0 2px 4px rgba(255, 255, 255, 0.25);
+  
+  /* Depth (inner bottom shadow) */
+  --depth-inset: inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  --depth-inset-strong: inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+  
+  /* Glow (colored ambient light) */
+  --depth-glow-primary: 0 0 20px rgba(59, 130, 246, 0.4);
+  --depth-glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+  --depth-glow-danger: 0 0 20px rgba(239, 68, 68, 0.4);
+  --depth-glow-warning: 0 0 20px rgba(245, 158, 11, 0.4);
 }
 
 /* ===========================================
@@ -576,11 +611,27 @@ a:hover {
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   transition: all var(--transition-base);
+  /* 3D Card Depth */
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0) perspective(1000px);
 }
 
 .card:hover {
   border-color: var(--border-secondary);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px) translateZ(8px) rotateX(1deg);
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
 }
 
 .card-header {
@@ -622,28 +673,74 @@ a:hover {
 .btn-primary {
   background: var(--primary);
   color: white;
+  /* 3D Button Depth */
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    var(--depth-shadow-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+  transition: all var(--transition-fast);
 }
 
 .btn-primary:hover {
   background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px) translateZ(4px);
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-glow-primary),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    var(--depth-highlight);
 }
 
 .btn-secondary {
   background: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-primary);
+  /* 3D Button Depth */
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+  transition: all var(--transition-fast);
 }
 
 .btn-secondary:hover {
   background: var(--bg-hover);
   border-color: var(--border-secondary);
+  transform: translateY(-2px) translateZ(2px);
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-sm),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
+  box-shadow: none;
+  transition: all var(--transition-fast);
 }
 
 .btn-ghost:hover {
@@ -1701,6 +1798,16 @@ a:hover {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: var(--radius-lg);
+  /* 3D Banner Depth */
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+  transition: all var(--transition-base);
   position: relative;
 }
 
@@ -2239,6 +2346,28 @@ a:hover {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  /* 3D Modal Depth - Maximum impact */
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-lg),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+  transform: translateZ(0) perspective(1200px);
+  transition: all var(--transition-slow);
+  animation: modalFloat 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modalFloat {
+  from {
+    opacity: 0;
+    transform: translateY(20px) translateZ(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
 }
 
 .modal-header {
@@ -2466,6 +2595,30 @@ option {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   position: relative;
+  /* 3D Depth for Banners */
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0) perspective(1000px);
+  transition: all var(--transition-base);
+}
+
+.featured-banner:hover,
+.pirate-flag-banner:hover,
+.search-container:hover,
+.blockchain-filter:hover {
+  transform: translateY(-4px) translateZ(8px);
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
 }
 
 /* Main content wrapper with neon blue frame */
@@ -4180,10 +4333,20 @@ table {
 .category-nav-container {
   width: calc(100% - 32px);
   margin: 16px auto;
-  padding: 12px;
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.15), rgba(59, 130, 246, 0.1));
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 50px;
+  padding: 14px;
+  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  /* 3D Floating Effect with Multiple Shadow Layers */
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),           /* Contact shadow */
+    0 8px 16px rgba(0, 0, 0, 0.2),          /* Ambient shadow */
+    0 16px 32px rgba(0, 0, 0, 0.15),        /* Depth shadow */
+    0 24px 48px rgba(0, 0, 0, 0.1),         /* Far shadow */
+    inset 0 1px 2px rgba(255, 255, 255, 0.3), /* Top highlight */
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2);    /* Bottom depth */
+  transform: translateZ(0);
+  will-change: transform;
   display: flex;
   gap: 8px;
   overflow-x: auto;
@@ -4191,6 +4354,18 @@ table {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-nav-container:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.12),
+    0 12px 20px rgba(0, 0, 0, 0.25),
+    0 20px 40px rgba(0, 0, 0, 0.18),
+    0 28px 56px rgba(0, 0, 0, 0.12),
+    inset 0 1px 3px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .category-nav-container::-webkit-scrollbar {
@@ -4200,32 +4375,50 @@ table {
 .category-btn {
   flex-shrink: 0;
   padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   border: 1px solid rgba(59, 130, 246, 0.4);
   border-radius: 50px;
   color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
+  /* 3D Raised Button Effect */
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
 }
 
 .category-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2));
   border-color: rgba(59, 130, 246, 0.6);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-3px) translateZ(4px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 8px 16px rgba(59, 130, 246, 0.3),
+    0 12px 24px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.15);
 }
 
 .category-btn.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.3));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(37, 99, 235, 0.4));
   border-color: var(--primary);
   color: #FFFFFF;
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+  /* Active State - Pressed In Effect */
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(59, 130, 246, 0.6),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.2);
+  transform: translateY(0) scale(0.98);
 }
 
 .category-btn.active:hover {
@@ -4290,3 +4483,273 @@ table {
     margin-left: 8px;
   }
 }
+
+/* ==========================================
+   CIRCULAR GAUGE COMPONENTS
+   ========================================== */
+.circular-gauge {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.gauge-card {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(59, 130, 246, 0.15));
+  border: 2px solid rgba(59, 130, 246, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 3D Card Elevation */
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.18),
+    0 16px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  transform: translateZ(0) perspective(1000px);
+}
+
+.gauge-card:hover {
+  border-color: rgba(59, 130, 246, 0.7);
+  transform: translateY(-8px) translateZ(20px) rotateX(2deg);
+  /* Enhanced Hover Elevation */
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(59, 130, 246, 0.3),
+    0 24px 48px rgba(0, 0, 0, 0.2),
+    0 32px 64px rgba(0, 0, 0, 0.15),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.stats-widget {
+  margin: 16px 0;
+}
+
+@media (max-width: 768px) {
+  .circular-gauge {
+    max-width: 160px;
+  }
+  
+  .gauge-card {
+    padding: 16px;
+  }
+}
+
+/* ==========================================
+   CRYPTO CAT AI WIDGET
+   ========================================== */
+.crypto-cat-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.crypto-cat-ai-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border: 3px solid rgba(59, 130, 246, 0.6);
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(59, 130, 246, 0.4);
+  flex-shrink: 0;
+}
+
+.crypto-cat-ai-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.crypto-cat-ai-title {
+  flex: 1;
+}
+
+.crypto-cat-ai-title h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #FFF;
+  font-weight: 700;
+}
+
+.crypto-cat-ai-mode {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.crypto-cat-welcome {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.1));
+  border-left: 4px solid var(--primary);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-agent-box {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(37, 99, 235, 0.3));
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  border-radius: 16px;
+  /* Deep 3D Floating Card Effect */
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 12px 24px rgba(0, 0, 0, 0.25),
+    0 24px 48px rgba(0, 0, 0, 0.2),
+    0 36px 72px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transform: translateZ(0);
+  perspective: 1000px;
+}
+
+@media (max-width: 768px) {
+  .crypto-cat-ai-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .crypto-cat-ai-title h3 {
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================
+   3D DEPTH UTILITY CLASSES
+   Reusable classes for consistent floating effects
+   ========================================== */
+
+/* Small Depth - Subtle floating (buttons, badges) */
+.depth-sm {
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    var(--depth-shadow-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+  transition: all var(--transition-base);
+}
+
+.depth-sm:hover {
+  transform: translateY(-2px) translateZ(2px);
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+}
+
+/* Medium Depth - Standard cards and panels */
+.depth-md {
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-md),
+    var(--depth-far-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0) perspective(1000px);
+  transition: all var(--transition-base);
+}
+
+.depth-md:hover {
+  transform: translateY(-4px) translateZ(8px) rotateX(1deg);
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+}
+
+/* Large Depth - Important modals and headers */
+.depth-lg {
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-md),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+  transform: translateZ(0) perspective(1200px);
+  transition: all var(--transition-slow);
+}
+
+.depth-lg:hover {
+  transform: translateY(-8px) translateZ(16px) rotateX(2deg);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg),
+    var(--depth-far-lg),
+    var(--depth-highlight-strong),
+    var(--depth-inset-strong);
+}
+
+/* Pressable (buttons with pressed effect) */
+.depth-pressable {
+  box-shadow: 
+    var(--depth-contact-sm),
+    var(--depth-ambient-sm),
+    var(--depth-highlight),
+    var(--depth-inset);
+  transform: translateZ(0);
+  transition: all var(--transition-fast);
+}
+
+.depth-pressable:hover {
+  transform: translateY(-3px) translateZ(4px);
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-shadow-sm),
+    var(--depth-highlight-strong),
+    var(--depth-inset);
+}
+
+.depth-pressable:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    var(--depth-highlight);
+}
+
+/* Glowing (active/selected states) */
+.depth-glow-primary {
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-ambient-md),
+    var(--depth-glow-primary),
+    var(--depth-highlight),
+    var(--depth-inset);
+}
+
+.depth-glow-success {
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-glow-success),
+    var(--depth-highlight);
+}
+
+.depth-glow-danger {
+  box-shadow: 
+    var(--depth-contact-md),
+    var(--depth-glow-danger),
+    var(--depth-highlight);
+}
+
