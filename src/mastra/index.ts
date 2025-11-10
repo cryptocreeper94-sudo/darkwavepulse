@@ -3173,68 +3173,88 @@ export const mastra = new Mastra({
           }
         },
       },
-      // Chart endpoint
+      // Chart endpoint - Returns time-series data for LightweightCharts
       {
         path: "/api/chart",
         method: "POST",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
           try {
-            // Check access session
-            const { checkAccessSession } = await import('./middleware/accessControl.js');
-            const sessionCheck = await checkAccessSession(c);
-            if (!sessionCheck.valid) {
-              return c.json({ error: 'Unauthorized - Invalid or expired session' }, 401);
+            const { ticker, timeframe, type } = await c.req.json();
+            logger?.info('📈 [Chart API] Chart data request', { ticker, timeframe, type });
+            
+            // Get market data
+            const days = timeframe === '1W' ? 7 : timeframe === '1M' ? 30 : timeframe === '3M' ? 90 : 1;
+            const marketData = await marketDataTool.execute({
+              context: { ticker, days: Math.max(days, 200) }, // Need 200 days for EMA 200 calculation
+              mastra,
+              runtimeContext: null as any
+            });
+            
+            const { EMA, SMA, BollingerBands } = await import('technicalindicators');
+            const prices = marketData.prices || [];
+            
+            if (prices.length < 50) {
+              return c.json({ 
+                success: false, 
+                error: 'Insufficient price data for indicators'
+              }, 400);
             }
             
-            const { ticker, userId } = await c.req.json();
-            logger?.info('📈 [Mini App] Chart request', { ticker, userId });
+            const closePrices = prices.map((p: any) => p.close);
             
-            // Get market data first
-            const marketData = await marketDataTool.execute({
-              context: { ticker, days: 90 },
-              mastra,
-              runtimeContext: null as any
+            // Calculate full time-series for each indicator
+            const ema9Values = EMA.calculate({ period: 9, values: closePrices });
+            const ema21Values = EMA.calculate({ period: 21, values: closePrices });
+            const ema50Values = EMA.calculate({ period: 50, values: closePrices });
+            const ema200Values = EMA.calculate({ period: 200, values: closePrices });
+            const sma50Values = SMA.calculate({ period: 50, values: closePrices });
+            const sma200Values = SMA.calculate({ period: 200, values: closePrices });
+            const bbValues = BollingerBands.calculate({ period: 20, values: closePrices, stdDev: 2 });
+            
+            // Convert to LightweightCharts format: {time: timestamp, value: number}
+            // EMAs/SMAs have warm-up periods, so align timestamps
+            const formatSeries = (values: number[], warmupPeriod: number) => {
+              return values.map((val, idx) => ({
+                time: prices[idx + warmupPeriod].timestamp,
+                value: val
+              }));
+            };
+            
+            const chartData = {
+              prices: prices.slice(-days).map((p: any) => ({
+                time: p.timestamp,
+                open: p.open || p.close,
+                high: p.high || p.close,
+                low: p.low || p.close,
+                close: p.close
+              })),
+              ema9: formatSeries(ema9Values, 8),
+              ema21: formatSeries(ema21Values, 20),
+              ema50: formatSeries(ema50Values, 49),
+              ema200: formatSeries(ema200Values, 199),
+              sma50: formatSeries(sma50Values, 49),
+              sma200: formatSeries(sma200Values, 199),
+              bollingerUpper: bbValues.map((bb: any, idx) => ({
+                time: prices[idx + 19].timestamp,
+                value: bb.upper
+              })),
+              bollingerLower: bbValues.map((bb: any, idx) => ({
+                time: prices[idx + 19].timestamp,
+                value: bb.lower
+              }))
+            };
+            
+            logger?.info('✅ [Chart API] Chart data prepared', { 
+              ticker, 
+              pricePoints: chartData.prices.length,
+              ema9Points: chartData.ema9.length 
             });
             
-            // Get analysis for EMAs
-            const analysis = await technicalAnalysisTool.execute({
-              context: { 
-                ticker,
-                prices: marketData.prices,
-                currentPrice: marketData.currentPrice,
-                priceChange24h: marketData.priceChange24h,
-                priceChangePercent24h: marketData.priceChangePercent24h
-              },
-              mastra,
-              runtimeContext: null as any
-            });
-            
-            // Prepare data for chart
-            const prices = marketData.prices.map((p: any) => ({
-              timestamp: p.timestamp,
-              close: p.close
-            }));
-            
-            // Create EMA arrays (simplified - use last value for all points)
-            const ema50 = new Array(prices.length).fill(analysis.ema50);
-            const ema200 = new Array(prices.length).fill(analysis.ema200);
-            
-            const result = await chartGeneratorTool.execute({
-              context: { ticker, prices, ema50, ema200 },
-              mastra,
-              runtimeContext: null as any
-            });
-            
-            return c.json({
-              chartUrl: result.chartUrl || '',
-              ticker: ticker.toUpperCase(),
-              success: result.success || false,
-              message: result.message || ''
-            });
+            return c.json({ success: true, chartData });
           } catch (error: any) {
-            logger?.error('❌ [Mini App] Chart error', { error: error.message });
-            return c.json({ chartUrl: '', ticker: '', success: false, error: error.message }, 500);
+            logger?.error('❌ [Chart API] Error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
           }
         },
       },
