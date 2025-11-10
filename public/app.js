@@ -4204,25 +4204,31 @@ function toggleCryptoCatImage() {
   localStorage.setItem('darkwave_crypto_cat', newState);
   state.cryptoCatEnabled = newState;
   
-  const statusIndicator = document.querySelector('.cat-toggle-status .status-indicator');
-  const statusText = document.querySelector('.cat-toggle-text');
+  const statusIndicator = document.querySelector('.cat-status-indicator') || document.getElementById('catToggleStatus');
   const catImage = document.getElementById('catToggleImage');
   
   if (newState) {
     // ON - Show current mode
-    statusIndicator.classList.add('active');
-    statusIndicator.textContent = 'ON';
-    catImage.style.opacity = '1';
-    catImage.style.filter = 'none';
-    showNotification(`😼 Crypto Cat activated in ${state.catMode} mode!`, 'success');
+    if (statusIndicator) {
+      statusIndicator.classList.add('active');
+      statusIndicator.textContent = 'ON';
+    }
+    if (catImage) {
+      catImage.style.opacity = '1';
+      catImage.style.filter = 'none';
+    }
+    showNotification(`😼 Crypto Cat activated!`, 'success');
     setTimeout(startRandomCatAppearances, 5000);
   } else {
     // OFF - Cat disabled
-    statusIndicator.classList.remove('active');
-    statusIndicator.textContent = 'OFF';
-    statusText.textContent = 'Disabled';
-    catImage.style.opacity = '0.4';
-    catImage.style.filter = 'grayscale(100%)';
+    if (statusIndicator) {
+      statusIndicator.classList.remove('active');
+      statusIndicator.textContent = 'OFF';
+    }
+    if (catImage) {
+      catImage.style.opacity = '0.4';
+      catImage.style.filter = 'grayscale(100%)';
+    }
     const existingPopup = document.querySelector('.crypto-cat-popup');
     if (existingPopup) existingPopup.remove();
     showNotification('😿 Crypto Cat disabled', 'info');
@@ -4237,21 +4243,18 @@ function toggleCryptoCatImage() {
 // Initialize cat toggle state on load
 document.addEventListener('DOMContentLoaded', () => {
   const isCatEnabled = localStorage.getItem('darkwave_crypto_cat') !== 'false';
-  const statusIndicator = document.querySelector('.cat-toggle-status .status-indicator');
-  const statusText = document.querySelector('.cat-toggle-text');
+  const statusIndicator = document.querySelector('.cat-status-indicator') || document.getElementById('catToggleStatus');
   const catImage = document.getElementById('catToggleImage');
   
-  if (statusIndicator && statusText && catImage) {
+  if (statusIndicator && catImage) {
     if (isCatEnabled) {
       statusIndicator.classList.add('active');
       statusIndicator.textContent = 'ON';
-      statusText.textContent = 'Crypto Cat';
       catImage.style.opacity = '1';
       catImage.style.filter = 'none';
     } else {
       statusIndicator.classList.remove('active');
       statusIndicator.textContent = 'OFF';
-      statusText.textContent = 'Disabled';
       catImage.style.opacity = '0.4';
       catImage.style.filter = 'grayscale(100%)';
     }
