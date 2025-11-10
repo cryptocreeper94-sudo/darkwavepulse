@@ -4012,17 +4012,55 @@ function toggleCryptoCatFromModal(checkbox) {
 
 // ===== AI AGENT WIDGET FUNCTIONS =====
 function toggleAIAgent() {
+  console.log('🐱 [CryptoCat] Toggle clicked');
   const aiBox = document.getElementById('aiAgentBox');
   const aiToggle = document.getElementById('aiAgentToggle');
   
-  if (aiBox.style.display === 'none') {
+  console.log('🐱 [CryptoCat] Elements found:', { 
+    aiBox: !!aiBox, 
+    aiToggle: !!aiToggle,
+    currentDisplay: aiBox?.style.display 
+  });
+  
+  if (!aiBox || !aiToggle) {
+    console.error('❌ [CryptoCat] Missing elements!');
+    return;
+  }
+  
+  if (aiBox.style.display === 'none' || aiBox.style.display === '') {
+    console.log('✅ [CryptoCat] Opening AI chat');
     aiBox.style.display = 'flex';
     aiToggle.style.display = 'none';
   } else {
+    console.log('✅ [CryptoCat] Closing AI chat');
     aiBox.style.display = 'none';
     aiToggle.style.display = 'flex';
   }
 }
+
+// Make it global
+window.toggleAIAgent = toggleAIAgent;
+
+// Also attach via event listener as backup
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('aiAgentToggle');
+  if (toggleBtn) {
+    console.log('✅ [CryptoCat] Attaching event listener to toggle button');
+    toggleBtn.addEventListener('click', toggleAIAgent);
+  } else {
+    console.error('❌ [CryptoCat] Toggle button not found on DOMContentLoaded');
+  }
+});
+
+// Try immediate attachment too
+setTimeout(() => {
+  const toggleBtn = document.getElementById('aiAgentToggle');
+  if (toggleBtn && !toggleBtn.dataset.listenerAttached) {
+    console.log('✅ [CryptoCat] Attaching event listener (delayed)');
+    toggleBtn.addEventListener('click', toggleAIAgent);
+    toggleBtn.dataset.listenerAttached = 'true';
+  }
+}, 500);
 
 async function sendAIMessage() {
   const input = document.getElementById('aiAgentInput');
