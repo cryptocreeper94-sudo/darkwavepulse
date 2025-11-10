@@ -712,13 +712,16 @@ async function loadTabContent(tabName) {
   }
 }
 
-// Category Navigation
-document.querySelectorAll('.category-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const category = btn.dataset.category;
+// Category Navigation - Using event delegation for reliability
+document.addEventListener('click', (e) => {
+  const categoryBtn = e.target.closest('.category-btn');
+  if (categoryBtn && categoryBtn.dataset.category) {
+    e.preventDefault();
+    e.stopPropagation();
+    const category = categoryBtn.dataset.category;
     switchCategory(category);
     if (tg) tg.HapticFeedback?.impactOccurred('light');
-  });
+  }
 });
 
 function switchCategory(category) {
@@ -2543,14 +2546,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // Asset Class Toggle (Stocks vs Crypto)
-  document.querySelectorAll('.asset-class-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const assetClass = btn.dataset.asset;
+  // Asset Class Toggle (Stocks vs Crypto) - Using event delegation
+  document.addEventListener('click', (e) => {
+    const assetBtn = e.target.closest('.asset-class-btn');
+    if (assetBtn && assetBtn.dataset.asset) {
+      e.preventDefault();
+      e.stopPropagation();
+      const assetClass = assetBtn.dataset.asset;
       
       // Update active state
       document.querySelectorAll('.asset-class-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      assetBtn.classList.add('active');
       
       // Update state
       state.assetClass = assetClass;
@@ -2570,7 +2576,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       if (tg) tg.HapticFeedback?.impactOccurred('light');
-    });
+    }
   });
 });
 
