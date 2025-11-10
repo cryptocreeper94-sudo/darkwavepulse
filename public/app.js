@@ -2560,10 +2560,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Update stats bar labels
       if (assetClass === 'stocks') {
-        document.querySelector('[data-asset="stocks"] .asset-label').textContent = 'Stocks';
+        const stockLabel = document.querySelector('[data-asset="stocks"] .asset-label') || document.querySelector('[data-asset="stocks"] .asset-toggle-text');
+        if (stockLabel) stockLabel.textContent = '📊 Stocks';
         showToast('📊 Switched to Stocks mode');
       } else {
-        document.querySelector('[data-asset="crypto"] .asset-label').textContent = 'Cryptocurrency';
+        const cryptoLabel = document.querySelector('[data-asset="crypto"] .asset-label') || document.querySelector('[data-asset="crypto"] .asset-toggle-text');
+        if (cryptoLabel) cryptoLabel.textContent = '🪙 Cryptocurrency';
         showToast('🪙 Switched to Crypto mode');
       }
       
@@ -4040,7 +4042,7 @@ async function sendAIMessage() {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
   
   try {
-    const response = await fetch('/api/agents/DarkWave-V2/generate', {
+    const response = await fetch('/api/agents/darkwaveAgent/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
