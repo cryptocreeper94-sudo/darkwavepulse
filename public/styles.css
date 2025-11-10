@@ -1811,13 +1811,24 @@ a:hover {
   position: relative;
 }
 
+.wave-banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  z-index: 1;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
 .wave-banner-title {
   font-size: 2.5rem;
   font-weight: bold;
   color: #FFFFFF;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(59, 130, 246, 0.6);
   margin: 0;
-  z-index: 1;
+  text-align: center;
 }
 
 .wave-banner-subtitle {
@@ -1825,7 +1836,7 @@ a:hover {
   color: #E0E7FF;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   margin: 8px 0 0 0;
-  z-index: 1;
+  text-align: center;
 }
 
 /* Mobile optimization - tight and concise */
