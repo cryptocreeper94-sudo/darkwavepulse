@@ -6177,30 +6177,36 @@ window.closeStatModal = closeStatModal;
 // Make stat items clickable
 function initializeStatClickers() {
   const stats = document.querySelectorAll('.cmc-stat-item');
+  console.log('🔧 [StatClickers] Initializing stat item clicks', { count: stats.length });
+  
   if (stats.length >= 4) {
     // Fear & Greed (first stat)
-    stats[0].addEventListener('click', () => {
+    stats[0].addEventListener('click', (e) => {
+      console.log('🖱️ [StatClickers] Fear & Greed clicked');
       openStatModal('fearGreedModal');
-      console.log('Fear & Greed Index modal opened');
     });
     
     // Altcoin Season (second stat)
-    stats[1].addEventListener('click', () => {
+    stats[1].addEventListener('click', (e) => {
+      console.log('🖱️ [StatClickers] Altcoin Season clicked');
       openStatModal('altSeasonModal');
-      console.log('Altcoin Season modal opened');
     });
     
     // Avg RSI (third stat - after logo)
-    stats[2].addEventListener('click', () => {
+    stats[2].addEventListener('click', (e) => {
+      console.log('🖱️ [StatClickers] Avg RSI clicked');
       openStatModal('avgRsiModal');
-      console.log('Avg RSI modal opened');
     });
     
     // Market Cap (fourth stat)
-    stats[3].addEventListener('click', () => {
+    stats[3].addEventListener('click', (e) => {
+      console.log('🖱️ [StatClickers] Market Cap clicked');
       openStatModal('marketCapModal');
-      console.log('Market Cap modal opened');
     });
+    
+    console.log('✅ [StatClickers] All stat item clicks initialized');
+  } else {
+    console.warn('⚠️ [StatClickers] Not enough stat items found:', stats.length);
   }
 }
 
