@@ -7,6 +7,32 @@ let currentCategory = 'top';
 let currentChart = null;
 let currentTicker = '';
 
+// Technical terms glossary for hyperlinks
+const TECHNICAL_TERMS = {
+  'RSI': 'Relative Strength Index - momentum oscillator (0-100). <30 = oversold (buy signal), >70 = overbought (sell signal)',
+  'MACD': 'Moving Average Convergence Divergence - trend & momentum indicator. Bullish cross = buy, bearish cross = sell',
+  'EMA': 'Exponential Moving Average - trend indicator giving more weight to recent prices. Price above EMA = uptrend',
+  'SMA': 'Simple Moving Average - average price over set period. 50/200 crossovers are powerful signals',
+  'BOLLINGER BANDS': 'Volatility bands (SMA ± 2 std dev). Price at lower band = oversold, upper band = overbought',
+  'BB': 'Bollinger Bands - volatility indicator. Bands squeeze = big move coming, expansion = trend in progress',
+  'VOLUME': 'Total units traded. High volume confirms price moves, low volume = weak/unreliable signals',
+  'SUPPORT': 'Price floor where buyers prevent further decline. Buy near support, exit if broken',
+  'RESISTANCE': 'Price ceiling where sellers prevent rise. Take profits near resistance, breakouts need volume',
+  'LIQUIDITY': 'Ability to buy/sell without moving price. DEX pairs need $50k+ for safe trading',
+  'RUG RISK': 'Probability devs will drain liquidity. Check: locked liquidity, verified contract, holder distribution',
+  'SLIPPAGE': 'Difference between expected vs actual price. Set 1-3% for liquid pairs, avoid >15%',
+  'DEX': 'Decentralized Exchange - peer-to-peer trading without central authority. Higher risk than CEX',
+  'MARKET CAP': 'Total value (price × supply). Higher cap = stable, lower cap = risky/high growth potential',
+  'FDV': 'Fully Diluted Valuation - market cap if all tokens unlocked. High FDV/cap ratio = dilution risk',
+  'BULLISH': 'Expecting price rise. Signals: RSI recovery, MACD cross up, price above EMAs, volume up',
+  'BEARISH': 'Expecting price fall. Signals: RSI decline, MACD cross down, price below EMAs, volume down',
+  'OVERBOUGHT': 'Risen too fast, correction likely. RSI >70 or price above upper BB = take profits',
+  'OVERSOLD': 'Fallen too fast, bounce likely. RSI <30 or price below lower BB = buying opportunity',
+  'MOMENTUM': 'Rate of price acceleration. Strong momentum = trend continues, weak = reversal warning',
+  'VOLATILITY': 'Degree of price fluctuation. High vol = bigger swings, higher risk/reward',
+  'CROSSOVER': 'One indicator crosses another - signals trend change. EMA/MACD crossovers are key buy/sell signals'
+};
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 DarkWave PULSE initializing...');
@@ -30,6 +56,28 @@ function subscribePlan(plan) {
   alert(`Opening ${plan.toUpperCase()} subscription checkout...`);
   // TODO: Integrate with Stripe Checkout
   window.open('https://buy.stripe.com/your-link-here', '_blank');
+}
+
+// Hyperlink technical terms with tooltips
+function linkTechnicalTerms(text) {
+  if (!text) return text;
+  
+  let result = text;
+  
+  // Sort terms by length (longest first) to avoid partial matches
+  const sortedTerms = Object.keys(TECHNICAL_TERMS).sort((a, b) => b.length - a.length);
+  
+  sortedTerms.forEach(term => {
+    const definition = TECHNICAL_TERMS[term];
+    // Create regex that matches whole words only (case insensitive)
+    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+    
+    result = result.replace(regex, (match) => {
+      return `<span class="tech-term" data-tooltip="${definition}">${match}</span>`;
+    });
+  });
+  
+  return result;
 }
 
 // ===== SEARCH / ANALYZE =====
@@ -799,7 +847,8 @@ async function sendAIMessage() {
       }
     }
     
-    messages.innerHTML += `<div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;"><strong>Crypto Cat:</strong> ${aiResponse}</div>`;
+    const linkedResponse = linkTechnicalTerms(aiResponse);
+    messages.innerHTML += `<div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;"><strong>DarkWave:</strong> ${linkedResponse}</div>`;
     messages.scrollTop = messages.scrollHeight;
   } catch (error) {
     console.error('AI chat error:', error);
