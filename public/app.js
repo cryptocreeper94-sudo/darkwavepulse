@@ -296,12 +296,22 @@ function renderMarketTable(items) {
     const changeColor = item.change24h >= 0 ? 'var(--success)' : 'var(--danger)';
     const changeIcon = item.change24h >= 0 ? '▲' : '▼';
     
+    // Generate logo URL based on asset type
+    const logoUrl = item.type === 'stock' 
+      ? `https://logo.clearbit.com/${item.ticker.toLowerCase()}.com`
+      : `https://cryptologos.cc/logos/${item.ticker.toLowerCase()}-${item.name.toLowerCase().replace(/\s+/g, '-')}-logo.png`;
+    
     return `
       <tr style="border-bottom: 1px solid var(--border-primary); cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'" onclick="quickAnalyze('${item.ticker}')">
         <td style="padding: 12px; color: var(--text-secondary);">${index + 1}</td>
         <td style="padding: 12px;">
-          <div style="font-weight: 600; color: var(--text-primary);">${item.name}</div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">${item.ticker}</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="${logoUrl}" alt="${item.ticker}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1);" onerror="this.style.display='none'" />
+            <div>
+              <div style="font-weight: 600; color: var(--text-primary);">${item.name}</div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">${item.ticker}</div>
+            </div>
+          </div>
         </td>
         <td style="padding: 12px; text-align: right; color: var(--text-primary);">$${item.price?.toLocaleString() || '0.00'}</td>
         <td style="padding: 12px; text-align: right; color: ${changeColor}; font-weight: 600;">${changeIcon} ${Math.abs(item.change24h || 0).toFixed(2)}%</td>
