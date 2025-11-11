@@ -39,7 +39,7 @@
         </div>
       </header>
 
-      <!-- Search / Analyze -->
+      <!-- Search Web3 -->
       <div class="search-section" style="margin: 24px 0;">
         <div class="universal-search-container" style="max-width: 600px; margin: 0 auto;">
           <div class="search-box-wrapper-oval">
@@ -48,10 +48,10 @@
               type="text" 
               id="universalSearchInput" 
               class="universal-search-input-oval" 
-              placeholder="Enter ticker: BTC, TSLA, BAYC..."
+              placeholder="Search Crypto, Stocks, NFTs, Contracts..."
               autocomplete="off"
             />
-            <button id="universalSearchBtn" class="universal-search-btn-oval">Analyze</button>
+            <button id="universalSearchBtn" class="universal-search-btn-oval">Search Web3</button>
           </div>
         </div>
       </div>
@@ -134,8 +134,8 @@
 
     <!-- AI Chat Widget (Floating) -->
     <div class="ai-agent-widget" id="aiAgentWidget" style="position: fixed; bottom: 24px; right: 24px; z-index: 1000;">
-      <button class="ai-agent-toggle" id="aiAgentToggle" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #8B5CF6); border: none; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s;">
-        🤖
+      <button class="ai-agent-toggle" id="aiAgentToggle" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #8B5CF6); border: none; padding: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s; overflow: hidden;">
+        <img src="/assets/crypto-cat-emblem.png" alt="Crypto Cat AI" style="width: 100%; height: 100%; object-fit: cover;" />
       </button>
       <div class="ai-agent-box" id="aiAgentBox" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; max-height: 500px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden;">
         <div class="crypto-cat-ai-header" style="padding: 16px; background: linear-gradient(135deg, var(--primary), #8B5CF6); color: white; display: flex; align-items: center; gap: 12px;">
