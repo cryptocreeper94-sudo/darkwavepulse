@@ -30,6 +30,7 @@ export const userSettingsTool = createTool({
       priceAlertsEnabled: z.boolean().optional().describe('Enable/disable price alert monitoring'),
       assetScope: z.enum(['coins', 'stocks', 'both']).optional().describe('Which assets to analyze'),
       autoMonitorWatchlist: z.boolean().optional().describe('Auto-create alerts for watchlist items'),
+      personalityMode: z.enum(['regular', 'cryptoCat']).optional().describe('AI personality: regular (professional) or cryptoCat (sarcastic, fun)'),
     }).optional(),
   }),
   outputSchema: z.object({
@@ -44,6 +45,7 @@ export const userSettingsTool = createTool({
       priceAlertsEnabled: z.boolean(),
       assetScope: z.string(),
       autoMonitorWatchlist: z.boolean(),
+      personalityMode: z.string(),
     }).optional(),
   }),
   execute: async ({ context, mastra, runtimeContext }) => {
@@ -70,6 +72,7 @@ export const userSettingsTool = createTool({
         priceAlertsEnabled: false,
         assetScope: 'both', // coins, stocks, or both
         autoMonitorWatchlist: false,
+        personalityMode: 'regular', // regular or cryptoCat
       };
       
       try {
@@ -147,6 +150,10 @@ export const userSettingsTool = createTool({
 ├─ Asset scope: ${currentSettings.assetScope === 'both' ? '📊 Stocks + 🪙 Crypto' : currentSettings.assetScope === 'stocks' ? '📊 Stocks only' : '🪙 Crypto only'}
 └─ Quick: "stocks only" | "coins only" | "both"
 
+🎭 PERSONALITY
+├─ Mode: ${currentSettings.personalityMode === 'regular' ? '🎯 Professional' : '😺 Crypto Cat (Sarcastic)'}
+└─ Quick: "mode regular" | "mode cat"
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✨ SUPER SIMPLE COMMANDS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -159,6 +166,7 @@ Examples:
   "on auto trading" "off sniping"
   "stocks only" "coins only"
   "kraken links" "dex links"
+  "mode cat" "mode regular"
   
 ${!safeMode ? '\n⚠️ AUTO-TRADING ACTIVE - Bot will execute trades automatically!\n' : ''}`.trim();
         
@@ -232,6 +240,11 @@ ${!safeMode ? '\n⚠️ AUTO-TRADING ACTIVE - Bot will execute trades automatica
         }
         if (settings.maxAutoSpendPerTrade !== undefined) {
           updateMsg += `💰 Max auto-spend: ${settings.maxAutoSpendPerTrade} SOL/trade\n`;
+        }
+        if (settings.personalityMode) {
+          const modeEmoji = settings.personalityMode === 'regular' ? '🎯' : '😺';
+          const modeName = settings.personalityMode === 'regular' ? 'Professional Mode' : 'Crypto Cat Mode (Sarcastic)';
+          updateMsg += `${modeEmoji} Personality: ${modeName}\n`;
         }
 
         if (updatedSettings.autoExecuteLimitOrders || updatedSettings.autoExecuteSniping) {
