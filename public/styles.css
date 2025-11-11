@@ -92,34 +92,34 @@
 
 :root, body.theme-jupiter {
   /* Core Colors */
-  --primary: #3B82F6;
-  --primary-hover: #2563EB;
-  --primary-light: #60A5FA;
+  --primary: #FFFFFF;
+  --primary-hover: #E5E5E5;
+  --primary-light: #FFFFFF;
   
   /* Backgrounds */
-  --bg-primary: #0F172A;
-  --bg-secondary: #1E293B;
-  --bg-tertiary: #334155;
-  --bg-hover: #475569;
+  --bg-primary: #000000;
+  --bg-secondary: #1A1A1A;
+  --bg-tertiary: #2A2A2A;
+  --bg-hover: #333333;
   
   /* Text */
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
-  --text-tertiary: #94A3B8;
+  --text-primary: #FFFFFF;
+  --text-secondary: #E5E5E5;
+  --text-tertiary: #CCCCCC;
   
   /* Borders */
-  --border-primary: #334155;
-  --border-secondary: #475569;
+  --border-primary: #FFFFFF;
+  --border-secondary: #FFFFFF;
   
   /* Status Colors */
   --success: #10B981;
-  --success-bg: rgba(16, 185, 129, 0.1);
+  --success-bg: rgba(16, 185, 129, 0.15);
   --danger: #EF4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
+  --danger-bg: rgba(239, 68, 68, 0.15);
   --warning: #F59E0B;
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --info: #3B82F6;
-  --info-bg: rgba(59, 130, 246, 0.1);
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --info: #FFFFFF;
+  --info-bg: rgba(255, 255, 255, 0.1);
 }
 
 /* ===========================================
@@ -535,7 +535,7 @@ body {
   font-weight: var(--font-normal);
   line-height: 1.5;
   color: var(--text-primary);
-  background: var(--bg-primary);
+  background: #000000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -5602,5 +5602,34 @@ select {
   .analysis-metrics-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================
+   WHITE GLOW THEME - BLACK & WHITE
+   ========================================== */
+
+/* Global white glow for all bordered elements */
+.metric-card,
+.market-table,
+.category-btn,
+.asset-tab,
+button,
+input,
+select,
+textarea {
+  box-shadow: 
+    0 0 8px rgba(255, 255, 255, 0.2),
+    0 0 16px rgba(255, 255, 255, 0.1),
+    inset 0 0 4px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Enhanced glow for active/hover states */
+button:hover,
+.category-btn:hover,
+.asset-tab:hover {
+  box-shadow: 
+    0 0 12px rgba(255, 255, 255, 0.4),
+    0 0 24px rgba(255, 255, 255, 0.2),
+    inset 0 0 6px rgba(255, 255, 255, 0.1) !important;
 }
 
