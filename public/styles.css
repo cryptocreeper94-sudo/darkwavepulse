@@ -5673,3 +5673,127 @@ button:hover,
   transform: translateX(-50%);
 }
 
+/* ==========================================
+   MOBILE RESPONSIVE FIXES
+   ========================================== */
+
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  /* Fix app container */
+  #app {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  .app-main {
+    max-width: 100% !important;
+    padding: 4px !important;
+  }
+  
+  /* Fix top bar layout */
+  .app-main > div:has(.universal-search-container) {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  
+  /* Fix search box */
+  .search-box-wrapper-oval {
+    flex-wrap: wrap;
+  }
+  
+  .universal-search-input-oval {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+  
+  .universal-search-btn-oval {
+    width: 100%;
+    margin-top: 8px;
+  }
+  
+  .clear-search-btn {
+    right: 8px !important;
+    top: 12px !important;
+    transform: none !important;
+  }
+  
+  /* Fix table overflow */
+  .market-table {
+    font-size: 0.75rem !important;
+  }
+  
+  .market-table th,
+  .market-table td {
+    padding: 4px !important;
+  }
+  
+  /* Fix token cards grid */
+  #tokenCardsContainer {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .token-card {
+    grid-column: span 1 !important;
+  }
+  
+  /* Fix analysis two-column layout */
+  .analysis-two-column {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .analysis-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Fix modals */
+  .modal-content {
+    width: 95% !important;
+    max-height: 85vh !important;
+  }
+  
+  /* Fix AI chat widget */
+  .ai-agent-box {
+    width: 300px !important;
+    max-width: calc(100vw - 32px) !important;
+    right: -8px !important;
+  }
+  
+  /* Fix news grid */
+  #newsLinks {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Fix banner text */
+  .digital-title-unified {
+    font-size: 1.5rem !important;
+  }
+  
+  .digital-subtitle-unified {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .analysis-metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .market-table {
+    font-size: 0.625rem !important;
+  }
+  
+  /* Hide less important columns on tiny screens */
+  .market-table th:nth-child(5),
+  .market-table td:nth-child(5),
+  .market-table th:nth-child(6),
+  .market-table td:nth-child(6) {
+    display: none;
+  }
+}
+

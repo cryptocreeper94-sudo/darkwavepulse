@@ -47,15 +47,35 @@ document.addEventListener('DOMContentLoaded', () => {
   loadMarketData('crypto', 'top');
   loadMarketTicker();
   loadNewsLinks();
+  loadDarkWaveTokens();
   
   console.log('✅ DarkWave PULSE ready');
 });
 
-// Subscribe function
-function subscribePlan(plan) {
-  alert(`Opening ${plan.toUpperCase()} subscription checkout...`);
-  // TODO: Integrate with Stripe Checkout
-  window.open('https://buy.stripe.com/your-link-here', '_blank');
+// Subscribe function - Stripe integration
+async function subscribePlan(plan) {
+  try {
+    const response = await fetch(`${API_BASE}/api/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        plan: plan,
+        userId: 'user-' + Date.now()
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.url) {
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } else {
+      showNotification('Failed to create payment session. Please try again.');
+    }
+  } catch (error) {
+    console.error('Payment error:', error);
+    showNotification('Payment system error. Please try again later.');
+  }
 }
 
 // Hyperlink technical terms with tooltips
@@ -84,6 +104,7 @@ function linkTechnicalTerms(text) {
 function bindSearchEvents() {
   const searchBtn = document.getElementById('universalSearchBtn');
   const searchInput = document.getElementById('universalSearchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
   
   if (searchBtn) {
     searchBtn.addEventListener('click', performAnalysis);
@@ -92,6 +113,21 @@ function bindSearchEvents() {
   if (searchInput) {
     searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') performAnalysis();
+    });
+    
+    // Show/hide clear button based on input
+    searchInput.addEventListener('input', () => {
+      if (clearSearchBtn) {
+        clearSearchBtn.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+      }
+    });
+  }
+  
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearSearchBtn.style.display = 'none';
+      searchInput.focus();
     });
   }
 }
@@ -827,6 +863,7 @@ function bindAIChat() {
   const close = document.getElementById('closeChatBtn');
   const send = document.getElementById('aiSendBtn');
   const input = document.getElementById('aiAgentInput');
+  const clearAIBtn = document.getElementById('clearAIInput');
   
   if (toggle) {
     toggle.addEventListener('click', () => {
@@ -848,6 +885,21 @@ function bindAIChat() {
   if (input) {
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendAIMessage();
+    });
+    
+    // Show/hide clear button
+    input.addEventListener('input', () => {
+      if (clearAIBtn) {
+        clearAIBtn.style.display = input.value.length > 0 ? 'block' : 'none';
+      }
+    });
+  }
+  
+  if (clearAIBtn) {
+    clearAIBtn.addEventListener('click', () => {
+      input.value = '';
+      clearAIBtn.style.display = 'none';
+      input.focus();
     });
   }
 }
@@ -912,6 +964,71 @@ function bindAdminButton() {
         window.location.href = `/admin?code=${encodeURIComponent(code.trim())}`;
       }
     });
+  }
+}
+
+// ===== DARKWAVE TOKENS =====
+async function loadDarkWaveTokens() {
+  const container = document.getElementById('tokenCardsContainer');
+  
+  try {
+    const response = await fetch(`${API_BASE}/coins/darkwave-coins-catalog.json`);
+    const data = await response.json();
+    
+    // Filter for uploaded and coming_soon tokens
+    const tokens = data.coins.filter(c => c.status === 'uploaded' || c.status === 'coming_soon');
+    
+    if (tokens.length === 0) {
+      container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">No tokens available</div>';
+      return;
+    }
+    
+    container.innerHTML = tokens.map((token, index) => {
+      const isComingSoon = token.status === 'coming_soon';
+      const sizes = ['small', 'medium', 'large'];
+      const size = sizes[index % 3];
+      
+      const sizeStyles = {
+        small: 'grid-column: span 1;',
+        medium: 'grid-column: span 2;',
+        large: 'grid-column: span 3;'
+      };
+      
+      return `
+        <div class="token-card" style="${sizeStyles[size]} background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 16px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; position: relative; overflow: hidden;" onclick="window.open('${token.dexscreenerUrl}', '_blank')">
+          ${isComingSoon ? '<div style="position: absolute; top: 8px; right: 8px; background: #FF00FF; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.625rem; font-weight: 700;">COMING SOON</div>' : ''}
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <img src="${token.image}" alt="${token.symbol}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 255, 255, 0.3);" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%231A1A1A%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23fff%22%3E🪙%3C/text%3E%3C/svg%3E'" />
+            <div style="flex: 1;">
+              <h3 style="margin: 0; color: var(--text-primary); font-size: 1rem; font-weight: 700;">${token.name}</h3>
+              <div style="color: var(--primary); font-size: 0.875rem; font-weight: 600;">${token.symbol}</div>
+            </div>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.75rem; margin: 0 0 12px 0; line-height: 1.4;">${token.description}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.625rem; color: var(--text-tertiary); text-transform: uppercase;">${token.platform}</span>
+            <button style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(255, 0, 255, 0.3);" onclick="event.stopPropagation(); window.open('${token.dexscreenerUrl}', '_blank')">
+              ${isComingSoon ? 'Learn More' : 'Buy on DEX'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Add hover effect with JS
+    document.querySelectorAll('.token-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-4px)';
+        card.style.boxShadow = '0 8px 24px rgba(255, 0, 255, 0.3)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.boxShadow = 'none';
+      });
+    });
+  } catch (error) {
+    console.error('Failed to load tokens:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--danger);">Failed to load tokens</div>';
   }
 }
 

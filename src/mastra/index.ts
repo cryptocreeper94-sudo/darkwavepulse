@@ -295,6 +295,117 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Analyze endpoint - Technical analysis for any ticker
+      {
+        path: "/api/analyze",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            const { ticker, userId } = await c.req.json();
+            logger?.info('📊 [Analyze] Request received', { ticker, userId });
+            
+            if (!ticker) {
+              return c.json({ error: 'Ticker is required' }, 400);
+            }
+            
+            // Call technical analysis tool via workflow execution
+            const result = await technicalAnalysisTool.execute(
+              { context: { ticker: ticker.toUpperCase() }, mastra }
+            );
+            
+            logger?.info('✅ [Analyze] Analysis completed', { ticker });
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('❌ [Analyze] Error', { error: error.message });
+            return c.json({ error: error.message || 'Analysis failed' }, 500);
+          }
+        }
+      },
+      // Stripe Checkout Session endpoint
+      {
+        path: "/api/create-checkout-session",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            const { plan, userId } = await c.req.json();
+            logger?.info('💳 [Stripe] Creating checkout session', { plan, userId });
+            
+            if (!plan || !['basic', 'premium'].includes(plan)) {
+              return c.json({ error: 'Invalid plan. Must be basic or premium' }, 400);
+            }
+            
+            // Check for Stripe secret key
+            if (!process.env.STRIPE_SECRET_KEY) {
+              logger?.error('❌ [Stripe] STRIPE_SECRET_KEY not configured');
+              return c.json({ error: 'Payment system not configured' }, 500);
+            }
+            
+            // Dynamically import Stripe
+            const Stripe = (await import('stripe')).default;
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+              apiVersion: '2025-10-29.clover'
+            });
+            
+            // Get current domain for success/cancel URLs
+            const baseUrl = process.env.REPL_SLUG 
+              ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
+              : 'http://localhost:5000';
+            
+            // Plan pricing
+            const planPrices: Record<string, { amount: number, name: string }> = {
+              basic: { amount: 200, name: 'DarkWave PULSE - Basic Plan' },
+              premium: { amount: 600, name: 'DarkWave PULSE - Premium Plan' }
+            };
+            
+            const selectedPlan = planPrices[plan];
+            
+            // Create Stripe Checkout Session
+            const session = await stripe.checkout.sessions.create({
+              mode: 'subscription',
+              payment_method_types: ['card'],
+              line_items: [
+                {
+                  price_data: {
+                    currency: 'usd',
+                    product_data: {
+                      name: selectedPlan.name,
+                      description: `${plan === 'premium' ? 'Advanced' : 'Essential'} market analysis features`
+                    },
+                    unit_amount: selectedPlan.amount,
+                    recurring: {
+                      interval: 'month'
+                    }
+                  },
+                  quantity: 1
+                }
+              ],
+              success_url: `${baseUrl}?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+              cancel_url: `${baseUrl}?payment=cancelled`,
+              metadata: {
+                userId: userId || 'unknown',
+                plan: plan
+              }
+            });
+            
+            logger?.info('✅ [Stripe] Checkout session created', { 
+              sessionId: session.id,
+              url: session.url 
+            });
+            
+            return c.json({ url: session.url, sessionId: session.id });
+          } catch (error: any) {
+            logger?.error('❌ [Stripe] Error creating checkout session', { 
+              error: error.message,
+              stack: error.stack 
+            });
+            return c.json({ error: 'Failed to create checkout session' }, 500);
+          }
+        }
+      },
       // Serve frontend HTML at root
       {
         path: "/",
@@ -407,6 +518,45 @@ export const mastra = new Mastra({
           }
           
           return c.text('Logo not found', 404);
+        }
+      },
+      // Serve coins directory (JSON and images)
+      {
+        path: "/coins/*",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const url = await import('url');
+          
+          const requestedFile = c.req.path.replace('/coins/', '');
+          const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+          const possiblePaths = [
+            path.join(process.cwd(), 'public', 'coins', requestedFile),
+            path.join(__dirname, '..', '..', 'public', 'coins', requestedFile),
+            path.join(__dirname, '..', '..', '..', 'public', 'coins', requestedFile),
+          ];
+          
+          for (const filePath of possiblePaths) {
+            try {
+              const fileBuffer = await fs.readFile(filePath);
+              
+              // Set content type based on file extension
+              if (requestedFile.endsWith('.json')) {
+                c.header('Content-Type', 'application/json');
+              } else if (requestedFile.endsWith('.jpg') || requestedFile.endsWith('.jpeg')) {
+                c.header('Content-Type', 'image/jpeg');
+              } else if (requestedFile.endsWith('.png')) {
+                c.header('Content-Type', 'image/png');
+              }
+              
+              return c.body(fileBuffer);
+            } catch (err) {
+              continue;
+            }
+          }
+          
+          return c.text('File not found: ' + requestedFile, 404);
         }
       },
       // Admin Dashboard - View subscribers and manage whitelist

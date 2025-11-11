@@ -49,6 +49,7 @@
               placeholder="Search Crypto, Stocks, NFTs..."
               autocomplete="off"
             />
+            <button id="clearSearchBtn" class="clear-search-btn" style="display: none; position: absolute; right: 110px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.25rem; cursor: pointer; padding: 0 8px; line-height: 1;" title="Clear">&times;</button>
             <button id="universalSearchBtn" class="universal-search-btn-oval">Search Web3</button>
           </div>
         </div>
@@ -118,6 +119,14 @@
         </div>
       </section>
 
+      <!-- DarkWave Tokens Showcase -->
+      <section id="darkwaveTokens" style="margin-top: 32px; padding: 24px 0; border-top: 2px solid rgba(255, 255, 255, 0.2);">
+        <h2 style="color: var(--text-primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center; font-weight: 700; letter-spacing: 0.05em;">🪙 DARKWAVE TOKENS</h2>
+        <div id="tokenCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div style="text-align: center; padding: 40px; color: var(--text-secondary);">Loading tokens...</div>
+        </div>
+      </section>
+
       <!-- News Section - Drudge Report Style (Full Width at Bottom) -->
       <section style="margin-top: 48px; padding: 24px 0; border-top: 2px solid rgba(255, 255, 255, 0.2);">
         <h2 style="color: var(--text-primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center; font-weight: 700; letter-spacing: 0.05em;">📰 MARKET NEWS</h2>
@@ -159,8 +168,9 @@
             <strong>Crypto Cat:</strong> Ask me about any asset, trading strategies, or market analysis.
           </div>
         </div>
-        <div class="ai-agent-input-area" style="padding: 16px; border-top: 1px solid var(--border-primary); display: flex; gap: 8px;">
+        <div class="ai-agent-input-area" style="padding: 16px; border-top: 1px solid var(--border-primary); display: flex; gap: 8px; position: relative;">
           <input type="text" id="aiAgentInput" placeholder="Ask Crypto Cat..." style="flex: 1; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: 8px; color: var(--text-primary);" />
+          <button id="clearAIInput" class="clear-ai-btn" style="display: none; position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.25rem; cursor: pointer; padding: 0 8px; line-height: 1;" title="Clear">&times;</button>
           <button class="ai-send-btn" id="aiSendBtn" style="padding: 8px 16px; background: var(--primary); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">➤</button>
         </div>
       </div>
