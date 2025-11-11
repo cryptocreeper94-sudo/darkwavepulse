@@ -179,10 +179,10 @@
       "category": "cryptoCat",
       "platform": "raydium",
       "contractAddress": "75A2MwNbiXMBNoJuKFgEsaN42fHAqjHhEuW4fPpKMGF",
-      "image": "/coins/cwc-catwifcash.jpg",
+      "image": "/coins/cwc-catwifcash.png",
       "dexscreenerUrl": "https://dexscreener.com/solana/75A2MwNbiXMBNoJuKFgEsaN42fHAqjHhEuW4fPpKMGF",
       "featured": true,
-      "status": "pending"
+      "status": "uploaded"
     }
   ]
 }
