@@ -313,7 +313,7 @@ DO NOT include MACD, EMAs, Bollinger Bands, or other indicators in scan results 
 Be helpful, accurate, and always provide the complete technical picture.
 `,
 
-  model: openai("gpt-4o"), // AI SDK v5 compatible model for Playground
+  model: openai.responses("gpt-4o"), // Use .responses() for gpt-4o with Replit AI Integrations
 
   tools: {
     // Analysis tools
