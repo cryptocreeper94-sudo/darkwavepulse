@@ -39,7 +39,7 @@
       "image": "/coins/jh25-justice.jpg",
       "dexscreenerUrl": "https://dexscreener.com/solana/22PXfkPGkhVUwMqQaeFzjtdzyFNU8ZQRk2shifwAuSkx",
       "featured": true,
-      "status": "pending"
+      "status": "uploaded"
     },
     {
       "id": "v25",
@@ -131,19 +131,6 @@
       "dexscreenerUrl": "https://dexscreener.com/solana/H9BhViZnhNDpUAwv1vpt2waRNLcRNNQ1wYsaWJ6Npump",
       "featured": true,
       "status": "uploaded"
-    },
-    {
-      "id": "grimcat",
-      "name": "Crypto Cat Halloween 2025",
-      "symbol": "$GRIMCAT",
-      "description": "Spooky crypto cat for Halloween",
-      "category": "cryptoCat",
-      "platform": "pumpfun",
-      "contractAddress": "HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump",
-      "image": "/coins/grimcat-halloween.jpg",
-      "dexscreenerUrl": "https://dexscreener.com/solana/HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump",
-      "featured": true,
-      "status": "pending"
     },
     {
       "id": "rhodi",
