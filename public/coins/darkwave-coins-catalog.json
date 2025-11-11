@@ -26,7 +26,7 @@
       "image": "/coins/love-united.jpg",
       "dexscreenerUrl": "https://dexscreener.com/solana/Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump",
       "featured": true,
-      "status": "pending"
+      "status": "uploaded"
     },
     {
       "id": "jh25",
@@ -169,7 +169,7 @@
       "image": "/coins/ccat-cryptocat.jpg",
       "dexscreenerUrl": "https://dexscreener.com/solana/CyokFVBYyvdDzvScSSpHeJ3gR2oGPU5o9CjBHXwkpump",
       "featured": true,
-      "status": "pending"
+      "status": "uploaded"
     },
     {
       "id": "cwc",
