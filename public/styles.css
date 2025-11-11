@@ -2005,6 +2005,114 @@ a:hover {
 }
 
 /* Digital Title - DarkWave with Red/Black/Silver Holographic */
+/* Unified Banner Styles */
+.wave-banner-unified {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    #0a0e1a 0%,
+    #1a1f35 25%,
+    #0f1729 50%,
+    #1a2035 75%,
+    #0a0e1a 100%
+  );
+  box-shadow: 
+    var(--depth-contact-lg),
+    var(--depth-ambient-lg),
+    var(--depth-shadow-lg);
+  margin-bottom: var(--space-md);
+}
+
+.wave-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-image: url('/darkwave-wave-banner.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.15;
+  z-index: 0;
+  animation: wave-pulse 8s ease-in-out infinite;
+}
+
+@keyframes wave-pulse {
+  0%, 100% {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+.wave-banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+}
+
+.digital-title-unified {
+  font-family: 'Courier New', monospace;
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin: 0;
+  background: linear-gradient(
+    90deg,
+    #FF0000 0%,
+    #FF4500 10%,
+    #FFD700 20%,
+    #00FF00 30%,
+    #00FFFF 40%,
+    #0080FF 50%,
+    #8000FF 60%,
+    #FF00FF 70%,
+    #FF0080 80%,
+    #FF0000 90%,
+    #FF4500 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 
+    0 0 8px rgba(59, 130, 246, 0.4),
+    0 0 16px rgba(139, 92, 246, 0.3);
+  animation: rainbow-flow 6s linear infinite;
+}
+
+.digital-subtitle-unified {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  text-shadow: 
+    0 0 12px rgba(59, 130, 246, 0.6),
+    0 0 24px rgba(139, 92, 246, 0.4);
+}
+
+@keyframes rainbow-flow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
 .digital-title {
   font-family: 'Courier New', monospace;
   font-size: 2rem;
