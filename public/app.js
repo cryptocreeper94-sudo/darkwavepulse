@@ -391,16 +391,15 @@ async function loadNewsLinks() {
     const data = await response.json();
     
     if (data.success && data.articles) {
-      newsDiv.innerHTML = data.articles.slice(0, 12).map(article => `
-        <a href="${article.url}" target="_blank" rel="noopener" class="news-link" style="color: var(--primary); text-decoration: none; padding: 12px; border-radius: 6px; transition: all 0.3s; display: block; background: rgba(255,255,255,0.02); border: 1px solid var(--border-primary);" onmouseover="this.style.background='rgba(59, 130, 246, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
-          <div style="font-weight: 600; margin-bottom: 4px;">${article.title}</div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">${article.source} • ${new Date(article.publishedAt).toLocaleDateString()}</div>
+      newsDiv.innerHTML = data.articles.slice(0, 15).map(article => `
+        <a href="${article.url}" target="_blank" rel="noopener" class="news-link" style="color: var(--primary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s;" onmouseover="this.style.color='var(--primary-hover)'" onmouseout="this.style.color='var(--primary)'">
+          ${article.source} - ${article.title}
         </a>
       `).join('');
     }
   } catch (error) {
     console.error('News error:', error);
-    newsDiv.innerHTML = '<p style="color: var(--text-secondary);">News unavailable</p>';
+    newsDiv.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.875rem;">News unavailable</p>';
   }
 }
 
