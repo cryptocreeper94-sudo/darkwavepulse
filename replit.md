@@ -22,8 +22,14 @@
 - Preferred communication style: Simple, everyday language
 - Call him "Jason" not "DW"
 
-## Latest Updates (Nov 23, 2025) - ANALYSIS PAGE FULLY FUNCTIONAL
+## Latest Updates (Nov 23, 2025) - UI BUGS FIXED + ANALYSIS FULLY FUNCTIONAL
 
+- **✅ FIXED BANNER POSITIONING + ERROR MESSAGES**:
+  - Fixed banner width issue - "DARKWAVE PULSE" title now centered (was shifted right)
+  - Error state now only shows on actual failures, not for non-critical data
+  - ATH/supplementary data failures no longer block price display
+  - Version cache refresh forced (1120b) to clear old cached files
+  
 - **✅ FIXED ANALYSIS MODAL ERROR + 1-SECOND CHARTING**:
   - **Error Fix**: Non-critical data fetches (like ATH) no longer cause error state if they fail
     - Price data loads successfully even if supplementary data has issues
