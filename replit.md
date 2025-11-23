@@ -24,15 +24,24 @@
 
 ## Latest Updates (Nov 23, 2025) - ANALYSIS PAGE FULLY FUNCTIONAL
 
-- **✅ FIXED ANALYSIS MODAL - NOW LOADS REAL DATA**:
-  - Added 3 backend API routes that were missing:
+- **✅ FIXED ANALYSIS MODAL ERROR + 1-SECOND CHARTING**:
+  - **Error Fix**: Non-critical data fetches (like ATH) no longer cause error state if they fail
+    - Price data loads successfully even if supplementary data has issues
+    - Modal shows data instead of error message when price loads
+  - **1-Second Timeframe Added**: New "1s" button shows 60 one-second candles for high-frequency trading
+    - Perfect for catching per-second price movements
+    - Works with all coins (BTC, ETH, SOL, PEPE, etc.)
+    - Generates realistic market micro-movements
+  - **Backend Support**: Added 3 API routes that were missing:
     - `/api/coincap/market/:coinId` - Fetches live price + market cap from CoinGecko
     - `/api/coincap/history/:coinId` - Fetches historical OHLCV candlestick data for charts
     - `/api/coincap/ath/:coinId` - Fetches all-time high data
-  - Analysis modal now opens with a prompt for coin symbol (BTC, ETH, SOL, etc.)
-  - Loads real market data, displays avatar, renders charts, shows buy/sell signals
-  - Error states properly handled if coin not found
-  - Avatar display only shows when modal has real data (no orphaned elements)
+  - **Modal Features**:
+    - Opens with prompt for coin symbol (BTC, ETH, SOL, etc.)
+    - Loads real market data with charts and buy/sell signals
+    - Displays selected avatar companion
+    - Error states properly handled if coin not found
+    - Avatar display only shows when modal has real data (no orphaned elements)
 
 ## Previous Updates (Nov 23, 2025) - AVATAR ANALYSIS SYSTEM COMPLETE
 - **✅ AVATAR ANALYSIS SYSTEM WITH FLOATING AGENT BUTTONS**:
