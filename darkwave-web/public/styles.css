@@ -608,7 +608,7 @@ body.theme-light .banner-title {
   width: 100%;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  padding: 6px 4px;
+  padding: 8px 6px;
   box-sizing: border-box;
   overflow-x: hidden;
 }
@@ -616,20 +616,28 @@ body.theme-light .banner-title {
 .metrics-stack {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 8px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Mobile: Make metric boxes taller and properly proportioned */
+@media (max-width: 768px) {
+  .metrics-stack {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
 }
 
 /* Compact Metric Boxes - 4 Horizontal Square Thumbnails on Mobile */
 .metric-box-wide {
   width: 100%;
-  aspect-ratio: 1.2 / 1;
+  aspect-ratio: 0.9 / 1;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 4px 2px 2px 2px;
+  border-radius: 6px;
+  padding: 6px 3px 4px 3px;
   text-align: center;
   box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
@@ -640,7 +648,18 @@ body.theme-light .banner-title {
   cursor: pointer;
   position: relative;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
+  min-height: 80px;
+}
+
+/* Mobile: Larger metric boxes */
+@media (max-width: 768px) {
+  .metric-box-wide {
+    aspect-ratio: 0.85 / 1;
+    padding: 8px 4px 6px 4px;
+    min-height: 100px;
+    border-radius: 8px;
+  }
 }
 
 /* Center only Market Cap and Volume boxes (3rd and 4th) */
@@ -684,25 +703,34 @@ body.theme-light .banner-title {
 }
 
 .metric-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-dim);
   margin: 1px 0 2px 0;
-  padding: 0 1px;
-  font-weight: 600;
+  padding: 0 2px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1px;
-  line-height: 1;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
   display: block;
   white-space: nowrap;
   text-align: center;
   overflow: visible;
   flex-shrink: 0;
   position: absolute;
-  top: 2px;
+  top: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
+  width: calc(100% - 4px);
   z-index: 2;
+}
+
+/* Mobile: Larger metric labels */
+@media (max-width: 768px) {
+  .metric-label {
+    font-size: 13px;
+    top: 6px;
+    font-weight: 700;
+  }
 }
 
 .metric-label-desktop {
@@ -720,15 +748,25 @@ body.theme-light .banner-title {
 }
 
 .metric-value {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
   position: absolute;
-  bottom: 4px;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
-  line-height: 1;
+  line-height: 1.2;
+  width: calc(100% - 4px);
+  padding: 0 2px;
+}
+
+/* Mobile: Larger metric values */
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 15px;
+    bottom: 8px;
+  }
 }
 
 /* Action Button Group - Full Width Mobile */
