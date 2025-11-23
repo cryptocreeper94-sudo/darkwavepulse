@@ -1,0 +1,167 @@
+// DarkWave Pulse - Coin Configuration (14 Featured Coins)
+// All Solana-based tokens with contract addresses
+
+export interface Coin {
+  id: number;
+  ticker: string;
+  name: string;
+  ca: string;
+  category: 'spiritual' | 'conspiracy' | 'meme' | 'featured';
+  image: string;
+  description: string;
+  isFeatured?: boolean;
+}
+
+export const COINS: Coin[] = [
+  // Featured
+  {
+    id: 1,
+    ticker: 'SolDump',
+    name: 'SolDump',
+    ca: 'SolDumpSolDumpSolDumpSolDumpSolDumpSolDump',
+    category: 'featured',
+    image: require('../assets/coins/soldump.jpg'),
+    description: 'Current featured coin',
+    isFeatured: true
+  },
+  
+  // Spiritual & Unity (4)
+  {
+    id: 2,
+    ticker: '$LOVE',
+    name: 'United',
+    ca: 'Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump',
+    category: 'spiritual',
+    image: require('../assets/coins/love-united.jpg'),
+    description: 'Unity and love on chain'
+  },
+  {
+    id: 3,
+    ticker: '$YAHU',
+    name: 'Yahusha',
+    ca: 'ADRs4hrVr729GDqCS5NeRSrVLPBvErpWJcF69vCJWsZT',
+    category: 'spiritual',
+    image: require('../assets/coins/yahu-yahusha.jpg'),
+    description: 'Spiritual awakening token'
+  },
+  {
+    id: 4,
+    ticker: '$YAH',
+    name: 'Yahuah',
+    ca: 'ERf16TD1VrUHdhpUFbUJpSPXVu9rbtzrzkKfCbwLMYiP',
+    category: 'spiritual',
+    image: require('../assets/coins/yah-yahuah.jpg'),
+    description: 'Divine consciousness'
+  },
+  {
+    id: 5,
+    ticker: '$RHODI',
+    name: 'Rhodium',
+    ca: 'HEkEQd1nwvD7qiRHcwLEw9d7bnsg2PffrkZrWMkKpump',
+    category: 'spiritual',
+    image: require('../assets/coins/rhodi-rhodium.jpg'),
+    description: 'Rare earth token'
+  },
+  
+  // Justice & Conspiracy (4)
+  {
+    id: 6,
+    ticker: '$JH-25',
+    name: 'Justice for Humanity',
+    ca: '22PXfkPGkhVUwMqQaeFzjtdzyFNU8ZQRk2shifwAuSkx',
+    category: 'conspiracy',
+    image: require('../assets/coins/jh25-justice.jpg'),
+    description: 'Fighting for justice'
+  },
+  {
+    id: 7,
+    ticker: '$OBEY',
+    name: 'Illuminati',
+    ca: 'FXXVV7T7MHptzLMd9b4cCtUYpqqbVg8rUGxMtRTuUq5k',
+    category: 'conspiracy',
+    image: require('../assets/coins/obey-illuminati.jpg'),
+    description: 'The all-seeing eye'
+  },
+  
+  // Pump & Degen (6)
+  {
+    id: 8,
+    ticker: '$V-25',
+    name: 'Vertigo I',
+    ca: 'DitutwBDmEU1fM82ePTymzjLStjraLdwSQDwvSdgCmTs',
+    category: 'meme',
+    image: require('../assets/coins/v25-vertigo.jpg'),
+    description: 'Spinning toward profits'
+  },
+  {
+    id: 9,
+    ticker: '$CHEERS',
+    name: 'Pumpaholic 2025',
+    ca: '3gyRB7GVxzM4tUj41WvWpcgaHqbmZsvU7ANP9vnaLSgZ',
+    category: 'meme',
+    image: require('../assets/coins/cheers-pumpaholic.jpg'),
+    description: 'Cheers to the pump 🚀'
+  },
+  {
+    id: 10,
+    ticker: '$P-25',
+    name: 'Pumpocracy 2025',
+    ca: '3eFj4ujRnuWH9SpvHyK9o4VJymkWHKsoweP5916Rywux',
+    category: 'meme',
+    image: require('../assets/coins/p25-pumpocracy.jpg'),
+    description: 'Government by the pump'
+  },
+  {
+    id: 11,
+    ticker: '$REKTMEOW',
+    name: 'Liquidation (Crypto Cat)',
+    ca: '4BqYgxjhcc3ew44WEkaxzxxtSUpL62emzmRvuraxpump',
+    category: 'meme',
+    image: require('../assets/coins/rektmeow-liquidation.jpg'),
+    description: 'When the cat gets liquidated'
+  },
+  {
+    id: 12,
+    ticker: '$UNCAT',
+    name: 'Uncertainty',
+    ca: 'H9BhViZnhNDpUAwv1vpt2waRNLcRNNQ1wYsaWJ6Npump',
+    category: 'meme',
+    image: require('../assets/coins/uncat-uncertainty.jpg'),
+    description: 'Schrödinger\'s pump'
+  },
+  {
+    id: 13,
+    ticker: '$GRIMCAT',
+    name: 'Crypto Cat Halloween 2025',
+    ca: 'HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump',
+    category: 'meme',
+    image: require('../assets/coins/grimcat-halloween.jpg'),
+    description: 'Spooky season trading'
+  },
+  {
+    id: 14,
+    ticker: '$CCAT',
+    name: 'CryptoCat',
+    ca: 'CyokFVBYyvdDzvScSSpHeJ3gR2oGPU5o9CjBHXwkpump',
+    category: 'meme',
+    image: require('../assets/coins/ccat-cryptocat.jpg'),
+    description: 'The original Crypto Cat'
+  },
+  {
+    id: 15,
+    ticker: '$CWC',
+    name: 'Catwifcash (Raydium)',
+    ca: '75A2MwNbiXMBNoJuKFgEsaN42fHAqjHhEuW4fPpKMGF',
+    category: 'meme',
+    image: require('../assets/coins/cwc-catwifcash.jpg'),
+    description: 'Cat with cash vibes'
+  }
+];
+
+export const getCoinsByCategory = (category: string) => {
+  return COINS.filter(coin => coin.category === category);
+};
+
+export const getFeaturedCoin = () => {
+  return COINS.find(coin => coin.isFeatured) || COINS[0];
+};
