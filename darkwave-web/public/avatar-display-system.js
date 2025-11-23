@@ -333,29 +333,80 @@ const avatarDisplaySystem = {
     const modal = document.createElement('div');
     modal.id = 'avatarBuilderModal';
     modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-      display: flex; align-items: center; justify-content: center; z-index: 10001;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95);
+      display: flex; align-items: center; justify-content: center; z-index: 10001; overflow-y: auto;
     `;
     
+    const isPaid = window.userData?.isPaid || false;
+    
+    // Avatar skin themes
+    const skinThemes = [
+      { name: '🌌 Deep Space', color: '#0B0C10', desc: 'Cosmic depths' },
+      { name: '🌊 Ocean', color: '#0d1b2a', desc: 'Deep blue waters' },
+      { name: '🌲 Forest', color: '#0f1419', desc: 'Green canopy' },
+      { name: '🌄 Outdoors', color: '#2A2416', desc: 'Countryside sunrise' },
+      { name: '🏈 Sports Pro', color: '#1a1a1a', desc: 'Professional sports' },
+      { name: '🎓 College', color: '#0a0e27', desc: 'College colors' },
+      { name: '🌀 Paisley', color: '#1a0f1f', desc: 'Ornate patterns' },
+      { name: '🌸 Flowers', color: '#2d1b2e', desc: 'Floral designs' },
+      { name: '⚫ Solid Black', color: '#000000', desc: 'Sleek black' },
+      { name: '⚪ Solid White', color: '#E8E8E8', desc: 'Clean white' }
+    ];
+    
+    const availableSkins = isPaid ? skinThemes : skinThemes.slice(7); // Nonsubscribers see paisleys, flowers, solid colors only
+    
+    const skinsHTML = availableSkins.map(skin => `
+      <div style="
+        padding: 12px; background: linear-gradient(135deg, ${skin.color}, rgba(255,255,255,0.05));
+        border: 2px solid rgba(168,85,247,0.3); border-radius: 8px; cursor: pointer; 
+        transition: all 0.2s; text-align: center;
+      " onmouseover="this.style.borderColor='#a78bfa'; this.style.boxShadow='0 0 15px rgba(168,85,247,0.4)'" 
+        onmouseout="this.style.borderColor='rgba(168,85,247,0.3)'; this.style.boxShadow=''">
+        <div style="font-weight: 700; color: #fff; margin-bottom: 4px;">${skin.name}</div>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.6);">${skin.desc}</div>
+        <div style="margin-top: 8px; height: 30px; background: ${skin.color}; border-radius: 4px; opacity: 0.7;"></div>
+      </div>
+    `).join('');
+    
     modal.innerHTML = `
-      <div style="background: #1a1f2e; border: 1px solid rgba(168,85,247,0.3); border-radius: 12px; padding: 30px; max-width: 600px; text-align: center;">
-        <h2 style="color: #c084fc; margin: 0 0 15px 0;">🎨 Avatar Builder (Admin Preview)</h2>
-        <p style="color: rgba(255,255,255,0.8); line-height: 1.6;">
-          This is where admins can create and test custom avatars before the full V2 release on December 25, 2025.
+      <div style="background: #1a1f2e; border: 2px solid rgba(168,85,247,0.5); border-radius: 12px; padding: 25px; max-width: 700px; max-height: 85vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="color: #c084fc; margin: 0;">🎨 Avatar Theme Builder</h2>
+          <button onclick="document.getElementById('avatarBuilderModal').remove()" style="
+            background: none; border: none; color: #c084fc; font-size: 24px; cursor: pointer; padding: 0;
+          ">×</button>
+        </div>
+        
+        <p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-size: 12px;">
+          ${isPaid ? '✅ Premium: Choose from all 10 avatar theme skins' : '⚠️ Free: Choose from 3 limited theme skins (Paisley, Flowers, Solid Colors)'}
         </p>
-        <div style="margin: 20px 0; padding: 15px; background: rgba(168,85,247,0.1); border-radius: 8px; border: 1px solid rgba(168,85,247,0.2);">
-          <p style="color: #c084fc; font-weight: 600; margin: 0 0 10px 0;">Features Coming:</p>
-          <ul style="color: rgba(255,255,255,0.7); text-align: left; display: inline-block; line-height: 1.8;">
-            <li>✅ Upload custom character images</li>
-            <li>✅ Configure personality traits</li>
-            <li>✅ Test in live analysis</li>
-            <li>✅ Share with team</li>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          ${skinsHTML}
+        </div>
+        
+        <div style="background: rgba(168,85,247,0.1); border-left: 3px solid #a78bfa; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+          <p style="color: #c084fc; font-size: 12px; margin: 0; font-weight: 600;">💡 How It Works:</p>
+          <ul style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 8px 0 0 0; padding-left: 20px;">
+            <li>Click a theme skin to select</li>
+            <li>Upload or use default avatar image</li>
+            <li>Add watermark or pattern overlay</li>
+            <li>Preview in real-time</li>
+            <li>Save to your profile</li>
           </ul>
         </div>
+        
+        ${!isPaid ? `
+          <div style="background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(168,85,247,0.1)); border: 1px solid rgba(59,130,246,0.3); padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center;">
+            <p style="color: #60a5fa; font-size: 12px; margin: 0; font-weight: 600;">🔓 Unlock Premium for 10+ Avatar Themes</p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 11px; margin: 6px 0 0 0;">Space, Ocean, Forest, Sports, College, and more</p>
+          </div>
+        ` : ''}
+        
         <button onclick="document.getElementById('avatarBuilderModal').remove()" style="
-          margin-top: 15px; padding: 10px 20px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
-          border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer;
-        ">Close</button>
+          width: 100%; padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
+          border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer; font-size: 12px;
+        ">Done</button>
       </div>
     `;
     
