@@ -11802,3 +11802,164 @@ body {
     gap: 12px;
   }
 }
+
+/* ========== AGENT REFRACTOR MODAL ========== */
+.agent-refractor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+}
+
+.agent-refractor-modal {
+  position: relative;
+  background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 40, 0.95));
+  border: 2px solid rgba(56, 97, 251, 0.5);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(56, 97, 251, 0.4), inset 0 0 40px rgba(131, 56, 236, 0.1);
+}
+
+.refractor-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(56, 97, 251, 0.2);
+  color: #FFF;
+  font-size: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refractor-close:hover {
+  background: rgba(56, 97, 251, 0.5);
+}
+
+.refractor-card-container {
+  text-align: center;
+  color: #FFF;
+}
+
+.refractor-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.refractor-name-block {
+  margin: 12px 0;
+}
+
+.refractor-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+  padding: 12px;
+  background: rgba(56, 97, 251, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(56, 97, 251, 0.2);
+}
+
+.stat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD700;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.refractor-serial {
+  margin: 16px 0;
+  padding: 10px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 6px;
+}
+
+.refractor-qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.qr-download-btn {
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.qr-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.refractor-view-profile {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #3861FB, #8338EC);
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 12px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.refractor-view-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(56, 97, 251, 0.5);
+}
+
+/* Holographic animation for agent thumbnails */
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
