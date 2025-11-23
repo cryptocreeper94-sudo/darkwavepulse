@@ -1,9 +1,30 @@
-import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
+import type { Coin } from '../src/config/coins';
 import { COINS, getFeaturedCoin, getCoinsByCategory } from '../src/config/coins';
 
-const { width } = Dimensions.get('window');
+const coinImages: { [key: string]: any } = {
+  'soldump': require('../src/assets/coins/soldump.jpg'),
+  'love-united': require('../src/assets/coins/love-united.jpg'),
+  'yahu-yahusha': require('../src/assets/coins/yahu-yahusha.jpg'),
+  'yah-yahuah': require('../src/assets/coins/yah-yahuah.jpg'),
+  'rhodi-rhodium': require('../src/assets/coins/rhodi-rhodium.jpg'),
+  'jh25-justice': require('../src/assets/coins/jh25-justice.jpg'),
+  'obey-illuminati': require('../src/assets/coins/obey-illuminati.jpg'),
+  'v25-vertigo': require('../src/assets/coins/v25-vertigo.jpg'),
+  'cheers-pumpaholic': require('../src/assets/coins/cheers-pumpaholic.jpg'),
+  'p25-pumpocracy': require('../src/assets/coins/p25-pumpocracy.jpg'),
+  'rektmeow-liquidation': require('../src/assets/coins/rektmeow-liquidation.jpg'),
+  'uncat-uncertainty': require('../src/assets/coins/uncat-uncertainty.jpg'),
+  'grimcat-halloween': require('../src/assets/coins/grimcat-halloween.jpg'),
+  'ccat-cryptocat': require('../src/assets/coins/ccat-cryptocat.jpg'),
+  'cwc-catwifcash': require('../src/assets/coins/cwc-catwifcash.png')
+};
+
+const getImage = (imagePath: string) => {
+  return coinImages[imagePath] || null;
+};
 
 export default function HomeScreen() {
   const featuredCoin = getFeaturedCoin();
@@ -30,7 +51,9 @@ export default function HomeScreen() {
           style={styles.featuredContainer}
         >
           <Text style={styles.featuredLabel}>FEATURED</Text>
-          <Image source={featuredCoin.image} style={styles.featuredImage} />
+          {getImage(featuredCoin.imagePath) && (
+            <Image source={getImage(featuredCoin.imagePath)} style={styles.featuredImage} />
+          )}
           <Text style={styles.featuredTicker}>{featuredCoin.ticker}</Text>
           <Text style={styles.featuredName}>{featuredCoin.name}</Text>
           <TouchableOpacity style={styles.buyButton}>
@@ -82,7 +105,7 @@ export default function HomeScreen() {
 }
 
 interface CoinCardProps {
-  coin: typeof COINS[0];
+  coin: Coin;
 }
 
 function CoinCard({ coin }: CoinCardProps) {
@@ -94,7 +117,9 @@ function CoinCard({ coin }: CoinCardProps) {
         end={{ x: 1, y: 1 }}
         style={styles.coinCardGradient}
       >
-        <Image source={coin.image} style={styles.coinImage} />
+        {getImage(coin.imagePath) && (
+          <Image source={getImage(coin.imagePath)} style={styles.coinImage} />
+        )}
         <Text style={styles.coinTicker}>{coin.ticker}</Text>
         <Text style={styles.coinName}>{coin.name}</Text>
       </LinearGradient>
