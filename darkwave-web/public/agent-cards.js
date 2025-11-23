@@ -1,37 +1,24 @@
 // Collectible Agent Cards System for Projects Page
 console.log('✅ Agent Cards system loaded');
 
-// Create collectible agent card for projects page
+// Create small carousel-style agent card
 function createAgentCard(agent) {
   const card = document.createElement('div');
-  card.className = 'agent-collectible-card';
+  card.className = 'carousel-coin-card';
+  card.onclick = () => {
+    setUserSelectedAgent(agent.id);
+    showAgentPopup(agent);
+  };
   card.innerHTML = `
-    <div class="agent-card-header">
-      <img src="${agent.image}" alt="${agent.name}" class="agent-card-image">
-      <div class="agent-card-badge">#${agent.id.toString().padStart(2, '0')}</div>
-    </div>
-    <div class="agent-card-body">
-      <h3 class="agent-card-name">${agent.name}</h3>
-      <p class="agent-card-title">${agent.title}</p>
-      <div class="agent-card-stats">
-        <span class="agent-card-stat">🌍 ${agent.race}</span>
-        <span class="agent-card-stat">👥 ${agent.gender}</span>
+    <div class="coin-card-wrapper">
+      <div class="coin-card-image-container">
+        <img src="${agent.image}" alt="${agent.name}" class="coin-card-image" onerror="this.src='/darkwave-coin.png'" />
+        <div class="coin-card-badge" style="background: linear-gradient(135deg, var(--accent-blue), #7C3AED); font-size: 11px; padding: 3px 6px;">Agent</div>
       </div>
-    </div>
-    <div class="agent-card-footer">
-      <div class="agent-card-highlight">
-        <span class="agent-card-label">Career Highlight:</span>
-        <p class="agent-card-text">"${agent.careerHighlight}"</p>
+      <div class="coin-card-info">
+        <h4 class="coin-card-name">${agent.name}</h4>
+        <p class="coin-card-symbol" style="font-size: 10px; margin: 2px 0;">#${agent.id.toString().padStart(2, '0')}</p>
       </div>
-      <div class="agent-card-funfact">
-        <span class="agent-card-label">Fun Fact:</span>
-        <p class="agent-card-text">"${agent.funFact}"</p>
-      </div>
-    </div>
-    <div class="agent-card-actions">
-      <button class="agent-card-btn" onclick="setUserSelectedAgent(${agent.id}); showAgentPopup(getAgentById(${agent.id}));">
-        Select Agent
-      </button>
     </div>
   `;
   return card;
@@ -46,14 +33,14 @@ function renderAgentCards(containerId) {
   }
   
   container.innerHTML = '';
-  container.className = 'agent-cards-grid';
+  container.className = 'featured-coins-grid';
   
   AGENTS.forEach(agent => {
     const card = createAgentCard(agent);
     container.appendChild(card);
   });
   
-  console.log(`✅ Rendered ${AGENTS.length} Agent cards`);
+  console.log(`✅ Rendered ${AGENTS.length} Agent cards in carousel`);
 }
 
 // Expose globally
