@@ -1,4 +1,5 @@
-// DarkWave Banner - Full-Width Holographic Wave with Dynamic Stretching
+// DarkWave Banner - Waveform Visualization (like the reference image)
+// Horizontal wave moving left-to-right with vertical geometric pattern inside
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
@@ -8,7 +9,7 @@ window.bannerChartManager = {
   candleData: [],
 
   init: function() {
-    console.log('🎬 Full-Width Wave Banner init');
+    console.log('🎬 Waveform Banner init');
     
     if (this.initialized) return;
 
@@ -38,7 +39,7 @@ window.bannerChartManager = {
 
     this.generateCandleData(300);
     this.initialized = true;
-    console.log('✅ Full-Width Wave banner ready');
+    console.log('✅ Waveform banner ready');
     
     this.animate();
   },
@@ -59,7 +60,7 @@ window.bannerChartManager = {
 
   animate: function() {
     this.draw();
-    this.time += 0.008;
+    this.time += 0.003; // Very slow horizontal movement
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 
@@ -73,79 +74,111 @@ window.bannerChartManager = {
     this.ctx.fillStyle = 'rgba(15, 15, 35, 0.96)';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Draw full-width rope wave (much larger)
-    this.drawFullWidthRopeWave(w, h, time);
+    // Draw waveform with geometric pattern
+    this.drawWaveform(w, h, time);
     
-    // Draw candlestick stream
+    // Draw candlesticks underneath
     this.drawCandleStream(w, h, time);
   },
 
-  drawFullWidthRopeWave: function(w, h, time) {
+  drawWaveform: function(w, h, time) {
     const centerY = h / 2;
-    const numStrings = 12; // 10-12 intertwined lines
+    const maxAmplitude = h * 0.3; // 50-60% range as requested
     
+    // Wave properties
+    const waveLength = w * 0.6; // Wavelength (how wide each wave cycle is)
+    const frequency = (2 * Math.PI) / waveLength;
+    
+    // Holographic colors for the wave fill
     const colors = [
-      'rgba(255, 30, 80, 0.70)',
-      'rgba(255, 60, 120, 0.72)',
-      'rgba(240, 80, 140, 0.74)',
-      'rgba(220, 100, 160, 0.76)',
-      'rgba(200, 120, 180, 0.76)',
-      'rgba(180, 140, 190, 0.76)',
-      'rgba(160, 160, 200, 0.75)',
-      'rgba(150, 150, 210, 0.73)',
-      'rgba(180, 120, 200, 0.71)',
-      'rgba(220, 100, 160, 0.70)',
-      'rgba(240, 80, 140, 0.69)',
-      'rgba(255, 60, 100, 0.68)',
+      'rgba(255, 30, 80, 0.35)',
+      'rgba(255, 60, 120, 0.40)',
+      'rgba(240, 80, 140, 0.42)',
+      'rgba(220, 100, 160, 0.40)',
+      'rgba(200, 120, 180, 0.38)',
+      'rgba(180, 140, 190, 0.36)',
+      'rgba(160, 160, 200, 0.34)',
     ];
 
-    for (let stringIdx = 0; stringIdx < numStrings; stringIdx++) {
-      // Vertical offset between strings (spread them across height)
-      const verticalSpacing = h / (numStrings + 1);
-      const baseY = verticalSpacing * (stringIdx + 1);
-      const color = colors[stringIdx % colors.length];
+    // Draw the wave envelope with fill
+    this.ctx.fillStyle = 'rgba(150, 80, 180, 0.15)';
+    this.ctx.strokeStyle = 'rgba(255, 100, 150, 0.8)';
+    this.ctx.lineWidth = 2;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
 
-      this.ctx.strokeStyle = color;
-      this.ctx.lineWidth = 2.5;
-      this.ctx.lineCap = 'round';
-      this.ctx.lineJoin = 'round';
+    this.ctx.beginPath();
+    let startX = null;
 
-      this.ctx.beginPath();
+    // Top boundary of wave
+    for (let x = 0; x < w; x += 1) {
+      const phase = (x - time * 60) * frequency;
+      const amplitude = Math.sin(phase) * maxAmplitude;
+      const y = centerY - Math.abs(amplitude); // Top half of wave
       
-      for (let x = 0; x < w; x += 2) {
-        // STRETCHED WAVE PATTERN: Covers full width with 1-2 cycles
-        // Very long wavelength to stretch across entire banner
-        const wavePhase = (x / w) * Math.PI * 2; // One full sine cycle across width
-        
-        // Primary wave: massive amplitude
-        const primaryWave = Math.sin(wavePhase - time * 0.8) * (h * 0.32);
-        
-        // Secondary wave: adds complexity (different frequency = 2 cycles)
-        const secondaryWave = Math.sin((x / w) * Math.PI * 4 - time * 1.2) * (h * 0.15);
-        
-        // Tertiary wave: adds subtle variation
-        const tertiaryWave = Math.sin((x / w) * Math.PI * 6 - time * 0.5) * (h * 0.08);
-        
-        // Per-string variation: slight offset for rope effect
-        const stringVariation = Math.sin(stringIdx * 0.5 + time * 0.3) * 6;
-        
-        // Dynamic stretching effect: amplitude changes over time
-        const stretchFactor = 0.8 + Math.sin(time * 0.5) * 0.4;
-        
-        const y = baseY + (primaryWave + secondaryWave + tertiaryWave + stringVariation) * stretchFactor;
-
-        if (x === 0) this.ctx.moveTo(x, y);
-        else this.ctx.lineTo(x, y);
+      if (x === 0) {
+        this.ctx.moveTo(x, y);
+        startX = x;
+      } else {
+        this.ctx.lineTo(x, y);
       }
-      
-      this.ctx.stroke();
     }
 
-    // Holographic glow
-    this.ctx.shadowColor = 'rgba(255, 80, 150, 0.3)';
-    this.ctx.shadowBlur = 30;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    // Bottom boundary of wave (return path)
+    for (let x = w - 1; x >= 0; x -= 1) {
+      const phase = (x - time * 60) * frequency;
+      const amplitude = Math.sin(phase) * maxAmplitude;
+      const y = centerY + Math.abs(amplitude); // Bottom half of wave
+      this.ctx.lineTo(x, y);
+    }
+
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    // Draw vertical ribbed lines inside the wave (geometric pattern)
+    this.drawWaveGeometry(w, h, centerY, time, frequency, maxAmplitude);
+
+    // Draw horizontal baseline
+    this.ctx.strokeStyle = 'rgba(255, 100, 150, 0.4)';
+    this.ctx.lineWidth = 1;
+    this.ctx.setLineDash([5, 5]);
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, centerY);
+    this.ctx.lineTo(w, centerY);
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+  },
+
+  drawWaveGeometry: function(w, h, centerY, time, frequency, maxAmplitude) {
+    const verticalSpacing = 8; // Lines every 8 pixels
+    const colors = [
+      'rgba(255, 80, 150, 0.6)',
+      'rgba(220, 100, 180, 0.6)',
+      'rgba(180, 140, 200, 0.6)',
+      'rgba(150, 160, 220, 0.6)',
+    ];
+
+    // Draw vertical lines at regular intervals
+    for (let x = 0; x < w; x += verticalSpacing) {
+      const phase = (x - time * 60) * frequency;
+      const amplitude = Math.sin(phase) * maxAmplitude;
+      
+      // Only draw line if inside the wave
+      if (Math.abs(amplitude) > 2) {
+        const colorIdx = Math.floor(x / verticalSpacing) % colors.length;
+        this.ctx.strokeStyle = colors[colorIdx];
+        this.ctx.lineWidth = 1;
+        this.ctx.globalAlpha = 0.7;
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, centerY - amplitude);
+        this.ctx.lineTo(x, centerY + amplitude);
+        this.ctx.stroke();
+        
+        this.ctx.globalAlpha = 1.0;
+      }
+    }
   },
 
   drawCandleStream: function(w, h, time) {
@@ -153,14 +186,14 @@ window.bannerChartManager = {
     const minPrice = Math.min(...this.candleData.map(c => c.low));
     const priceRange = maxPrice - minPrice || 1;
     
-    const candleWidth = 1.6;
-    const spacing = candleWidth + 0.4;
+    const candleWidth = 1.2;
+    const spacing = candleWidth + 0.3;
     const totalWidth = this.candleData.length * spacing;
-    const scrollPos = (time * 100) % (totalWidth + w);
+    const scrollPos = (time * 20) % (totalWidth + w);
     
-    // Candlestick chart in lower portion
-    const chartTop = h * 0.55;
-    const chartHeight = h * 0.40;
+    // Candlesticks in bottom portion
+    const chartTop = h * 0.65;
+    const chartHeight = h * 0.30;
 
     for (let i = 0; i < this.candleData.length; i++) {
       const candle = this.candleData[i];
@@ -176,10 +209,9 @@ window.bannerChartManager = {
       const isGreen = close < open;
 
       // Wick
-      this.ctx.strokeStyle = isGreen ? 'rgba(100, 240, 120, 0.75)' : 'rgba(255, 100, 80, 0.75)';
-      this.ctx.lineWidth = 0.7;
-      this.ctx.shadowColor = isGreen ? 'rgba(100, 240, 120, 0.3)' : 'rgba(255, 100, 80, 0.3)';
-      this.ctx.shadowBlur = 4;
+      this.ctx.strokeStyle = isGreen ? 'rgba(100, 240, 120, 0.6)' : 'rgba(255, 100, 80, 0.6)';
+      this.ctx.lineWidth = 0.6;
+      this.ctx.globalAlpha = 0.5;
 
       this.ctx.beginPath();
       this.ctx.moveTo(x + candleWidth / 2, high);
@@ -187,26 +219,16 @@ window.bannerChartManager = {
       this.ctx.stroke();
 
       // Body
-      const bodyColor = isGreen ? 'rgba(100, 240, 120, 0.8)' : 'rgba(255, 100, 80, 0.8)';
-      const bodyStroke = isGreen ? 'rgba(150, 255, 160, 1)' : 'rgba(255, 140, 100, 1)';
-      
+      const bodyColor = isGreen ? 'rgba(100, 240, 120, 0.7)' : 'rgba(255, 100, 80, 0.7)';
       this.ctx.fillStyle = bodyColor;
-      this.ctx.strokeStyle = bodyStroke;
-      this.ctx.lineWidth = 0.5;
-      this.ctx.shadowColor = isGreen ? 'rgba(100, 240, 120, 0.3)' : 'rgba(255, 100, 80, 0.3)';
-      this.ctx.shadowBlur = 3;
+      this.ctx.globalAlpha = 0.6;
 
       const bodyTop = Math.min(open, close);
-      const bodyHeight = Math.max(Math.abs(close - open), 1);
-      
+      const bodyHeight = Math.max(Math.abs(close - open), 0.5);
       this.ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
-      if (bodyHeight > 1) {
-        this.ctx.strokeRect(x, bodyTop, candleWidth, bodyHeight);
-      }
-    }
 
-    this.ctx.shadowColor = 'transparent';
-    this.ctx.shadowBlur = 0;
+      this.ctx.globalAlpha = 1.0;
+    }
   }
 };
 
