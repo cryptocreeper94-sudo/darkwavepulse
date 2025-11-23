@@ -8176,56 +8176,49 @@ body.theme-light .banner-title {
    STAKING TAB - V2 ECOSYSTEM
    =========================================== */
 
-/* V2 Lock Overlay */
+/* V2 Lock Overlay - Now a proper landing page */
 .v2-lock-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: static;
+  display: block;
   width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  background: var(--bg-primary);
+  padding: 30px 15px;
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
+  min-height: auto;
+  animation: none;
 }
 
 .v2-lock-content {
   text-align: center;
-  max-width: 85vw;
+  max-width: 100%;
   width: 100%;
-  animation: fadeInUp 0.5s ease;
-  margin: auto;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 40px 30px 40px 30px;
+  animation: none;
+  margin: 0 auto;
+  max-height: none;
+  overflow-y: visible;
+  padding: 30px 15px;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 12px;
-  border: 1px solid rgba(56, 97, 251, 0.4);
-  box-shadow: 0 0 50px rgba(56, 97, 251, 0.2);
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .v2-lock-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  position: fixed;
+  top: 75px;
+  right: 15px;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
   color: var(--text-primary);
-  font-size: 32px;
-  width: 50px;
-  height: 50px;
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 10001;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8243,24 +8236,24 @@ body.theme-light .banner-title {
 }
 
 .v2-lock-icon {
-  font-size: 80px;
+  font-size: 60px;
   margin-bottom: 20px;
-  animation: pulse 2s infinite;
+  animation: none;
 }
 
 .v2-lock-content h2 {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 900;
   letter-spacing: 2px;
-  color: var(--accent-pink);
+  color: #00FF41;
   margin-bottom: 15px;
 }
 
 .v2-lock-date {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--text-green);
-  margin-bottom: 20px;
+  color: #3861FB;
+  margin-bottom: 30px;
   letter-spacing: 1px;
 }
 
