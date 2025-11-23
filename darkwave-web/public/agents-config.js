@@ -1,4 +1,4 @@
-// Agent Series Configuration - 16 diverse agents with career highlights and fun facts
+// Agent Series Configuration - 18 diverse agents with career highlights and fun facts
 console.log('✅ Agent Series Configuration loaded');
 
 const AGENTS = [
@@ -10,7 +10,9 @@ const AGENTS = [
     careerHighlight: 'Cracked a $100M ransomware network that the FBI had been chasing for 2 years',
     funFact: 'Memorized the Bitcoin whitepaper backwards. Literally. For fun.',
     race: 'Black',
-    gender: 'Female'
+    gender: 'Female',
+    age: 28,
+    ageGroup: 'young'
   },
   {
     id: 2,
@@ -20,7 +22,9 @@ const AGENTS = [
     careerHighlight: 'Predicted the 2024 bull market 3 months before it happened using only price data',
     funFact: 'Can identify any coin by its chart pattern in under 5 seconds',
     race: 'Asian',
-    gender: 'Male'
+    gender: 'Male',
+    age: 42,
+    ageGroup: 'middle'
   },
   {
     id: 3,
@@ -30,7 +34,9 @@ const AGENTS = [
     careerHighlight: 'Designed the liquidity protocol that saved a $50M DeFi platform from collapse',
     funFact: 'Learned Solidity in 2 weeks. Now teaches it to Wall Street traders.',
     race: 'Latina',
-    gender: 'Female'
+    gender: 'Female',
+    age: 26,
+    ageGroup: 'young'
   },
   {
     id: 4,
@@ -40,7 +46,9 @@ const AGENTS = [
     careerHighlight: 'Managed a $500M crypto portfolio that outperformed Wall Street by 300%',
     funFact: 'Codes trading bots while meditating. Seriously.',
     race: 'South Asian',
-    gender: 'Male'
+    gender: 'Male',
+    age: 48,
+    ageGroup: 'middle'
   },
   {
     id: 5,
@@ -50,7 +58,9 @@ const AGENTS = [
     careerHighlight: 'Built the risk model that prevented a $200M algorithmic trading disaster',
     funFact: 'Knows every exploit in DeFi history. By heart.',
     race: 'Middle Eastern',
-    gender: 'Female'
+    gender: 'Female',
+    age: 51,
+    ageGroup: 'middle'
   },
   {
     id: 6,
@@ -60,7 +70,9 @@ const AGENTS = [
     careerHighlight: 'Called the bottom of the last three bear markets. Exactly.',
     funFact: 'Sleeps with 2 monitors showing live crypto charts. No, seriously.',
     race: 'White',
-    gender: 'Male'
+    gender: 'Male',
+    age: 58,
+    ageGroup: 'old'
   },
   {
     id: 7,
@@ -70,7 +82,9 @@ const AGENTS = [
     careerHighlight: 'Navigated a crypto company through regulatory hell and came out untouched',
     funFact: 'Reads 500+ page regulatory documents for fun. Yes, for fun.',
     race: 'Black',
-    gender: 'Male'
+    gender: 'Male',
+    age: 45,
+    ageGroup: 'middle'
   },
   {
     id: 8,
@@ -80,7 +94,9 @@ const AGENTS = [
     careerHighlight: 'Built a 100K member community from zero. Now it self-governs.',
     funFact: 'Can talk markets in 7 languages. Still prefers memes.',
     race: 'Indigenous',
-    gender: 'Female'
+    gender: 'Female',
+    age: 31,
+    ageGroup: 'young'
   },
   {
     id: 9,
@@ -90,7 +106,9 @@ const AGENTS = [
     careerHighlight: 'Designed the infrastructure handling 1M transactions per second',
     funFact: 'Debugged a critical smart contract bug with only console.log statements',
     race: 'Southeast Asian',
-    gender: 'Female'
+    gender: 'Female',
+    age: 27,
+    ageGroup: 'young'
   },
   {
     id: 10,
@@ -100,7 +118,9 @@ const AGENTS = [
     careerHighlight: 'Advised 5 crypto projects that became unicorns worth $1B+',
     funFact: 'Sees market trends 6 months before they happen. Has a secret method.',
     race: 'White',
-    gender: 'Female'
+    gender: 'Female',
+    age: 61,
+    ageGroup: 'old'
   },
   {
     id: 11,
@@ -110,7 +130,9 @@ const AGENTS = [
     careerHighlight: 'Found a vulnerability in a $2B smart contract nobody else saw coming',
     funFact: 'Codes in Rust while reviewing Solidity. Multi-tasking level 9000.',
     race: 'East Indian',
-    gender: 'Male'
+    gender: 'Male',
+    age: 39,
+    ageGroup: 'middle'
   },
   {
     id: 12,
@@ -120,7 +142,9 @@ const AGENTS = [
     careerHighlight: 'Took a crypto project from 1K to 1M users in 6 months using pure strategy',
     funFact: 'Can predict user behavior better than AI models. Actually supernatural.',
     race: 'African',
-    gender: 'Female'
+    gender: 'Female',
+    age: 29,
+    ageGroup: 'young'
   },
   {
     id: 13,
@@ -130,7 +154,9 @@ const AGENTS = [
     careerHighlight: 'Provides liquidity for 50+ trading pairs with 99.9% uptime',
     funFact: 'Can spot a pump-and-dump from across the room. It\'s a gift.',
     race: 'Mediterranean',
-    gender: 'Male'
+    gender: 'Male',
+    age: 46,
+    ageGroup: 'middle'
   },
   {
     id: 14,
@@ -140,7 +166,9 @@ const AGENTS = [
     careerHighlight: 'Applied quantum computing to crypto price prediction with 78% accuracy',
     funFact: 'Thinks in superposition. Both bullish AND bearish at the same time.',
     race: 'East Asian',
-    gender: 'Female'
+    gender: 'Female',
+    age: 35,
+    ageGroup: 'middle'
   },
   {
     id: 15,
@@ -150,7 +178,9 @@ const AGENTS = [
     careerHighlight: 'Designed token models that achieved 80% user retention (industry avg 10%)',
     funFact: 'Can balance a complex tokenomics system in his sleep. Literally happened once.',
     race: 'Latin American',
-    gender: 'Male'
+    gender: 'Male',
+    age: 25,
+    ageGroup: 'young'
   },
   {
     id: 16,
@@ -160,7 +190,9 @@ const AGENTS = [
     careerHighlight: 'Built bridges between crypto culture and mainstream finance. Successfully.',
     funFact: 'Convinced her grandmother to buy Bitcoin. Now her gram hodls better than anyone.',
     race: 'Pacific Islander',
-    gender: 'Female'
+    gender: 'Female',
+    age: 56,
+    ageGroup: 'old'
   },
   {
     id: 17,
@@ -170,7 +202,9 @@ const AGENTS = [
     careerHighlight: 'Built the first AI trading system to beat 10,000+ human traders simultaneously',
     funFact: 'Codes with AI assistance and jokes that she\'s "collaborating with her future self."',
     race: 'Afro-Caribbean',
-    gender: 'Female'
+    gender: 'Female',
+    age: 32,
+    ageGroup: 'young'
   },
   {
     id: 18,
@@ -180,7 +214,9 @@ const AGENTS = [
     careerHighlight: 'Designed the decentralized network powering the next generation of Web4 platforms',
     funFact: 'Believes the future is already here. You just have to look at the blockchain.',
     race: 'Mixed Race',
-    gender: 'Male'
+    gender: 'Male',
+    age: 52,
+    ageGroup: 'middle'
   }
 ];
 

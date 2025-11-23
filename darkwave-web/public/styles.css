@@ -11347,3 +11347,245 @@ body {
     padding: 12px;
   }
 }
+
+/* AGENT SELECTOR MODAL - COMPACT CAROUSEL */
+#agentSelectorModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+#agentSelectorContainer {
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  max-width: 600px;
+  width: 90%;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.agent-selector-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.agent-lock-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.agent-selector-locked h3 {
+  color: #FFF;
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.agent-selector-locked p {
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  font-size: 12px;
+}
+
+.agent-upgrade-btn {
+  background: linear-gradient(135deg, #3861FB 0%, #5D5FFF 100%);
+  color: #FFF;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.agent-upgrade-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(56, 97, 251, 0.3);
+}
+
+.agent-carousel-wrapper {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agent-carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.agent-carousel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #FFF;
+}
+
+.agent-carousel-close {
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.agent-carousel-close:hover {
+  color: #FFF;
+}
+
+.agent-carousel-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.agent-filter-btn {
+  background: rgba(56, 97, 251, 0.15);
+  border: 1px solid rgba(56, 97, 251, 0.3);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.agent-filter-btn:hover {
+  border-color: rgba(56, 97, 251, 0.6);
+}
+
+.agent-filter-btn.active {
+  background: var(--accent-blue);
+  color: #000;
+  border-color: var(--accent-blue);
+}
+
+.agent-carousel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-carousel-nav {
+  background: rgba(56, 97, 251, 0.2);
+  border: 1px solid rgba(56, 97, 251, 0.3);
+  color: var(--accent-blue);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.agent-carousel-nav:hover {
+  background: rgba(56, 97, 251, 0.4);
+  transform: scale(1.1);
+}
+
+#agentCarouselTrack {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  flex: 1;
+  padding: 4px 0;
+  scrollbar-width: none;
+}
+
+#agentCarouselTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.agent-carousel-card {
+  flex: 0 0 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: rgba(56, 97, 251, 0.08);
+}
+
+.agent-carousel-card:hover {
+  background: rgba(56, 97, 251, 0.15);
+  border-color: rgba(56, 97, 251, 0.3);
+  transform: translateY(-2px);
+}
+
+.agent-carousel-card img {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  margin-bottom: 6px;
+}
+
+.agent-card-info {
+  text-align: center;
+  width: 100%;
+}
+
+.agent-card-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFF;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agent-card-age {
+  font-size: 9px;
+  color: var(--accent-blue);
+  margin: 0;
+  font-weight: 600;
+}
+
+.agent-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.agent-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(56, 97, 251, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.agent-dot.active {
+  background: var(--accent-blue);
+  width: 12px;
+  border-radius: 3px;
+}
