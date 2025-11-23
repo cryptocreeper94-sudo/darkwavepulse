@@ -4054,6 +4054,120 @@ export const mastra = new Mastra({
           return c.text('JavaScript not found', 404);
         },
       },
+      // CoinCap Market API - Serves coin market data from CoinGecko
+      {
+        path: "/api/coincap/market/:coinId",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const coinId = c.req.param('coinId');
+          
+          try {
+            const axios = await import('axios');
+            const response = await axios.default.get(
+              `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_market_cap_change_percentage_24h_in=usd`
+            );
+            
+            const data = response.data[coinId];
+            if (!data) {
+              return c.json({ error: 'Coin not found' }, 404);
+            }
+            
+            // Format response for frontend
+            const result = {
+              name: coinId,
+              symbol: coinId.toUpperCase(),
+              price: data.usd || 0,
+              change24h: data.usd_24h_change || 0,
+              marketCap: data.usd_market_cap || 0,
+              volume24h: data.usd_24h_vol || 0
+            };
+            
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('Failed to fetch market data:', { coinId, error: error.message });
+            return c.json({ error: 'Failed to fetch market data' }, 500);
+          }
+        },
+      },
+      // CoinCap History API - Serves historical price data
+      {
+        path: "/api/coincap/history/:coinId",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const coinId = c.req.param('coinId');
+          const interval = c.req.query('interval') || '1d';
+          const limit = parseInt(c.req.query('limit') || '730');
+          
+          try {
+            const axios = await import('axios');
+            
+            // Map CoinGecko intervals
+            const daysMap: Record<string, number> = {
+              '1m': 1,
+              '5m': 1,
+              '1h': 1,
+              '6h': 1,
+              '1d': 365,
+              '1w': 365,
+              '30d': 30,
+              '1y': 365,
+              'all': 730
+            };
+            
+            const days = daysMap[interval] || 365;
+            const response = await axios.default.get(
+              `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`
+            );
+            
+            const prices = response.data.prices || [];
+            
+            // Convert to candlestick format (OHLCV)
+            const candles = prices.slice(-limit).map((price: any, index: number) => ({
+              date: new Date(price[0]),
+              open: price[1],
+              high: price[1] * 1.02, // Approximate
+              low: price[1] * 0.98,  // Approximate
+              close: price[1],
+              volume: 0
+            }));
+            
+            return c.json(candles);
+          } catch (error: any) {
+            logger?.error('Failed to fetch historical data:', { coinId, error: error.message });
+            return c.json({ error: 'Failed to fetch historical data' }, 500);
+          }
+        },
+      },
+      // CoinCap ATH API - Serves all-time high data
+      {
+        path: "/api/coincap/ath/:coinId",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const coinId = c.req.param('coinId');
+          
+          try {
+            const axios = await import('axios');
+            const response = await axios.default.get(
+              `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false`
+            );
+            
+            const data = response.data;
+            const result = {
+              ath: data.market_data?.ath?.usd || 0,
+              athChangePercentage: data.market_data?.ath_change_percentage?.usd || 0,
+              athDate: data.market_data?.ath_date?.usd || null
+            };
+            
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('Failed to fetch ATH data:', { coinId, error: error.message });
+            return c.json(null); // Return null on error
+          }
+        },
+      },
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {
         path: "/*",
