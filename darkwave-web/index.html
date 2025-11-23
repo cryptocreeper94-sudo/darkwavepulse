@@ -94,6 +94,7 @@
   
   <!-- Agent Series System -->
   <script src="/agents-config.js"></script>
+  <script src="/v2-feature-lock.js"></script>
   <script src="/agent-selector.js"></script>
   <script src="/agent-cards.js"></script>
   
@@ -2969,6 +2970,48 @@
             </div>
             <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 10px; color: #888; text-align: center;" id="checklistProgress">
               0 of 4 completed
+            </div>
+          </div>
+
+          <!-- V2 FEATURES LOCK CONTROL -->
+          <div style="margin-bottom: 12px; padding: 12px; background: linear-gradient(135deg, rgba(56, 97, 251, 0.15) 0%, rgba(131, 56, 252, 0.1) 100%); border: 2px solid rgba(56, 97, 251, 0.4); border-radius: 8px; box-shadow: 0 0 20px rgba(56, 97, 251, 0.3);">
+            <h4 style="font-size: 13px; margin-bottom: 10px; color: rgba(56, 97, 251, 0.9); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+              <span>🔐 V2 Features Control</span>
+              <span style="font-size: 10px; opacity: 0.7;">(Admin Only)</span>
+            </h4>
+            <div style="display: grid; gap: 8px;">
+              <div style="padding: 10px; background: var(--bg-tertiary); border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                  <div style="font-size: 12px; font-weight: 600;">
+                    👤 Avatar King
+                  </div>
+                  <div id="avatarKingStatus" style="font-size: 10px; color: #10b981; font-weight: 600;">LOCKED</div>
+                </div>
+                <div style="font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+                  Users can choose their AI agent for Twitter marketing
+                </div>
+                <button onclick="toggleV2Feature('avatar-king')" style="width: 100%; padding: 6px 12px; background: rgba(56, 97, 251, 0.2); border: 1px solid rgba(56, 97, 251, 0.5); border-radius: 4px; color: rgba(56, 97, 251, 0.9); font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase;">
+                  Unlock for Testing
+                </button>
+              </div>
+
+              <div style="padding: 10px; background: var(--bg-tertiary); border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                  <div style="font-size: 12px; font-weight: 600;">
+                    🎨 NFT Builder (Coming Soon)
+                  </div>
+                  <div id="nftBuilderStatus" style="font-size: 10px; color: #10b981; font-weight: 600;">LOCKED</div>
+                </div>
+                <div style="font-size: 10px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+                  Users upload image → AI builds 3D NFT avatar variations
+                </div>
+                <button onclick="toggleV2Feature('nft-collection')" style="width: 100%; padding: 6px 12px; background: rgba(56, 97, 251, 0.2); border: 1px solid rgba(56, 97, 251, 0.5); border-radius: 4px; color: rgba(56, 97, 251, 0.9); font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase;">
+                  Unlock for Testing
+                </button>
+              </div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 10px; color: rgba(255,255,255,0.6); text-align: center;">
+              All features auto-unlock on Dec 25, 2025
             </div>
           </div>
 

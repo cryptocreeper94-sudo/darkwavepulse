@@ -395,6 +395,159 @@ body.theme-space::before {
   text-shadow: 0 1px 6px rgba(0,0,0,0.9);
 }
 
+/* V2 Feature Lock Modal */
+.v2-lock-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.v2-lock-content {
+  background: var(--bg-secondary);
+  border: 2px solid rgba(56, 97, 251, 0.3);
+  border-radius: 12px;
+  padding: 32px 28px;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 40px rgba(56, 97, 251, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.v2-lock-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 28px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.v2-lock-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.v2-lock-header {
+  margin-bottom: 20px;
+}
+
+.v2-lock-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.v2-lock-header h2 {
+  margin: 0;
+  color: rgba(56, 97, 251, 0.9);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.v2-lock-body {
+  margin-bottom: 24px;
+}
+
+.v2-feature-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #fff;
+}
+
+.v2-lock-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.v2-countdown {
+  background: linear-gradient(135deg, rgba(56, 97, 251, 0.2) 0%, rgba(131, 56, 252, 0.1) 100%);
+  border: 1px solid rgba(56, 97, 251, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.countdown-number {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #3861FB, #8338EC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+.v2-launch-date {
+  font-size: 13px;
+  color: rgba(56, 97, 251, 0.8);
+  font-weight: 600;
+  margin: 0;
+}
+
+.v2-lock-footer {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Light Mode - Animated Gradient Title */
 body.theme-light .banner-title {
   background: linear-gradient(90deg, 
