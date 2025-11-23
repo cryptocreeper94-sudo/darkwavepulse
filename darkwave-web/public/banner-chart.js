@@ -1,15 +1,16 @@
-// DarkWave Banner - Holographic Dual-Layer Wave System
-// Background: 30 holographic neon lines with independent wave pattern
-// Foreground: Candlestick chart with different harmonic wave pattern
+// DarkWave Banner - Holographic Rope Wave + Dense Candlestick Stream
+// Background: 10 intertwined holographic lines creating unified horizontal wave
+// Foreground: Dense 200+ candlestick chart scrolling horizontally
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
   animationFrame: null,
   time: 0,
   initialized: false,
+  candleData: [], // Pre-generated candlestick data
 
   init: function() {
-    console.log('🎬 Holographic Banner init called');
+    console.log('🎬 Rope Wave + Candle Stream Banner init');
     
     if (this.initialized) return;
 
@@ -37,15 +38,35 @@ window.bannerChartManager = {
       return;
     }
 
+    // Pre-generate 300 candlesticks with realistic OHLC data
+    this.generateCandleData(300);
+    
     this.initialized = true;
-    console.log('✅ Holographic dual-layer banner initialized');
+    console.log('✅ Rope Wave + Candle Stream banner ready');
     
     this.animate();
   },
 
+  generateCandleData: function(count) {
+    let price = 50000;
+    for (let i = 0; i < count; i++) {
+      const change = (Math.random() - 0.48) * 1500; // Slight upward bias
+      const open = price;
+      const close = price + change;
+      const high = Math.max(open, close) + Math.random() * 800;
+      const low = Math.min(open, close) - Math.random() * 800;
+      price = close;
+      
+      this.candleData.push({
+        open, high, low, close,
+        volume: Math.random() * 1000000
+      });
+    }
+  },
+
   animate: function() {
     this.draw();
-    this.time += 0.01;
+    this.time += 0.012; // Horizontal scroll speed
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 
@@ -57,59 +78,58 @@ window.bannerChartManager = {
     const time = this.time;
 
     // Dark background
-    this.ctx.fillStyle = 'rgba(15, 15, 35, 0.95)';
+    this.ctx.fillStyle = 'rgba(15, 15, 35, 0.96)';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Layer 1: Holographic neon lines with independent wave pattern
-    this.drawHolographicWaves(w, h, time);
+    // Layer 1: Holographic rope wave (background)
+    this.drawRopeWave(w, h, time);
     
-    // Layer 2: Candlestick chart with different harmonic wave pattern
-    this.drawHarmonicCandles(w, h, time);
+    // Layer 2: Dense candlestick stream (foreground)
+    this.drawCandleStream(w, h, time);
   },
 
-  drawHolographicWaves: function(w, h, time) {
+  drawRopeWave: function(w, h, time) {
     const centerY = h / 2;
-    const numLines = 32; // 30+ parallel lines
-    const spacing = h / (numLines + 1);
+    const ropeWidth = 60; // Height range for the rope
+    const numStrings = 10; // 10 intertwined lines
     
-    // Holographic color palette: maroon → purple → lavender → orange
-    const holographicColors = [
-      'rgba(100, 20, 50, 0.6)',      // Deep maroon
-      'rgba(120, 30, 70, 0.65)',     // Maroon-purple
-      'rgba(140, 40, 90, 0.7)',      // Purple-maroon
-      'rgba(160, 50, 120, 0.7)',     // Purple
-      'rgba(180, 70, 150, 0.75)',    // Bright purple
-      'rgba(200, 100, 180, 0.75)',   // Purple-lavender
-      'rgba(220, 130, 200, 0.8)',    // Lavender
-      'rgba(230, 150, 210, 0.8)',    // Bright lavender
-      'rgba(240, 160, 180, 0.75)',   // Lavender-pink
-      'rgba(250, 140, 100, 0.7)',    // Orange-pink
-      'rgba(255, 120, 80, 0.65)',    // Orange
+    // Holographic gradient: maroon → purple → lavender → orange
+    const colors = [
+      'rgba(100, 20, 50, 0.65)',
+      'rgba(130, 35, 80, 0.68)',
+      'rgba(160, 50, 110, 0.70)',
+      'rgba(190, 70, 140, 0.72)',
+      'rgba(210, 100, 160, 0.75)',
+      'rgba(230, 140, 180, 0.77)',
+      'rgba(245, 160, 170, 0.75)',
+      'rgba(255, 140, 100, 0.70)',
+      'rgba(240, 120, 80, 0.65)',
+      'rgba(220, 100, 60, 0.60)',
     ];
 
-    for (let lineIdx = 0; lineIdx < numLines; lineIdx++) {
-      const baseY = spacing * (lineIdx + 1);
-      const colorIdx = lineIdx % holographicColors.length;
-      const color = holographicColors[colorIdx];
+    for (let stringIdx = 0; stringIdx < numStrings; stringIdx++) {
+      const baseOffset = (stringIdx - numStrings / 2) * 5; // Offset between strings
+      const color = colors[stringIdx % colors.length];
 
       this.ctx.strokeStyle = color;
-      this.ctx.lineWidth = 1.8;
+      this.ctx.lineWidth = 2.2;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
 
       this.ctx.beginPath();
       
-      for (let x = 0; x < w; x += 2) {
-        // WAVE PATTERN 1 (for background lines): Slower, broader waves
-        const waveTime = time * 0.8; // Slower motion
-        const waveFreq = 0.007; // Lower frequency = broader waves
+      for (let x = 0; x < w; x += 3) {
+        // Main horizontal wave (sine wave moving left to right)
+        const wavePhase = (x * 0.006 - time * 1.2) * Math.PI / 50;
+        const verticalOffset = Math.sin(wavePhase) * ropeWidth;
         
-        // Multi-layer sine waves for complex motion
-        const wave1 = Math.sin((x * waveFreq + waveTime) * Math.PI / 80) * 40;
-        const wave2 = Math.sin((x * waveFreq * 0.4 - waveTime * 0.6) * Math.PI / 100) * 20;
-        const wave3 = Math.cos((x * waveFreq * 0.2 + waveTime * 0.3) * Math.PI / 120) * 10;
+        // Add slight randomness per string for rope effect
+        const randomWave = Math.sin((x * 0.008 + stringIdx * 2 + time * 0.5) * Math.PI / 60) * 8;
         
-        const y = baseY + wave1 + wave2 + wave3;
+        // Harmonic variation (different frequencies create rope twist)
+        const twist = Math.cos((x * 0.004 - time * 0.8 + stringIdx) * Math.PI / 40) * 12;
+        
+        const y = centerY + baseOffset + verticalOffset + randomWave + twist;
 
         if (x === 0) this.ctx.moveTo(x, y);
         else this.ctx.lineTo(x, y);
@@ -118,74 +138,72 @@ window.bannerChartManager = {
       this.ctx.stroke();
     }
 
-    // Holographic glow effect
-    this.ctx.shadowColor = 'rgba(200, 100, 180, 0.3)';
-    this.ctx.shadowBlur = 25;
+    // Holographic glow
+    this.ctx.shadowColor = 'rgba(200, 80, 150, 0.25)';
+    this.ctx.shadowBlur = 22;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
   },
 
-  drawHarmonicCandles: function(w, h, time) {
+  drawCandleStream: function(w, h, time) {
     const centerY = h / 2;
-    const spacing = 48;
+    const maxPrice = Math.max(...this.candleData.map(c => c.high));
+    const minPrice = Math.min(...this.candleData.map(c => c.low));
+    const priceRange = maxPrice - minPrice || 1;
     
-    // WAVE PATTERN 2 (for candles): Different frequency & speed = harmonic variation
-    const candleWaveTime = time * 1.3; // Faster motion than background
-    const candleWaveFreq = 0.009; // Different frequency = different wavelength
+    const candleWidth = 1.8; // Tight, compressed candles
+    const spacing = candleWidth + 0.5; // Tight spacing
+    const totalWidth = this.candleData.length * spacing;
+    
+    // Scroll position (moves left to right across screen)
+    const scrollPos = (time * 120) % (totalWidth + w);
+    
+    const chartHeight = h * 0.5;
+    const chartPadding = (h - chartHeight) / 2;
 
-    for (let i = 0; i < (w / spacing) + 2; i++) {
-      const x = i * spacing;
+    for (let i = 0; i < this.candleData.length; i++) {
+      const candle = this.candleData[i];
+      const x = scrollPos - (this.candleData.length - i) * spacing;
       
-      // Calculate position with DIFFERENT wave pattern than background
-      const waveValue = Math.sin((x * candleWaveFreq + candleWaveTime) * Math.PI / 60) * 30 +
-                        Math.sin((x * candleWaveFreq * 0.6 - candleWaveTime * 0.8) * Math.PI / 90) * 18 +
-                        Math.cos((x * candleWaveFreq * 0.3 + candleWaveTime * 0.5) * Math.PI / 110) * 12;
-      
-      const isGreen = i % 2 === 0;
-      
-      // Determine trend from harmonic pattern
-      const trend = Math.sin((i + candleWaveTime) * 0.5);
-      
-      // High/low points
-      const high = centerY - Math.abs(waveValue) - 18;
-      const low = centerY + Math.abs(waveValue) + 18;
-      
-      // Open/close follows trend
-      const openOffset = trend * 12;
-      const closeOffset = -trend * 12;
-      const open = centerY + openOffset + (waveValue * 0.2);
-      const close = centerY + closeOffset + (waveValue * 0.2);
+      // Only draw candles visible on screen
+      if (x < -10 || x > w + 10) continue;
 
-      // Draw wick with glow
-      const wickColor = isGreen ? 'rgba(100, 255, 150, 0.85)' : 'rgba(255, 100, 100, 0.85)';
-      this.ctx.strokeStyle = wickColor;
-      this.ctx.lineWidth = 2;
-      this.ctx.lineCap = 'round';
-      this.ctx.shadowColor = isGreen ? 'rgba(100, 255, 150, 0.5)' : 'rgba(255, 100, 100, 0.5)';
-      this.ctx.shadowBlur = 10;
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
+      // Normalize prices to chart height
+      const high = chartPadding + chartHeight - ((candle.high - minPrice) / priceRange) * chartHeight;
+      const low = chartPadding + chartHeight - ((candle.low - minPrice) / priceRange) * chartHeight;
+      const open = chartPadding + chartHeight - ((candle.open - minPrice) / priceRange) * chartHeight;
+      const close = chartPadding + chartHeight - ((candle.close - minPrice) / priceRange) * chartHeight;
+
+      const isGreen = close < open; // Green if price went up
+
+      // Draw wick (thin vertical line)
+      this.ctx.strokeStyle = isGreen ? 'rgba(80, 220, 120, 0.8)' : 'rgba(255, 90, 90, 0.8)';
+      this.ctx.lineWidth = 0.8;
+      this.ctx.shadowColor = isGreen ? 'rgba(80, 220, 120, 0.4)' : 'rgba(255, 90, 90, 0.4)';
+      this.ctx.shadowBlur = 5;
 
       this.ctx.beginPath();
-      this.ctx.moveTo(x + 7, high);
-      this.ctx.lineTo(x + 7, low);
+      this.ctx.moveTo(x + candleWidth / 2, high);
+      this.ctx.lineTo(x + candleWidth / 2, low);
       this.ctx.stroke();
 
-      // Draw body
-      const bodyColor = isGreen ? 'rgba(100, 255, 150, 0.7)' : 'rgba(255, 100, 100, 0.7)';
-      const bodyStrokeColor = isGreen ? 'rgba(150, 255, 200, 0.95)' : 'rgba(255, 150, 150, 0.95)';
+      // Draw body (rectangle)
+      const bodyColor = isGreen ? 'rgba(80, 220, 120, 0.85)' : 'rgba(255, 90, 90, 0.85)';
+      const bodyStroke = isGreen ? 'rgba(120, 255, 160, 1)' : 'rgba(255, 130, 130, 1)';
       
       this.ctx.fillStyle = bodyColor;
-      this.ctx.strokeStyle = bodyStrokeColor;
-      this.ctx.lineWidth = 1.8;
-      this.ctx.shadowColor = isGreen ? 'rgba(100, 255, 150, 0.4)' : 'rgba(255, 100, 100, 0.4)';
-      this.ctx.shadowBlur = 8;
+      this.ctx.strokeStyle = bodyStroke;
+      this.ctx.lineWidth = 0.6;
+      this.ctx.shadowColor = isGreen ? 'rgba(80, 220, 120, 0.35)' : 'rgba(255, 90, 90, 0.35)';
+      this.ctx.shadowBlur = 4;
 
       const bodyTop = Math.min(open, close);
-      const bodyHeight = Math.max(Math.abs(close - open), 5);
+      const bodyHeight = Math.max(Math.abs(close - open), 1);
       
-      this.ctx.fillRect(x + 1, bodyTop, 12, bodyHeight);
-      this.ctx.strokeRect(x + 1, bodyTop, 12, bodyHeight);
+      this.ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+      if (bodyHeight > 1) {
+        this.ctx.strokeRect(x, bodyTop, candleWidth, bodyHeight);
+      }
     }
 
     // Reset shadow
@@ -197,10 +215,10 @@ window.bannerChartManager = {
 // Auto-init when DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded - initializing holographic banner');
+    console.log('DOMContentLoaded - initializing rope wave banner');
     setTimeout(() => window.bannerChartManager.init(), 100);
   });
 } else {
-  console.log('DOM ready - initializing holographic banner immediately');
+  console.log('DOM ready - initializing rope wave banner');
   setTimeout(() => window.bannerChartManager.init(), 100);
 }
