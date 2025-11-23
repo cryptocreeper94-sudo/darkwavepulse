@@ -1887,11 +1887,25 @@ async function initCharts() {
     // Ensure charts and series exist before updating
     if (dashboardSparklineChart && dashboardSparklineSeries && dashboardCandleChart && dashboardCandleSeries) {
       console.log('Charts ready, loading data...');
+      
+      // Resize charts to proper dimensions after creation
+      const containerWidth = sparklineContainer.clientWidth || 600;
+      dashboardSparklineChart.applyOptions({ width: containerWidth });
+      dashboardCandleChart.applyOptions({ width: containerWidth });
+      console.log('📊 Charts resized to width:', containerWidth);
+      
       await updateDashboardCharts(currentMainChartTimeframe);
       console.log('✅ Dashboard charts initialized successfully');
       
       // Apply saved sparkline color
       applySavedSparklineColor();
+      
+      // Add window resize listener to handle responsive charts
+      window.addEventListener('resize', () => {
+        const newWidth = sparklineContainer.clientWidth || 600;
+        if (dashboardSparklineChart) dashboardSparklineChart.applyOptions({ width: newWidth });
+        if (dashboardCandleChart) dashboardCandleChart.applyOptions({ width: newWidth });
+      });
     } else {
       console.error('❌ Charts or series not created properly');
     }
