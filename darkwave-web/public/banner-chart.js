@@ -114,12 +114,12 @@ window.bannerChartManager = {
     const minPrice = Math.min(...this.candleData.map(c => c.low));
     const priceRange = maxPrice - minPrice || 1;
     
-    const candleWidth = w / (this.candleData.length * 0.6);
+    const candleWidth = w / (this.candleData.length * 1.5);
     const chartHeight = h * 0.85;
     const centerY = h / 2;
     
     this.candleData.forEach((candle, idx) => {
-      const x = (idx * w / this.candleData.length - this.scrollOffset) % w;
+      const x = (idx * w / (this.candleData.length * 0.67) - this.scrollOffset) % w;
       
       const openY = centerY - ((candle.open - minPrice) / priceRange - 0.5) * chartHeight;
       const closeY = centerY - ((candle.close - minPrice) / priceRange - 0.5) * chartHeight;
@@ -139,7 +139,7 @@ window.bannerChartManager = {
       const bodyHeight = Math.max(Math.abs(closeY - openY), 2);
       
       this.ctx.fillStyle = isGreen ? 'rgba(80, 200, 100, 0.9)' : 'rgba(220, 60, 60, 0.9)';
-      this.ctx.fillRect(x, bodyTop, candleWidth * 0.7, bodyHeight);
+      this.ctx.fillRect(x, bodyTop, candleWidth * 0.35, bodyHeight);
     });
   },
 
