@@ -3089,17 +3089,25 @@ function openAnalyticsSearch() {
   
   // Try to open modal - with retries if not ready
   function tryOpenModal(attempts = 0) {
-    if (window.analysisModalController && window.analysisModalController.openAnalysisModal) {
-      analysisModalController.openAnalysisModal({
-        symbol: searchSymbol,
-        name: searchSymbol,
-        assetType: 'crypto'
-      });
-    } else if (attempts < 5) {
-      // Retry after 100ms if modal controller not ready
-      setTimeout(() => tryOpenModal(attempts + 1), 100);
+    try {
+      if (typeof analysisModalController !== 'undefined' && analysisModalController.openAnalysisModal) {
+        console.log(`✅ Opening analysis for ${searchSymbol}`);
+        analysisModalController.openAnalysisModal({
+          symbol: searchSymbol,
+          name: searchSymbol,
+          assetType: 'crypto'
+        });
+        return;
+      }
+    } catch (e) {
+      console.warn(`⚠️ Modal attempt ${attempts + 1} failed:`, e.message);
+    }
+    
+    if (attempts < 15) {
+      // Retry after 200ms if modal controller not ready
+      setTimeout(() => tryOpenModal(attempts + 1), 200);
     } else {
-      console.error('Analytics modal not available');
+      console.error('Analytics modal not available after retries');
       alert('Analytics modal is loading. Please try again in a moment.');
     }
   }
