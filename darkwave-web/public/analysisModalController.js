@@ -115,6 +115,10 @@ const analysisModalController = {
       // Populate modal with data
       this.populateModal(assetData, indicators, signal);
       
+      // Show avatar now that data is loaded
+      const avatarContainer = document.getElementById('avatarDisplayContainer');
+      if (avatarContainer) avatarContainer.style.display = 'block';
+      
       // Render avatar display
       if (typeof avatarDisplaySystem !== 'undefined') {
         avatarDisplaySystem.renderAvatarInModal();
@@ -959,17 +963,32 @@ const analysisModalController = {
   
   // Show loading state
   showLoadingState() {
+    // Hide avatar until data loads
+    const avatarContainer = document.getElementById('avatarDisplayContainer');
+    if (avatarContainer) avatarContainer.style.display = 'none';
+    
     document.getElementById('analysisAssetName').textContent = 'Loading...';
     document.getElementById('analysisSignal').textContent = 'ANALYZING';
     document.getElementById('analysisSignal').className = 'signal-badge';
+    document.getElementById('analysisSignal').style.display = 'block';
     document.getElementById('analysisPrice').textContent = '$0.00';
     document.getElementById('analysisChange').textContent = '+0%';
     document.getElementById('aiAnalysis').textContent = 'Analyzing market conditions...';
   },
   
-  // Show error state
+  // Show error state - only call if REAL error occurs
   showErrorState(message) {
+    // Hide avatar on error
+    const avatarContainer = document.getElementById('avatarDisplayContainer');
+    if (avatarContainer) avatarContainer.style.display = 'none';
+    
+    // Hide signal badge on error
+    const signalBadge = document.getElementById('analysisSignal');
+    if (signalBadge) signalBadge.style.display = 'none';
+    
     document.getElementById('analysisAssetName').textContent = 'Error Loading Data';
+    document.getElementById('analysisPrice').textContent = '$0.00';
+    document.getElementById('analysisChange').textContent = '+0%';
     document.getElementById('aiAnalysis').textContent = `Failed to load analysis: ${message}. Please try again.`;
   },
   
