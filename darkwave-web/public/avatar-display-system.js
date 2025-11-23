@@ -332,7 +332,7 @@ const avatarDisplaySystem = {
     
     const modal = document.createElement('div');
     modal.id = 'avatarBuilderModal';
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2A2A2A !important; display: flex; align-items: center; justify-content: center; z-index: 10001; overflow-y: auto; backdrop-filter: none !important;';
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; z-index: 10001; overflow-y: auto;';
     
     const isPaid = window.userData?.isPaid || false;
     
@@ -357,7 +357,7 @@ const avatarDisplaySystem = {
       skinsHTML += '<div style="padding: 12px; border: 2px solid rgba(168,85,247,0.3); border-radius: 8px; cursor: pointer; text-align: center;" onclick="this.style.borderColor=\'#c084fc\'"><div style="font-weight: 700; color: #fff; margin-bottom: 6px;">' + skin.name + '</div><div style="height: 50px; background: ' + skin.bg + '; border-radius: 4px; margin-bottom: 8px;"></div><div style="font-size: 10px; color: rgba(255,255,255,0.6);">' + skin.desc + '</div></div>';
     });
     
-    modal.innerHTML = '<div style="background: #1a1f2e; border: 2px solid rgba(168,85,247,0.5); border-radius: 12px; padding: 25px; max-width: 700px;"><div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2 style="color: #c084fc; margin: 0;">🎨 Avatar Theme Builder</h2><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="background: none; border: none; color: #c084fc; font-size: 24px; cursor: pointer;">×</button></div><p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-size: 12px;">' + (isPaid ? '✅ Premium: All 10 skins' : '⚠️ Free: 4 skins') + '</p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">' + skinsHTML + '</div><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="width: 100%; padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer;">Done</button></div>';
+    modal.innerHTML = '<div style="background: #2A2A2A; border: 2px solid rgba(168,85,247,0.5); border-radius: 12px; padding: 25px; max-width: 700px;"><div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2 style="color: #c084fc; margin: 0;">🎨 Avatar Theme Builder</h2><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="background: none; border: none; color: #c084fc; font-size: 24px; cursor: pointer;">×</button></div><p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-size: 12px;">' + (isPaid ? '✅ Premium: All 10 skins' : '⚠️ Free: 4 skins') + '</p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">' + skinsHTML + '</div><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="width: 100%; padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer;">Done</button></div>';
     
     document.body.appendChild(modal);
     modal.addEventListener('click', (e) => {
