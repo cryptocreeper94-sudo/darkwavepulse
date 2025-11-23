@@ -4,9 +4,22 @@
 DarkWave-V2 is an advanced technical analysis bot built with the Mastra framework, offering comprehensive cryptocurrency, stock market, and NFT analysis. It integrates with Telegram to deliver real-time buy/sell signals based on technical indicators. The system features DEX pair and meme coin support with rug-risk detection, NFT collection analysis, a live trending carousel, database-backed session management, and multi-chain wallet tracking. It also includes a subscription notification system, a professional token submission system, and cryptocurrency payment integration via Coinbase Commerce. A "Crypto Cat" mascot provides interactive commentary. The project aims to launch the DarkWave (DWLP) token on December 25, 2025, with a whitepaper detailing its mission, tokenomics, utility, and roadmap.
 
 ## User Preferences
-Preferred communication style: Simple, everyday language.
+- User name: Jason
+- Preferred communication style: Simple, everyday language
+- Call him "Jason" not "DW"
+
+## Recent Changes (November 23, 2025)
+- **React/Vite Migration Completed**: Frontend migrated from vanilla JavaScript to React + Vite framework
+- **Hybrid Architecture**: Mastra backend (port 3001) + React frontend (port 5000) running concurrently
+- **Vite Proxy Setup**: Frontend proxies `/api` requests to Mastra backend on port 3001
+- **Dev Server**: Single `run-dev.sh` script starts both services with proper port configuration
+- **App Status**: Fully functional with all features restored (gauges, charts, Agent System, navigation tabs, themes)
+- **Visual Theme**: Currently using Pro Blue (dark) theme with wave watermark; 9-theme system fully functional
 
 ## System Architecture
+
+### Frontend Framework (React + Vite)
+The DarkWave Pulse frontend is built with React 19 and Vite 7, providing a modern development experience with hot module replacement and optimized builds. The application loads external utility scripts (CSS, themes, gauges, chart managers, etc.) from the public directory as window objects, maintaining compatibility with existing vanilla JavaScript modules while leveraging React's component model.
 
 ### Agent Framework (Mastra Core)
 The application uses the Mastra framework for an AI agent (DarkWave-V2) capable of calling tools, maintaining memory, and processing natural language. Workflow orchestration is handled by `createWorkflow` and `createStep` for deterministic execution. A modular tool system (`createTool`) encapsulates specific functionalities with Zod schemas for typed inputs/outputs. Memory persistence uses `@mastra/memory` with `PostgresStore` for conversation context and user data.
@@ -80,3 +93,40 @@ Security is addressed with browser-generated unique user IDs and an admin dashbo
 ### Supporting Libraries
 -   axios
 -   zod
+-   React 19
+-   Vite 7
+
+## Workflow Configuration
+
+### Start application (Port 5000)
+Runs `./run-dev.sh` which:
+1. Starts Mastra backend on port 3001 with `-p 3001` flag
+2. Waits 3 seconds for backend initialization
+3. Starts Vite dev server on port 5000 in darkwave-web directory
+4. Vite proxies `/api/*` requests to `http://localhost:3001`
+
+The frontend displays on port 5000; backend API available internally on port 3001.
+
+## Project Structure
+```
+/home/runner/workspace/
+├── run-dev.sh                 # Unified dev server script
+├── src/                       # Mastra backend source (TypeScript)
+│   └── mastra/               # Agent framework, tools, workflows
+├── darkwave-web/             # React frontend application
+│   ├── src/                  # React components
+│   │   ├── App.jsx          # Main React component
+│   │   ├── main.jsx         # Entry point
+│   │   └── *.css            # Styling
+│   ├── public/               # Static assets loaded as window objects
+│   │   ├── styles.css       # Global styles
+│   │   ├── themes-config.js # Theme definitions
+│   │   ├── app.js           # Main app initialization
+│   │   ├── gauges-clean.js  # Fear & Greed, Altcoin Season gauges
+│   │   ├── chartIndicatorManager.js # Chart functionality
+│   │   ├── agent-cards.js   # Agent Series avatars
+│   │   └── [25+ other utility files]
+│   ├── index.html           # Vite entry HTML
+│   ├── vite.config.js       # Vite configuration with API proxy
+│   └── package.json         # React dependencies (React 19, Vite 7)
+└── package.json             # Root dependencies (Mastra, AI SDK, etc.)

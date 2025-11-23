@@ -1,0 +1,190 @@
+// Fear & Greed Gauge - CMC Style (UPDATED VERSION - NOV 14 2025)
+console.log('🎯 Fear & Greed Gauge UPDATED VERSION loaded - Nov 14 2025');
+
+// Preload Business Cat images for Fear & Greed gauge (SIMPLIFIED - Nov 15 2025)
+const businessCatImages = {
+  grumpyFace: null,  // Grumpy cat face (for fear)
+  coolFace: null,    // Cool cat with sunglasses (for greed)
+  arm: null,         // Rotating arm
+  loaded: false
+};
+
+function preloadBusinessCatImages() {
+  // Load the composite asset image
+  const compositeImg = new Image();
+  compositeImg.src = '/cat-popup-images/gauge-cat-assets.jpeg';
+  
+  compositeImg.onload = () => {
+    // Composite: 1024×1536
+    // Top 1024px: Two cat faces side-by-side (512×1024 each)
+    // Bottom 512px: Arm (1024×512)
+    
+    // Grumpy face (left): x=0, y=0, w=512, h=1024
+    const grumpyCanvas = document.createElement('canvas');
+    grumpyCanvas.width = 512;
+    grumpyCanvas.height = 1024;
+    const grumpyCtx = grumpyCanvas.getContext('2d');
+    grumpyCtx.drawImage(compositeImg, 0, 0, 512, 1024, 0, 0, 512, 1024);
+    businessCatImages.grumpyFace = grumpyCanvas;
+    
+    // Cool face (right): x=512, y=0, w=512, h=1024
+    const coolCanvas = document.createElement('canvas');
+    coolCanvas.width = 512;
+    coolCanvas.height = 1024;
+    const coolCtx = coolCanvas.getContext('2d');
+    coolCtx.drawImage(compositeImg, 512, 0, 512, 1024, 0, 0, 512, 1024);
+    businessCatImages.coolFace = coolCanvas;
+    
+    // Orange arm (bottom half, LEFT side only): x=0, y=1024, w=512, h=512
+    const armCanvas = document.createElement('canvas');
+    armCanvas.width = 512;
+    armCanvas.height = 512;
+    const armCtx = armCanvas.getContext('2d');
+    armCtx.drawImage(compositeImg, 0, 1024, 512, 512, 0, 0, 512, 512);
+    businessCatImages.arm = armCanvas;
+    
+    businessCatImages.loaded = true;
+    console.log('✅ Simple Cat Face + Arm loaded for Fear & Greed gauge!');
+  };
+  
+  compositeImg.onerror = () => {
+    console.error('❌ Failed to load cat assets');
+  };
+}
+
+// Preload images on script load
+if (typeof window !== 'undefined') {
+  preloadBusinessCatImages();
+}
+
+function drawFearGreedGaugeBackground(ctx, centerX, centerY, radius) {
+  // Draw background arc segments (shared by both needle types)
+  const segments = [
+    { start: Math.PI, end: Math.PI * 1.2, color: '#EA3943', label: 'Fear' },
+    { start: Math.PI * 1.2, end: Math.PI * 1.4, color: '#F59E0B', label: 'Neutral' },
+    { start: Math.PI * 1.4, end: Math.PI * 1.6, color: '#10B981', label: 'Greed' },
+    { start: Math.PI * 1.6, end: Math.PI * 1.8, color: '#16C784', label: 'Extreme' },
+    { start: Math.PI * 1.8, end: Math.PI * 2, color: '#059669', label: 'Greed' }
+  ];
+  
+  const lineWidth = Math.max(8, radius / 3);
+  segments.forEach(seg => {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, seg.start, seg.end);
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = seg.color;
+    ctx.stroke();
+  });
+}
+
+function drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength) {
+  // Regular static needle (when Commentary Mode is OFF)
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(angle); // Fixed: removed + Math.PI / 2 offset
+  
+  ctx.beginPath();
+  ctx.moveTo(0, -12);
+  ctx.lineTo(needleLength, 0);
+  ctx.lineTo(0, 12);
+  ctx.closePath();
+  
+  ctx.fillStyle = '#FFFFFF';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#3861FB';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+function drawCatNeedle(ctx, centerX, centerY, radius, angle, needleLength, value, scaleFactor = 1, canvasHeight) {
+  // SIMPLIFIED: Just white needle + cat face (no arm for now)
+  if (!businessCatImages.loaded) {
+    drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength);
+    return;
+  }
+  
+  // Use same cat face for both business and casual modes (grumpy face)
+  const catFace = businessCatImages.grumpyFace;
+  
+  if (!catFace) {
+    drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength);
+    return;
+  }
+  
+  // 1. Draw regular white needle
+  drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength);
+  
+  // 2. Draw cat face on baseline (proper proportions)
+  const faceWidth = 50 * scaleFactor;
+  const faceScale = faceWidth / catFace.width;
+  const faceHeight = catFace.height * faceScale;
+  const faceX = centerX - faceWidth / 2;
+  const faceY = centerY - faceHeight;
+  
+  ctx.drawImage(catFace, faceX, faceY, faceWidth, faceHeight);
+}
+
+function drawFearGreedGauge(canvasId, value, options = {}) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const centerX = canvas.width / 2;
+  const radius = Math.min(canvas.width, canvas.height) / 2 - 15;
+  const centerY = canvas.height - 10;
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  drawFearGreedGaugeBackground(ctx, centerX, centerY, radius);
+  
+  const angle = Math.PI + (Math.PI * (value / 100));
+  const needleLength = radius + 5;
+  
+  // Check persona mode: Business/Casual = cat needles, Off = regular needles
+  const isDashboard = options.mode === 'dashboard';
+  const personaMode = window.currentCatMode || 'off';
+  const catNeedleEnabled = !isDashboard && (personaMode === 'business' || personaMode === 'casual');
+  
+  console.log('Drawing Fear & Greed needle:', { value, angle, catMode: catNeedleEnabled, personaMode, mode: options.mode });
+  
+  // Scale factor: popup mode gets 2.2x larger cat images for visibility
+  const scaleFactor = options.mode === 'popup' ? 2.2 : 1;
+  
+  if (catNeedleEnabled) {
+    drawCatNeedle(ctx, centerX, centerY, radius, angle, needleLength, value, scaleFactor, canvas.height);
+    // NO CENTER DOT for cat needle - cat body covers it
+  } else {
+    drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength);
+    // Draw center circle only for regular needle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#3861FB';
+    ctx.fill();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+  }
+  
+  // Draw value number
+  ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.fillText(Math.round(value), centerX, centerY - 35);
+  ctx.shadowBlur = 0;
+}
+
+// Initialize on load
+if (typeof window !== 'undefined') {
+  window.drawFearGreedGauge = drawFearGreedGauge;
+}

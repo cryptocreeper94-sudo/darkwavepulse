@@ -22,10 +22,6 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 5173
-externalPort = 8008
-
-[[ports]]
 localPort = 35133
 externalPort = 6800
 
@@ -91,23 +87,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
+args = "Start inngest server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start inngest server"
-
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "mastra dev"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "automations"
+args = "Start application"
 
 [[workflows.workflow]]
 name = "Start inngest server"
@@ -120,3 +104,15 @@ waitForPort = 3000
 
 [workflows.workflow.metadata]
 outputType = "automations"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./run-dev.sh"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
