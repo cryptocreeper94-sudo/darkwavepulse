@@ -8,6 +8,14 @@ DarkWave-V2 is an advanced technical analysis bot built with the Mastra framewor
 - Preferred communication style: Simple, everyday language
 - Call him "Jason" not "DW"
 
+## Latest Updates (Nov 23, 2025)
+- **Banner Redesign**: New seamless-looping banners with neon candlestick design
+  - Dark banner: `banner-dark.png` (black background)
+  - Light banner: `banner-light.png` (gray background)
+  - Auto-switches based on theme selection
+  - No animation - uses CSS background-repeat for seamless tile
+  - Title placeholder ready for re-addition
+
 ## System Architecture
 
 ### Frontend
