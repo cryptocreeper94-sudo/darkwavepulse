@@ -377,3 +377,12 @@ if (document.readyState === 'loading') {
 
 // Expose globally
 window.avatarDisplaySystem = avatarDisplaySystem;
+
+// Test function - directly open avatar builder
+window.testAvatarBuilder = function() {
+  console.log('🧪 Testing Avatar Builder...');
+  window.userData = {accessLevel: 'admin', isPaid: true};
+  avatarDisplaySystem.openAvatarBuilder();
+};
+
+console.log('✅ Avatar Display System ready - Call testAvatarBuilder() to open avatar builder');
