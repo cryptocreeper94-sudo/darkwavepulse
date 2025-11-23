@@ -1,5 +1,5 @@
-// DarkWave Banner - Smoldering Candlestick Chart
-// Black background, subtle wispy smoke trail, prominent candlestick zig-zag line
+// DarkWave Banner - Smoldering Candlestick Chart with Holographic Smoke
+// Black background, holographic colored smoke trail, prominent candlestick zig-zag line
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
@@ -8,6 +8,16 @@ window.bannerChartManager = {
   initialized: false,
   candleData: [],
   smokeParticles: [],
+  smokeColors: [
+    { r: 255, g: 30, b: 80 },      // Maroon/Red
+    { r: 255, g: 60, b: 120 },     // Red-Pink
+    { r: 240, g: 80, b: 140 },     // Pink-Purple
+    { r: 220, g: 100, b: 160 },    // Purple-Pink
+    { r: 200, g: 120, b: 180 },    // Purple
+    { r: 180, g: 140, b: 190 },    // Lavender-Purple
+    { r: 160, g: 160, b: 200 },    // Lavender
+    { r: 240, g: 100, b: 120 }     // Orange-Pink
+  ],
 
   init: function() {
     console.log('🎬 Smoldering Chart Banner init');
@@ -66,14 +76,15 @@ window.bannerChartManager = {
 
   initializeSmokeParticles: function() {
     this.smokeParticles = [];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 100; i++) {
       this.smokeParticles.push({
         x: Math.random() * this.canvas.width,
-        y: this.canvas.height / 2 + (Math.random() - 0.5) * 10,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: -Math.random() * 0.8,
-        life: Math.random() * 0.6,
-        size: Math.random() * 20 + 8
+        y: this.canvas.height / 2 + (Math.random() - 0.5) * 15,
+        vx: (Math.random() - 0.5) * 1.8,
+        vy: -Math.random() * 1,
+        life: Math.random() * 0.7,
+        colorIdx: Math.floor(Math.random() * this.smokeColors.length),
+        size: Math.random() * 25 + 12
       });
     }
   },
@@ -82,19 +93,20 @@ window.bannerChartManager = {
     this.draw();
     this.scrollTime += 0.015; // Slow horizontal scroll
     
-    // Update smoke particles with very subtle motion
+    // Update smoke particles with subtle motion
     this.smokeParticles.forEach((p, idx) => {
-      p.x += p.vx * 0.5;
-      p.y += p.vy * 0.3;
-      p.life -= 0.003;
+      p.x += p.vx * 0.6;
+      p.y += p.vy * 0.4;
+      p.life -= 0.0035;
       
       if (p.life <= 0) {
         // Reset particle at centerline
         p.x = Math.random() * this.canvas.width;
-        p.y = this.canvas.height / 2 + (Math.random() - 0.5) * 5;
-        p.vy = -Math.random() * 0.8;
-        p.vx = (Math.random() - 0.5) * 1.5;
-        p.life = 0.6;
+        p.y = this.canvas.height / 2 + (Math.random() - 0.5) * 8;
+        p.vy = -Math.random() * 1;
+        p.vx = (Math.random() - 0.5) * 1.8;
+        p.life = 0.7;
+        p.colorIdx = Math.floor(Math.random() * this.smokeColors.length);
       }
     });
     
@@ -111,26 +123,64 @@ window.bannerChartManager = {
     this.ctx.fillStyle = '#0F0F23';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Layer 1: Extremely subtle wispy smoke (barely visible)
-    this.drawWispySmoke(w, h);
+    // Layer 1: Holographic colored smoke (smoldering effect)
+    this.drawHolographicSmoke(w, h);
     
     // Layer 2: Prominent candlestick line
     this.drawCandlestickLine(w, h);
   },
 
-  drawWispySmoke: function(w, h) {
-    // Draw smoke particles with VERY low opacity
+  drawHolographicSmoke: function(w, h) {
+    // Draw smoke particles with holographic color gradient
     this.smokeParticles.forEach(particle => {
       if (particle.life > 0) {
-        // Very subtle white smoke
-        const opacity = (particle.life * 0.7) * 0.12; // Extremely low opacity
+        const color = this.smokeColors[particle.colorIdx];
         
-        this.ctx.fillStyle = `rgba(200, 200, 200, ${opacity})`;
+        // Subtle opacity that fades as particles die
+        const opacity = (particle.life * 0.8) * 0.18;
+        
+        // Holographic colored smoke
+        this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
         this.ctx.beginPath();
         this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         this.ctx.fill();
       }
     });
+
+    // Add soft holographic glow overlay following the candle path
+    this.ctx.strokeStyle = 'rgba(220, 100, 160, 0.08)';
+    this.ctx.lineWidth = 5;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+
+    const pixelsPerCandle = w / this.candleData.length;
+    const startCandle = Math.floor((this.scrollTime * 100) % this.candleData.length);
+    
+    const maxPrice = Math.max(...this.candleData.map(c => c.high));
+    const minPrice = Math.min(...this.candleData.map(c => c.low));
+    const priceRange = maxPrice - minPrice || 1;
+    const centerY = h / 2;
+    const maxAmplitude = h * 0.20;
+    
+    this.ctx.beginPath();
+    let pathStarted = false;
+
+    for (let i = 0; i < this.candleData.length; i++) {
+      const candleIdx = (startCandle + i) % this.candleData.length;
+      const candle = this.candleData[candleIdx];
+      
+      const x = i * pixelsPerCandle;
+      const closeNorm = (candle.close - minPrice) / priceRange;
+      const y = centerY + (0.5 - closeNorm) * maxAmplitude * 2;
+      
+      if (!pathStarted) {
+        this.ctx.moveTo(x, y);
+        pathStarted = true;
+      } else {
+        this.ctx.lineTo(x, y);
+      }
+    }
+    this.ctx.stroke();
   },
 
   drawCandlestickLine: function(w, h) {
@@ -195,12 +245,12 @@ window.bannerChartManager = {
       this.ctx.stroke();
     }
 
-    // ===== SUBTLE GLOW EFFECT (smoldering effect) =====
-    this.ctx.strokeStyle = 'rgba(0, 255, 136, 0.15)';
+    // ===== SUBTLE GREEN GLOW EFFECT =====
+    this.ctx.strokeStyle = 'rgba(0, 255, 136, 0.12)';
     this.ctx.lineWidth = 6;
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
-    this.ctx.globalAlpha = 0.6;
+    this.ctx.globalAlpha = 0.5;
 
     this.ctx.beginPath();
     let glowStarted = false;
