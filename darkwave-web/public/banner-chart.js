@@ -39,7 +39,7 @@ window.bannerChartManager = {
       return;
     }
 
-    this.generateCandleData(80);
+    this.generateCandleData(40);
     this.generateNoise();
     this.initialized = true;
     console.log('✅ Chaotic twisting waves banner ready');
@@ -114,7 +114,7 @@ window.bannerChartManager = {
     const minPrice = Math.min(...this.candleData.map(c => c.low));
     const priceRange = maxPrice - minPrice || 1;
     
-    const candleWidth = w / (this.candleData.length * 0.8);
+    const candleWidth = w / (this.candleData.length * 0.6);
     const chartHeight = h * 0.85;
     const centerY = h / 2;
     
