@@ -143,6 +143,12 @@ const avatarDisplaySystem = {
     
     container.innerHTML = html;
     container.style.display = html ? 'block' : 'none';
+    
+    // Also show signal badge when avatar is displayed
+    const signalBadge = document.getElementById('analysisSignal');
+    if (signalBadge && html) {
+      signalBadge.style.display = 'flex';
+    }
   },
   
   // Open mode selector with floating agent buttons
