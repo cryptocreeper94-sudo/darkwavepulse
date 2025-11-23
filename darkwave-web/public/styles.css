@@ -353,7 +353,7 @@ body.theme-space::before {
   height: 100%;
   overflow: hidden;
   background: url('/banner-dark.png');
-  background-size: auto 100%;
+  background-size: 150% 100%;
   background-position: 0 center;
   background-repeat: repeat-x;
   background-attachment: scroll;
@@ -361,12 +361,13 @@ body.theme-space::before {
 
 body.theme-light .banner-scroll {
   background: url('/banner-light.png');
-  background-size: auto 100%;
+  background-size: 150% 100%;
   background-position: 0 center;
   background-repeat: repeat-x;
 }
 
 .banner-text {
+  display: none;
   position: absolute;
   top: 50%;
   left: 50%;
