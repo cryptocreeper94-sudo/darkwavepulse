@@ -332,128 +332,39 @@ const avatarDisplaySystem = {
     
     const modal = document.createElement('div');
     modal.id = 'avatarBuilderModal';
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2A2A2A !important;
-      display: flex; align-items: center; justify-content: center; z-index: 10001; overflow-y: auto;
-      backdrop-filter: none !important;
-    `;
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2A2A2A !important; display: flex; align-items: center; justify-content: center; z-index: 10001; overflow-y: auto; backdrop-filter: none !important;';
     
     const isPaid = window.userData?.isPaid || false;
     
-    // Avatar skin themes with visual previews
-    const skinThemes = [
-      { 
-        name: '🌌 Deep Space', 
-        preview: 'radial-gradient(circle at 20% 30%, #FFE81F 2px, transparent 2px), radial-gradient(circle at 60% 70%, #FFFFFF 1px, transparent 1px), radial-gradient(circle at 80% 20%, #FFFFFF 1.5px, transparent 1.5px), linear-gradient(135deg, #0B0C10 0%, #1a1a3a 100%)',
-        desc: 'Cosmic depths with stars' 
-      },
-      { 
-        name: '🌊 Ocean', 
-        preview: 'linear-gradient(180deg, #0d1b2a 0%, #1e3a4a 50%, #0a3d5c 100%)',
-        desc: 'Deep blue waters' 
-      },
-      { 
-        name: '🌲 Forest', 
-        preview: 'linear-gradient(135deg, #0f1419 0%, #1a4d2e 50%, #0f2419 100%)',
-        desc: 'Green canopy' 
-      },
-      { 
-        name: '🌄 Outdoors', 
-        preview: 'linear-gradient(180deg, #6BA3FF 0%, #FFD700 40%, #2A2416 100%)',
-        desc: 'Countryside sunrise' 
-      },
-      { 
-        name: '🏈 Sports Pro', 
-        preview: 'repeating-linear-gradient(45deg, #1a1a1a 0px, #1a1a1a 10px, #333333 10px, #333333 20px)',
-        desc: 'Professional sports' 
-      },
-      { 
-        name: '🎓 College', 
-        preview: 'linear-gradient(135deg, #0a0e27 0%, #8B0000 50%, #0a0e27 100%)',
-        desc: 'College colors' 
-      },
-      { 
-        name: '🌀 Paisley', 
-        preview: 'repeating-radial-gradient(circle at 0 0, #1a0f1f 0px, #1a0f1f 15px, #4a2f5a 15px, #4a2f5a 30px)',
-        desc: 'Ornate patterns' 
-      },
-      { 
-        name: '🌸 Flowers', 
-        preview: 'radial-gradient(circle at 30% 40%, #FFB6C1 15%, transparent 15%), radial-gradient(circle at 70% 60%, #FF69B4 12%, transparent 12%), linear-gradient(135deg, #2d1b2e 0%, #4a2f5a 100%)',
-        desc: 'Floral designs' 
-      },
-      { 
-        name: '⚫ Solid Black', 
-        preview: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
-        desc: 'Sleek black' 
-      },
-      { 
-        name: '⚪ Solid White', 
-        preview: 'linear-gradient(135deg, #FFFFFF 0%, #E8E8E8 100%)',
-        desc: 'Clean white' 
-      }
+    // Build skins HTML directly
+    let skinsHTML = '';
+    const skins = [
+      {name: '🌌 Deep Space', bg: 'linear-gradient(135deg, #0B0C10, #1a1a3a)', desc: 'Cosmic depths'},
+      {name: '🌊 Ocean', bg: 'linear-gradient(180deg, #0d1b2a, #0a3d5c)', desc: 'Deep waters'},
+      {name: '🌲 Forest', bg: 'linear-gradient(135deg, #0f1419, #1a4d2e)', desc: 'Green canopy'},
+      {name: '🌄 Outdoors', bg: 'linear-gradient(180deg, #6BA3FF, #2A2416)', desc: 'Sunrise'},
+      {name: '🏈 Sports Pro', bg: '#1a2a3a', desc: 'Sports'},
+      {name: '🎓 College', bg: 'linear-gradient(135deg, #0a0e27, #8B0000)', desc: 'College'},
+      {name: '🌀 Paisley', bg: '#2a1a3a', desc: 'Ornate'},
+      {name: '🌸 Flowers', bg: 'linear-gradient(135deg, #2d1b2e, #4a2f5a)', desc: 'Floral'},
+      {name: '⚫ Solid Black', bg: '#000000', desc: 'Black'},
+      {name: '⚪ Solid White', bg: '#E8E8E8', desc: 'White'}
     ];
     
-    const availableSkins = isPaid ? skinThemes : skinThemes.slice(7); // Nonsubscribers see paisleys, flowers, solid colors only
+    const availableSkins = isPaid ? skins : skins.slice(6);
     
-    const skinsHTML = availableSkins.map(skin => `
-      <div style="
-        padding: 12px; border: 2px solid rgba(168,85,247,0.3); border-radius: 8px; cursor: pointer; 
-        transition: all 0.2s; text-align: center; overflow: hidden;
-      " onmouseover="this.style.borderColor='#a78bfa'; this.style.boxShadow='0 0 15px rgba(168,85,247,0.4)'" 
-        onmouseout="this.style.borderColor='rgba(168,85,247,0.3)'; this.style.boxShadow=''">
-        <div style="font-weight: 700; color: #fff; margin-bottom: 6px; font-size: 12px;">${skin.name}</div>
-        <div style="margin-bottom: 8px; height: 60px; border-radius: 4px; background: ${skin.preview}; box-shadow: inset 0 0 8px rgba(0,0,0,0.5);"></div>
-        <div style="font-size: 10px; color: rgba(255,255,255,0.6);">${skin.desc}</div>
-      </div>
-    `).join('');
+    availableSkins.forEach(skin => {
+      skinsHTML += '<div style="padding: 12px; border: 2px solid rgba(168,85,247,0.3); border-radius: 8px; cursor: pointer; text-align: center;" onclick="this.style.borderColor=\'#c084fc\'"><div style="font-weight: 700; color: #fff; margin-bottom: 6px;">' + skin.name + '</div><div style="height: 50px; background: ' + skin.bg + '; border-radius: 4px; margin-bottom: 8px;"></div><div style="font-size: 10px; color: rgba(255,255,255,0.6);">' + skin.desc + '</div></div>';
+    });
     
-    modal.innerHTML = `
-      <div style="background: #1a1f2e; border: 2px solid rgba(168,85,247,0.5); border-radius: 12px; padding: 25px; max-width: 700px; max-height: 85vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2 style="color: #c084fc; margin: 0;">🎨 Avatar Theme Builder</h2>
-          <button onclick="document.getElementById('avatarBuilderModal').remove()" style="
-            background: none; border: none; color: #c084fc; font-size: 24px; cursor: pointer; padding: 0;
-          ">×</button>
-        </div>
-        
-        <p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-size: 12px;">
-          ${isPaid ? '✅ Premium: Choose from all 10 avatar theme skins' : '⚠️ Free: Choose from 3 limited theme skins (Paisley, Flowers, Solid Colors)'}
-        </p>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
-          ${skinsHTML}
-        </div>
-        
-        <div style="background: rgba(168,85,247,0.1); border-left: 3px solid #a78bfa; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
-          <p style="color: #c084fc; font-size: 12px; margin: 0; font-weight: 600;">💡 How It Works:</p>
-          <ul style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 8px 0 0 0; padding-left: 20px;">
-            <li>Click a theme skin to select</li>
-            <li>Upload or use default avatar image</li>
-            <li>Add watermark or pattern overlay</li>
-            <li>Preview in real-time</li>
-            <li>Save to your profile</li>
-          </ul>
-        </div>
-        
-        ${!isPaid ? `
-          <div style="background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(168,85,247,0.1)); border: 1px solid rgba(59,130,246,0.3); padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center;">
-            <p style="color: #60a5fa; font-size: 12px; margin: 0; font-weight: 600;">🔓 Unlock Premium for 10+ Avatar Themes</p>
-            <p style="color: rgba(255,255,255,0.6); font-size: 11px; margin: 6px 0 0 0;">Space, Ocean, Forest, Sports, College, and more</p>
-          </div>
-        ` : ''}
-        
-        <button onclick="document.getElementById('avatarBuilderModal').remove()" style="
-          width: 100%; padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
-          border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer; font-size: 12px;
-        ">Done</button>
-      </div>
-    `;
+    modal.innerHTML = '<div style="background: #1a1f2e; border: 2px solid rgba(168,85,247,0.5); border-radius: 12px; padding: 25px; max-width: 700px;"><div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2 style="color: #c084fc; margin: 0;">🎨 Avatar Theme Builder</h2><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="background: none; border: none; color: #c084fc; font-size: 24px; cursor: pointer;">×</button></div><p style="color: rgba(255,255,255,0.8); margin: 0 0 15px 0; font-size: 12px;">' + (isPaid ? '✅ Premium: All 10 skins' : '⚠️ Free: 4 skins') + '</p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">' + skinsHTML + '</div><button onclick="document.getElementById(\'avatarBuilderModal\').remove()" style="width: 100%; padding: 10px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; color: #60a5fa; font-weight: 600; cursor: pointer;">Done</button></div>';
     
     document.body.appendChild(modal);
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.remove();
     });
+    
+    console.log('✅ Avatar Builder opened with', availableSkins.length, 'skins');
   }
 };
 
