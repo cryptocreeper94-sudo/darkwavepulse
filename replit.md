@@ -23,12 +23,21 @@
 - Call him "Jason" not "DW"
 
 ## Latest Updates (Nov 23, 2025)
-- **✅ BUY/SELL LIMIT ORDERS - V2 LOCKED INFRASTRUCTURE**:
+- **✅ BUY/SELL LIMIT ORDERS - V2 SNIPER INFRASTRUCTURE LOCKED**:
   - Backend endpoints: `/api/trading/buy-limit` (POST), `/api/trading/sell-limit` (POST), `/api/trading/orders` (GET)
   - All return 423 status with V2 lock message: "🔒 Coming Dec 25, 2025!"
-  - Features described: AI-powered entry points, auto-execution, risk-adjusted exits
-  - Frontend: New "🤖 Trading (V2)" tab with locked UI overlay
+  - Frontend: New "🤖 Trading (V2)" tab with locked UI overlay showing:
+    - **Buy Sniper**: Set IN price entry point, executes automatically when reached
+    - **Sell Sniper**: Set OUT price exit point, locks profits when target hit
+  - Works on: All crypto/stablecoins + memes with custom RPC endpoints
+  - Available on: Coin research pages & analysis dashboard
   - Fully functional infrastructure ready for V2 unlock - no additional build needed
+  
+- **✅ UI REFINEMENTS - CLEANER NAVIGATION**:
+  - Removed close button from BETA V1/Legacy Founder/New Here banner
+  - Removed back-arrow buttons from all tab headers
+  - Added close buttons to all popup modals
+  - Trading feature descriptions updated to "Sniper" terminology (IN/OUT prices)
   
 - **✅ CHARTS LIVE TIME UPDATES**: 
   - Candlestick chart now refreshes every 2 seconds (matching sparkline)

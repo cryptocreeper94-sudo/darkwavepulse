@@ -157,8 +157,6 @@
       💊 NEW HERE? READ FIRST
     </button>
     
-    <!-- Close Button -->
-    <button onclick="document.getElementById('infoBannerBar').style.display='none'" style="background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 18px; cursor: pointer; padding: 4px 6px; line-height: 1; transition: color 0.2s; hover:color: rgba(255,255,255,0.8);">&times;</button>
   </div>
 
     <!-- Top Navigation Menu -->
@@ -451,7 +449,7 @@
       
       <!-- Analysis Tab -->
       <div id="analysis" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         <div class="stats-dashboard">
           
@@ -508,7 +506,7 @@
 
       <!-- Stocks Tab -->
       <div id="stocks" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         <!-- Major Indices Overview -->
         <div class="market-overview-section">
@@ -674,7 +672,7 @@
 
       <!-- Projects Tab -->
       <div id="projects" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         
         <!-- DUAL SPOTLIGHT BOXES - FEATURED & COMING SOON -->
@@ -950,7 +948,7 @@
 
       <!-- TRUTH ABOUT CRYPTO Tab -->
       <div id="truth" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
 
         <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
@@ -1270,7 +1268,7 @@
 
       <!-- Knowledge Base Tab (Educational) -->
       <div id="glossary" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
 
         <!-- Subscription Gate (shown if user is not Premium) -->
@@ -1361,7 +1359,7 @@
 
       <!-- Portfolio Tab -->
       <div id="portfolio" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         
         <!-- Subscription Gate (shown if user is on free trial) -->
@@ -1548,7 +1546,7 @@
 
       <!-- Trading Tab (V2 Locked) -->
       <div id="trading" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         
         <!-- V2 Lock Overlay -->
@@ -1562,36 +1560,37 @@
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 30px 0;">
               
-              <!-- Buy Limit Card -->
+              <!-- Buy Sniper Card -->
               <div style="background: linear-gradient(135deg, rgba(22, 199, 132, 0.15) 0%, rgba(22, 199, 132, 0.05) 100%); border: 1px solid rgba(22, 199, 132, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
-                <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #16C784;">Buy Limit Orders</h3>
+                <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #16C784;">Buy Sniper</h3>
                 <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 12px;">
-                  Set automatic buy orders when your target price is reached. AI-powered entry points based on technical signals.
+                  Set your IN price entry point. Executes automatically when price is reached. AI-powered entry signals for perfect timing.
                 </p>
-                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">AI-POWERED ENTRY POINTS</div>
+                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">AUTOMATIC ENTRY EXECUTION</div>
               </div>
               
-              <!-- Sell Limit Card -->
+              <!-- Sell Sniper Card -->
               <div style="background: linear-gradient(135deg, rgba(234, 57, 67, 0.15) 0%, rgba(234, 57, 67, 0.05) 100%); border: 1px solid rgba(234, 57, 67, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
-                <div style="font-size: 32px; margin-bottom: 12px;">📉</div>
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #EA3943;">Sell Limit Orders</h3>
+                <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #EA3943;">Sell Sniper</h3>
                 <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 12px;">
-                  Lock in profits at your target price. Built-in stop-loss and take-profit levels powered by AI exit signals.
+                  Set your OUT price exit point. Locks in profits automatically when target is hit. AI-powered exit signals for optimal fills.
                 </p>
-                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">RISK-ADJUSTED EXIT SIGNALS</div>
+                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">AUTOMATIC EXIT EXECUTION</div>
               </div>
               
             </div>
             
             <div style="background: rgba(56, 97, 251, 0.1); border: 1px solid rgba(56, 97, 251, 0.3); border-radius: 8px; padding: 16px; margin: 20px 0;">
               <div style="font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.8;">
-                <strong style="color: #3861FB;">💡 What's Included:</strong><br/>
-                ✓ Set buy/sell limit orders on 100+ crypto assets<br/>
-                ✓ Auto-execution when price conditions are met<br/>
-                ✓ Predictive entry/exit signals from DarkWave AI<br/>
-                ✓ Real-time order management dashboard<br/>
-                ✓ Integration with Jupiter DEX for gas-free execution
+                <strong style="color: #3861FB;">💡 Sniper Features:</strong><br/>
+                ✓ Buy/Sell Snipers on all crypto & stablecoin assets<br/>
+                ✓ Memes: Custom RPC endpoints for advanced traders<br/>
+                ✓ Auto-execution when IN/OUT prices are reached<br/>
+                ✓ Predictive AI entry/exit signals from DarkWave AI<br/>
+                ✓ Integration with Jupiter DEX for gas-free execution<br/>
+                ✓ Available on coin research pages & analysis dashboard
               </div>
             </div>
             
@@ -1609,7 +1608,7 @@
 
       <!-- Staking Tab -->
       <div id="staking" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         
         <!-- V2 Lock Overlay (shows for everyone until V2 launch) -->
@@ -2322,7 +2321,7 @@
 
       <!-- Investors Tab -->
       <div id="investors" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         
         <div class="widget">
@@ -2429,7 +2428,7 @@
 
       <!-- Community Chat Tab -->
       <div id="community" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         <div class="widget" style="margin-bottom: 20px;">
           <h3>Community Chat</h3>
@@ -2453,7 +2452,7 @@
 
       <!-- Settings Tab -->
       <div id="settings" class="tab-pane">
-        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        
         <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
         <button class="admin-btn-circle" onclick="showAdminLogin()" title="Admin Dashboard">👑</button>
         <div class="widget">
