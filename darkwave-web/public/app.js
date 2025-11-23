@@ -2175,7 +2175,8 @@ async function updateDashboardCharts(timeframe) {
     return true; // Success
     
   } catch (error) {
-    console.error('❌ Error updating dashboard charts:', error);
+    console.error('❌ Error updating dashboard charts:', error?.message || String(error));
+    console.error('Stack:', error?.stack);
     console.warn('⚠️ Charts will retain previous data');
     return false; // Failure - gracefully degrade
   }
