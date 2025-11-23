@@ -23,6 +23,16 @@
 - Call him "Jason" not "DW"
 
 ## Latest Updates (Nov 23, 2025)
+- **✅ CHARTS NOW RENDERING**: Real BTC historical data with TradingView Lightweight Charts
+  - Backend `/api/crypto/market-chart` endpoint now fetches live data from CryptoCompare API
+  - Returns 121 candlestick candles (OHLCV data) + 121 sparkline closing prices
+  - Fixed timestamp field naming (backend returns `timestamp` in milliseconds, frontend converts to seconds)
+  - Charts display 24-hour historical data for Bitcoin with proper normalization and filtering
+  
+- **✅ BETA V1 BANNER UPDATED**: Changed from brown/orange to pleasant pastel cyan
+  - Color: `rgba(176, 224, 230, 0.15)` with matching border `rgba(176,224,230,0.3)`
+  - Harmonizes with platform's dark theme aesthetic
+  
 - **✅ CANONICAL BANNER LOCKED**: "Predictive Signals. Complete Ecosystem. Maximum Edge."
   - **DO NOT CHANGE** until replaced with new design
   - Dual-positioning mission statement encapsulates entire ecosystem vision (launchpad, wallet, marketplace, staking)
