@@ -1,4 +1,4 @@
-// DarkWave Pulse - Coin Configuration (14 Featured Coins)
+// DarkWave Pulse - Coin Configuration (14+ Featured Coins)
 // All Solana-based tokens with contract addresses
 
 export interface Coin {
@@ -7,7 +7,7 @@ export interface Coin {
   name: string;
   ca: string;
   category: 'spiritual' | 'conspiracy' | 'meme' | 'featured';
-  image: string;
+  imagePath: string;
   description: string;
   isFeatured?: boolean;
 }
@@ -20,19 +20,19 @@ export const COINS: Coin[] = [
     name: 'SolDump',
     ca: 'SolDumpSolDumpSolDumpSolDumpSolDumpSolDump',
     category: 'featured',
-    image: require('../assets/coins/soldump.jpg'),
+    imagePath: 'soldump',
     description: 'Current featured coin',
     isFeatured: true
   },
   
-  // Spiritual & Unity (4)
+  // Spiritual & Unity (5)
   {
     id: 2,
     ticker: '$LOVE',
     name: 'United',
     ca: 'Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump',
     category: 'spiritual',
-    image: require('../assets/coins/love-united.jpg'),
+    imagePath: 'love-united',
     description: 'Unity and love on chain'
   },
   {
@@ -41,7 +41,7 @@ export const COINS: Coin[] = [
     name: 'Yahusha',
     ca: 'ADRs4hrVr729GDqCS5NeRSrVLPBvErpWJcF69vCJWsZT',
     category: 'spiritual',
-    image: require('../assets/coins/yahu-yahusha.jpg'),
+    imagePath: 'yahu-yahusha',
     description: 'Spiritual awakening token'
   },
   {
@@ -50,7 +50,7 @@ export const COINS: Coin[] = [
     name: 'Yahuah',
     ca: 'ERf16TD1VrUHdhpUFbUJpSPXVu9rbtzrzkKfCbwLMYiP',
     category: 'spiritual',
-    image: require('../assets/coins/yah-yahuah.jpg'),
+    imagePath: 'yah-yahuah',
     description: 'Divine consciousness'
   },
   {
@@ -59,18 +59,18 @@ export const COINS: Coin[] = [
     name: 'Rhodium',
     ca: 'HEkEQd1nwvD7qiRHcwLEw9d7bnsg2PffrkZrWMkKpump',
     category: 'spiritual',
-    image: require('../assets/coins/rhodi-rhodium.jpg'),
+    imagePath: 'rhodi-rhodium',
     description: 'Rare earth token'
   },
   
-  // Justice & Conspiracy (4)
+  // Justice & Conspiracy (3)
   {
     id: 6,
     ticker: '$JH-25',
     name: 'Justice for Humanity',
     ca: '22PXfkPGkhVUwMqQaeFzjtdzyFNU8ZQRk2shifwAuSkx',
     category: 'conspiracy',
-    image: require('../assets/coins/jh25-justice.jpg'),
+    imagePath: 'jh25-justice',
     description: 'Fighting for justice'
   },
   {
@@ -79,18 +79,18 @@ export const COINS: Coin[] = [
     name: 'Illuminati',
     ca: 'FXXVV7T7MHptzLMd9b4cCtUYpqqbVg8rUGxMtRTuUq5k',
     category: 'conspiracy',
-    image: require('../assets/coins/obey-illuminati.jpg'),
+    imagePath: 'obey-illuminati',
     description: 'The all-seeing eye'
   },
   
-  // Pump & Degen (6)
+  // Pump & Degen (7)
   {
     id: 8,
     ticker: '$V-25',
     name: 'Vertigo I',
     ca: 'DitutwBDmEU1fM82ePTymzjLStjraLdwSQDwvSdgCmTs',
     category: 'meme',
-    image: require('../assets/coins/v25-vertigo.jpg'),
+    imagePath: 'v25-vertigo',
     description: 'Spinning toward profits'
   },
   {
@@ -99,7 +99,7 @@ export const COINS: Coin[] = [
     name: 'Pumpaholic 2025',
     ca: '3gyRB7GVxzM4tUj41WvWpcgaHqbmZsvU7ANP9vnaLSgZ',
     category: 'meme',
-    image: require('../assets/coins/cheers-pumpaholic.jpg'),
+    imagePath: 'cheers-pumpaholic',
     description: 'Cheers to the pump 🚀'
   },
   {
@@ -108,7 +108,7 @@ export const COINS: Coin[] = [
     name: 'Pumpocracy 2025',
     ca: '3eFj4ujRnuWH9SpvHyK9o4VJymkWHKsoweP5916Rywux',
     category: 'meme',
-    image: require('../assets/coins/p25-pumpocracy.jpg'),
+    imagePath: 'p25-pumpocracy',
     description: 'Government by the pump'
   },
   {
@@ -117,7 +117,7 @@ export const COINS: Coin[] = [
     name: 'Liquidation (Crypto Cat)',
     ca: '4BqYgxjhcc3ew44WEkaxzxxtSUpL62emzmRvuraxpump',
     category: 'meme',
-    image: require('../assets/coins/rektmeow-liquidation.jpg'),
+    imagePath: 'rektmeow-liquidation',
     description: 'When the cat gets liquidated'
   },
   {
@@ -126,7 +126,7 @@ export const COINS: Coin[] = [
     name: 'Uncertainty',
     ca: 'H9BhViZnhNDpUAwv1vpt2waRNLcRNNQ1wYsaWJ6Npump',
     category: 'meme',
-    image: require('../assets/coins/uncat-uncertainty.jpg'),
+    imagePath: 'uncat-uncertainty',
     description: 'Schrödinger\'s pump'
   },
   {
@@ -135,7 +135,7 @@ export const COINS: Coin[] = [
     name: 'Crypto Cat Halloween 2025',
     ca: 'HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump',
     category: 'meme',
-    image: require('../assets/coins/grimcat-halloween.jpg'),
+    imagePath: 'grimcat-halloween',
     description: 'Spooky season trading'
   },
   {
@@ -144,7 +144,7 @@ export const COINS: Coin[] = [
     name: 'CryptoCat',
     ca: 'CyokFVBYyvdDzvScSSpHeJ3gR2oGPU5o9CjBHXwkpump',
     category: 'meme',
-    image: require('../assets/coins/ccat-cryptocat.jpg'),
+    imagePath: 'ccat-cryptocat',
     description: 'The original Crypto Cat'
   },
   {
@@ -153,15 +153,19 @@ export const COINS: Coin[] = [
     name: 'Catwifcash (Raydium)',
     ca: '75A2MwNbiXMBNoJuKFgEsaN42fHAqjHhEuW4fPpKMGF',
     category: 'meme',
-    image: require('../assets/coins/cwc-catwifcash.jpg'),
+    imagePath: 'cwc-catwifcash',
     description: 'Cat with cash vibes'
   }
 ];
 
-export const getCoinsByCategory = (category: string) => {
+export const getCoinsByCategory = (category: string): Coin[] => {
   return COINS.filter(coin => coin.category === category);
 };
 
-export const getFeaturedCoin = () => {
+export const getFeaturedCoin = (): Coin => {
   return COINS.find(coin => coin.isFeatured) || COINS[0];
+};
+
+export const getCoinById = (id: number): Coin | undefined => {
+  return COINS.find(coin => coin.id === id);
 };
