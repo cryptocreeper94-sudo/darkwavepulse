@@ -558,9 +558,65 @@ export const mastra = new Mastra({
         method: "GET",
         createHandler: async ({ mastra }) => async (c: any) => {
           try {
-            return c.json({ data: [] });
-          } catch (error) {
-            return c.json({ error: 'Failed to fetch market chart' }, 500);
+            const { interval } = c.req.query();
+            const logger = mastra.getLogger();
+            
+            logger?.info('📊 [MarketChart] Request received', { interval });
+            
+            // Fetch BTC historical data using CryptoCompare
+            const priceUrl = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC&tsyms=USD`;
+            const priceResponse = await (await import('axios')).default.get(priceUrl);
+            
+            const btcData = priceResponse.data?.RAW?.BTC?.USD;
+            if (!btcData) {
+              logger?.warn('⚠️ [MarketChart] BTC data not found');
+              return c.json({ candleData: [], sparklineData: [] });
+            }
+            
+            // Determine days of history based on interval
+            const intervalMinutes = parseInt(interval) || 60;
+            const days = Math.max(1, Math.ceil((intervalMinutes * 100) / (24 * 60)));
+            
+            // Fetch historical hourly data
+            const limit = Math.min(days * 24, 2000);
+            const historyUrl = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=BTC&tsym=USD&limit=${limit}`;
+            const historyResponse = await (await import('axios')).default.get(historyUrl);
+            
+            const histData = historyResponse.data?.Data?.Data || [];
+            
+            if (histData.length === 0) {
+              logger?.warn('⚠️ [MarketChart] No historical data received');
+              return c.json({ candleData: [], sparklineData: [] });
+            }
+            
+            // Aggregate hourly data into candles based on interval
+            const candleSize = Math.max(1, Math.ceil(intervalMinutes / 60));
+            const candleData = [];
+            
+            for (let i = 0; i < histData.length; i += candleSize) {
+              const candles = histData.slice(i, Math.min(i + candleSize, histData.length));
+              if (candles.length === 0) continue;
+              
+              const open = candles[0].open;
+              const close = candles[candles.length - 1].close;
+              const high = Math.max(...candles.map((c: any) => c.high));
+              const low = Math.min(...candles.map((c: any) => c.low));
+              const volume = candles.reduce((sum: number, c: any) => sum + c.volumeto, 0);
+              const timestamp = candles[0].time * 1000;
+              
+              candleData.push({ timestamp, open, high, low, close, volume });
+            }
+            
+            // Extract sparkline (just closing prices)
+            const sparklineData = candleData.map((c: any) => c.close);
+            
+            logger?.info('✅ [MarketChart] Data prepared', { candleCount: candleData.length, sparklineCount: sparklineData.length });
+            
+            return c.json({ candleData, sparklineData });
+          } catch (error: any) {
+            const logger = mastra.getLogger();
+            logger?.error('❌ [MarketChart] Error fetching data', { error: error.message });
+            return c.json({ candleData: [], sparklineData: [] });
           }
         }
       },
