@@ -47,8 +47,13 @@ const analysisModalController = {
         // Start with crypto, but fallback to stock if crypto fails
         try {
           assetData = await analysisDataService.getAssetData(symbol, this.currentTimeframe);
-          // Fetch ATH data for crypto only
-          this.currentATH = await analysisDataService.getATHData(symbol);
+          // Fetch ATH data for crypto only (optional - don't fail if it errors)
+          try {
+            this.currentATH = await analysisDataService.getATHData(symbol);
+          } catch (athError) {
+            console.warn(`⚠️ ATH data failed (non-critical):`, athError.message);
+            this.currentATH = null; // Set to null but don't fail
+          }
         } catch (cryptoError) {
           // Only fallback to stock if this is a NOT FOUND error (404), not transient errors (500, 429, etc.)
           // Error messages from analysisDataService include "HTTP {status}" format
@@ -80,6 +85,16 @@ const analysisModalController = {
           } else {
             // Not a 404 or not stock pattern - re-throw the original crypto error
             throw cryptoError;
+          }
+        }
+        
+        // Also try to fetch ATH for stocks (optional - don't fail if it errors)
+        if (finalAssetType === 'stock') {
+          try {
+            this.currentATH = await analysisDataService.getATHData(symbol);
+          } catch (athError) {
+            console.warn(`⚠️ ATH data failed (non-critical):`, athError.message);
+            this.currentATH = null;
           }
         }
       }
@@ -376,6 +391,7 @@ const analysisModalController = {
   // Get interval in seconds for a timeframe
   getIntervalSeconds(timeframe) {
     const map = {
+      '1s': 1,
       '1m': 60,
       '5m': 300,
       '1h': 3600,
