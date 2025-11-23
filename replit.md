@@ -1,7 +1,21 @@
 # DarkWave-V2 Technical Analysis Bot
 
-## Overview
-DarkWave-V2 is an advanced technical analysis bot built with the Mastra framework, designed for comprehensive cryptocurrency, stock market, and NFT analysis. It integrates with Telegram to provide real-time buy/sell signals based on technical indicators. Key capabilities include DEX pair and meme coin support with rug-risk detection, NFT collection analysis, a live trending carousel, database-backed session management, and multi-chain wallet tracking. The system also features a subscription notification system, a professional token submission system, and cryptocurrency payment integration via Coinbase Commerce. A "Crypto Cat" mascot provides interactive commentary. The project aims to launch the DarkWave (DWLP) token with a detailed whitepaper outlining its mission, tokenomics, utility, and roadmap.
+## Overview - PREDICTIVE TRADING PLATFORM
+**DarkWave Pulse** is a predictive trading platform serving both degens and professionals. Built on Mastra AI framework with predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. 
+
+**Mission**: Your Trading Advantage - AI-powered signals to catch trends before they explode (degen appeal) + institutional-grade risk-adjusted analytics (pro appeal).
+
+**Key Capabilities**:
+- Predictive trading signals across crypto & stocks
+- Real-time technical analysis with advanced indicators
+- Dual-mode UI: Degen Mode (hype/trend-focused) + Pro Mode (institutional metrics)
+- DEX pair analysis with rug-risk detection
+- Multi-chain wallet tracking
+- Telegram bot integration
+- Cryptocurrency payment processing (Coinbase Commerce)
+- Community ecosystem: 16 AI personas (Avatar King) + 20 NFT Trading Cards
+
+**V2 Launch**: December 25, 2025 with dual-mode UI for market positioning.
 
 ## User Preferences
 - User name: Jason
@@ -9,21 +23,21 @@ DarkWave-V2 is an advanced technical analysis bot built with the Mastra framewor
 - Call him "Jason" not "DW"
 
 ## Latest Updates (Nov 23, 2025)
-- **Banner System Complete**: Professional seamless-looping banners with neon candlestick design
-  - Dark banner: `banner-dark.png` (black background with neon candlesticks/waveforms)
-  - Light banner: `banner-light.png` (gray background with same design)
-  - Auto-switches based on theme selection
-  - Shows 4 panels per screen width for optimal visibility
-  - No animation - uses CSS background-repeat for seamless tile
-  - **Fixed z-index layering** - removed Market Cap/Volume blob overlap
-  - **Title Section Integrated**: "DARKWAVE PULSE" on right half with frosted overlay
-    - Large modern technical font (monospace, 2.2rem, uppercase)
-    - Right-aligned on right 50% of banner (stationary)
-    - Heavy blur + dark overlay (backdrop-filter: blur(8px)) for clean presentation
-  - **Infinite Scrolling Animation**: 60-second smooth cycle
-    - Left 50% shows scrolling neon candlesticks in continuous loop
-    - Seamless tiling with background-repeat: repeat-x
-  - Subtext placeholder ready for addition
+- **Strategic Rebrand - Predictive Trading Platform**: Dual positioning for degens + professionals
+  - Messaging: "Your Trading Advantage" - signals for explosive gains + institutional metrics
+  - Planned: Degen/Pro mode toggle in Settings (UI for different audiences)
+  - Next: Update homepage copy, feature highlights, CTAs based on user intent
+  
+- **Banner System Complete**: Professional seamless-looping with increased visibility
+  - Dark banner: `banner-dark.png` | Light banner: `banner-light.png`
+  - **Infinite Scrolling**: Neon candlesticks continuously loop in 60-second cycle
+  - **Title Section**: "DARKWAVE PULSE" on right 50% with frosted overlay
+    - Modern monospace font (2.2rem, uppercase)
+    - Stationary title, transparent background (0.15 opacity) - waves visible behind
+    - Blur effect (8px) for clean but visible animation
+  - **Left 50%**: Clear, highly visible neon patterns scrolling continuously
+  - Auto-switches dark/light theme banners
+  - Subtext placeholder ready when ready
 
 ## System Architecture
 
