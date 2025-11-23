@@ -1,15 +1,17 @@
-// DarkWave Banner - Flowing Waveform Over Candlesticks
-// Large candlestick bars with smooth flowing curves on top
+// DarkWave Banner - Fluid Organic Waves Over Candlesticks
+// Uses Perlin noise for smooth, random, flowing motion
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
   animationFrame: null,
   scrollOffset: 0,
+  timeOffset: 0,
   initialized: false,
   candleData: [],
+  noise: [],
 
   init: function() {
-    console.log('🎬 Flowing Waveform Banner init');
+    console.log('🎬 Fluid Waves Banner init');
     
     if (this.initialized) return;
 
@@ -37,9 +39,10 @@ window.bannerChartManager = {
       return;
     }
 
-    this.generateCandleData(100);
+    this.generateCandleData(80);
+    this.generateNoise();
     this.initialized = true;
-    console.log('✅ Flowing waveform banner ready');
+    console.log('✅ Fluid waves banner ready');
     
     this.animate();
   },
@@ -58,9 +61,36 @@ window.bannerChartManager = {
     }
   },
 
+  generateNoise: function() {
+    this.noise = [];
+    for (let i = 0; i < 400; i++) {
+      this.noise.push(Math.random());
+    }
+  },
+
+  perlinNoise: function(x, y) {
+    const xi = Math.floor(x) % this.noise.length;
+    const yi = Math.floor(y) % this.noise.length;
+    const xf = x - Math.floor(x);
+    const yf = y - Math.floor(y);
+    
+    const u = xf * xf * (3 - 2 * xf);
+    const v = yf * yf * (3 - 2 * yf);
+    
+    const n00 = this.noise[(xi + yi * 13) % this.noise.length];
+    const n10 = this.noise[((xi + 1) + yi * 13) % this.noise.length];
+    const n01 = this.noise[(xi + (yi + 1) * 13) % this.noise.length];
+    const n11 = this.noise[((xi + 1) + (yi + 1) * 13) % this.noise.length];
+    
+    const nx0 = n00 * (1 - u) + n10 * u;
+    const nx1 = n01 * (1 - u) + n11 * u;
+    return nx0 * (1 - v) + nx1 * v;
+  },
+
   animate: function() {
     this.draw();
     this.scrollOffset += this.canvas.width / 10800;
+    this.timeOffset += 0.002;
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 
@@ -73,22 +103,22 @@ window.bannerChartManager = {
     this.ctx.fillStyle = '#0a0a14';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Layer 1: Candlestick bars
-    this.drawCandleSticks(w, h);
+    // Layer 1: Large candlestick bars
+    this.drawLargeCandleSticks(w, h);
     
-    // Layer 2: Flowing waves on top
-    this.drawFlowingWaves(w, h);
+    // Layer 2: Fluid flowing waves
+    this.drawFluidWaves(w, h);
   },
 
-  drawCandleSticks: function(w, h) {
+  drawLargeCandleSticks: function(w, h) {
     if (this.candleData.length === 0) return;
     
     const maxPrice = Math.max(...this.candleData.map(c => c.high));
     const minPrice = Math.min(...this.candleData.map(c => c.low));
     const priceRange = maxPrice - minPrice || 1;
     
-    const candleWidth = w / (this.candleData.length * 1.2);
-    const chartHeight = h * 0.9;
+    const candleWidth = w / (this.candleData.length * 0.8);
+    const chartHeight = h * 0.85;
     const centerY = h / 2;
     
     this.candleData.forEach((candle, idx) => {
@@ -102,8 +132,8 @@ window.bannerChartManager = {
       const isGreen = candle.close >= candle.open;
       
       // Draw wick
-      this.ctx.strokeStyle = isGreen ? 'rgba(100, 200, 120, 0.4)' : 'rgba(200, 80, 80, 0.4)';
-      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = isGreen ? 'rgba(80, 200, 100, 0.5)' : 'rgba(220, 60, 60, 0.5)';
+      this.ctx.lineWidth = 1.5;
       this.ctx.beginPath();
       this.ctx.moveTo(x + candleWidth / 2, highY);
       this.ctx.lineTo(x + candleWidth / 2, lowY);
@@ -111,14 +141,14 @@ window.bannerChartManager = {
       
       // Draw body
       const bodyTop = Math.min(openY, closeY);
-      const bodyHeight = Math.max(Math.abs(closeY - openY), 1);
+      const bodyHeight = Math.max(Math.abs(closeY - openY), 2);
       
-      this.ctx.fillStyle = isGreen ? 'rgba(100, 200, 120, 0.5)' : 'rgba(200, 80, 80, 0.5)';
-      this.ctx.fillRect(x, bodyTop, candleWidth * 0.8, bodyHeight);
+      this.ctx.fillStyle = isGreen ? 'rgba(80, 200, 100, 0.6)' : 'rgba(220, 60, 60, 0.6)';
+      this.ctx.fillRect(x, bodyTop, candleWidth * 0.7, bodyHeight);
     });
   },
 
-  drawFlowingWaves: function(w, h) {
+  drawFluidWaves: function(w, h) {
     // Color gradient: red → magenta → purple → blue
     const colors = [
       { r: 255, g: 30, b: 80 },
@@ -131,33 +161,38 @@ window.bannerChartManager = {
     ];
     
     const centerY = h / 2;
-    const numCurves = 7;
+    const numWaves = 7;
     
-    // Draw 7 smooth flowing curves
-    for (let curveIdx = 0; curveIdx < numCurves; curveIdx++) {
-      const frequency = 0.6 + curveIdx * 0.12;
-      const amplitude = (h * 0.35) / (curveIdx + 1);
-      const yOffset = (curveIdx - numCurves / 2) * (h * 0.08);
+    // Draw 7 organic fluid waves using Perlin noise
+    for (let waveIdx = 0; waveIdx < numWaves; waveIdx++) {
+      const amplitude = (h * 0.3) / (waveIdx + 1);
+      const yOffset = (waveIdx - numWaves / 2) * (h * 0.06);
+      const scale = 0.02 + waveIdx * 0.01;
       
-      const color = colors[curveIdx];
-      const opacity = 0.8 - (curveIdx / numCurves) * 0.3;
+      const color = colors[waveIdx];
+      const opacity = 0.8 - (waveIdx / numWaves) * 0.3;
       
       this.ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
       this.ctx.lineWidth = 2;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
       
-      // Add glow
+      // Glow effect
       this.ctx.shadowColor = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity * 0.5})`;
-      this.ctx.shadowBlur = 8;
+      this.ctx.shadowBlur = 6;
       
       this.ctx.beginPath();
       let pathStarted = false;
       
-      for (let x = 0; x <= w; x += 1.5) {
-        const phase = (x - this.scrollOffset) * 0.004 * frequency;
-        const wave = Math.sin(phase) * amplitude;
-        const y = centerY + yOffset + wave;
+      for (let x = 0; x <= w; x += 2) {
+        // Use Perlin noise for organic, flowing motion
+        const noiseX = (x - this.scrollOffset) * scale;
+        const noiseY = this.timeOffset + waveIdx * 0.3;
+        
+        const noiseVal = this.perlinNoise(noiseX, noiseY);
+        const fluidWave = (noiseVal - 0.5) * amplitude * 2;
+        
+        const y = centerY + yOffset + fluidWave;
         
         if (!pathStarted) {
           this.ctx.moveTo(x, y);
