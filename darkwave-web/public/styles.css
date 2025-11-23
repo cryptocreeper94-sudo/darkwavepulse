@@ -10994,13 +10994,14 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: #2A2A2A !important;
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 10100;
   overflow-y: auto;
   padding: 12px;
+  backdrop-filter: none !important;
 }
 
 .agent-selector-container {
@@ -11355,10 +11356,11 @@ body {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: #2A2A2A !important;
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  backdrop-filter: none !important;
 }
 
 #agentSelectorContainer {
