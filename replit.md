@@ -23,15 +23,17 @@
 - Call him "Jason" not "DW"
 
 ## Latest Updates (Nov 23, 2025)
-- **Banner + Subtitle System COMPLETE**: "Predictive Signals. Complete Ecosystem. Maximum Edge."
+- **✅ CANONICAL BANNER LOCKED**: "Predictive Signals. Complete Ecosystem. Maximum Edge."
+  - **DO NOT CHANGE** until replaced with new design
   - Dual-positioning mission statement encapsulates entire ecosystem vision (launchpad, wallet, marketplace, staking)
   - Degens hear: Early signals, opportunity pipeline, complete trading ecosystem
   - Pros hear: Predictive advantage, infrastructure, risk management
-  - **Visual Implementation**:
+  - **FINAL Visual Implementation**:
     - Title: "DARKWAVE PULSE" (uppercase monospace, 2.2rem, white, right-aligned)
     - Subtitle: "Predictive Signals. Complete Ecosystem. Maximum Edge." (0.75rem, 75% opacity, monospace, right-aligned)
-    - Both on right 50% of banner with frosted blur overlay
+    - Both on right 50% of banner with frosted blur overlay (8px blur, 0.15 opacity dark / 0.08 opacity light)
     - Left 50%: Neon candlesticks scrolling infinitely in 60-second cycle
+    - **Configuration**: 2 panels (50% background-size), repeat-x, 60s animation cycle
     - Auto-switches dark/light theme (banner-dark.png / banner-light.png)
   - Ready for social media ad variations (degen vs pro angles)
   
