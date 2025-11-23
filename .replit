@@ -17,47 +17,63 @@ run = ["sh", "-c", "cd .mastra/output && NODE_ENV=production node index.mjs"]
 deploymentTarget = "cloudrun"
 
 [[ports]]
-localPort = 3000
-externalPort = 3000
-exposeLocalhost = true
-
-[[ports]]
 localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8289
-
-[[ports]]
-localPort = 36365
-externalPort = 6800
-
-[[ports]]
-localPort = 41161
-externalPort = 8000
-
-[[ports]]
-localPort = 42753
-externalPort = 5173
-
-[[ports]]
-localPort = 44797
-externalPort = 5000
-
-[[ports]]
-localPort = 45843
+localPort = 5173
 externalPort = 8008
 
 [[ports]]
-localPort = 46847
+localPort = 35133
+externalPort = 6800
+
+[[ports]]
+localPort = 36013
+externalPort = 8080
+
+[[ports]]
+localPort = 37247
 externalPort = 4200
 
 [[ports]]
-localPort = 50052
+localPort = 40275
+externalPort = 8081
+
+[[ports]]
+localPort = 41057
+externalPort = 5173
+
+[[ports]]
+localPort = 41183
+externalPort = 3000
+
+[[ports]]
+localPort = 42913
+externalPort = 8099
+
+[[ports]]
+localPort = 43073
+externalPort = 5000
+
+[[ports]]
+localPort = 43191
 externalPort = 3002
 
 [[ports]]
-localPort = 50053
+localPort = 43237
+externalPort = 6000
+
+[[ports]]
+localPort = 44277
+externalPort = 3003
+
+[[ports]]
+localPort = 44655
+externalPort = 8000
+
+[[ports]]
+localPort = 45063
 externalPort = 3001
 
 [workflows]
