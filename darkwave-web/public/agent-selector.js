@@ -49,6 +49,12 @@ function closeAgentPopup() {
 
 // Open agent selector modal
 function openAgentSelector() {
+  // Check if feature is locked
+  if (typeof isFeatureLocked !== 'undefined' && isFeatureLocked('avatar-king')) {
+    showV2LockModal('avatar-king');
+    return;
+  }
+  
   const modal = document.getElementById('agentSelectorModal');
   if (!modal) {
     console.warn('Agent selector modal not found in HTML');
