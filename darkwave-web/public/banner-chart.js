@@ -1,4 +1,6 @@
-// DarkWave Banner - Professional Neon Wave Pattern with Candlestick Overlay
+// DarkWave Banner - Holographic Dual-Layer Wave System
+// Background: 30 holographic neon lines with independent wave pattern
+// Foreground: Candlestick chart with different harmonic wave pattern
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
@@ -7,11 +9,10 @@ window.bannerChartManager = {
   initialized: false,
 
   init: function() {
-    console.log('🎬 Banner init called');
+    console.log('🎬 Holographic Banner init called');
     
     if (this.initialized) return;
 
-    // Find or create canvas
     let canvas = document.getElementById('banner-chart-canvas');
     if (!canvas) {
       const bannerWave = document.querySelector('.banner-wave');
@@ -37,14 +38,14 @@ window.bannerChartManager = {
     }
 
     this.initialized = true;
-    console.log('✅ Banner animated wave initialized');
+    console.log('✅ Holographic dual-layer banner initialized');
     
     this.animate();
   },
 
   animate: function() {
     this.draw();
-    this.time += 0.008; // Slower, smoother motion
+    this.time += 0.01;
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 
@@ -59,51 +60,54 @@ window.bannerChartManager = {
     this.ctx.fillStyle = 'rgba(15, 15, 35, 0.95)';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Draw multiple parallel neon lines (30 waves)
-    this.drawNeonWaves(w, h, time);
+    // Layer 1: Holographic neon lines with independent wave pattern
+    this.drawHolographicWaves(w, h, time);
     
-    // Draw candlestick pattern overlay
-    this.drawCandleOverlay(w, h, time);
+    // Layer 2: Candlestick chart with different harmonic wave pattern
+    this.drawHarmonicCandles(w, h, time);
   },
 
-  drawNeonWaves: function(w, h, time) {
+  drawHolographicWaves: function(w, h, time) {
     const centerY = h / 2;
-    const numWaves = 32; // 30+ parallel lines
-    const spacing = h / (numWaves + 1);
-    const waveAmp = 35; // Wave amplitude
-    const waveFreq = 0.008; // Frequency of the main wave
-
-    // Gradient colors from purple to lavender
-    const colors = [
-      'rgba(200, 100, 255, 0.7)',  // Bright magenta
-      'rgba(180, 120, 255, 0.7)',  // Purple
-      'rgba(160, 140, 255, 0.7)',  // Light purple
-      'rgba(157, 78, 221, 0.8)',   // Deep purple
-      'rgba(192, 125, 255, 0.8)',  // Medium purple
-      'rgba(224, 170, 255, 0.8)',  // Lavender
+    const numLines = 32; // 30+ parallel lines
+    const spacing = h / (numLines + 1);
+    
+    // Holographic color palette: maroon → purple → lavender → orange
+    const holographicColors = [
+      'rgba(100, 20, 50, 0.6)',      // Deep maroon
+      'rgba(120, 30, 70, 0.65)',     // Maroon-purple
+      'rgba(140, 40, 90, 0.7)',      // Purple-maroon
+      'rgba(160, 50, 120, 0.7)',     // Purple
+      'rgba(180, 70, 150, 0.75)',    // Bright purple
+      'rgba(200, 100, 180, 0.75)',   // Purple-lavender
+      'rgba(220, 130, 200, 0.8)',    // Lavender
+      'rgba(230, 150, 210, 0.8)',    // Bright lavender
+      'rgba(240, 160, 180, 0.75)',   // Lavender-pink
+      'rgba(250, 140, 100, 0.7)',    // Orange-pink
+      'rgba(255, 120, 80, 0.65)',    // Orange
     ];
 
-    for (let waveIdx = 0; waveIdx < numWaves; waveIdx++) {
-      const baseY = spacing * (waveIdx + 1);
-      const colorIdx = waveIdx % colors.length;
-      const color = colors[colorIdx];
+    for (let lineIdx = 0; lineIdx < numLines; lineIdx++) {
+      const baseY = spacing * (lineIdx + 1);
+      const colorIdx = lineIdx % holographicColors.length;
+      const color = holographicColors[colorIdx];
 
       this.ctx.strokeStyle = color;
-      this.ctx.lineWidth = 1.5;
+      this.ctx.lineWidth = 1.8;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
 
       this.ctx.beginPath();
       
       for (let x = 0; x < w; x += 2) {
-        // Main wave motion (horizontal scroll)
-        const scrollOffset = time * 80; // Scroll speed
-        const xNorm = (x + scrollOffset) * waveFreq;
+        // WAVE PATTERN 1 (for background lines): Slower, broader waves
+        const waveTime = time * 0.8; // Slower motion
+        const waveFreq = 0.007; // Lower frequency = broader waves
         
-        // Multi-layered sine wave for complex motion
-        const wave1 = Math.sin(xNorm * Math.PI / 100) * waveAmp;
-        const wave2 = Math.sin((xNorm * 0.5 - time) * Math.PI / 100) * (waveAmp * 0.4);
-        const wave3 = Math.cos((xNorm * 0.25 + time * 0.5) * Math.PI / 100) * (waveAmp * 0.2);
+        // Multi-layer sine waves for complex motion
+        const wave1 = Math.sin((x * waveFreq + waveTime) * Math.PI / 80) * 40;
+        const wave2 = Math.sin((x * waveFreq * 0.4 - waveTime * 0.6) * Math.PI / 100) * 20;
+        const wave3 = Math.cos((x * waveFreq * 0.2 + waveTime * 0.3) * Math.PI / 120) * 10;
         
         const y = baseY + wave1 + wave2 + wave3;
 
@@ -114,66 +118,74 @@ window.bannerChartManager = {
       this.ctx.stroke();
     }
 
-    // Add subtle glow effect
-    this.ctx.shadowColor = 'rgba(157, 78, 221, 0.4)';
-    this.ctx.shadowBlur = 20;
+    // Holographic glow effect
+    this.ctx.shadowColor = 'rgba(200, 100, 180, 0.3)';
+    this.ctx.shadowBlur = 25;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
   },
 
-  drawCandleOverlay: function(w, h, time) {
+  drawHarmonicCandles: function(w, h, time) {
     const centerY = h / 2;
-    const spacing = 45;
-    const scrollOffset = time * 80;
+    const spacing = 48;
     
-    // Generate candlestick pattern
+    // WAVE PATTERN 2 (for candles): Different frequency & speed = harmonic variation
+    const candleWaveTime = time * 1.3; // Faster motion than background
+    const candleWaveFreq = 0.009; // Different frequency = different wavelength
+
     for (let i = 0; i < (w / spacing) + 2; i++) {
-      const x = scrollOffset + i * spacing;
+      const x = i * spacing;
       
-      // Calculate wave height at this position for candlestick
-      const xNorm = x * 0.008;
-      const waveHeight = Math.sin(xNorm * Math.PI / 100) * 35 + 
-                         Math.sin((xNorm * 0.5 - time) * Math.PI / 100) * 15 +
-                         Math.cos((xNorm * 0.25 + time * 0.5) * Math.PI / 100) * 8;
+      // Calculate position with DIFFERENT wave pattern than background
+      const waveValue = Math.sin((x * candleWaveFreq + candleWaveTime) * Math.PI / 60) * 30 +
+                        Math.sin((x * candleWaveFreq * 0.6 - candleWaveTime * 0.8) * Math.PI / 90) * 18 +
+                        Math.cos((x * candleWaveFreq * 0.3 + candleWaveTime * 0.5) * Math.PI / 110) * 12;
       
       const isGreen = i % 2 === 0;
       
-      // High and low points
-      const high = centerY - Math.abs(waveHeight) - 15;
-      const low = centerY + Math.abs(waveHeight) + 15;
+      // Determine trend from harmonic pattern
+      const trend = Math.sin((i + candleWaveTime) * 0.5);
       
-      // Open/close based on trend
-      const open = centerY + (isGreen ? 8 : -8) + (waveHeight * 0.3);
-      const close = centerY - (isGreen ? 8 : -8) + (waveHeight * 0.3);
+      // High/low points
+      const high = centerY - Math.abs(waveValue) - 18;
+      const low = centerY + Math.abs(waveValue) + 18;
+      
+      // Open/close follows trend
+      const openOffset = trend * 12;
+      const closeOffset = -trend * 12;
+      const open = centerY + openOffset + (waveValue * 0.2);
+      const close = centerY + closeOffset + (waveValue * 0.2);
 
-      // Draw wick (thin line from high to low)
-      this.ctx.strokeStyle = isGreen ? 
-        'rgba(100, 255, 150, 0.9)' : 'rgba(255, 100, 100, 0.9)';
-      this.ctx.lineWidth = 2.5;
+      // Draw wick with glow
+      const wickColor = isGreen ? 'rgba(100, 255, 150, 0.85)' : 'rgba(255, 100, 100, 0.85)';
+      this.ctx.strokeStyle = wickColor;
+      this.ctx.lineWidth = 2;
       this.ctx.lineCap = 'round';
-      this.ctx.shadowColor = isGreen ? 
-        'rgba(100, 255, 150, 0.7)' : 'rgba(255, 100, 100, 0.7)';
-      this.ctx.shadowBlur = 12;
+      this.ctx.shadowColor = isGreen ? 'rgba(100, 255, 150, 0.5)' : 'rgba(255, 100, 100, 0.5)';
+      this.ctx.shadowBlur = 10;
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
 
       this.ctx.beginPath();
-      this.ctx.moveTo(x + 6, high);
-      this.ctx.lineTo(x + 6, low);
+      this.ctx.moveTo(x + 7, high);
+      this.ctx.lineTo(x + 7, low);
       this.ctx.stroke();
 
-      // Draw body (rectangle)
-      this.ctx.fillStyle = isGreen ? 
-        'rgba(100, 255, 150, 0.8)' : 'rgba(255, 100, 100, 0.8)';
-      this.ctx.strokeStyle = isGreen ? 
-        'rgba(150, 255, 200, 1)' : 'rgba(255, 150, 150, 1)';
-      this.ctx.lineWidth = 2;
+      // Draw body
+      const bodyColor = isGreen ? 'rgba(100, 255, 150, 0.7)' : 'rgba(255, 100, 100, 0.7)';
+      const bodyStrokeColor = isGreen ? 'rgba(150, 255, 200, 0.95)' : 'rgba(255, 150, 150, 0.95)';
+      
+      this.ctx.fillStyle = bodyColor;
+      this.ctx.strokeStyle = bodyStrokeColor;
+      this.ctx.lineWidth = 1.8;
+      this.ctx.shadowColor = isGreen ? 'rgba(100, 255, 150, 0.4)' : 'rgba(255, 100, 100, 0.4)';
+      this.ctx.shadowBlur = 8;
 
       const bodyTop = Math.min(open, close);
-      const bodyHeight = Math.max(Math.abs(close - open), 4);
+      const bodyHeight = Math.max(Math.abs(close - open), 5);
       
-      this.ctx.fillRect(x, bodyTop, 14, bodyHeight);
-      this.ctx.strokeRect(x, bodyTop, 14, bodyHeight);
+      this.ctx.fillRect(x + 1, bodyTop, 12, bodyHeight);
+      this.ctx.strokeRect(x + 1, bodyTop, 12, bodyHeight);
     }
 
     // Reset shadow
@@ -185,10 +197,10 @@ window.bannerChartManager = {
 // Auto-init when DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded - initializing banner');
+    console.log('DOMContentLoaded - initializing holographic banner');
     setTimeout(() => window.bannerChartManager.init(), 100);
   });
 } else {
-  console.log('DOM ready - initializing banner immediately');
+  console.log('DOM ready - initializing holographic banner immediately');
   setTimeout(() => window.bannerChartManager.init(), 100);
 }
