@@ -24,6 +24,14 @@
 
 ## Latest Updates (Nov 23, 2025) - UI BUGS FIXED + ANALYSIS FULLY FUNCTIONAL
 
+- **✅ THEMED COIN SEARCH MODAL - CENTERED & GORGEOUS**:
+  - Replaced boring browser prompt with beautiful centered modal
+  - Modal is theme-aware - colors adapt to your current theme (dark, light, space, jupiter, pink, etc.)
+  - Gradient background with smooth slide-in animation
+  - Enter key submits search, clicking outside closes modal
+  - Perfect responsive design for mobile and desktop
+  - Shows helpful placeholder: "BTC, ETH, SOL, PEPE, or Solana address..."
+
 - **✅ FIXED BANNER POSITIONING + ERROR MESSAGES**:
   - Fixed banner width issue - "DARKWAVE PULSE" title now centered (was shifted right)
   - Error state now only shows on actual failures, not for non-critical data

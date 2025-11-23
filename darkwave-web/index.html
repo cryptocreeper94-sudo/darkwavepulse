@@ -3767,6 +3767,17 @@ Thanks for being here — let's build something powerful together!</textarea>
     </div>
   </div>
 
+  <!-- Coin Analysis Search Modal -->
+  <div id="coinSearchModal" class="coin-search-modal" style="display: none;">
+    <div class="coin-search-container">
+      <button class="close-btn-circle" onclick="closeCoinSearch()">×</button>
+      <h2 class="coin-search-title">📊 Search Coin Analysis</h2>
+      <p class="coin-search-subtitle">Enter a coin symbol or Solana token address</p>
+      <input type="text" id="coinSearchInput" placeholder="BTC, ETH, SOL, PEPE, or Solana address..." class="coin-search-input" onkeydown="if(event.key==='Enter') submitCoinSearch();" />
+      <button onclick="submitCoinSearch()" class="coin-search-btn">Open Analysis →</button>
+    </div>
+  </div>
+
   <!-- Full-Screen Analysis Modal -->
   <div id="analysisModal" class="analysis-modal" style="display: none;">
     <div class="analysis-container">

@@ -3080,12 +3080,39 @@ async function analyzeToken() {
   input.value = '';
 }
 
-// Open analytics search dialog
+// Open analytics search dialog (themed modal instead of browser prompt)
 function openAnalyticsSearch() {
-  const symbol = prompt('Enter coin symbol (BTC, ETH, SOL, etc) or Solana address:');
-  if (!symbol || !symbol.trim()) return;
+  const modal = document.getElementById('coinSearchModal');
+  if (!modal) return;
   
-  const searchSymbol = symbol.trim().toUpperCase();
+  const input = document.getElementById('coinSearchInput');
+  if (!input) return;
+  
+  // Show modal
+  modal.style.display = 'flex';
+  input.value = '';
+  input.focus();
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+// Close coin search modal
+function closeCoinSearch() {
+  const modal = document.getElementById('coinSearchModal');
+  if (!modal) return;
+  
+  modal.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// Submit coin search
+function submitCoinSearch() {
+  const input = document.getElementById('coinSearchInput');
+  if (!input || !input.value.trim()) return;
+  
+  const searchSymbol = input.value.trim().toUpperCase();
+  closeCoinSearch();
   
   // Try to open modal - with retries if not ready
   function tryOpenModal(attempts = 0) {
@@ -3114,6 +3141,18 @@ function openAnalyticsSearch() {
   
   tryOpenModal();
 }
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+  const coinSearchModal = document.getElementById('coinSearchModal');
+  if (coinSearchModal) {
+    coinSearchModal.addEventListener('click', function(e) {
+      if (e.target === coinSearchModal) {
+        closeCoinSearch();
+      }
+    });
+  }
+});
 
 // Crypto Cat AI Chat
 async function sendCatMessage() {
