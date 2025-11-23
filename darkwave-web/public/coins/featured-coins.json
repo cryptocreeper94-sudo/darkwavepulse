@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1001,
+    "name": "Crypto Cat Energy",
+    "ticker": "MEOW",
+    "image": "/trading-cards/Grumpy_cat_angry_pose_63318575.png",
+    "category": "cryptocat",
+    "contractAddress": "5z3U8zvXUpggTLxyNMfEmpvKC24F2gjw37gpVtV8pump",
+    "description": "The OG grumpy cat energy on chain"
+  },
+  {
+    "id": 1002,
+    "name": "Crypto Cat Vibes",
+    "ticker": "VIBE",
+    "image": "/trading-cards/Grumpy_cat_thumbs_up_e77056f4.png",
+    "category": "cryptocat",
+    "contractAddress": "5z3U8zvXUpggTLxyNMfEmpvKC24F2gjw37gpVtV8pump",
+    "description": "Thumbs up energy for bullish times"
+  },
+  {
+    "id": 1003,
+    "name": "Crypto Cat Sarcasm",
+    "ticker": "SNARK",
+    "image": "/trading-cards/Grumpy_cat_sideeye_pose_5e52df88.png",
+    "category": "cryptocat",
+    "contractAddress": "5z3U8zvXUpggTLxyNMfEmpvKC24F2gjw37gpVtV8pump",
+    "description": "Peak sarcasm token"
+  },
+  {
+    "id": 2001,
+    "name": "Illuminati Coin",
+    "ticker": "ILLUM",
+    "image": "/darkwave-coin.png",
+    "category": "conspiracy",
+    "contractAddress": "HpqKPSHXkbRYpkTqsJEpLJXWpuHhiGhzqMhTBgH7pump",
+    "description": "The truth is out there"
+  },
+  {
+    "id": 2002,
+    "name": "Area 51 Token",
+    "ticker": "A51",
+    "image": "/darkwave-coin.png",
+    "category": "conspiracy",
+    "contractAddress": "HpqKPSHXkbRYpkTqsJEpLJXWpuHhiGhzqMhTBgH7pump",
+    "description": "What they don't want you to know"
+  },
+  {
+    "id": 3001,
+    "name": "Light & Love",
+    "ticker": "LOVE",
+    "image": "/darkwave-coin.png",
+    "category": "spiritual",
+    "contractAddress": "SpiritualBlockchain123456789012345678901234",
+    "description": "Vibrations of positivity"
+  },
+  {
+    "id": 3002,
+    "name": "Unity Consciousness",
+    "ticker": "UNITY",
+    "image": "/darkwave-coin.png",
+    "category": "spiritual",
+    "contractAddress": "SpiritualBlockchain123456789012345678901234",
+    "description": "We are all connected"
+  },
+  {
+    "id": 4001,
+    "name": "Degen Dreams",
+    "ticker": "DEGEN",
+    "image": "/darkwave-coin.png",
+    "category": "meme",
+    "contractAddress": "DegenMemeBlockchain98765432109876543210pump",
+    "description": "Pure degen energy"
+  },
+  {
+    "id": 4002,
+    "name": "Paper Hands Token",
+    "ticker": "PAPER",
+    "image": "/darkwave-coin.png",
+    "category": "meme",
+    "contractAddress": "DegenMemeBlockchain98765432109876543210pump",
+    "description": "For those who sell at loss"
+  }
+]
