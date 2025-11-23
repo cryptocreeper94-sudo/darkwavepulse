@@ -1,5 +1,5 @@
-// DarkWave Banner - Layered Waveform Contours
-// Many distinct wave curves with large amplitude creating visual depth
+// DarkWave Banner - Flowing Waveform Over Candlesticks
+// Large candlestick bars with smooth flowing curves on top
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
@@ -9,7 +9,7 @@ window.bannerChartManager = {
   candleData: [],
 
   init: function() {
-    console.log('🎬 Layered Waveform Banner init');
+    console.log('🎬 Flowing Waveform Banner init');
     
     if (this.initialized) return;
 
@@ -39,7 +39,7 @@ window.bannerChartManager = {
 
     this.generateCandleData(100);
     this.initialized = true;
-    console.log('✅ Layered waveform banner ready');
+    console.log('✅ Flowing waveform banner ready');
     
     this.animate();
   },
@@ -48,11 +48,11 @@ window.bannerChartManager = {
     let price = 45000;
     this.candleData = [];
     for (let i = 0; i < count; i++) {
-      const change = (Math.random() - 0.48) * price * 0.02;
+      const change = (Math.random() - 0.45) * price * 0.03;
       const open = price;
       const close = price + change;
-      const high = Math.max(open, close) * 1.01;
-      const low = Math.min(open, close) * 0.99;
+      const high = Math.max(open, close) * (1 + Math.random() * 0.02);
+      const low = Math.min(open, close) * (1 - Math.random() * 0.02);
       price = close;
       this.candleData.push({ open, close, high, low });
     }
@@ -73,78 +73,91 @@ window.bannerChartManager = {
     this.ctx.fillStyle = '#0a0a14';
     this.ctx.fillRect(0, 0, w, h);
 
-    this.drawCandleBackground(w, h);
-    this.drawLayeredWaveform(w, h);
+    // Layer 1: Candlestick bars
+    this.drawCandleSticks(w, h);
+    
+    // Layer 2: Flowing waves on top
+    this.drawFlowingWaves(w, h);
   },
 
-  drawCandleBackground: function(w, h) {
+  drawCandleSticks: function(w, h) {
     if (this.candleData.length === 0) return;
     
     const maxPrice = Math.max(...this.candleData.map(c => c.high));
     const minPrice = Math.min(...this.candleData.map(c => c.low));
     const priceRange = maxPrice - minPrice || 1;
     
-    const chartHeight = h * 0.8;
+    const candleWidth = w / (this.candleData.length * 1.2);
+    const chartHeight = h * 0.9;
     const centerY = h / 2;
     
     this.candleData.forEach((candle, idx) => {
       const x = (idx * w / this.candleData.length - this.scrollOffset) % w;
       
+      const openY = centerY - ((candle.open - minPrice) / priceRange - 0.5) * chartHeight;
+      const closeY = centerY - ((candle.close - minPrice) / priceRange - 0.5) * chartHeight;
       const highY = centerY - ((candle.high - minPrice) / priceRange - 0.5) * chartHeight;
       const lowY = centerY - ((candle.low - minPrice) / priceRange - 0.5) * chartHeight;
       
-      this.ctx.strokeStyle = 'rgba(100, 100, 150, 0.1)';
-      this.ctx.lineWidth = 0.6;
+      const isGreen = candle.close >= candle.open;
+      
+      // Draw wick
+      this.ctx.strokeStyle = isGreen ? 'rgba(100, 200, 120, 0.4)' : 'rgba(200, 80, 80, 0.4)';
+      this.ctx.lineWidth = 1;
       this.ctx.beginPath();
-      this.ctx.moveTo(x, highY);
-      this.ctx.lineTo(x, lowY);
+      this.ctx.moveTo(x + candleWidth / 2, highY);
+      this.ctx.lineTo(x + candleWidth / 2, lowY);
       this.ctx.stroke();
+      
+      // Draw body
+      const bodyTop = Math.min(openY, closeY);
+      const bodyHeight = Math.max(Math.abs(closeY - openY), 1);
+      
+      this.ctx.fillStyle = isGreen ? 'rgba(100, 200, 120, 0.5)' : 'rgba(200, 80, 80, 0.5)';
+      this.ctx.fillRect(x, bodyTop, candleWidth * 0.8, bodyHeight);
     });
   },
 
-  drawLayeredWaveform: function(w, h) {
+  drawFlowingWaves: function(w, h) {
     // Color gradient: red → magenta → purple → blue
     const colors = [
-      { r: 255, g: 20, b: 60 },
-      { r: 255, g: 40, b: 100 },
-      { r: 255, g: 60, b: 130 },
+      { r: 255, g: 30, b: 80 },
+      { r: 255, g: 50, b: 120 },
       { r: 240, g: 80, b: 150 },
-      { r: 220, g: 100, b: 160 },
-      { r: 200, g: 120, b: 170 },
-      { r: 180, g: 140, b: 190 },
-      { r: 160, g: 160, b: 210 },
-      { r: 140, g: 180, b: 225 },
-      { r: 120, g: 200, b: 240 },
-      { r: 100, g: 210, b: 250 },
+      { r: 200, g: 120, b: 180 },
+      { r: 160, g: 150, b: 210 },
+      { r: 120, g: 180, b: 240 },
       { r: 80, g: 200, b: 255 }
     ];
     
-    // Draw 35 distinct wave curves with LARGE oscillation
-    const numWaves = 35;
-    const waveSpacing = h / numWaves; // Vertical spacing
-    const waveHeight = h * 0.05; // How much each wave oscillates
+    const centerY = h / 2;
+    const numCurves = 7;
     
-    for (let waveIdx = 0; waveIdx < numWaves; waveIdx++) {
-      // Center line for this specific wave
-      const waveCenterY = (waveIdx + 0.5) * waveSpacing;
-      const frequency = 0.4 + (waveIdx % 4) * 0.15;
+    // Draw 7 smooth flowing curves
+    for (let curveIdx = 0; curveIdx < numCurves; curveIdx++) {
+      const frequency = 0.6 + curveIdx * 0.12;
+      const amplitude = (h * 0.35) / (curveIdx + 1);
+      const yOffset = (curveIdx - numCurves / 2) * (h * 0.08);
       
-      const colorIdx = Math.floor((waveIdx / numWaves) * (colors.length - 1));
-      const color = colors[colorIdx];
+      const color = colors[curveIdx];
+      const opacity = 0.8 - (curveIdx / numCurves) * 0.3;
       
-      const opacity = 0.85 - (waveIdx / numWaves) * 0.25;
       this.ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
-      this.ctx.lineWidth = 1;
+      this.ctx.lineWidth = 2;
       this.ctx.lineCap = 'round';
       this.ctx.lineJoin = 'round';
+      
+      // Add glow
+      this.ctx.shadowColor = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity * 0.5})`;
+      this.ctx.shadowBlur = 8;
       
       this.ctx.beginPath();
       let pathStarted = false;
       
-      for (let x = 0; x <= w; x += 0.8) {
-        const phase = (x - this.scrollOffset) * 0.005 * frequency;
-        const yWave = Math.sin(phase) * waveHeight;
-        const y = waveCenterY + yWave;
+      for (let x = 0; x <= w; x += 1.5) {
+        const phase = (x - this.scrollOffset) * 0.004 * frequency;
+        const wave = Math.sin(phase) * amplitude;
+        const y = centerY + yOffset + wave;
         
         if (!pathStarted) {
           this.ctx.moveTo(x, y);
@@ -155,6 +168,9 @@ window.bannerChartManager = {
       }
       this.ctx.stroke();
     }
+    
+    this.ctx.shadowColor = 'transparent';
+    this.ctx.shadowBlur = 0;
   }
 };
 
