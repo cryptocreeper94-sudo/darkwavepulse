@@ -155,27 +155,117 @@ const avatarDisplaySystem = {
     container.innerHTML = html;
   },
   
-  // Open mode selector
+  // Open mode selector with floating agent buttons
   openModeSelector() {
+    const agent = this.getCurrentAgent();
+    const agentColor = this.getAgentColor(agent ? agent.id : 1);
+    
+    // Create a fixed modal overlay to ensure visibility
+    const modal = document.createElement('div');
+    modal.id = 'avatarModeSelectorModal';
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.4); z-index: 5000; display: flex; 
+      align-items: center; justify-content: center;
+    `;
+    
     const html = `
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 12px;">
-        <button onclick="avatarDisplaySystem.setMode('agent')" style="padding: 8px 12px; background: ${this.currentMode === 'agent' ? '#3b82f6' : 'rgba(59,130,246,0.3)'}; border: 1px solid ${this.currentMode === 'agent' ? '#60a5fa' : 'rgba(59,130,246,0.5)'}; border-radius: 6px; color: white; cursor: pointer; font-weight: 600; font-size: 12px;">🤖 Agent Mode</button>
-        <button onclick="avatarDisplaySystem.setMode('crypto-cat')" style="padding: 8px 12px; background: ${this.currentMode === 'crypto-cat' ? '#8b5cf6' : 'rgba(139,92,246,0.3)'}; border: 1px solid ${this.currentMode === 'crypto-cat' ? '#a78bfa' : 'rgba(139,92,246,0.5)'}; border-radius: 6px; color: white; cursor: pointer; font-weight: 600; font-size: 12px;">🐱 Cat Mode</button>
-        <button onclick="avatarDisplaySystem.setMode('off')" style="padding: 8px 12px; background: ${this.currentMode === 'off' ? '#6b7280' : 'rgba(107,114,128,0.3)'}; border: 1px solid ${this.currentMode === 'off' ? '#9ca3af' : 'rgba(107,114,128,0.5)'}; border-radius: 6px; color: white; cursor: pointer; font-weight: 600; font-size: 12px;">🔇 Off</button>
+      <div style="
+        position: relative; width: 90%; max-width: 400px; height: 150px; 
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(0,0,0,0.2); border: 1px solid rgba(168,85,247,0.2); 
+        border-radius: 16px; padding: 30px 20px;
+      ">
+        <!-- Agent Mode Button (Left) -->
+        <button onclick="avatarDisplaySystem.setMode('agent'); document.getElementById('avatarModeSelectorModal').remove();" style="
+          position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+          width: 120px; border: none; background: none; cursor: pointer;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          transition: all 0.3s;
+        " onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+          <div style="
+            width: 80px; height: 80px; border-radius: 50%; 
+            background: ${agentColor}; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white; font-size: 32px;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 80px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
+            position: relative; z-index: 2;
+          ">${agent ? agent.name.split(' ').map(n => n[0]).join('') : 'AG'}</div>
+          <div style="
+            margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.9);
+            font-weight: 600; white-space: nowrap;
+          ">🤖 Agent</div>
+        </button>
+        
+        <!-- Center Label -->
+        <div style="
+          position: absolute; left: 50%; transform: translateX(-50%); 
+          text-align: center; z-index: 1; width: 60px;
+        ">
+          <div style="font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; font-weight: 600;">
+            SELECT<br/>MODE
+          </div>
+        </div>
+        
+        <!-- Cat Mode Button (Center-Right) -->
+        <button onclick="avatarDisplaySystem.setMode('crypto-cat'); document.getElementById('avatarModeSelectorModal').remove();" style="
+          position: absolute; left: 50%; transform: translateX(-50%) translateY(-50%); top: 50%;
+          width: 120px; border: none; background: none; cursor: pointer;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          transition: all 0.3s;
+        " onmouseover="this.style.transform='translateX(-50%) translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateX(-50%) translateY(-50%) scale(1)'">
+          <div style="
+            width: 80px; height: 80px; border-radius: 50%; 
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 80px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
+            position: relative; z-index: 2;
+          ">🐱</div>
+          <div style="
+            margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.9);
+            font-weight: 600; white-space: nowrap;
+          ">🐱 Cat</div>
+        </button>
+        
+        <!-- Off Mode Button (Right) -->
+        <button onclick="avatarDisplaySystem.setMode('off'); document.getElementById('avatarModeSelectorModal').remove();" style="
+          position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+          width: 120px; border: none; background: none; cursor: pointer;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          transition: all 0.3s;
+        " onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+          <div style="
+            width: 80px; height: 80px; border-radius: 50%; 
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 80px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
+            position: relative; z-index: 2;
+          ">🔇</div>
+          <div style="
+            margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.9);
+            font-weight: 600; white-space: nowrap;
+          ">Off</div>
+        </button>
       </div>
     `;
     
-    const container = document.getElementById('avatarDisplayContainer');
-    if (container) {
-      const modeSelector = document.createElement('div');
-      modeSelector.id = 'avatarModeSelector';
-      modeSelector.innerHTML = html;
-      container.parentElement.insertBefore(modeSelector, container);
-      
-      setTimeout(() => {
-        modeSelector.remove();
-      }, 8000);
-    }
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+    
+    // Click outside to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+    
+    // Auto-close after 10 seconds
+    setTimeout(() => {
+      const el = document.getElementById('avatarModeSelectorModal');
+      if (el) el.remove();
+    }, 10000);
   },
   
   // Open agent selector
