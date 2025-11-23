@@ -169,6 +169,7 @@
       <button class="nav-btn" data-tab="truth">⭐ Truth ⭐</button>
       <button class="nav-btn" data-tab="glossary">Knowledge Base</button>
       <button class="nav-btn" data-tab="portfolio">Portfolio</button>
+      <button class="nav-btn" data-tab="trading">🤖 Trading (V2)</button>
       <button class="nav-btn" data-tab="staking">Staking</button>
       <button class="nav-btn" data-tab="investors">Investors</button>
       <button class="nav-btn" data-tab="community">Community</button>
@@ -1542,6 +1543,67 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Trading Tab (V2 Locked) -->
+      <div id="trading" class="tab-pane">
+        <button class="back-btn-circle" onclick="switchTab('crypto')">←</button>
+        <button class="close-btn-circle" onclick="switchTab('crypto')">×</button>
+        
+        <!-- V2 Lock Overlay -->
+        <div class="v2-lock-overlay" id="tradingV2Lock">
+          <button class="v2-lock-close-btn" onclick="switchTab('crypto')">&times;</button>
+          <div class="v2-lock-content">
+            
+            <div class="v2-lock-icon">🤖</div>
+            <h2 style="font-family: 'Orbitron', sans-serif; font-size: 36px; margin: 20px 0 10px 0; color: #00FF41; text-align: center;">PREDICTIVE TRADING</h2>
+            <p class="v2-lock-date" style="font-size: 14px; color: #3861FB; font-weight: 700; margin-bottom: 30px; text-align: center;">V2 FEATURE • LAUNCHES DECEMBER 25TH, 2025</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 30px 0;">
+              
+              <!-- Buy Limit Card -->
+              <div style="background: linear-gradient(135deg, rgba(22, 199, 132, 0.15) 0%, rgba(22, 199, 132, 0.05) 100%); border: 1px solid rgba(22, 199, 132, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
+                <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #16C784;">Buy Limit Orders</h3>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 12px;">
+                  Set automatic buy orders when your target price is reached. AI-powered entry points based on technical signals.
+                </p>
+                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">AI-POWERED ENTRY POINTS</div>
+              </div>
+              
+              <!-- Sell Limit Card -->
+              <div style="background: linear-gradient(135deg, rgba(234, 57, 67, 0.15) 0%, rgba(234, 57, 67, 0.05) 100%); border: 1px solid rgba(234, 57, 67, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
+                <div style="font-size: 32px; margin-bottom: 12px;">📉</div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #EA3943;">Sell Limit Orders</h3>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 12px;">
+                  Lock in profits at your target price. Built-in stop-loss and take-profit levels powered by AI exit signals.
+                </p>
+                <div style="font-size: 11px; color: #3861FB; font-weight: 700;">RISK-ADJUSTED EXIT SIGNALS</div>
+              </div>
+              
+            </div>
+            
+            <div style="background: rgba(56, 97, 251, 0.1); border: 1px solid rgba(56, 97, 251, 0.3); border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.8;">
+                <strong style="color: #3861FB;">💡 What's Included:</strong><br/>
+                ✓ Set buy/sell limit orders on 100+ crypto assets<br/>
+                ✓ Auto-execution when price conditions are met<br/>
+                ✓ Predictive entry/exit signals from DarkWave AI<br/>
+                ✓ Real-time order management dashboard<br/>
+                ✓ Integration with Jupiter DEX for gas-free execution
+              </div>
+            </div>
+            
+            <button class="v2-upgrade-btn" onclick="switchTab('settings')" style="width: 100%; margin-bottom: 12px; font-size: 14px; font-weight: 900; padding: 14px; background: linear-gradient(135deg, #3861FB, #8338EC); box-shadow: 0 4px 20px rgba(56, 97, 251, 0.4); cursor: pointer;">
+              🚀 UNLOCK V2 FEATURES ON DECEMBER 25
+            </button>
+            
+            <div style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 12px;">
+              Coming soon for all paid subscribers. Free tier upgrade paths available.
+            </div>
+            
+          </div>
         </div>
       </div>
 

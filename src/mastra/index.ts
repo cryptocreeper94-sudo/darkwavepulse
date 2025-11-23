@@ -620,6 +620,80 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Trading API: Buy Limit Order (V2 Feature - Locked)
+      {
+        path: "/api/trading/buy-limit",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { tokenSymbol, targetPrice, amount, walletAddress } = await c.req.json();
+            logger?.info('📈 [BuyLimit] Order received', { tokenSymbol, targetPrice, amount });
+            
+            // V2 Locked Feature - Return locked response
+            return c.json({
+              success: false,
+              locked: true,
+              message: '🔒 Buy Limit Orders are a V2 Predictive Trading feature. Coming Dec 25, 2025!',
+              features: {
+                description: 'Set automatic buy orders when your target price is reached',
+                predictiveEdge: 'AI-powered entry points based on technical signals',
+                autoExecution: 'Executes instantly when conditions are met'
+              }
+            }, 423);
+          } catch (error: any) {
+            return c.json({ error: error.message }, 400);
+          }
+        }
+      },
+      // Trading API: Sell Limit Order (V2 Feature - Locked)
+      {
+        path: "/api/trading/sell-limit",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const { tokenSymbol, targetPrice, amount, walletAddress } = await c.req.json();
+            logger?.info('📉 [SellLimit] Order received', { tokenSymbol, targetPrice, amount });
+            
+            // V2 Locked Feature - Return locked response
+            return c.json({
+              success: false,
+              locked: true,
+              message: '🔒 Sell Limit Orders are a V2 Predictive Trading feature. Coming Dec 25, 2025!',
+              features: {
+                description: 'Set automatic sell orders at your target price',
+                riskManagement: 'Built-in stop-loss and take-profit levels',
+                prediction: 'AI-powered exit signals for optimal profits'
+              }
+            }, 423);
+          } catch (error: any) {
+            return c.json({ error: error.message }, 400);
+          }
+        }
+      },
+      // Trading API: List Active Orders (V2 Feature - Locked)
+      {
+        path: "/api/trading/orders",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            logger?.info('📋 [Orders] List request');
+            
+            // V2 Locked Feature - Return locked response
+            return c.json({
+              success: false,
+              locked: true,
+              message: '🔒 Order Management is a V2 Predictive Trading feature. Coming Dec 25, 2025!',
+              orders: [],
+              upgradeUrl: '/pricing'
+            }, 423);
+          } catch (error: any) {
+            return c.json({ error: error.message }, 400);
+          }
+        }
+      },
       // ALIAS: /api/payments/plans
       {
         path: "/api/payments/plans",
