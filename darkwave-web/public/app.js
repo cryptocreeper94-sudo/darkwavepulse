@@ -221,7 +221,7 @@ function closeDisclaimerModal() {
 function closeStakingV2Lock() {
   const overlay = document.getElementById('stakingV2Lock');
   if (overlay) {
-    overlay.style.display = 'none';
+    overlay.classList.add('hidden');
     console.log('🔓 Staking preview closed');
   }
 }
@@ -229,7 +229,7 @@ function closeStakingV2Lock() {
 function unlockStakingPreview() {
   const overlay = document.getElementById('stakingV2Lock');
   if (overlay) {
-    overlay.style.display = 'none';
+    overlay.classList.add('hidden');
     console.log('🔓 Staking preview unlocked for dev/admin');
   }
   
