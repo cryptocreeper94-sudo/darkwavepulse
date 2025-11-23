@@ -1,23 +1,19 @@
-// DarkWave Banner - Neon Wave Animation
+// DarkWave Banner - Enhanced Waveform with Layered Depth
+// Multiple sine waves with red→magenta→purple→blue gradient, horizontal scroll
 window.bannerChartManager = {
   canvas: null,
   ctx: null,
   animationFrame: null,
-  time: 0,
+  scrollOffset: 0,
   initialized: false,
 
   init: function() {
-    console.log('🎬 Banner init called');
+    console.log('🎬 Enhanced Waveform Banner init');
     
-    if (this.initialized) {
-      console.log('Already initialized');
-      return;
-    }
+    if (this.initialized) return;
 
-    // Find or create canvas
     let canvas = document.getElementById('banner-chart-canvas');
     if (!canvas) {
-      console.log('Creating new canvas');
       const bannerWave = document.querySelector('.banner-wave');
       if (!bannerWave) {
         console.error('banner-wave not found!');
@@ -30,7 +26,6 @@ window.bannerChartManager = {
       canvas.height = 150;
       canvas.style.cssText = 'display:block;position:absolute;top:0;left:0;width:100%;height:100%;';
       bannerWave.appendChild(canvas);
-      console.log('Canvas created:', canvas.width, 'x', canvas.height);
     }
 
     this.canvas = canvas;
@@ -42,14 +37,17 @@ window.bannerChartManager = {
     }
 
     this.initialized = true;
-    console.log('✅ Banner animated wave initialized');
+    console.log('✅ Enhanced waveform banner ready');
     
     this.animate();
   },
 
   animate: function() {
     this.draw();
-    this.time += 0.016;
+    
+    // Ultra-slow scroll: canvas.width pixels in 180 seconds (3 minutes)
+    this.scrollOffset += this.canvas.width / 10800;
+    
     this.animationFrame = requestAnimationFrame(() => this.animate());
   },
 
@@ -58,79 +56,85 @@ window.bannerChartManager = {
 
     const w = this.canvas.width;
     const h = this.canvas.height;
-    const time = this.time;
 
-    // Clear
-    this.ctx.fillStyle = 'rgba(15, 15, 35, 0.95)';
+    // Black background
+    this.ctx.fillStyle = '#0a0a14';
     this.ctx.fillRect(0, 0, w, h);
 
-    // Draw waves
-    const centerY = h / 2;
-    
-    // Wave 1
-    this.ctx.strokeStyle = 'rgba(157, 78, 221, 0.7)';
-    this.ctx.lineWidth = 3;
-    this.ctx.beginPath();
-    for (let x = 0; x < w; x += 3) {
-      const y = centerY + Math.sin((x + time * 50) * 0.02) * 40;
-      if (x === 0) this.ctx.moveTo(x, y);
-      else this.ctx.lineTo(x, y);
-    }
-    this.ctx.stroke();
-
-    // Wave 2 (secondary)
-    this.ctx.strokeStyle = 'rgba(224, 170, 255, 0.5)';
-    this.ctx.lineWidth = 2;
-    this.ctx.beginPath();
-    for (let x = 0; x < w; x += 4) {
-      const y = centerY + Math.sin((x - time * 30) * 0.015) * 30;
-      if (x === 0) this.ctx.moveTo(x, y);
-      else this.ctx.lineTo(x, y);
-    }
-    this.ctx.stroke();
-
-    // Draw candles
-    this.drawCandles(w, h, time);
+    // Draw waveform layers with depth
+    this.drawWaveformLayers(w, h);
   },
 
-  drawCandles: function(w, h, time) {
+  drawWaveformLayers: function(w, h) {
     const centerY = h / 2;
-    const spacing = 40;
+    const amplitude = h * 0.42; // Increased amplitude for deeper waves
     
-    for (let i = 0; i < w / spacing; i++) {
-      const x = (time * 60) + i * spacing;
-      if (x < -30 || x > w) continue;
-
-      const isGreen = i % 2 === 0;
-      const waveOffset = Math.sin((x + time * 50) * 0.02) * 25;
+    // Rich color gradient: red → magenta → purple → blue
+    const colors = [
+      { r: 255, g: 30, b: 70 },      // Bright Red
+      { r: 255, g: 50, b: 120 },     // Red-Magenta
+      { r: 255, g: 70, b: 150 },     // Magenta-Pink
+      { r: 240, g: 100, b: 170 },    // Pink-Purple
+      { r: 200, g: 120, b: 190 },    // Purple-Pink
+      { r: 160, g: 140, b: 210 },    // Light Purple
+      { r: 120, g: 160, b: 230 },    // Purple-Blue
+      { r: 80, g: 180, b: 250 },     // Blue-Purple
+      { r: 60, g: 200, b: 255 },     // Bright Blue
+      { r: 50, g: 150, b: 220 },     // Deep Blue
+      { r: 80, g: 120, b: 200 },     // Blue-Purple
+      { r: 100, g: 100, b: 180 }     // Dark Purple
+    ];
+    
+    // Draw multiple overlapping wave layers
+    const frequencies = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7];
+    
+    frequencies.forEach((freq, layerIdx) => {
+      const color = colors[layerIdx % colors.length];
       
-      // Wick
-      this.ctx.strokeStyle = isGreen ? 'rgba(100, 255, 150, 0.8)' : 'rgba(255, 100, 100, 0.8)';
-      this.ctx.lineWidth = 2;
+      // Opacity varies by layer - center layers brighter
+      const centerDist = Math.abs(layerIdx - frequencies.length / 2);
+      const opacity = 0.95 - (centerDist / frequencies.length) * 0.35;
+      
+      this.ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
+      this.ctx.lineWidth = 1.8;
+      this.ctx.lineCap = 'round';
+      this.ctx.lineJoin = 'round';
+      
+      // Glow effect for brighter appearance
+      this.ctx.shadowColor = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity * 0.7})`;
+      this.ctx.shadowBlur = 10;
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
+      
       this.ctx.beginPath();
-      this.ctx.moveTo(x + 6, centerY - 35 + waveOffset);
-      this.ctx.lineTo(x + 6, centerY + 35 + waveOffset);
-      this.ctx.stroke();
-
-      // Body
-      this.ctx.fillStyle = isGreen ? 'rgba(100, 255, 150, 0.7)' : 'rgba(255, 100, 100, 0.7)';
-      this.ctx.strokeStyle = isGreen ? 'rgba(150, 255, 180, 0.9)' : 'rgba(255, 150, 150, 0.9)';
-      this.ctx.lineWidth = 1.5;
+      let pathStarted = false;
       
-      const bodyTop = centerY - 15 + waveOffset;
-      this.ctx.fillRect(x, bodyTop, 12, 20);
-      this.ctx.strokeRect(x, bodyTop, 12, 20);
-    }
+      for (let x = 0; x <= w; x += 1.5) {
+        // Wave calculation with scroll offset
+        const phase = (x - this.scrollOffset) * 0.004 * freq;
+        const y = centerY - Math.sin(phase) * amplitude;
+        
+        if (!pathStarted) {
+          this.ctx.moveTo(x, y);
+          pathStarted = true;
+        } else {
+          this.ctx.lineTo(x, y);
+        }
+      }
+      
+      this.ctx.stroke();
+    });
+    
+    // Remove shadow effects
+    this.ctx.shadowColor = 'transparent';
+    this.ctx.shadowBlur = 0;
   }
 };
 
-// Auto-init when DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded - initializing banner');
     setTimeout(() => window.bannerChartManager.init(), 100);
   });
 } else {
-  console.log('DOM ready - initializing banner immediately');
   setTimeout(() => window.bannerChartManager.init(), 100);
 }
