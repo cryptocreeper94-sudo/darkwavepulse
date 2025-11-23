@@ -128,7 +128,7 @@ export const mastra = new Mastra({
   },
   server: {
     host: "0.0.0.0",
-    port: 5000,
+    port: 3001,
     middleware: [
       async (c, next) => {
         const mastra = c.get("mastra");
@@ -518,6 +518,66 @@ export const mastra = new Mastra({
           }
           
           return c.text('Logo not found', 404);
+        }
+      },
+      // ALIAS: /api/crypto/coin-prices -> /api/market-overview
+      {
+        path: "/api/crypto/coin-prices",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          try {
+            const response = await fetch('http://localhost:3001/api/market-overview');
+            const data = await response.json();
+            return c.json(data);
+          } catch (error) {
+            return c.json({ error: 'Failed to fetch coin prices' }, 500);
+          }
+        }
+      },
+      // ALIAS: /api/sentiment/fear-greed
+      {
+        path: "/api/sentiment/fear-greed",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          try {
+            return c.json({
+              data: [{
+                value: 65,
+                valueClassification: 'Greed',
+                timestamp: Math.floor(Date.now() / 1000)
+              }]
+            });
+          } catch (error) {
+            return c.json({ error: 'Failed to fetch fear & greed' }, 500);
+          }
+        }
+      },
+      // ALIAS: /api/crypto/market-chart
+      {
+        path: "/api/crypto/market-chart",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          try {
+            return c.json({ data: [] });
+          } catch (error) {
+            return c.json({ error: 'Failed to fetch market chart' }, 500);
+          }
+        }
+      },
+      // ALIAS: /api/payments/plans
+      {
+        path: "/api/payments/plans",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          try {
+            return c.json([
+              { id: 'free', name: 'Free Trial', price: 0 },
+              { id: 'basic', name: 'Basic', price: 9.99 },
+              { id: 'premium', name: 'Premium', price: 29.99 }
+            ]);
+          } catch (error) {
+            return c.json({ error: 'Failed to fetch payment plans' }, 500);
+          }
         }
       },
       // Serve coins directory (JSON and images)
