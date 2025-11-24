@@ -11994,3 +11994,45 @@ body {
     font-size: 14px;
   }
 }
+
+/* MOBILE SEARCH LAYOUT - Separate Desktop and Mobile */
+@media (max-width: 640px) {
+  #searchAnalyticsBar {
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: none !important;
+    gap: 8px !important;
+    margin: 8px 8px !important;
+  }
+  
+  .web3-search-section {
+    flex: 1 !important;
+  }
+  
+  #analyticsButtonContainer {
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    gap: 4px !important;
+    padding: 0 !important;
+  }
+  
+  #analyticsButtonContainer > div:first-child {
+    display: none !important;
+  }
+  
+  #analyzeBtn {
+    padding: 8px !important;
+    font-size: 0 !important;
+    flex: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  #analyzeBtn::after {
+    content: "📊";
+    font-size: 18px;
+  }
+}
