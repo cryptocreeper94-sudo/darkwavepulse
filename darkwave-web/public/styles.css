@@ -11995,6 +11995,7 @@ body {
   }
 }
 
+
 /* MOBILE SEARCH LAYOUT - Separate Desktop and Mobile */
 @media (max-width: 640px) {
   #searchAnalyticsBar {
@@ -12010,10 +12011,13 @@ body {
   }
   
   #analyticsButtonContainer {
-    flex-direction: row !important;
-    align-items: flex-end !important;
-    gap: 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
     padding: 0 !important;
+    flex: 0 0 auto;
   }
   
   #analyticsButtonContainer > div:first-child {
@@ -12021,18 +12025,21 @@ body {
   }
   
   #analyzeBtn {
-    padding: 8px !important;
-    font-size: 0 !important;
-    flex: 0 !important;
-    width: 40px !important;
-    height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    flex: 1 !important;
+    height: auto !important;
+    width: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-  }
-  
-  #analyzeBtn::after {
-    content: "📊";
-    font-size: 18px;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #3861FB, #8338EC) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: white !important;
+    cursor: pointer !important;
+    white-space: nowrap;
+    min-width: 80px;
   }
 }
