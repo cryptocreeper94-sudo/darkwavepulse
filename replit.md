@@ -38,6 +38,14 @@
 - Removed redundant staking landing page - users go straight to sandbox setup
 - Fixed coin table row click handlers: Replaced inline onclick handlers with proper event listeners using data attributes
 - Balanced 18 AI agents: 6 per age group (young/middle/old), 9 male/9 female, diverse racial representation, varied hair colors
+- **METRIC BOX LAYOUT REFINEMENT**: Perfected 4 metric boxes (Fear & Greed, Altcoin Season, Market Cap, Volume)
+  - Squeezed gauge boxes to remove excess gaps between number and gauge
+  - Market Cap & Volume titles now positioned on X-axis centerline with content below
+  - Added green/red percentage coloring for Market Cap & Volume changes
+  - All boxes now tight, balanced, and proportional with zero wasted space
+- **REMOVED DUPLICATE STAKING CONTENT**: Deleted "Coming Soon" section from Projects tab
+  - DARKWAVE COIN and $CRAZY token cards now only appear on dedicated Staking page
+  - Eliminated redundant content across multiple pages - each section stays on its own page
 
 ## System Architecture
 
