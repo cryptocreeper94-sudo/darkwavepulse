@@ -4253,8 +4253,10 @@ function showVolumeFlowExplanation() {
     }
   }
   
-  // Show popup using existing cat popup system
-  if (typeof showCatPopup === 'function') {
+  // Show popup using agent popup system
+  if (typeof showAgentPopup === 'function') {
+    showAgentPopup(term, definition);
+  } else if (typeof showCatPopup === 'function') {
     showCatPopup(term, definition);
   }
 }
@@ -4290,7 +4292,9 @@ function showMetricExplanation(metricType) {
   };
   
   const metric = explanations[metricType];
-  if (metric && typeof showCatPopup === 'function') {
+  if (metric && typeof showAgentPopup === 'function') {
+    showAgentPopup(metric.term, metric.definition);
+  } else if (metric && typeof showCatPopup === 'function') {
     showCatPopup(metric.term, metric.definition);
   }
 }
@@ -4313,7 +4317,9 @@ function showIndexExplanation(indexType) {
   };
   
   const index = explanations[indexType];
-  if (index && typeof showCatPopup === 'function') {
+  if (index && typeof showAgentPopup === 'function') {
+    showAgentPopup(index.term, index.definition);
+  } else if (index && typeof showCatPopup === 'function') {
     showCatPopup(index.term, index.definition);
   }
 }
@@ -4324,7 +4330,9 @@ function showBitcoinProxyExplanation() {
   const btcDom = document.getElementById('btcDominance')?.textContent || '52%';
   const definition = `Bitcoin is the most important asset in crypto. When BTC moves, the entire market follows. This chart shows real-time Bitcoin price action using professional-grade data. Bitcoin currently holds ${btcDom} market dominance, making every tick of this chart crucial for understanding crypto market direction. Watch this chart to stay ahead of the market.`;
   
-  if (typeof showCatPopup === 'function') {
+  if (typeof showAgentPopup === 'function') {
+    showAgentPopup(term, definition);
+  } else if (typeof showCatPopup === 'function') {
     showCatPopup(term, definition);
   }
 }

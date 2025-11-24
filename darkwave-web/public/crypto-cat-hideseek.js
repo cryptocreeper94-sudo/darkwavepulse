@@ -209,50 +209,42 @@ function showHideSeekPopup(spotId) {
   recentMessages.push(message);
   if (recentMessages.length > MAX_RECENT_HISTORY) recentMessages.shift();
   
-  // Select cat image based on persona (ALL AVAILABLE IMAGES for maximum variety)
-  const catImages = persona === 'business' 
-    ? [
-        '/crypto-cat-images/business-cat-pointing.jpg',
-        '/crypto-cat-images/business-cat-explaining.jpg',
-        '/crypto-cat-images/business-cat-facepalm.jpg',
-        '/crypto-cat-images/business-cat-sitting.jpg'
-      ]
-    : [
-        '/crypto-cat-images/sarcastic-cat-pointing.jpg',
-        '/crypto-cat-images/sarcastic-cat-sunglasses.jpg',
-        '/crypto-cat-images/sarcastic-cat-facepalm.jpg',
-        '/crypto-cat-images/sarcastic-cat.png'
-      ];
+  // Get agent from popup system
+  const agent = typeof getPopupAgent === 'function' ? getPopupAgent() : null;
   
-  // Filter out recently shown images
-  const availableImages = catImages.filter(img => !recentImages.includes(img));
-  const imagesToChooseFrom = availableImages.length > 0 ? availableImages : catImages;
-  const randomImage = imagesToChooseFrom[Math.floor(Math.random() * imagesToChooseFrom.length)];
-  
-  // Track this image
-  recentImages.push(randomImage);
-  if (recentImages.length > MAX_RECENT_HISTORY) recentImages.shift();
-  
-  // Check if Commentary Mode is ON (business or casual)
-  const showCatImage = persona === 'business' || persona === 'casual';
+  // Check if Commentary Mode is ON (business or casual) and agent is available
+  const showAgentImage = (persona === 'business' || persona === 'casual') && agent;
 
   const popup = document.createElement('div');
   popup.id = 'catPopup';
   popup.className = 'cat-popup';
 
   popup.innerHTML = `
-    <div class="cat-popup-content ${!showCatImage ? 'cat-popup-simple' : ''}">
+    <div class="cat-popup-content ${!showAgentImage ? 'cat-popup-simple' : ''}">
       <button class="cat-popup-close" onclick="closeCatPopup()">×</button>
       
-      ${showCatImage ? `
-      <div class="cat-popup-cat">
-        <img src="${randomImage}" alt="Crypto Cat" />
+      ${showAgentImage ? `
+      <div class="cat-popup-cat" style="text-align: center;">
+        <img src="${agent.image}" alt="${agent.name}" style="
+          max-width: 140px;
+          height: auto;
+          object-fit: contain;
+          filter: drop-shadow(0 0 8px rgba(56, 97, 251, 0.4));
+        " />
+        <div style="
+          font-size: 11px;
+          font-weight: 700;
+          color: #3861fb;
+          margin-top: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        ">${agent.name}</div>
       </div>
       ` : ''}
       
       <div class="cat-popup-panel-content">
         <div class="cat-popup-panel-content-inner">
-          <div class="cat-popup-term">${showCatImage ? 'You Found Me!' : '💡 Trading Insight'}</div>
+          <div class="cat-popup-term">${showAgentImage ? 'You Found Them!' : '💡 Trading Insight'}</div>
           <div class="cat-popup-text">${message}</div>
           <div class="cat-found-count">${foundCats.length} / ${hotspots.length} discovered</div>
         </div>
@@ -276,25 +268,39 @@ function showHideSeekPopup(spotId) {
 function showAllCatsFoundPopup() {
   // Get current persona mode
   const persona = window.currentCatMode || 'casual';
-  const showCatImage = persona === 'business' || persona === 'casual';
+  const agent = typeof getPopupAgent === 'function' ? getPopupAgent() : null;
+  const showAgentImage = (persona === 'business' || persona === 'casual') && agent;
   
   const popup = document.createElement('div');
   popup.id = 'catPopup';
   popup.className = 'cat-popup';
   
   // Title and message based on Commentary Mode
-  const title = showCatImage ? '🎉 You Found Them All!' : '🎉 All Insights Discovered!';
-  const completionMessage = showCatImage 
-    ? "Impressive! You've got the attention span of a true degen trader. Now use that focus to actually read the charts instead of hunting for cats! 😼"
+  const title = showAgentImage ? '🎉 You Found Them All!' : '🎉 All Insights Discovered!';
+  const completionMessage = showAgentImage 
+    ? `Impressive! You've got the attention span of a true degen trader. Now use that focus to actually read the charts instead of hunting for agents! 😼`
     : "Excellent attention to detail! You've discovered all hidden trading insights. Apply this same level of focus when analyzing market data and charts.";
   
   popup.innerHTML = `
-    <div class="cat-popup-content ${!showCatImage ? 'cat-popup-simple' : ''}">
+    <div class="cat-popup-content ${!showAgentImage ? 'cat-popup-simple' : ''}">
       <button class="cat-popup-close" onclick="closeCatPopup()">×</button>
       
-      ${showCatImage ? `
-      <div class="cat-popup-cat">
-        <img src="/crypto-cat-images/sarcastic-cat-coins.jpg" alt="Crypto Cat" />
+      ${showAgentImage ? `
+      <div class="cat-popup-cat" style="text-align: center;">
+        <img src="${agent.image}" alt="${agent.name}" style="
+          max-width: 140px;
+          height: auto;
+          object-fit: contain;
+          filter: drop-shadow(0 0 8px rgba(56, 97, 251, 0.4));
+        " />
+        <div style="
+          font-size: 11px;
+          font-weight: 700;
+          color: #3861fb;
+          margin-top: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        ">${agent.name}</div>
       </div>
       ` : ''}
       
