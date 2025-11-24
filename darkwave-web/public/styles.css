@@ -11998,6 +11998,7 @@ body {
 
 
 
+
 /* MOBILE SEARCH LAYOUT - Separate Desktop and Mobile */
 @media (max-width: 640px) {
   #searchAnalyticsBar {
@@ -12006,11 +12007,17 @@ body {
     grid-template-columns: none !important;
     gap: 6px !important;
     margin: 8px 8px !important;
-    align-items: flex-end !important;
+    align-items: stretch !important;
   }
   
   .web3-search-section {
     flex: 1 !important;
+  }
+  
+  .search-box {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: stretch !important;
   }
   
   #analyticsButtonContainer {
@@ -12028,16 +12035,18 @@ body {
   }
   
   #analyzeBtn {
-    width: 44px !important;
-    height: 44px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
     padding: 0 !important;
     font-size: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: transparent !important;
-    border: 3px solid #FFD700 !important;
-    border-radius: 50% !important;
+    background: linear-gradient(135deg, rgba(56, 97, 251, 0.5), rgba(131, 56, 236, 0.5)) !important;
+    border: 1px solid rgba(56, 97, 251, 0.3) !important;
+    border-radius: 6px !important;
     color: #FFD700 !important;
     cursor: pointer !important;
     flex-shrink: 0;
@@ -12045,12 +12054,13 @@ body {
   }
   
   #analyzeBtn:hover {
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    background: linear-gradient(135deg, rgba(56, 97, 251, 0.7), rgba(131, 56, 236, 0.7)) !important;
+    box-shadow: 0 0 12px rgba(56, 97, 251, 0.3);
   }
   
   #analyzeBtn::after {
     content: "₿";
-    font-size: 24px;
+    font-size: 28px;
     color: #FFD700;
     font-weight: 700;
   }
