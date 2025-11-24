@@ -4952,13 +4952,13 @@ body.theme-light .banner-title {
 
 /* Large value display above gauge */
 .gauge-value-display {
-  font-size: 63px;
+  font-size: 38px;
   font-weight: 900;
   color: var(--text-primary);
   text-align: center;
-  margin: 12px 0 6px 0;
+  margin: 8px 0 4px 0;
   line-height: 1;
-  padding: 0 8px;
+  padding: 0 4px;
 }
 
 /* For CAP and VOL boxes - center values vertically */
