@@ -6879,3 +6879,31 @@ function initV2Countdown() {
 window.addEventListener('load', () => {
   initV2Countdown();
 });
+
+// Mobile Search Modal Functions
+function openMobileSearchModal() {
+  if (window.innerWidth <= 640) {
+    document.getElementById('mobileSearchModal').style.display = 'flex';
+    document.getElementById('mobileSearchInput').focus();
+  }
+}
+
+function closeMobileSearchModal() {
+  document.getElementById('mobileSearchModal').style.display = 'none';
+}
+
+function performMobileSearch() {
+  const query = document.getElementById('mobileSearchInput').value;
+  if (query.trim()) {
+    document.getElementById('web3SearchInput').value = query;
+    searchWeb3();
+    closeMobileSearchModal();
+  }
+}
+
+// Close modal when pressing Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('mobileSearchModal').style.display !== 'none') {
+    closeMobileSearchModal();
+  }
+});

@@ -11,10 +11,16 @@
 
 ## Recent Changes (Nov 24, 2025)
 - **VERSION 2 DETAILS BUTTON**: Added "📅 V2 DETAILS" button between Settings and Avatar icon in navigation
-  - Button is ~1 inch wide, styled with blue-purple gradient
+  - Button is ~1 inch wide on desktop, styled with blue-purple gradient
   - Pushes Disclaimer (⚠️) all the way to right edge, filling empty space
   - Links to compact V2 Details page showing launch date, countdown, features, and roadmap
   - Page features: Dec 25, 2025 countdown timer, 2-column feature list (Live Now vs V2 Exclusive), roadmap phases, Legacy Founder deadline
+  - On mobile: Shows only 📅 emoji to save space (text hidden via CSS)
+- **MOBILE SEARCH OPTIMIZATION**: Separated mobile and desktop layouts for search section
+  - **Desktop**: Grid layout with Web 3 Search (2fr) and Coin Analytics (1fr) side by side
+  - **Mobile**: Web 3 Search takes full width, Coin Analytics becomes small 📊 icon button beside it
+  - **Mobile Search Modal**: Clicking search input on mobile opens full-screen modal so user can see what they're typing
+  - Search query syncs between mobile modal and desktop input
 - **NAVIGATION CONSOLIDATION**: Simplified from 11 tabs to 6 tabs to fit mobile without horizontal scrolling
   - 📊 Markets (combines Crypto + Stocks)
   - 🚀 Projects
