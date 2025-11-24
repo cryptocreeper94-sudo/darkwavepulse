@@ -4897,6 +4897,8 @@ body.theme-light .banner-title {
   margin: 0;
   padding: 0 2px 2px 2px;
   min-width: 0;
+  min-height: 0;
+  overflow: visible;
 }
 
 .gauge-container canvas {
@@ -4904,8 +4906,6 @@ body.theme-light .banner-title {
   height: auto;
   width: 100%;
   display: block;
-  transform: scale(1.08);
-  transform-origin: center bottom;
 }
 
 /* Value display above gauge */
