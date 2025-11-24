@@ -4824,7 +4824,7 @@ function renderCoinTable(coins, categoryLabel) {
       : `<div style="width: 24px; height: 24px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">${coin.symbol.substring(0, 1)}</div>`;
     
     return `
-      <tr class="clickable-row" onclick="analysisModalController.openAnalysisModal({symbol: '${coin.symbol}', name: '${coin.name}'})">
+      <tr class="clickable-row" data-symbol="${escapeHtml(coin.symbol)}" data-name="${escapeHtml(coin.name)}">
         <td>
           <div style="display: flex; align-items: center; gap: 10px;">
             ${logoHTML}
@@ -4838,6 +4838,43 @@ function renderCoinTable(coins, categoryLabel) {
       </tr>
     `;
   }).join('');
+  
+  // Attach event listeners to clickable rows
+  attachCoinTableListeners();
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+// Attach click listeners to coin table rows
+function attachCoinTableListeners() {
+  const rows = document.querySelectorAll('.clickable-row');
+  rows.forEach(row => {
+    row.removeEventListener('click', handleCoinRowClick);
+    row.addEventListener('click', handleCoinRowClick);
+  });
+}
+
+// Handle coin table row clicks
+function handleCoinRowClick(event) {
+  const row = event.currentTarget;
+  const symbol = row.getAttribute('data-symbol');
+  const name = row.getAttribute('data-name');
+  
+  if (symbol && name && typeof analysisModalController !== 'undefined') {
+    analysisModalController.openAnalysisModal({ symbol, name });
+  } else {
+    console.warn('❌ Unable to open analysis: missing data or analysisModalController not ready');
+  }
 }
 
 // Get blockchain badge
