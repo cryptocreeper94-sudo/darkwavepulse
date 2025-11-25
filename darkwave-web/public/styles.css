@@ -992,9 +992,7 @@ body.theme-light .banner-title {
 }
 
 /* OLD .metric-value CSS - DISABLED - using .gauge-value-display instead */
-.metric-value {
-  display: none !important;
-}
+/* NOTE: Removed display:none since .macro-metrics-grid .metric-value needs to be visible */
 
 /* Action Button Group - Full Width Mobile */
 .action-group {
