@@ -552,72 +552,95 @@ export const mastra = new Mastra({
           }
         }
       },
-      // ALIAS: /api/crypto/market-chart
+      // ALIAS: /api/crypto/market-chart (with 60-second cache using CoinGecko API)
       {
         path: "/api/crypto/market-chart",
         method: "GET",
-        createHandler: async ({ mastra }) => async (c: any) => {
-          try {
-            const { interval } = c.req.query();
-            const logger = mastra.getLogger();
-            
-            logger?.info('📊 [MarketChart] Request received', { interval });
-            
-            // Fetch BTC historical data using CryptoCompare
-            const priceUrl = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC&tsyms=USD`;
-            const priceResponse = await (await import('axios')).default.get(priceUrl);
-            
-            const btcData = priceResponse.data?.RAW?.BTC?.USD;
-            if (!btcData) {
-              logger?.warn('⚠️ [MarketChart] BTC data not found');
+        createHandler: async ({ mastra }) => {
+          // In-memory cache for market chart data (60 second TTL)
+          let chartCache: { data: any; timestamp: number; interval: string } | null = null;
+          const CACHE_TTL_MS = 60000; // 60 seconds
+          
+          return async (c: any) => {
+            try {
+              const { interval } = c.req.query();
+              const logger = mastra.getLogger();
+              const currentInterval = interval || '60';
+              
+              // Return cached data if still valid
+              if (chartCache && 
+                  chartCache.interval === currentInterval && 
+                  (Date.now() - chartCache.timestamp) < CACHE_TTL_MS) {
+                logger?.info('📦 [MarketChart] Returning cached data');
+                return c.json(chartCache.data);
+              }
+              
+              logger?.info('📊 [MarketChart] Fetching fresh data from CoinGecko', { interval: currentInterval });
+              
+              // Use CoinGecko API for BTC market chart data (more reliable, free tier friendly)
+              // CoinGecko OHLC API only accepts specific days values: 1, 7, 14, 30, 90, 180, 365, max
+              const intervalMinutes = parseInt(currentInterval) || 60;
+              let days: number | string = 1; // Default to 1 day
+              if (intervalMinutes <= 60) days = 1;
+              else if (intervalMinutes <= 240) days = 7;
+              else if (intervalMinutes <= 720) days = 14;
+              else if (intervalMinutes <= 1440) days = 30;
+              else days = 90;
+              
+              // CoinGecko market_chart endpoint - auto-selects granularity
+              const coinGeckoUrl = `https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`;
+              const axios = (await import('axios')).default;
+              
+              const response = await axios.get(coinGeckoUrl, {
+                headers: { 'Accept': 'application/json' },
+                timeout: 10000
+              });
+              
+              const ohlcData = response.data;
+              
+              if (!ohlcData || !Array.isArray(ohlcData) || ohlcData.length === 0) {
+                logger?.warn('⚠️ [MarketChart] No OHLC data from CoinGecko');
+                if (chartCache && chartCache.data) {
+                  return c.json(chartCache.data);
+                }
+                return c.json({ candleData: [], sparklineData: [] });
+              }
+              
+              // CoinGecko OHLC format: [timestamp, open, high, low, close]
+              const candleData = ohlcData.map((candle: number[]) => ({
+                timestamp: candle[0],
+                open: candle[1],
+                high: candle[2],
+                low: candle[3],
+                close: candle[4],
+                volume: 0 // CoinGecko OHLC doesn't include volume
+              }));
+              
+              // Extract sparkline (just closing prices)
+              const sparklineData = candleData.map((c: any) => c.close);
+              
+              const responseData = { candleData, sparklineData };
+              
+              // Update cache
+              chartCache = {
+                data: responseData,
+                timestamp: Date.now(),
+                interval: currentInterval
+              };
+              
+              logger?.info('✅ [MarketChart] Data cached from CoinGecko', { candleCount: candleData.length, sparklineCount: sparklineData.length });
+              
+              return c.json(responseData);
+            } catch (error: any) {
+              const logger = mastra.getLogger();
+              logger?.error('❌ [MarketChart] Error fetching data', { error: error.message });
+              // Return cached data if available
+              if (chartCache && chartCache.data) {
+                return c.json(chartCache.data);
+              }
               return c.json({ candleData: [], sparklineData: [] });
             }
-            
-            // Determine days of history based on interval
-            const intervalMinutes = parseInt(interval) || 60;
-            const days = Math.max(1, Math.ceil((intervalMinutes * 100) / (24 * 60)));
-            
-            // Fetch historical hourly data
-            const limit = Math.min(days * 24, 2000);
-            const historyUrl = `https://min-api.cryptocompare.com/data/v2/histohour?fsym=BTC&tsym=USD&limit=${limit}`;
-            const historyResponse = await (await import('axios')).default.get(historyUrl);
-            
-            const histData = historyResponse.data?.Data?.Data || [];
-            
-            if (histData.length === 0) {
-              logger?.warn('⚠️ [MarketChart] No historical data received');
-              return c.json({ candleData: [], sparklineData: [] });
-            }
-            
-            // Aggregate hourly data into candles based on interval
-            const candleSize = Math.max(1, Math.ceil(intervalMinutes / 60));
-            const candleData = [];
-            
-            for (let i = 0; i < histData.length; i += candleSize) {
-              const candles = histData.slice(i, Math.min(i + candleSize, histData.length));
-              if (candles.length === 0) continue;
-              
-              const open = candles[0].open;
-              const close = candles[candles.length - 1].close;
-              const high = Math.max(...candles.map((c: any) => c.high));
-              const low = Math.min(...candles.map((c: any) => c.low));
-              const volume = candles.reduce((sum: number, c: any) => sum + c.volumeto, 0);
-              const timestamp = candles[0].time * 1000;
-              
-              candleData.push({ timestamp, open, high, low, close, volume });
-            }
-            
-            // Extract sparkline (just closing prices)
-            const sparklineData = candleData.map((c: any) => c.close);
-            
-            logger?.info('✅ [MarketChart] Data prepared', { candleCount: candleData.length, sparklineCount: sparklineData.length });
-            
-            return c.json({ candleData, sparklineData });
-          } catch (error: any) {
-            const logger = mastra.getLogger();
-            logger?.error('❌ [MarketChart] Error fetching data', { error: error.message });
-            return c.json({ candleData: [], sparklineData: [] });
-          }
+          };
         }
       },
       // Trading API: Buy Limit Order (V2 Feature - Locked)
