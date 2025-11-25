@@ -83,6 +83,17 @@ async function retryWithBackoff(fetchFn, maxRetries = 3, baseDelay = 1000) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 DarkWave Pulse initializing...');
   
+  // Check for valid session - redirect to lockscreen if not logged in
+  const dwpUser = JSON.parse(localStorage.getItem('dwp_user') || '{}');
+  const hasValidSession = dwpUser.accessLevel || dwpUser.subscriptionTier || dwpUser.isWhitelisted;
+  
+  // If no session at all, redirect to lockscreen (but not in development with localhost)
+  if (!hasValidSession && !window.location.hostname.includes('localhost')) {
+    console.log('🔒 No valid session found, redirecting to login...');
+    window.location.href = '/lockscreen.html';
+    return;
+  }
+  
   // Set initial theme
   document.body.className = 'theme-dark';
   
