@@ -10,6 +10,22 @@
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color (Nov 24, 2025)
 
 ## Recent Changes (Nov 25, 2025)
+- **STAKING TAB RESTORED TO NAVIGATION**: Added 💰 Staking tab back to main navigation (between Community and Settings)
+  - Navigation now has 7 tabs: Markets, Projects, Learn, Portfolio, Community, Staking, Settings
+  - Beta V1 and Legacy Founder buttons now work correctly (navigate to staking)
+- **TRUTH TAB REDESIGN**: Replaced giant red hero box with compact header bar
+  - Small pill icon (💊) and title on left, close button (×) on right
+  - Much more low-profile design
+  - Visible close button that returns to Markets tab
+- **MOBILE OVERFLOW FIXES**: Added comprehensive mobile formatting fixes
+  - Global max-width: 100vw on all elements to prevent horizontal scroll
+  - Force grids to single column on mobile (768px and below)
+  - Word-wrap and overflow-wrap on all text elements
+  - Reduced font sizes and padding for mobile
+  - Extra small screen fixes (400px breakpoint)
+- **SWITCHTAB FUNCTION IMPROVED**: Now works even without matching nav button
+  - Validates target pane first, then nav button
+  - Scrolls to top of page on tab switch
 - **CRITICAL HTML STRUCTURE FIX**: Fixed tab navigation issues caused by unbalanced div tags
   - Removed 2 extra closing `</div>` tags in staking tab that caused staking content to appear on main crypto page
   - Removed 1 orphan closing `</div>` after footer that broke overall page structure
