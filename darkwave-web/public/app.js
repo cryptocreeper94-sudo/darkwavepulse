@@ -1735,55 +1735,64 @@ let currentStockSymbol = 'SPY'; // S&P 500 for macro market overview
 let currentStockTimeframe = '24hr';
 let currentChartDataType = 'price'; // 'price' or 'volume'
 
-// Update Main Chart with Timeframe
+// Request debouncing to prevent rate limiting
+let chartUpdateDebounceTimer = null;
+let pendingChartTimeframe = null;
+const CHART_DEBOUNCE_MS = 500; // Wait 500ms before fetching to debounce rapid clicks
+
+// Update Main Chart with Timeframe (debounced to prevent rate limiting)
 async function updateMainChart(timeframe, event) {
-  try {
-    // Store previous timeframe and button state in case of failure
-    const previousTimeframe = currentMainChartTimeframe;
-    const previousActiveBtn = document.querySelector('.market-timeframes-main .tf-btn.active');
-    
-    // Remove active from all timeframe buttons
-    document.querySelectorAll('.market-timeframes-main .tf-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    
-    // Set active on clicked button (if event provided)
-    if (event && event.target) {
-      event.target.classList.add('active');
-    } else {
-      // Fallback: find button by timeframe data attribute
-      const targetBtn = document.querySelector(`.market-timeframes-main .tf-btn[data-tf="${timeframe}"]`);
-      if (targetBtn) targetBtn.classList.add('active');
-    }
-    
-    // Update current timeframe
-    currentMainChartTimeframe = timeframe;
-    
-    // Fetch new data based on timeframe and update charts
-    console.log(`📊 Updating main chart to ${timeframe} timeframe`);
-    
-    // Update dashboard charts with new timeframe data
-    const success = await updateDashboardCharts(timeframe);
-    
-    if (!success) {
-      // Restore previous button state if update failed
-      console.warn('⚠️ Chart update failed, restoring previous timeframe');
-      currentMainChartTimeframe = previousTimeframe;
-      document.querySelectorAll('.market-timeframes-main .tf-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      if (previousActiveBtn) {
-        previousActiveBtn.classList.add('active');
-      }
-      return;
-    }
-    
-    // Optionally fetch updated macro metrics on success
-    fetchMacroMarketMetrics();
-  } catch (error) {
-    console.error('❌ Error updating main chart:', error);
-    // Chart will retain previous data - UI remains functional
+  // Clear any pending update
+  if (chartUpdateDebounceTimer) {
+    clearTimeout(chartUpdateDebounceTimer);
   }
+  
+  // Store the pending timeframe
+  pendingChartTimeframe = timeframe;
+  
+  // Update UI immediately for responsiveness
+  document.querySelectorAll('.market-timeframes-main .tf-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  if (event && event.target) {
+    event.target.classList.add('active');
+  } else {
+    const targetBtn = document.querySelector(`.market-timeframes-main .tf-btn[data-tf="${timeframe}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+  }
+  
+  // Debounce the actual data fetch
+  chartUpdateDebounceTimer = setTimeout(async () => {
+    try {
+      const previousTimeframe = currentMainChartTimeframe;
+      const previousActiveBtn = document.querySelector('.market-timeframes-main .tf-btn.active');
+      
+      // Use the pending timeframe (in case of rapid clicks)
+      const tf = pendingChartTimeframe || timeframe;
+      currentMainChartTimeframe = tf;
+      
+      console.log(`📊 Updating main chart to ${tf} timeframe`);
+      
+      const success = await updateDashboardCharts(tf);
+      
+      if (!success) {
+        console.warn('⚠️ Chart update failed, restoring previous timeframe');
+        currentMainChartTimeframe = previousTimeframe;
+        document.querySelectorAll('.market-timeframes-main .tf-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        if (previousActiveBtn) {
+          previousActiveBtn.classList.add('active');
+        }
+        return;
+      }
+      
+      fetchMacroMarketMetrics();
+    } catch (error) {
+      console.error('❌ Error updating main chart:', error);
+    }
+  }, CHART_DEBOUNCE_MS);
 }
 
 // Fetch Macro Market Metrics
@@ -2157,10 +2166,23 @@ async function initCharts() {
     }
     
     // Create candle chart (candlestick series) - only once
+    // IMPORTANT: Temporarily show container to get proper width since it starts hidden
     if (!dashboardCandleChart) {
       console.log('Creating candle chart...');
+      
+      // Temporarily show container to measure width correctly
+      const wasHidden = !candleContainer.classList.contains('active');
+      if (wasHidden) {
+        candleContainer.style.visibility = 'hidden';
+        candleContainer.style.display = 'block';
+        candleContainer.style.position = 'absolute';
+      }
+      
+      // Use sparkline container width as fallback (they're in same parent)
+      const containerWidth = candleContainer.clientWidth || sparklineContainer.clientWidth || 600;
+      
       dashboardCandleChart = LightweightCharts.createChart(candleContainer, {
-        width: candleContainer.clientWidth,
+        width: containerWidth,
         height: 200,
         layout: { background: { color: '#1A1A1A' }, textColor: '#D9D9D9' },
         grid: { vertLines: { color: '#2B2B2B' }, horzLines: { color: '#2B2B2B' } },
@@ -2171,6 +2193,13 @@ async function initCharts() {
         handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true }
       });
       
+      // Restore hidden state
+      if (wasHidden) {
+        candleContainer.style.visibility = '';
+        candleContainer.style.display = '';
+        candleContainer.style.position = '';
+      }
+      
       dashboardCandleSeries = dashboardCandleChart.addCandlestickSeries({
         upColor: '#16C784',
         downColor: '#EA3943',
@@ -2178,7 +2207,7 @@ async function initCharts() {
         wickUpColor: '#16C784',
         wickDownColor: '#EA3943'
       });
-      console.log('✅ Candle chart created');
+      console.log('✅ Candle chart created with width:', containerWidth);
       
       // Add double-tap handler for landscape fullscreen
       addDashboardChartFullscreenHandler(candleContainer, 'candle');

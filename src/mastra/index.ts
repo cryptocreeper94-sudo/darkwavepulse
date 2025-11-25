@@ -762,8 +762,8 @@ export const mastra = new Mastra({
               else if (intervalMinutes <= 60) days = 1;  // 24hr view: 1 day of hourly data
               else if (intervalMinutes <= 240) days = 7; // 7d view
               else if (intervalMinutes <= 720) days = 14;
-              else if (intervalMinutes <= 1440) days = 30;
-              else days = 90;
+              else if (intervalMinutes <= 1440) days = 30; // 1 month view
+              else if (intervalMinutes <= 10080) days = 365; // 1 year / all time view - get full year of data
               
               const axios = (await import('axios')).default;
               
