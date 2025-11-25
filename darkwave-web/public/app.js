@@ -1907,15 +1907,15 @@ async function initCharts() {
         if (dashboardCandleChart) dashboardCandleChart.applyOptions({ width: newWidth });
       });
       
-      // Add live time updates for charts (refresh every 2 seconds)
+      // Add live time updates for charts (refresh every 30 seconds to avoid API rate limits)
       if (!window.chartLiveUpdateInterval) {
         window.chartLiveUpdateInterval = setInterval(async () => {
           if (dashboardSparklineChart && dashboardCandleSeries) {
             await updateDashboardCharts(currentMainChartTimeframe);
             console.log('📊 Charts updated - live time');
           }
-        }, 2000);
-        console.log('🔄 Live chart updates started (every 2 seconds)');
+        }, 30000);
+        console.log('🔄 Live chart updates started (every 30 seconds)');
       }
     } else {
       console.error('❌ Charts or series not created properly');
