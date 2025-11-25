@@ -534,6 +534,186 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Crypto Category Filter Routes - Used by coin table filter buttons
+      {
+        path: "/api/crypto/category/:category",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const category = c.req.param('category');
+          const timeframe = c.req.query('timeframe') || '24h';
+          
+          logger?.info('📊 [CryptoCategory] Request', { category, timeframe });
+          
+          try {
+            const axios = (await import('axios')).default;
+            
+            // Map frontend categories to CoinGecko API calls
+            let coins: any[] = [];
+            
+            switch (category) {
+              case 'top':
+                // Top 10 by market cap
+                const topRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    order: 'market_cap_desc',
+                    per_page: 10,
+                    page: 1,
+                    sparkline: false,
+                    price_change_percentage: '24h'
+                  },
+                  timeout: 10000
+                });
+                coins = topRes.data.map((coin: any) => ({
+                  symbol: coin.symbol.toUpperCase(),
+                  name: coin.name,
+                  price: coin.current_price,
+                  change24h: coin.price_change_percentage_24h || 0,
+                  volume: coin.total_volume,
+                  image: coin.image
+                }));
+                break;
+                
+              case 'meme':
+                // Meme coins category
+                const memeRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    category: 'meme-token',
+                    order: 'market_cap_desc',
+                    per_page: 10,
+                    page: 1,
+                    sparkline: false,
+                    price_change_percentage: '24h'
+                  },
+                  timeout: 10000
+                });
+                coins = memeRes.data.map((coin: any) => ({
+                  symbol: coin.symbol.toUpperCase(),
+                  name: coin.name,
+                  price: coin.current_price,
+                  change24h: coin.price_change_percentage_24h || 0,
+                  volume: coin.total_volume,
+                  image: coin.image
+                }));
+                break;
+                
+              case 'defi':
+                // DeFi tokens
+                const defiRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    category: 'decentralized-finance-defi',
+                    order: 'market_cap_desc',
+                    per_page: 10,
+                    page: 1,
+                    sparkline: false,
+                    price_change_percentage: '24h'
+                  },
+                  timeout: 10000
+                });
+                coins = defiRes.data.map((coin: any) => ({
+                  symbol: coin.symbol.toUpperCase(),
+                  name: coin.name,
+                  price: coin.current_price,
+                  change24h: coin.price_change_percentage_24h || 0,
+                  volume: coin.total_volume,
+                  image: coin.image
+                }));
+                break;
+                
+              case 'bluechip':
+                // Blue chips (top market cap, established coins)
+                const blueRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    ids: 'bitcoin,ethereum,binancecoin,solana,ripple,cardano,avalanche-2,polkadot,chainlink,polygon',
+                    order: 'market_cap_desc',
+                    sparkline: false,
+                    price_change_percentage: '24h'
+                  },
+                  timeout: 10000
+                });
+                coins = blueRes.data.map((coin: any) => ({
+                  symbol: coin.symbol.toUpperCase(),
+                  name: coin.name,
+                  price: coin.current_price,
+                  change24h: coin.price_change_percentage_24h || 0,
+                  volume: coin.total_volume,
+                  image: coin.image
+                }));
+                break;
+                
+              case 'gainers':
+                // Top gainers
+                const gainersRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    order: timeframe === '1h' ? 'volume_desc' : 'market_cap_desc',
+                    per_page: 100,
+                    page: 1,
+                    sparkline: false,
+                    price_change_percentage: timeframe === '1h' ? '1h' : '24h'
+                  },
+                  timeout: 10000
+                });
+                const changeKey = timeframe === '1h' ? 'price_change_percentage_1h_in_currency' : 'price_change_percentage_24h';
+                coins = gainersRes.data
+                  .filter((coin: any) => (coin[changeKey] || coin.price_change_percentage_24h || 0) > 0)
+                  .sort((a: any, b: any) => (b[changeKey] || b.price_change_percentage_24h || 0) - (a[changeKey] || a.price_change_percentage_24h || 0))
+                  .slice(0, 10)
+                  .map((coin: any) => ({
+                    symbol: coin.symbol.toUpperCase(),
+                    name: coin.name,
+                    price: coin.current_price,
+                    change24h: coin[changeKey] || coin.price_change_percentage_24h || 0,
+                    volume: coin.total_volume,
+                    image: coin.image
+                  }));
+                break;
+                
+              case 'losers':
+                // Top losers
+                const losersRes = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                  params: {
+                    vs_currency: 'usd',
+                    order: timeframe === '1h' ? 'volume_desc' : 'market_cap_desc',
+                    per_page: 100,
+                    page: 1,
+                    sparkline: false,
+                    price_change_percentage: timeframe === '1h' ? '1h' : '24h'
+                  },
+                  timeout: 10000
+                });
+                const loseChangeKey = timeframe === '1h' ? 'price_change_percentage_1h_in_currency' : 'price_change_percentage_24h';
+                coins = losersRes.data
+                  .filter((coin: any) => (coin[loseChangeKey] || coin.price_change_percentage_24h || 0) < 0)
+                  .sort((a: any, b: any) => (a[loseChangeKey] || a.price_change_percentage_24h || 0) - (b[loseChangeKey] || b.price_change_percentage_24h || 0))
+                  .slice(0, 10)
+                  .map((coin: any) => ({
+                    symbol: coin.symbol.toUpperCase(),
+                    name: coin.name,
+                    price: coin.current_price,
+                    change24h: coin[loseChangeKey] || coin.price_change_percentage_24h || 0,
+                    volume: coin.total_volume,
+                    image: coin.image
+                  }));
+                break;
+                
+              default:
+                return c.json({ error: 'Invalid category' }, 400);
+            }
+            
+            logger?.info('✅ [CryptoCategory] Success', { category, count: coins.length });
+            return c.json(coins);
+            
+          } catch (error: any) {
+            logger?.error('❌ [CryptoCategory] Error', { category, error: error.message });
+            return c.json({ error: 'Failed to fetch category data' }, 500);
+          }
+        }
+      },
       // ALIAS: /api/sentiment/fear-greed
       {
         path: "/api/sentiment/fear-greed",
