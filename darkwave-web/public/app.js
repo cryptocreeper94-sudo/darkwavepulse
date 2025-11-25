@@ -1646,9 +1646,16 @@ async function fetchMacroMarketMetrics() {
       const btcDomElement = document.getElementById('btcDominance');
       if (btcDomElement) {
         btcDomElement.textContent = `${btcDom.toFixed(1)}%`;
+        console.log('✅ BTC Dominance updated:', btcDom.toFixed(1) + '%');
+      } else {
+        console.error('❌ btcDominance element not found');
       }
       
-      console.log('✅ Macro market metrics updated');
+      console.log('✅ Macro market metrics updated:', { 
+        marketCap: capText, 
+        volume: volText, 
+        btcDominance: btcDom.toFixed(1) + '%' 
+      });
     }
   } catch (error) {
     console.error('❌ Error fetching macro metrics:', error);
