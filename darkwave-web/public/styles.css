@@ -991,6 +991,77 @@ body.theme-light .banner-title {
   }
 }
 
+/* ============================================
+   DESKTOP METRIC BOXES - Larger Layout
+   Only affects screens 769px and wider
+   ============================================ */
+@media (min-width: 769px) {
+  /* Taller boxes on desktop */
+  .metric-box-wide {
+    aspect-ratio: 1 / 1.1;
+    min-height: 160px;
+    padding: 8px 4px;
+  }
+  
+  /* Larger titles for all boxes */
+  .metric-label {
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  
+  /* Larger titles for Market Cap & Volume (boxes 3 & 4) */
+  .metric-box-wide:nth-child(3) .metric-label,
+  .metric-box-wide:nth-child(4) .metric-label {
+    font-size: 14px;
+    top: 12px;
+  }
+  
+  /* Larger values for Fear & Greed and Altcoin Season (boxes 1 & 2) */
+  .metric-box-wide:nth-child(1) .gauge-value-display,
+  .metric-box-wide:nth-child(2) .gauge-value-display {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 8px 0 4px 0;
+  }
+  
+  /* Larger gauge canvas on desktop */
+  .gauge-container {
+    min-height: 120px;
+  }
+  
+  .gauge-container canvas {
+    height: 100px;
+    transform: scale(1.6);
+    margin-top: -5px;
+  }
+  
+  /* Larger values for Market Cap & Volume (boxes 3 & 4) */
+  .metric-box-wide:nth-child(3) .gauge-value-display,
+  .metric-box-wide:nth-child(4) .gauge-value-display {
+    font-size: 28px;
+    font-weight: 800;
+  }
+  
+  /* Move percentage change closer to value (right under it) */
+  .metric-box-wide:nth-child(3) .metric-change,
+  .metric-box-wide:nth-child(4) .metric-change {
+    position: absolute;
+    top: calc(50% + 22px);
+    bottom: auto;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  /* Volume flow indicator positioned just below % change */
+  .metric-box-wide:nth-child(4) .volume-flow-indicator {
+    position: absolute;
+    top: calc(50% + 44px);
+    bottom: auto;
+    font-size: 12px;
+  }
+}
+
 /* OLD .metric-value CSS - DISABLED - using .gauge-value-display instead */
 /* NOTE: Removed display:none since .macro-metrics-grid .metric-value needs to be visible */
 
