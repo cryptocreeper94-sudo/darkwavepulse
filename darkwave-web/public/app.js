@@ -5537,26 +5537,54 @@ function showComingSoon(featureName) {
 }
 
 // Initialize Portfolio and Educational tabs when switching to them
-const originalSwitchTab = window.switchTab;
-window.switchTab = function(tabId) {
-  // Call original switchTab
-  originalSwitchTab(tabId);
-  
-  // Check portfolio access when switching to portfolio tab
-  if (tabId === 'portfolio') {
-    checkPortfolioAccess();
+// NOTE: This wrapper extends switchTab with additional tab-specific logic
+// It's called AFTER the main switchTab function is defined
+(function() {
+  // Wait for DOM to be ready to ensure switchTab is defined
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupSwitchTabWrapper);
+  } else {
+    setupSwitchTabWrapper();
   }
   
-  // Check educational access when switching to glossary/guide tab
-  if (tabId === 'glossary') {
-    checkEducationalAccess();
+  function setupSwitchTabWrapper() {
+    // Only wrap if switchTab exists and isn't already wrapped
+    if (typeof switchTab !== 'function') {
+      console.warn('switchTab not found, wrapper not applied');
+      return;
+    }
+    
+    const originalSwitchTab = switchTab;
+    
+    window.switchTab = function(tabId) {
+      // Call original switchTab
+      originalSwitchTab(tabId);
+      
+      // Check portfolio access when switching to portfolio tab
+      if (tabId === 'portfolio') {
+        if (typeof checkPortfolioAccess === 'function') {
+          checkPortfolioAccess();
+        }
+      }
+      
+      // Check educational access when switching to glossary/guide tab
+      if (tabId === 'glossary') {
+        if (typeof checkEducationalAccess === 'function') {
+          checkEducationalAccess();
+        }
+      }
+      
+      // Initialize comments when switching to projects tab
+      if (tabId === 'projects') {
+        if (typeof initializeCommentSection === 'function') {
+          initializeCommentSection();
+        }
+      }
+    };
+    
+    console.log('✅ switchTab wrapper applied');
   }
-  
-  // Initialize comments when switching to projects tab
-  if (tabId === 'projects') {
-    initializeCommentSection();
-  }
-};
+})();
 
 // Initialize comment section based on subscription status
 function initializeCommentSection() {
