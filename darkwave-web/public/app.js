@@ -52,6 +52,28 @@ function toggleCollapsible(btn) {
   }
 }
 
+// Switch truth sections (Learn page tabs)
+function showTruthSection(section) {
+  // Hide all sections
+  document.querySelectorAll('.truth-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.truth-tab-btn').forEach(btn => {
+    btn.style.background = 'rgba(255,255,255,0.1)';
+    btn.style.border = '1px solid rgba(255,255,255,0.2)';
+    btn.classList.remove('truth-tab-active');
+  });
+  
+  // Show selected section
+  const selectedSection = document.getElementById(`truth-section-${section}`);
+  if (selectedSection) {
+    selectedSection.style.display = 'block';
+  }
+  
+  // Highlight active tab
+  event.target.style.background = '#3861FB';
+  event.target.style.border = 'none';
+  event.target.classList.add('truth-tab-active');
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 DarkWave Pulse initializing...');
