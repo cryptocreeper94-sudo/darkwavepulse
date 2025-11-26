@@ -27,6 +27,15 @@
     "description": "Power to the pumpers"
   },
   {
+    "id": 1004,
+    "name": "Rhodium",
+    "ticker": "RHODI",
+    "image": "/coins/rhodi-rhodium.jpg",
+    "category": "conspiracy",
+    "contractAddress": "HEkEQd1nwvD7qiRHcwLEw9d7bnsg2PffrkZrWMkKpump",
+    "description": "Precious metal token on Solana"
+  },
+  {
     "id": 2001,
     "name": "CryptoCat",
     "ticker": "CCAT",
@@ -82,24 +91,15 @@
   },
   {
     "id": 3003,
-    "name": "Rhodium",
-    "ticker": "RHODI",
-    "image": "/coins/rhodi-rhodium.jpg",
-    "category": "spiritual",
-    "contractAddress": "HEkEQd1nwvD7qiRHcwLEw9d7bnsg2PffrkZrWMkKpump",
-    "description": "Precious metal token on Solana"
-  },
-  {
-    "id": 4001,
     "name": "United",
     "ticker": "LOVE",
     "image": "/coins/love-united.jpg",
-    "category": "meme",
+    "category": "spiritual",
     "contractAddress": "Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump",
     "description": "United in love and community"
   },
   {
-    "id": 4002,
+    "id": 4001,
     "name": "Justice for Humanity",
     "ticker": "JH-25",
     "image": "/coins/jh25-justice.jpg",
@@ -108,7 +108,7 @@
     "description": "A movement for global justice"
   },
   {
-    "id": 4003,
+    "id": 4002,
     "name": "Pumpaholic",
     "ticker": "CHEERS",
     "image": "/coins/cheers-pumpaholic.jpg",
@@ -117,7 +117,7 @@
     "description": "Celebrating the pump lifestyle"
   },
   {
-    "id": 4004,
+    "id": 4003,
     "name": "Overstimulated",
     "ticker": "INSANE",
     "image": "/coins/insane-overstimulated.jpg",
