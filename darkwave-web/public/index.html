@@ -4879,15 +4879,15 @@ Thanks for being here — let's build something powerful together!</textarea>
     </div>
   </div>
 
-  <!-- Floating Stacked Circular Buttons - Mode Aware -->
+  <!-- Floating Action Buttons -->
   <div class="floating-buttons-stack" id="floatingButtonsStack">
-    <button class="floating-btn floating-btn-community" id="floatingCommunityBtn" onclick="switchTab('community')" title="Community Chat">
-      <span class="floating-btn-emoji">💬</span>
-      <img class="floating-btn-character" id="floatingCommunityCharacter" src="" alt="" style="display: none;" />
-    </button>
     <button class="floating-btn floating-btn-ai" id="floatingAIBtn" onclick="openFloatingAI()" title="AI Analyst">
-      <span class="floating-btn-emoji">🤖</span>
-      <img class="floating-btn-character" id="floatingAICharacter" src="" alt="" style="display: none;" />
+      <span class="floating-btn-icon">🤖</span>
+      <span class="floating-btn-label">AI</span>
+    </button>
+    <button class="floating-btn floating-btn-community" id="floatingCommunityBtn" onclick="switchTab('community')" title="Community">
+      <span class="floating-btn-icon">💬</span>
+      <span class="floating-btn-label">Chat</span>
     </button>
   </div>
 
@@ -4896,7 +4896,7 @@ Thanks for being here — let's build something powerful together!</textarea>
     <div class="floating-ai-widget">
       <div class="floating-ai-header" onclick="closeFloatingAI()">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <img src="/crypto-cat-images/business-cat-pointing.jpg" alt="Crypto Cat AI" id="floatingCatImage" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" />
+          <span style="font-size: 20px;">🤖</span>
           <span style="font-size: 13px; font-weight: 700;">AI Analyst</span>
         </div>
         <button class="floating-ai-toggle" onclick="event.stopPropagation(); closeFloatingAI()" title="Close">×</button>
@@ -4957,101 +4957,60 @@ Thanks for being here — let's build something powerful together!</textarea>
     }
     
     .floating-btn {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(56, 97, 251, 0.4);
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       color: white;
       cursor: pointer;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
+      gap: 2px;
+      transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      opacity: 0.7;
-      position: relative;
-      overflow: hidden;
+      backdrop-filter: blur(8px);
     }
     
     .floating-btn:hover {
-      opacity: 1;
-      background: rgba(56, 97, 251, 0.6);
-      transform: scale(1.1);
-      box-shadow: 0 6px 16px rgba(56, 97, 251, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     
-    /* Emoji styling for floating buttons - visible by default in off mode */
-    .floating-btn-emoji {
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
+    .floating-btn:active {
+      transform: translateY(0);
+    }
+    
+    .floating-btn-icon {
+      font-size: 20px;
       line-height: 1;
-      z-index: 1;
     }
     
-    .floating-btn-community {
-      background: rgba(34, 197, 94, 0.4);
-    }
-    
-    .floating-btn-community:hover {
-      background: rgba(34, 197, 94, 0.6);
-      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    .floating-btn-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
     }
     
     .floating-btn-ai {
-      background: rgba(139, 92, 246, 0.4);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(109, 40, 217, 0.85));
     }
     
     .floating-btn-ai:hover {
-      background: rgba(139, 92, 246, 0.6);
-      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 1), rgba(109, 40, 217, 1));
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
     }
     
-    /* Character mode floating buttons */
-    .floating-btn.character-mode {
-      background: transparent !important;
-      box-shadow: none !important;
-      opacity: 1 !important;
-      overflow: visible;
+    .floating-btn-community {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.85), rgba(22, 163, 74, 0.85));
     }
     
-    .floating-btn.character-mode:hover {
-      background: transparent !important;
-      transform: scale(1.15);
-      filter: drop-shadow(0 4px 12px rgba(56, 97, 251, 0.5));
-    }
-    
-    .floating-btn-character {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-      object-position: center;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
-    }
-    
-    .floating-btn.character-mode .floating-btn-emoji {
-      display: none;
-    }
-    
-    .floating-btn.character-mode .floating-btn-character {
-      display: block;
-    }
-    
-    /* Cat mode - round crop */
-    .floating-btn.cat-mode .floating-btn-character {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      object-fit: cover;
+    .floating-btn-community:hover {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 1));
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
     }
     
     .floating-ai-header {
