@@ -13,9 +13,9 @@ packages = ["freetype", "imagemagick", "jq", "lcms2", "libimagequant", "libjpeg"
 MASTRA_HIDE_CLOUD_CTA = "true"
 
 [deployment]
-build = ["bash", "scripts/build.sh"]
-run = ["sh", "-c", "cd .mastra/output && NODE_ENV=production node index.mjs"]
-deploymentTarget = "cloudrun"
+build = ["bash", "-c", "cd darkwave-web && npm run build && cp -r dist/* ../public/"]
+run = ["npm", "run", "dev"]
+deploymentTarget = "autoscale"
 
 [[ports]]
 localPort = 5000
