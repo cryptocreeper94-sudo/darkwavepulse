@@ -12,7 +12,7 @@ echo -e "${BLUE}🚀 DarkWave Development Server Starting...${NC}"
 
 # Step 1: Start Mastra backend on port 3001 in background
 echo -e "${BLUE}📡 Starting Mastra backend on port 3001...${NC}"
-npm run dev -- --port 3001 &
+PORT=3001 npm run dev &
 BACKEND_PID=$!
 echo -e "${GREEN}✅ Backend PID: $BACKEND_PID${NC}"
 
