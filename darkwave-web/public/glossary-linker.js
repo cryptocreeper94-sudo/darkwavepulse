@@ -145,8 +145,10 @@ class GlossaryLinker {
       popupText = definition.definition;
     }
 
-    // Use new slide-in popup system
-    if (window.showCharacterSlideIn) {
+    // Use new character popup system
+    if (window.characterSystem) {
+      window.characterSystem.showTermDefinition(definition.term, popupText);
+    } else if (window.showCharacterSlideIn) {
       window.showCharacterSlideIn({
         term: definition.term.toUpperCase(),
         definition: popupText,
