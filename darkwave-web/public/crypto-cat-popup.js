@@ -1,8 +1,8 @@
 // Crypto Cat Popup System
 let cryptoCatMode = 'off'; // 'off', 'business', 'casual' - DEFAULT: minimized
 
-// Casual (Sarcastic) responses for glossary terms
-const casualResponses = {
+// Casual (Sarcastic) responses for glossary terms - attached to window to avoid redeclaration
+window.casualResponses = window.casualResponses || {
   'liquidation': '💧 Where your tears flow when the market decides you had too much leverage!',
   'fomo': '😱 That feeling when everyone is making money except you... spoiler: they aren\'t!',
   'hodl': '💎 Hold On for Dear Life... or just can\'t spell "hold". Both valid!',
@@ -25,8 +25,8 @@ const casualResponses = {
   'shitcoin': '💩 99% of all cryptocurrencies. But yours is different, right?'
 };
 
-// Business (Professional) responses for glossary terms
-const businessResponses = {
+// Business (Professional) responses for glossary terms - attached to window to avoid redeclaration
+window.businessResponses = window.businessResponses || {
   'liquidation': 'Forced position closure when margin requirements aren\'t met. Risk management is crucial.',
   'fomo': 'Fear Of Missing Out - emotion-driven investment decisions typically lead to buying at peaks.',
   'hodl': 'Long-term holding strategy, originally a misspelling that became crypto culture.',

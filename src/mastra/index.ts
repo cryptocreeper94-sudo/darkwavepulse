@@ -3163,6 +3163,9 @@ export const mastra = new Mastra({
               return c.json({ error: 'Invalid signature' }, 400);
             }
             
+            // Import audit trail service
+            const { auditTrailService, AUDIT_EVENT_TYPES, EVENT_CATEGORIES } = await import('../services/auditTrailService.js');
+            
             // Handle checkout.session.completed
             if (event.type === 'checkout.session.completed') {
               const session = event.data.object;
@@ -3175,6 +3178,27 @@ export const mastra = new Mastra({
               }
               
               logger?.info(`💳 [Stripe] Activating ${plan} plan for user`, { userId, plan });
+              
+              // 🔗 AUDIT TRAIL: Record subscription payment
+              try {
+                await auditTrailService.logEvent({
+                  userId,
+                  eventType: AUDIT_EVENT_TYPES.SUBSCRIPTION_STARTED,
+                  category: EVENT_CATEGORIES.SUBSCRIPTION,
+                  data: {
+                    plan,
+                    provider: 'stripe',
+                    amount: plan === 'premium' ? 500 : 200,
+                    currency: 'usd',
+                    stripeSessionId: session.id,
+                    customerEmail: session.customer_details?.email || null,
+                    source: 'stripe_webhook',
+                  },
+                });
+                logger?.info('🔗 [Audit] Subscription event recorded to blockchain trail', { userId });
+              } catch (auditError: any) {
+                logger?.error('❌ [Audit] Failed to record subscription event', { error: auditError.message });
+              }
               
               // Calculate expiry (1 month from now)
               const expiryDate = new Date();
@@ -3313,6 +3337,24 @@ export const mastra = new Mastra({
                   .where(eq(subscriptions.userId, sub.userId));
                 
                 logger?.info('✅ [Stripe] Subscription status updated', { userId: sub.userId });
+                
+                // 🔗 AUDIT TRAIL: Record subscription cancellation
+                try {
+                  await auditTrailService.logEvent({
+                    userId: sub.userId,
+                    eventType: AUDIT_EVENT_TYPES.SUBSCRIPTION_CANCELLED,
+                    category: EVENT_CATEGORIES.SUBSCRIPTION,
+                    data: {
+                      plan: sub.plan,
+                      provider: 'stripe',
+                      stripeSubscriptionId: stripeSubId,
+                      source: 'stripe_webhook',
+                    },
+                  });
+                  logger?.info('🔗 [Audit] Cancellation event recorded to blockchain trail', { userId: sub.userId });
+                } catch (auditError: any) {
+                  logger?.error('❌ [Audit] Failed to record cancellation event', { error: auditError.message });
+                }
                 
                 // 📧 Send Telegram notification to admin about cancellation
                 try {
@@ -3596,6 +3638,28 @@ export const mastra = new Mastra({
               }
               
               logger?.info('🎉 [Crypto] Subscription activated', { userId, expiryDate });
+              
+              // 🔗 AUDIT TRAIL: Record crypto payment
+              try {
+                const { auditTrailService, AUDIT_EVENT_TYPES, EVENT_CATEGORIES } = await import('../services/auditTrailService.js');
+                await auditTrailService.logEvent({
+                  userId,
+                  eventType: AUDIT_EVENT_TYPES.PAYMENT_COMPLETED,
+                  category: EVENT_CATEGORIES.PAYMENT,
+                  data: {
+                    plan: 'premium',
+                    provider: 'crypto',
+                    chargeId: chargeId,
+                    cryptoCurrency: charge.payments[0]?.network || 'unknown',
+                    cryptoAmount: charge.payments[0]?.value?.crypto?.amount || '0',
+                    usdAmount: 600,
+                    source: 'coinbase_webhook',
+                  },
+                });
+                logger?.info('🔗 [Audit] Crypto payment recorded to blockchain trail', { userId });
+              } catch (auditError: any) {
+                logger?.error('❌ [Audit] Failed to record crypto payment', { error: auditError.message });
+              }
               
               // Send admin notification
               try {

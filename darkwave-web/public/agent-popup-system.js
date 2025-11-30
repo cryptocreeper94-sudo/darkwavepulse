@@ -22,8 +22,8 @@ function setPopupAgent(agentId) {
   localStorage.setItem('userSelectedAgent', agentId);
 }
 
-// Business mode responses
-const businessResponses = {
+// Business mode responses - use window to avoid redeclaration
+window.businessResponses = window.businessResponses || {
   'liquidation': 'Forced position closure when margin requirements aren\'t met. Risk management is crucial.',
   'fomo': 'Fear Of Missing Out - emotion-driven investment decisions typically lead to buying at peaks.',
   'hodl': 'Long-term holding strategy, originally a misspelling that became crypto culture.',
@@ -46,8 +46,8 @@ const businessResponses = {
   'shitcoin': 'Low-quality cryptocurrency with questionable fundamentals. Thorough vetting required.'
 };
 
-// Casual mode responses
-const casualResponses = {
+// Casual mode responses - use window to avoid redeclaration
+window.casualResponses = window.casualResponses || {
   'liquidation': '💧 Where your tears flow when the market decides you had too much leverage!',
   'fomo': '😱 That feeling when everyone is making money except you... spoiler: they aren\'t!',
   'hodl': '💎 Hold On for Dear Life... or just can\'t spell "hold". Both valid!',
@@ -79,9 +79,9 @@ function showAgentPopup(term, definition) {
   if (agentPopupMode === 'off') {
     responseText = definition;
   } else if (agentPopupMode === 'business') {
-    responseText = businessResponses[term.toLowerCase()] || definition;
+    responseText = window.businessResponses[term.toLowerCase()] || definition;
   } else {
-    responseText = casualResponses[term.toLowerCase()] || definition;
+    responseText = window.casualResponses[term.toLowerCase()] || definition;
   }
 
   // Use new slide-in popup system
