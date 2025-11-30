@@ -33,64 +33,80 @@ function showSlideInPopup(options) {
     animation: slideInFrom${direction === 'left' ? 'Left' : 'Right'} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   `;
   
+  // Comic-style oblong oval speech bubble
   const speechBubble = document.createElement('div');
-  speechBubble.className = 'speech-bubble';
+  speechBubble.className = 'comic-speech-bubble';
   speechBubble.style.cssText = `
-    background: linear-gradient(135deg, rgba(20, 20, 35, 0.95), rgba(30, 30, 50, 0.95));
-    border: 2px solid #3861fb;
-    border-radius: 20px;
-    padding: 16px 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
+    border: 3px solid #1a1a2e;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    padding: 18px 28px;
     max-width: 320px;
-    margin-bottom: 8px;
+    min-width: 180px;
+    margin-bottom: 12px;
     position: relative;
-    box-shadow: 0 8px 32px rgba(56, 97, 251, 0.3), 0 0 20px rgba(56, 97, 251, 0.15);
-    backdrop-filter: blur(10px);
+    box-shadow: 4px 4px 0 #1a1a2e, 0 8px 25px rgba(0, 0, 0, 0.3);
     animation: bubblePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.6);
+    text-align: center;
+  `;
+  
+  // Comic-style curved tail
+  const tail = document.createElement('div');
+  tail.style.cssText = `
+    position: absolute;
+    bottom: -22px;
+    ${direction === 'left' ? 'left: 35px' : 'right: 35px'};
+    width: 25px;
+    height: 25px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
+    border-right: 3px solid #1a1a2e;
+    border-bottom: 3px solid #1a1a2e;
+    transform: rotate(45deg) skew(15deg, 15deg);
+    box-shadow: 3px 3px 0 #1a1a2e;
+  `;
+  
+  // Cover to hide tail overlap
+  const cover = document.createElement('div');
+  cover.style.cssText = `
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 15px;
+    background: #f0f4ff;
+    border-radius: 0 0 20px 20px;
   `;
   
   speechBubble.innerHTML = `
-    <div style="
-      position: absolute;
-      bottom: -12px;
-      ${direction === 'left' ? 'left: 30px' : 'right: 30px'};
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 14px solid #3861fb;
-    "></div>
-    <div style="
-      position: absolute;
-      bottom: -8px;
-      ${direction === 'left' ? 'left: 32px' : 'right: 32px'};
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 12px solid rgba(25, 25, 40, 0.95);
-    "></div>
     ${title ? `<div style="
       font-size: 16px;
-      font-weight: 800;
-      color: #3861fb;
-      margin-bottom: 8px;
+      font-weight: 900;
+      color: #1a1a2e;
+      margin-bottom: 10px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
     ">${title}</div>` : ''}
     <div style="
-      font-size: 14px;
-      color: #e0e0e0;
+      font-size: 15px;
+      color: #2a2a3e;
       line-height: 1.5;
+      font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+      font-weight: 500;
     ">${message}</div>
     ${name ? `<div style="
       margin-top: 10px;
-      font-size: 11px;
-      color: #888;
+      font-size: 12px;
+      color: #555;
       font-style: italic;
+      font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
     ">— ${name}</div>` : ''}
   `;
+  
+  speechBubble.appendChild(tail);
+  speechBubble.appendChild(cover);
   
   const characterContainer = document.createElement('div');
   characterContainer.style.cssText = `

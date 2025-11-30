@@ -381,91 +381,86 @@ class CharacterSystem {
         transition: all 0.4s ease-out;
       }
       
+      /* Comic-style oblong oval speech bubble */
       .character-speech-bubble {
-        background: linear-gradient(135deg, rgba(15, 15, 25, 0.95), rgba(25, 25, 40, 0.95));
-        border: 2px solid #3861fb;
-        border-radius: 25px;
-        padding: 16px 22px;
-        max-width: 300px;
-        margin-bottom: 8px;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
+        border: 3px solid #1a1a2e;
+        border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+        padding: 18px 28px;
+        max-width: 320px;
+        min-width: 180px;
+        margin-bottom: 12px;
         position: relative;
         box-shadow: 
-          0 8px 32px rgba(56, 97, 251, 0.25),
-          0 0 20px rgba(56, 97, 251, 0.1),
-          inset 0 1px 0 rgba(255,255,255,0.05);
-        backdrop-filter: blur(10px);
-        animation: bubbleAppear 0.3s ease-out 0.2s both;
+          4px 4px 0 #1a1a2e,
+          0 8px 25px rgba(0, 0, 0, 0.3);
+        animation: bubbleAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        text-align: center;
       }
       
       @keyframes bubbleAppear {
         from {
           opacity: 0;
-          transform: scale(0.8);
+          transform: scale(0.6) translateY(10px);
         }
         to {
           opacity: 1;
-          transform: scale(1);
+          transform: scale(1) translateY(0);
         }
       }
       
       .character-speech-simple {
-        border-radius: 20px;
+        border-radius: 45% 45% 45% 45% / 35% 35% 50% 50%;
       }
       
+      /* Comic-style curved tail pointing down to character */
       .character-speech-tail {
         position: absolute;
-        bottom: -14px;
-        width: 0;
-        height: 0;
+        bottom: -22px;
+        width: 25px;
+        height: 25px;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
+        border-right: 3px solid #1a1a2e;
+        border-bottom: 3px solid #1a1a2e;
+        transform: rotate(45deg) skew(15deg, 15deg);
+        box-shadow: 3px 3px 0 #1a1a2e;
       }
       
       .character-speech-tail-left {
-        left: 30px;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 16px solid #3861fb;
-      }
-      
-      .character-speech-tail-left::after {
-        content: '';
-        position: absolute;
-        top: -18px;
-        left: -12px;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-top: 14px solid rgba(20, 20, 32, 0.95);
+        left: 35px;
       }
       
       .character-speech-tail-right {
-        right: 30px;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 16px solid #3861fb;
+        right: 35px;
       }
       
-      .character-speech-tail-right::after {
+      /* Inner white cover to hide the tail overlap */
+      .character-speech-bubble::after {
         content: '';
         position: absolute;
-        top: -18px;
-        left: -12px;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-top: 14px solid rgba(20, 20, 32, 0.95);
+        bottom: 0;
+        left: 20px;
+        right: 20px;
+        height: 15px;
+        background: linear-gradient(180deg, #f0f4ff 0%, #f0f4ff 100%);
       }
       
       .character-speech-title {
-        font-size: 15px;
-        font-weight: 800;
-        color: #3861fb;
-        margin-bottom: 8px;
+        font-size: 16px;
+        font-weight: 900;
+        color: #1a1a2e;
+        margin-bottom: 10px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
       }
       
       .character-speech-message {
-        font-size: 14px;
-        color: #e0e0e0;
+        font-size: 15px;
+        color: #2a2a3e;
         line-height: 1.5;
+        font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+        font-weight: 500;
       }
       
       .character-image-container {
@@ -509,8 +504,17 @@ class CharacterSystem {
         }
         
         .character-speech-bubble {
-          max-width: 250px;
-          padding: 12px 16px;
+          max-width: 260px;
+          min-width: 150px;
+          padding: 14px 20px;
+        }
+        
+        .character-speech-title {
+          font-size: 14px;
+        }
+        
+        .character-speech-message {
+          font-size: 13px;
         }
         
         .character-popup-img {

@@ -131,6 +131,11 @@ class AuditTrailService {
    * Log an audit event
    */
   async logEvent(eventPayload: AuditEventPayload): Promise<AuditEvent> {
+    // Auto-initialize if needed
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
     const eventId = this.generateEventId();
     const timestamp = eventPayload.timestamp || new Date();
     
