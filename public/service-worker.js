@@ -1,53 +1,21 @@
-const CACHE_NAME = 'darkwave-v1';
-const urlsToCache = [
-  '/mini-app',
-  '/mini-app/styles.css',
-  '/mini-app/app.js',
-  '/darkwave-coin.png',
-  '/darkwave-banner.png'
-];
+// SERVICE WORKER DISABLED - NO CACHING
+// Forces fresh loads to remove cached arm code
 
-// Install service worker and cache assets
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(err => {
-        console.log('Cache install failed:', err);
-      })
-  );
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
 });
 
-// Fetch from cache first, then network
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
-// Clean up old caches
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames.map((cacheName) => caches.delete(cacheName))
       );
-    })
+    }).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('fetch', (event) => {
+  // Always fetch fresh from network - NO CACHE
+  event.respondWith(fetch(event.request));
 });
