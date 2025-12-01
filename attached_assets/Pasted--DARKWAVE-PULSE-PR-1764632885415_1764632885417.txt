@@ -1,0 +1,390 @@
+================================================================================
+DARKWAVE PULSE - PREMIUM UI/UX SPECIFICATION v1.0
+Complete Design System & Implementation Guide
+================================================================================
+
+================================================================================
+SECTION 1: ANIMATED GRADIENT BACKGROUND
+================================================================================
+
+CANVAS SETUP:
+Position: fixed, inset-0, z-index: -10
+
+COLOR STOPS:
+- #0F172A (slate-900) - base
+- #164E63 (cyan-900) - accent dark  
+- #0E7490 (cyan-700) - accent mid
+- #06B6D4 (cyan-500) - accent bright
+
+ANIMATION:
+- Duration: 15-20 seconds per cycle
+- Timing: ease-in-out, infinite
+- Movement: Diagonal flow (top-left to bottom-right)
+- Color opacity: 30-50%
+
+FLOATING PARTICLES:
+- Count: 15-30 particles
+- Size: 2-4px diameter
+- Color: white at 10-30% opacity
+- Movement: Slow upward drift (0.2-0.5px per frame)
+- Animation: Subtle opacity pulse (0.1 to 0.3)
+
+CSS CODE:
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(135deg, #0F172A 0%, #164E63 25%, #0F172A 50%, #0E7490 75%, #0F172A 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 20s ease-in-out infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+================================================================================
+SECTION 2: TYPOGRAPHY SYSTEM
+================================================================================
+
+FONT FAMILIES:
+- Primary: 'Inter', system-ui, -apple-system, sans-serif
+- Monospace: 'JetBrains Mono', 'Fira Code', monospace
+
+TYPE SCALE (Desktop):
+- Display/Hero: 48-64px, weight 700, line-height 1.1, color slate-50
+- H1: 36px, weight 700, line-height 1.2, color slate-100
+- H2: 28px, weight 600, line-height 1.25, color slate-100
+- H3: 22px, weight 600, line-height 1.3, color slate-200
+- H4: 18px, weight 600, line-height 1.4, color slate-200
+- Body Large: 16px, weight 400, line-height 1.6, color slate-300
+- Body: 14px, weight 400, line-height 1.5, color slate-400
+- Body Small: 13px, weight 400, line-height 1.5, color slate-400
+- Caption: 12px, weight 400, line-height 1.4, color slate-500
+- Label: 11px, weight 500, line-height 1.3, color slate-500, UPPERCASE, letter-spacing 0.05em
+- Overline: 10px, weight 600, line-height 1.2, color slate-500, UPPERCASE, letter-spacing 0.1em
+
+TYPE SCALE (Mobile - reduce by 15%):
+- Display: 36-48px
+- H1: 28px
+- H2: 22px
+- Body: 14px
+
+================================================================================
+SECTION 3: COLOR PALETTE
+================================================================================
+
+PRIMARY BRAND (Cyan):
+- Cyan 50: #ECFEFF
+- Cyan 100: #CFFAFE
+- Cyan 200: #A5F3FC
+- Cyan 300: #67E8F9
+- Cyan 400: #22D3EE
+- Cyan 500: #06B6D4 (PRIMARY - use this most)
+- Cyan 600: #0891B2
+- Cyan 700: #0E7490
+- Cyan 800: #155E75
+- Cyan 900: #164E63
+
+NEUTRALS (Slate):
+- Slate 50: #F8FAFC (bright text)
+- Slate 100: #F1F5F9 (primary headings)
+- Slate 200: #E2E8F0 (secondary headings)
+- Slate 300: #CBD5E1 (emphasized body)
+- Slate 400: #94A3B8 (body text)
+- Slate 500: #64748B (muted/captions)
+- Slate 600: #475569 (disabled)
+- Slate 700: #334155 (borders)
+- Slate 800: #1E293B (card backgrounds)
+- Slate 900: #0F172A (surface backgrounds)
+- Slate 950: #020617 (page background)
+
+SEMANTIC COLORS:
+- Success: #10B981 (emerald-500)
+- Warning: #F59E0B (amber-500)
+- Error: #EF4444 (red-500)
+- Info: #3B82F6 (blue-500)
+
+TRANSPARENCY FORMULA (use for ALL status colors):
+- Background: bg-{color}-500/20
+- Text: text-{color}-400
+- Border: border-{color}-500/30
+- Glow/Shadow: shadow-{color}-500/25
+
+================================================================================
+SECTION 4: SPACING & LAYOUT
+================================================================================
+
+SPACING SCALE (base: 4px):
+- 0: 0px
+- 0.5: 2px (hairline)
+- 1: 4px (tight)
+- 1.5: 6px (icon gaps)
+- 2: 8px (small gaps, badge padding)
+- 3: 12px (list gaps)
+- 4: 16px (standard padding)
+- 5: 20px (card padding mobile)
+- 6: 24px (card padding desktop)
+- 8: 32px (section gaps)
+- 10: 40px (large gaps)
+- 12: 48px (page sections)
+- 16: 64px (major breaks)
+- 20: 80px (hero spacing)
+
+CONTAINER WIDTHS:
+- sm: 640px
+- md: 768px
+- lg: 1024px
+- xl: 1280px
+- 2xl: 1536px
+- Max content: 1400px
+
+BREAKPOINTS:
+- Mobile: 0-639px
+- Tablet: 640-1023px
+- Desktop: 1024-1279px
+- Large: 1280px+
+
+GRID:
+- Columns: 12
+- Gutter: 16px mobile, 24px desktop
+- Margin: 16px mobile, 24px tablet, 32px desktop
+
+================================================================================
+SECTION 5: COMPONENT STYLES
+================================================================================
+
+--- PRIMARY BUTTON ---
+Background: linear-gradient(135deg, #06B6D4, #0891B2)
+Text: white, font-weight 600
+Padding: 12px 24px
+Border-radius: 12px
+Shadow: 0 4px 14px rgba(6, 182, 212, 0.25)
+HOVER: gradient shifts lighter, shadow increases, translateY(-1px)
+ACTIVE: scale(0.98), shadow decreases
+DISABLED: opacity 0.5, cursor not-allowed
+
+--- SECONDARY BUTTON ---
+Background: rgba(255, 255, 255, 0.05)
+Border: 1px solid rgba(255, 255, 255, 0.1)
+Text: slate-300
+Backdrop-filter: blur(8px)
+HOVER: bg rgba(255,255,255,0.1), border cyan, text white
+
+--- GHOST BUTTON ---
+Background: transparent
+Text: slate-400
+HOVER: bg rgba(255,255,255,0.05), text white
+
+--- GLASS CARD ---
+Background: rgba(255, 255, 255, 0.05)
+Backdrop-filter: blur(16px)
+Border: 1px solid rgba(255, 255, 255, 0.1)
+Border-radius: 16px (rounded-2xl)
+Padding: 24px
+HOVER (if interactive): border cyan/30, shadow cyan glow, translateY(-2px)
+
+--- STAT CARD ---
+Same as Glass Card plus:
+- Icon container: 40x40px, rounded-xl, bg-{color}-500/20
+- Value: text-3xl font-bold text-white
+- Label: text-xs text-slate-500 uppercase tracking-wider
+
+--- TEXT INPUT ---
+Background: rgba(255, 255, 255, 0.05)
+Border: 1px solid rgba(255, 255, 255, 0.1)
+Border-radius: 12px
+Padding: 12px 16px
+Color: slate-200
+Placeholder: slate-500
+FOCUS: border cyan-500, box-shadow 0 0 0 3px rgba(6,182,212,0.15)
+ERROR: border red-500, box-shadow 0 0 0 3px rgba(239,68,68,0.15)
+
+--- MODAL ---
+Overlay: rgba(0,0,0,0.6), backdrop-filter blur(4px)
+Background: #1E293B
+Border: 1px solid rgba(255,255,255,0.1)
+Border-radius: 24px
+Padding: 32px
+Shadow: 0 25px 50px rgba(0,0,0,0.5)
+Max-width: 500px
+ANIMATION: fade in + scale from 0.95 + translateY from 10px, 200ms
+
+--- TOOLTIP ---
+Background: #1E293B
+Border: 1px solid rgba(255,255,255,0.1)
+Border-radius: 8px
+Padding: 8px 12px
+Font-size: 12px
+Color: slate-300
+Shadow: 0 4px 12px rgba(0,0,0,0.3)
+
+--- BADGE ---
+Padding: 4px 10px
+Border-radius: 9999px (full pill)
+Font-size: 11px
+Font-weight: 500
+Pattern: bg-{color}-500/20 text-{color}-400 border-{color}-500/30
+
+--- ACCORDION ---
+Header padding: 16px, cursor pointer
+HOVER: bg rgba(255,255,255,0.02)
+EXPANDED: bg cyan-500/5, border cyan-500/20
+Content: padding 16px, animate slideDown 200ms
+
+================================================================================
+SECTION 6: MICRO-INTERACTIONS
+================================================================================
+
+HOVER EFFECTS:
+- Cards/Buttons: translateY(-2px) or scale(1.02), transition 200ms ease-out
+- Links: color to cyan-400, optional underline animation
+- Icons: subtle rotation or scale, color shift
+
+TRANSITION DURATIONS:
+- Instant: 0ms (color only)
+- Fast: 100ms (small feedback)
+- Normal: 200ms (most interactions)
+- Slow: 300ms (modals, drawers)
+- Emphasis: 400-500ms (page transitions)
+
+TIMING FUNCTIONS:
+- Default: ease-out
+- Bounce: cubic-bezier(0.34, 1.56, 0.64, 1)
+- Smooth: cubic-bezier(0.16, 1, 0.3, 1)
+- Sharp: cubic-bezier(0.4, 0, 0.2, 1)
+
+LOADING SPINNER:
+Size: 20px inline, 40px page
+Border: 2px solid rgba(6,182,212,0.2)
+Border-top: 2px solid #06B6D4
+Animation: spin 0.8s linear infinite
+
+SKELETON SCREEN:
+Background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%)
+Background-size: 200% 100%
+Animation: shimmer 1.5s infinite
+Border-radius: 8px
+
+================================================================================
+SECTION 7: GLASS/BLUR EFFECTS
+================================================================================
+
+BLUR LEVELS:
+- Subtle: backdrop-blur-sm (4px) - overlays
+- Standard: backdrop-blur (8px) - dropdowns
+- Strong: backdrop-blur-md (12px) - modals
+- Heavy: backdrop-blur-lg (16px) - cards
+- Maximum: backdrop-blur-xl (24px) - hero sections
+
+TRANSPARENCY LEVELS:
+- Barely visible: white/5 or black/5
+- Subtle: white/10 or black/10
+- Visible: white/20 or black/20
+- Strong: white/30 or black/30
+
+BORDER TREATMENTS:
+- Subtle: border-white/10
+- Visible: border-white/20
+- Accent: border-cyan-500/30
+- Strong accent: border-cyan-500/50
+
+================================================================================
+SECTION 8: SHADOWS & DEPTH
+================================================================================
+
+ELEVATION LEVELS:
+- Level 0 (flat): none
+- Level 1 (raised): 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)
+- Level 2 (card): 0 4px 6px rgba(0,0,0,0.1)
+- Level 3 (dropdown): 0 10px 20px rgba(0,0,0,0.15)
+- Level 4 (modal): 0 25px 50px rgba(0,0,0,0.25)
+
+GLOW SHADOWS (colored):
+- Subtle: 0 4px 14px {color}/15
+- Medium: 0 4px 20px {color}/25
+- Strong: 0 8px 30px {color}/35
+- Intense: 0 12px 40px {color}/50
+
+INNER SHADOWS (for depth):
+- Subtle inset: inset 0 1px 2px rgba(0,0,0,0.1)
+- Input focus: inset 0 0 0 1px {color}
+
+================================================================================
+SECTION 9: MOTION/ANIMATION
+================================================================================
+
+ENTRANCE ANIMATIONS:
+- Fade in: opacity 0 to 1, 200ms
+- Slide up: translateY(20px) to 0 + fade, 300ms
+- Scale in: scale(0.95) to 1 + fade, 200ms
+- Stagger: delay each item by 50-100ms
+
+EXIT ANIMATIONS:
+- Fade out: opacity 1 to 0, 150ms
+- Slide down: translateY(0) to 10px + fade, 200ms
+- Scale out: scale(1) to 0.95 + fade, 150ms
+
+LIST ANIMATIONS (Framer Motion):
+initial={{ opacity: 0, y: 20 }}
+animate={{ opacity: 1, y: 0 }}
+transition={{ delay: index * 0.05 }}
+
+HOVER ANIMATIONS:
+whileHover={{ scale: 1.02, y: -2 }}
+whileTap={{ scale: 0.98 }}
+
+PAGE TRANSITIONS:
+- Duration: 300-400ms
+- Pattern: fade + subtle slide
+- Easing: cubic-bezier(0.16, 1, 0.3, 1)
+
+================================================================================
+SECTION 10: ICONS & IMAGERY
+================================================================================
+
+ICON STYLE:
+- Library: Lucide React (outlined style)
+- Stroke width: 1.5-2px
+- Default size: 20px (h-5 w-5)
+- Small: 16px (h-4 w-4)
+- Large: 24px (h-6 w-6)
+- Color: inherit from text or explicit (text-cyan-400)
+
+ICON CONTAINERS:
+- Padding: 8-12px
+- Border-radius: rounded-lg (8px) or rounded-xl (12px)
+- Background: bg-{color}-500/20
+- Icon color: text-{color}-400
+
+IMAGE TREATMENTS:
+- Border-radius: rounded-xl or rounded-2xl
+- Object-fit: cover
+- Aspect ratios: 16:9 (hero), 4:3 (cards), 1:1 (avatars)
+
+AVATAR SIZES:
+- XS: 24px
+- SM: 32px
+- MD: 40px
+- LG: 48px
+- XL: 64px
+
+================================================================================
+QUICK REFERENCE: THE PREMIUM CHECKLIST
+================================================================================
+
+Before shipping, verify:
+[ ] Background has subtle gradient animation with particles
+[ ] All cards use glassmorphic style (transparency + blur + subtle border)
+[ ] Interactive elements have glow effects on hover
+[ ] List items animate in with stagger effect
+[ ] Colors use transparency pattern (bg-color/20, text-color-400, border-color/30)
+[ ] Buttons have press feedback (scale down on click)
+[ ] Page transitions are smooth (fade + slide)
+[ ] Touch targets are minimum 44px on mobile
+[ ] Typography hierarchy is clear (size + weight + color)
+[ ] Spacing is consistent (use the spacing scale)
+
+================================================================================
+END OF SPECIFICATION
+================================================================================
