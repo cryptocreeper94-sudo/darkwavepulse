@@ -10,6 +10,18 @@
 - **IMPORTANT**: Always check with Jason before proceeding to verify any task - confirm changes look correct before moving on
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color (Nov 24, 2025)
 
+## Recent Changes (Dec 1, 2025)
+- **PREMIUM UI/UX UPGRADE**: Enhanced visual experience with professional animations
+  - Animated gradient background using DarkWave colors (cyan, purple, blue)
+  - Floating particles effect (20 subtle particles with varying colors)
+  - Glow overlay with radial gradients for depth and atmosphere
+  - Enhanced card hover effects (translateY + glow + smooth cubic-bezier transitions)
+  - Stagger animations for coin table rows, nav buttons, and metric boxes (fadeInUp with delays)
+- **CSS IMPROVEMENTS**:
+  - Added premium hover effects only on pointer devices (@media hover: hover)
+  - Particle colors alternate between white, cyan, and purple
+  - All animations use cubic-bezier timing for smooth transitions
+
 ## Recent Changes (Nov 30, 2025)
 - **SOLANA AUDIT TRAIL SYSTEM**: Built complete blockchain-backed audit trail
   - Database tables: audit_events, hallmark_profiles, hallmark_mints, system_config
