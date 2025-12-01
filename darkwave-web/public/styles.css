@@ -101,6 +101,63 @@
     radial-gradient(ellipse at 50% 50%, rgba(0, 255, 255, 0.04) 0%, transparent 60%);
 }
 
+/* ============================================ */
+/* STAGGER ANIMATIONS FOR LIST ITEMS           */
+/* ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply stagger to coin table rows */
+.coin-table-body tr {
+  animation: fadeInUp 0.35s ease-out forwards;
+  opacity: 0;
+}
+
+.coin-table-body tr:nth-child(1) { animation-delay: 0.02s; }
+.coin-table-body tr:nth-child(2) { animation-delay: 0.04s; }
+.coin-table-body tr:nth-child(3) { animation-delay: 0.06s; }
+.coin-table-body tr:nth-child(4) { animation-delay: 0.08s; }
+.coin-table-body tr:nth-child(5) { animation-delay: 0.1s; }
+.coin-table-body tr:nth-child(6) { animation-delay: 0.12s; }
+.coin-table-body tr:nth-child(7) { animation-delay: 0.14s; }
+.coin-table-body tr:nth-child(8) { animation-delay: 0.16s; }
+.coin-table-body tr:nth-child(9) { animation-delay: 0.18s; }
+.coin-table-body tr:nth-child(10) { animation-delay: 0.2s; }
+.coin-table-body tr:nth-child(n+11) { animation-delay: 0.22s; }
+
+/* Stagger for nav buttons */
+.nav-btn {
+  animation: fadeInUp 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.nav-btn:nth-child(1) { animation-delay: 0.05s; }
+.nav-btn:nth-child(2) { animation-delay: 0.1s; }
+.nav-btn:nth-child(3) { animation-delay: 0.15s; }
+.nav-btn:nth-child(4) { animation-delay: 0.2s; }
+.nav-btn:nth-child(5) { animation-delay: 0.25s; }
+.nav-btn:nth-child(6) { animation-delay: 0.3s; }
+
+/* Stagger for metric boxes */
+.metric-box-wide {
+  animation: fadeInUp 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.metrics-stack .metric-box-wide:nth-child(1) { animation-delay: 0.05s; }
+.metrics-stack .metric-box-wide:nth-child(2) { animation-delay: 0.1s; }
+.metrics-stack .metric-box-wide:nth-child(3) { animation-delay: 0.15s; }
+.metrics-stack .metric-box-wide:nth-child(4) { animation-delay: 0.2s; }
+
 html, body {
   width: 100%;
   max-width: 100vw;
