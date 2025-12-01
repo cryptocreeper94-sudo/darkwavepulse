@@ -488,16 +488,18 @@ const analysisModalController = {
     const priceEl = document.getElementById('analysisPrice');
     const changeEl = document.getElementById('analysisChange');
     
-    const isPricePositive = assetData.priceChange24h >= 0;
-    priceEl.textContent = `$${this.formatNumber(assetData.price)}`;
+    // Handle both field names: priceChange24h (expected) and change24h (from backend)
+    const priceChange24h = assetData.priceChange24h ?? assetData.change24h ?? 0;
+    const isPricePositive = priceChange24h >= 0;
+    priceEl.textContent = `$${this.formatNumber(assetData.price || 0)}`;
     priceEl.style.color = isPricePositive ? 'var(--green)' : 'var(--red)';
     
     const changeSign = isPricePositive ? '+' : '';
-    changeEl.textContent = `${changeSign}${assetData.priceChange24h.toFixed(2)}%`;
+    changeEl.textContent = `${changeSign}${priceChange24h.toFixed(2)}%`;
     changeEl.className = isPricePositive ? 'price-change positive' : 'price-change negative';
     
-    document.getElementById('analysisVolume').textContent = `$${this.formatLargeNumber(assetData.volume24h)}`;
-    document.getElementById('analysisMarketCap').textContent = `$${this.formatLargeNumber(assetData.marketCap)}`;
+    document.getElementById('analysisVolume').textContent = `$${this.formatLargeNumber(assetData.volume24h || 0)}`;
+    document.getElementById('analysisMarketCap').textContent = `$${this.formatLargeNumber(assetData.marketCap || 0)}`;
     
     // ATH Market Cap - Calculate from ATH price and circulating supply (crypto only)
     const athMarketCapEl = document.getElementById('analysisATHMarketCap');
@@ -513,20 +515,20 @@ const analysisModalController = {
       athMarketCapEl.style.color = '#888';
     }
     
-    document.getElementById('analysisRank').textContent = `#${assetData.rank}`;
+    document.getElementById('analysisRank').textContent = `#${assetData.rank || 0}`;
     
     // Volume Change (Inflow/Outflow) - simple indicator based on price direction
     const volumeChangeEl = document.getElementById('analysisVolumeChange');
     if (volumeChangeEl) {
-      if (assetData.volume24h && (assetData.priceChange24h !== undefined || assetData.priceChangePercent24h !== undefined)) {
-        // Use whichever price change field is available (crypto has priceChange24h, stocks have priceChangePercent24h)
-        const priceChange = assetData.priceChange24h !== undefined ? assetData.priceChange24h : assetData.priceChangePercent24h;
+      // Handle both field names for price change
+      const priceChangeValue = assetData.priceChange24h ?? assetData.change24h ?? assetData.priceChangePercent24h ?? 0;
+      if (assetData.volume24h && priceChangeValue !== undefined) {
         
         // Show simple Inflow/Outflow indicator based on price direction
-        if (priceChange > 0) {
+        if (priceChangeValue > 0) {
           volumeChangeEl.textContent = '↑ Inflow';
           volumeChangeEl.style.color = '#00ff41';
-        } else if (priceChange < 0) {
+        } else if (priceChangeValue < 0) {
           volumeChangeEl.textContent = '↓ Outflow';
           volumeChangeEl.style.color = '#ff006e';
         } else {
@@ -541,10 +543,11 @@ const analysisModalController = {
     // ATH Data
     if (this.currentATH) {
       const athDate = new Date(this.currentATH.date);
-      document.getElementById('athPrice').textContent = `$${this.formatNumber(this.currentATH.price)}`;
+      document.getElementById('athPrice').textContent = `$${this.formatNumber(this.currentATH.price || 0)}`;
       document.getElementById('athDate').textContent = athDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
       const athPercent = document.getElementById('athPercent');
-      athPercent.textContent = `${this.currentATH.percentFromATH.toFixed(1)}%`;
+      const athPercentValue = this.currentATH.percentFromATH ?? 0;
+      athPercent.textContent = `${athPercentValue.toFixed(1)}%`;
       athPercent.style.color = 'var(--red)';
     }
     
