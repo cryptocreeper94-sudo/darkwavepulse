@@ -61,20 +61,20 @@
   position: absolute;
   width: 5px;
   height: 5px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   animation: floatUp 12s linear infinite;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .particle:nth-child(odd) {
-  background: rgba(0, 255, 255, 0.9);
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.7);
+  background: rgba(0, 255, 255, 0.8);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
 }
 
 .particle:nth-child(3n) {
-  background: rgba(131, 56, 236, 0.9);
-  box-shadow: 0 0 12px rgba(131, 56, 236, 0.7);
+  background: rgba(131, 56, 236, 0.8);
+  box-shadow: 0 0 12px rgba(131, 56, 236, 0.6);
 }
 
 @keyframes floatUp {
@@ -94,18 +94,18 @@
   }
 }
 
-/* SUPER VIVID Glow Overlay - 50-60% opacity for maximum visibility */
+/* VIVID Glow Overlay - 40-45% opacity */
 .glow-overlay {
   position: fixed;
   inset: 0;
   z-index: -8;
   pointer-events: none;
   background: 
-    radial-gradient(ellipse at 20% 20%, rgba(0, 255, 255, 0.55) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(131, 56, 236, 0.55) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 50%, rgba(56, 97, 251, 0.5) 0%, transparent 65%),
-    radial-gradient(ellipse at 30% 70%, rgba(0, 255, 255, 0.45) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 30%, rgba(160, 80, 255, 0.45) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 20%, rgba(0, 255, 255, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(131, 56, 236, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(56, 97, 251, 0.4) 0%, transparent 65%),
+    radial-gradient(ellipse at 30% 70%, rgba(0, 255, 255, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 30%, rgba(160, 80, 255, 0.35) 0%, transparent 50%);
 }
 
 /* ============================================ */
