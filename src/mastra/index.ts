@@ -579,6 +579,9 @@ export const mastra = new Mastra({
           for (const filePath of possiblePaths) {
             try {
               const html = await fs.readFile(filePath, 'utf-8');
+              c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+              c.header('Pragma', 'no-cache');
+              c.header('Expires', '0');
               return c.html(html);
             } catch (err) {
               continue;
