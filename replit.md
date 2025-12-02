@@ -1,7 +1,14 @@
-# DarkWave-V2 Technical Analysis Bot
+# Pulse - AI Trading Analysis Platform
 
 ## Overview
-**DarkWave Pulse** is a predictive trading platform built on the Mastra AI framework, offering predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its mission is to provide an AI-powered trading advantage by catching trends early (degen appeal) and offering risk-adjusted analytics (pro appeal). Key capabilities include real-time technical analysis, a dual-mode UI (Degen and Pro), DEX pair analysis with rug-risk detection, multi-chain wallet tracking, Telegram bot integration, cryptocurrency payment processing, and a community ecosystem featuring 18 AI personas and 20 NFT Trading Cards. The V2 launch is scheduled for December 25, 2025.
+**Pulse** (powered by DarkWave Studios) is a predictive trading platform built on the Mastra AI framework, offering predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its mission is to provide an AI-powered trading advantage by catching trends early (degen appeal) and offering risk-adjusted analytics (pro appeal). Key capabilities include real-time technical analysis, a dual-mode UI (Degen and Pro), DEX pair analysis with rug-risk detection, multi-chain wallet tracking, Telegram bot integration, cryptocurrency payment processing, and a community ecosystem featuring 18 AI personas and 20 NFT Trading Cards. The V2 Founders Launch is scheduled for December 25, 2025.
+
+## Branding
+- **Product Name**: Pulse
+- **Parent Company**: DarkWave Studios, LLC
+- **Token**: $PULSE
+- **Footer**: "Powered by DarkWave Studios"
+- **Other DarkWave Products**: Orbit Finance, Orbit Staffing, Orbee, GarageBot
 
 ## User Preferences
 - User name: Jason
@@ -9,6 +16,18 @@
 - Call him "Jason" not "DW"
 - **IMPORTANT**: Always check with Jason before proceeding to verify any task - confirm changes look correct before moving on
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color (Nov 24, 2025)
+
+## Recent Changes (Dec 2, 2025)
+- **REBRANDING**: Changed from "DarkWave Pulse" to just "Pulse"
+  - App is now called "Pulse" with "Powered by DarkWave Studios" in footer
+  - Updated page title, meta tags, hero banner, and all major references
+  - Aligns with other DarkWave products (Orbit Finance, Orbee, GarageBot)
+- **TRANSPARENCY OVERHAUL**: Removed ALL box backgrounds site-wide
+  - Added 400+ line CSS override section for total transparency
+  - All buttons, icons, navigation tabs, metric boxes now transparent
+  - Only animated gradient background + particles should be visible
+  - Removed border-top/border-bottom dividers from metric box internals
+  - Protected .animated-bg from transparency override to keep gradient visible
 
 ## Recent Changes (Dec 1, 2025)
 - **PREMIUM UI/UX UPGRADE**: Enhanced visual experience with professional animations
