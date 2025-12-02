@@ -14342,3 +14342,477 @@ h3 {
 [style*="background-color:#2"] {
   background: var(--glass-bg, rgba(15, 45, 80, 0.35)) !important;
 }
+
+/* ============================================ */
+/* TOTAL TRANSPARENCY OVERHAUL                 */
+/* Remove ALL box backgrounds site-wide        */
+/* Only gradient bg + particles should show    */
+/* ============================================ */
+
+/* === NAVIGATION TABS - Fully transparent === */
+.nav-tabs,
+.nav-tab,
+.tab-button,
+.category-btn,
+.category-tabs,
+.truth-tab-btn,
+.truth-tab-nav,
+[class*="tab-btn"],
+[class*="nav-btn"],
+[class*="category-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.category-btn.active,
+.nav-tab.active,
+.tab-button.active,
+.truth-tab-active {
+  background: transparent !important;
+  border-bottom: 2px solid var(--pastel-cyan, #8FE9FF) !important;
+  box-shadow: none !important;
+}
+
+/* === HERO ICON BUTTONS - No boxes === */
+.hero-icon-btn,
+.hero-icons,
+.hero-icon,
+.feature-icon,
+.icon-btn,
+.icon-button,
+[class*="hero-icon"],
+[class*="feature-btn"],
+.hero-section button,
+.hero-section .icon-container {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* === METRIC BOXES - Transparent internals === */
+.metric-box,
+.metric-box-wide,
+.metrics-stack,
+.metrics-grid,
+.gauge-container,
+.gauge-wrapper,
+.gauge-value-display,
+.gauge-value-under-title,
+.metric-label,
+.metric-value,
+.metric-change,
+[class*="metric-"],
+[class*="gauge-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === SEARCH SECTION - Transparent === */
+.search-section,
+.search-container,
+.search-box,
+.search-btn,
+.search-button,
+.analytics-btn,
+.analytics-button,
+.coin-search-btn,
+[class*="search-"],
+[class*="analytics-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(143, 233, 255, 0.3) !important;
+}
+
+/* === FLOATING BUTTONS & ICONS === */
+.floating-btn,
+.floating-button,
+.floating-icon,
+.chat-btn,
+.chat-bubble,
+.popup-btn,
+.agent-popup,
+.agent-btn,
+.commentary-btn,
+.info-icon,
+.help-icon,
+[class*="floating-"],
+[class*="popup-"],
+[class*="bubble-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* === BANNER & PROMO ELEMENTS === */
+.info-banner,
+.info-banner-content,
+.promo-banner,
+.version-banner,
+.v2-banner,
+.announcement-banner,
+[class*="banner-"],
+[class*="promo-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === ICON CONTAINERS - All transparent === */
+.icon-wrapper,
+.emoji-container,
+.emoji-wrapper,
+.icon-container,
+.btn-icon,
+.button-icon,
+[class*="icon-wrap"],
+[class*="emoji-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* === SETTINGS & ACTION BUTTONS === */
+.settings-btn,
+.logout-btn,
+.avatar-btn,
+.theme-btn,
+.bug-btn,
+.disclaimer-btn,
+.close-btn,
+.close-btn-circle,
+.action-btn,
+[class*="settings-"],
+[class*="logout-"],
+[class*="avatar-"],
+button[onclick*="switchTab"],
+button[onclick*="logout"],
+button[onclick*="settings"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* === CARDS & CONTAINERS - Keep only subtle glass effect on main containers === */
+.card-body,
+.card-content,
+.card-inner,
+.box-content,
+.panel-content,
+.section-content,
+.collapsible-content {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* === EMBLEM / WATERMARK - Transparent background === */
+.watermark,
+.emblem,
+.logo-watermark,
+.bg-logo,
+.bg-emblem,
+.background-logo,
+[class*="watermark"],
+[class*="emblem"],
+.hero-logo,
+.brand-mark {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* === LIVE PRICES SECTION === */
+.live-prices,
+.live-prices-header,
+.live-prices-content,
+.price-ticker,
+.ticker-item,
+[class*="live-price"],
+[class*="ticker-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === COIN TABLE - Transparent rows === */
+.coin-table,
+.coin-table-body,
+.coin-table-row,
+.coin-row,
+.table-row,
+.data-row,
+tbody tr,
+.coin-table-body tr {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.coin-table-body tr:hover {
+  background: rgba(143, 233, 255, 0.1) !important;
+}
+
+/* === DROPDOWN & MENUS === */
+.dropdown,
+.dropdown-menu,
+.dropdown-item,
+.menu-item,
+.select-menu,
+[class*="dropdown-"],
+[class*="menu-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === MODAL INTERNALS - Transparent inner elements === */
+.modal-body,
+.modal-content-inner,
+.modal-section,
+.popup-content,
+.dialog-content {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* === PROJECT CARDS === */
+.project-card,
+.project-card-content,
+.project-info,
+.coin-card,
+.token-card,
+[class*="project-card"],
+[class*="coin-card"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === STAKING ELEMENTS === */
+.staking-card,
+.staking-tier,
+.tier-card,
+.stake-info,
+[class*="staking-"],
+[class*="tier-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === KNOWLEDGE BASE / LEARN === */
+.guide-section,
+.chapter-card,
+.lesson-card,
+.knowledge-item,
+[class*="guide-"],
+[class*="chapter-"],
+[class*="lesson-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === PORTFOLIO ELEMENTS === */
+.portfolio-card,
+.holding-card,
+.wallet-card,
+.balance-display,
+[class*="portfolio-"],
+[class*="holding-"],
+[class*="wallet-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === FORM ELEMENTS - Just border, no bg === */
+.form-group,
+.input-group,
+.field-wrapper,
+[class*="form-group"],
+[class*="input-group"] {
+  background: transparent !important;
+}
+
+/* === ACCORDION / COLLAPSIBLE === */
+.accordion,
+.accordion-item,
+.accordion-header,
+.accordion-body,
+.collapsible-section,
+.collapsible-header,
+.collapsible-btn,
+[class*="accordion-"],
+[class*="collapsible-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === TRADING CARDS === */
+.trading-card,
+.nft-card,
+.agent-card,
+.persona-card,
+[class*="trading-card"],
+[class*="nft-"],
+[class*="agent-card"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === MINI BUTTONS / PRESETS === */
+.color-preset-mini,
+.preset-btn,
+.mini-btn,
+.quick-btn,
+[class*="preset-"],
+[class*="mini-btn"] {
+  box-shadow: none !important;
+}
+
+/* === SPOTLIGHT / FEATURED === */
+.spotlight-card,
+.featured-card,
+.highlight-card,
+[class*="spotlight-"],
+[class*="featured-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === CHART CONTAINERS === */
+.chart-container,
+.chart-wrapper,
+.candlestick-container,
+[class*="chart-"] {
+  background: transparent !important;
+}
+
+/* === REMOVE BOX SHADOWS FROM EVERYTHING === */
+*:not(.animated-bg):not(.particles-overlay):not(.glow-overlay) {
+  box-shadow: none !important;
+}
+
+/* === UNIVERSAL EMOJI/ICON TRANSPARENCY === */
+span:has(> img),
+span:has(> svg),
+div:has(> img.icon),
+div:has(> svg.icon),
+button span,
+a span,
+.emoji,
+.icon {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* === FORCE TRANSPARENT ON INLINE STYLES === */
+[style*="background"]:not(.animated-bg):not(.particles-overlay):not(.glow-overlay):not([style*="gradient"]):not([style*="url("]) {
+  background: transparent !important;
+}
+
+/* === BUTTONS - ONLY KEEP TEXT/EMOJI VISIBLE === */
+button,
+.btn,
+[role="button"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === SUBTLE BORDERS FOR CLICKABLE ELEMENTS === */
+button:not(.close-btn):not(.close-btn-circle),
+.btn:not(.close-btn),
+.category-btn,
+.nav-tab,
+.search-btn {
+  border: 1px solid rgba(143, 233, 255, 0.25) !important;
+  border-radius: 8px;
+}
+
+button:hover,
+.btn:hover {
+  border-color: rgba(143, 233, 255, 0.5) !important;
+  background: rgba(143, 233, 255, 0.1) !important;
+}
+
+/* === MAIN CONTAINERS - Keep very subtle glass for readability === */
+.app-container,
+.main-content,
+.tab-pane,
+.page-content {
+  background: transparent !important;
+}
+
+/* === HEADER / NAVIGATION BAR === */
+.header,
+.navbar,
+.nav-bar,
+.top-bar,
+.header-container,
+[class*="header-"],
+[class*="navbar-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === FOOTER === */
+.footer,
+.footer-content,
+[class*="footer-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === TAB PANES === */
+.tab-pane,
+.tab-content,
+#crypto,
+#stocks,
+#projects,
+#learn,
+#portfolio,
+#staking,
+#settings,
+#truth,
+#v2-details {
+  background: transparent !important;
+}
+
+/* === ENSURE TEXT REMAINS READABLE === */
+body,
+.app-container,
+main {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* === PRESERVE ONLY ESSENTIAL BACKGROUNDS === */
+/* Keep gradient background layers */
+.animated-bg,
+.particles-overlay,
+.glow-overlay,
+.particle {
+  /* These keep their backgrounds - they ARE the background */
+}
+
+/* Keep subtle glass on modals for readability */
+.modal,
+.modal-content,
+.popup,
+.dialog {
+  background: rgba(10, 30, 60, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(143, 233, 255, 0.3) !important;
+}
+
+/* Keep input field backgrounds for usability */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background: rgba(15, 45, 80, 0.4) !important;
+  border: 1px solid rgba(143, 233, 255, 0.3) !important;
+}
