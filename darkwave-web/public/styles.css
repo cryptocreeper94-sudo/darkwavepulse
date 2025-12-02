@@ -14953,6 +14953,28 @@ body {
   background-color: transparent !important;
 }
 
+/* Override ALL theme-specific body backgrounds */
+body.theme-dark,
+body.theme-light,
+body.theme-jupiter,
+body.theme-pink-blossom,
+body.theme-sunny-field,
+body.theme-space,
+body[class*="theme-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Also disable any theme pseudo-elements that create overlays */
+body.theme-jupiter::before,
+body.theme-pink-blossom::before,
+body.theme-sunny-field::before,
+body.theme-space::before,
+body[class*="theme-"]::before {
+  display: none !important;
+}
+
 #app {
   background: transparent !important;
   background-color: transparent !important;
