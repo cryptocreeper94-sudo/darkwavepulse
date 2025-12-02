@@ -14163,33 +14163,55 @@ section,
   border: 1px solid var(--glass-border, rgba(143, 233, 255, 0.25)) !important;
 }
 
-/* === BANNER FIX: Preserve wave/candles image with gradient blend === */
-.app-banner {
-  background: transparent !important;
-  border-bottom: 2px solid rgba(143, 233, 255, 0.3) !important;
+/* === SIMPLE GLASS HEADER === */
+.glass-header {
+  width: 100%;
+  padding: 20px 24px;
+  text-align: center;
+  background: var(--glass-bg, rgba(15, 45, 80, 0.3));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border, rgba(143, 233, 255, 0.2));
+  position: relative;
+  z-index: 5;
 }
 
-.banner-scroll {
-  background: url('/banner-dark.png') !important;
-  background-size: 50% 100% !important;
-  background-position: 0 center !important;
-  background-repeat: repeat-x !important;
-  opacity: 0.85;
-}
-
-.banner-title {
-  color: #0a4a7a !important;
+.glass-header-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  color: #0a3d5c;
   text-shadow: 
-    0 0 20px rgba(143, 233, 255, 0.8),
-    0 0 40px rgba(143, 233, 255, 0.5),
-    0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    0 0 30px rgba(143, 233, 255, 0.9),
+    0 0 60px rgba(143, 233, 255, 0.6),
+    0 2px 4px rgba(255, 255, 255, 0.3);
+  font-family: 'Courier New', 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 3px;
 }
 
-.banner-subtitle {
-  color: #1a5a8a !important;
+.glass-header-subtitle {
+  font-size: 0.85rem;
+  margin: 0;
+  color: #1a5a7a;
   text-shadow: 
-    0 0 15px rgba(143, 233, 255, 0.6),
-    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    0 0 20px rgba(143, 233, 255, 0.7),
+    0 1px 2px rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 480px) {
+  .glass-header {
+    padding: 14px 16px;
+  }
+  .glass-header-title {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+  .glass-header-subtitle {
+    font-size: 0.75rem;
+  }
 }
 
 /* Carousels and sliders */
