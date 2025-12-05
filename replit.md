@@ -22,12 +22,9 @@
   - App is now called "Pulse" with "Powered by DarkWave Studios" in footer
   - Updated page title, meta tags, hero banner, and all major references
   - Aligns with other DarkWave products (Orbit Finance, Orbee, GarageBot)
-- **TRANSPARENCY OVERHAUL**: Removed ALL box backgrounds site-wide
-  - Added 400+ line CSS override section for total transparency
-  - All buttons, icons, navigation tabs, metric boxes now transparent
-  - Only animated gradient background + particles should be visible
-  - Removed border-top/border-bottom dividers from metric box internals
-  - Protected .animated-bg from transparency override to keep gradient visible
+- **CSS FIX**: Removed aggressive transparency overrides that were breaking the dashboard
+  - The "total transparency overhaul" CSS was making everything white/invisible
+  - Reverted to working CSS state with proper glassmorphism and backgrounds
 
 ## Recent Changes (Dec 1, 2025)
 - **PREMIUM UI/UX UPGRADE**: Enhanced visual experience with professional animations
