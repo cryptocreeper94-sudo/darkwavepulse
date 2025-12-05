@@ -99,6 +99,223 @@
   --accent-gold: #FFD700;
 }
 
+/* ============================================ */
+/* SLIM HEADER BAR                              */
+/* ============================================ */
+
+.slim-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #0a0a0a;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 9999;
+}
+
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background: #252525;
+  border-color: #444;
+}
+
+.hamburger-btn.active {
+  background: #3861FB;
+  border-color: #3861FB;
+}
+
+.hamburger-line {
+  width: 20px;
+  height: 2px;
+  background: #8FE9FF;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.header-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #00d9ff;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+  margin: 0;
+}
+
+.header-version {
+  font-size: 12px;
+  color: #666;
+  background: #1a1a1a;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+/* ============================================ */
+/* HAMBURGER MENU DROPDOWN                      */
+/* ============================================ */
+
+.hamburger-menu {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 280px;
+  max-height: calc(100vh - 50px);
+  background: #0f0f0f;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 9998;
+  overflow-y: auto;
+}
+
+.hamburger-menu.open {
+  transform: translateX(0);
+}
+
+.hamburger-menu-content {
+  padding: 16px;
+}
+
+.menu-section {
+  margin-bottom: 20px;
+}
+
+.menu-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: #252525;
+  border-color: #3861FB;
+  color: #fff;
+}
+
+.menu-item.active {
+  background: linear-gradient(135deg, #1a2a4a, #1a1a2a);
+  border-color: #3861FB;
+  color: #8FE9FF;
+}
+
+.menu-item--logout {
+  border-color: #442222;
+}
+
+.menu-item--logout:hover {
+  background: #331a1a;
+  border-color: #ff4444;
+  color: #ff6666;
+}
+
+.menu-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.menu-footer {
+  padding: 16px 12px;
+  border-top: 1px solid #222;
+  margin-top: 10px;
+}
+
+.menu-footer-text {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+.menu-search-counter {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #8FE9FF;
+  text-align: center;
+}
+
+/* Menu overlay for closing */
+.menu-overlay {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9997;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Adjust body padding for fixed header */
+body {
+  padding-top: 50px;
+}
+
 /* Global Input Styles - Solid Dark */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
 textarea,
@@ -1342,6 +1559,175 @@ body.theme-light .banner-title {
     font-size: 14px;
     font-weight: 600;
   }
+}
+
+/* ============================================ */
+/* NEW METRIC CARDS - Redesigned Layout        */
+/* ============================================ */
+
+.metric-card {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 160px;
+}
+
+.metric-card:hover {
+  background: #1a1a1a;
+  border-color: #3861FB;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 97, 251, 0.3);
+}
+
+/* Stagger animation for metric cards */
+.metrics-stack .metric-card {
+  animation: fadeInUp 0.4s ease forwards;
+  opacity: 0;
+}
+
+.metrics-stack .metric-card:nth-child(1) { animation-delay: 0.05s; }
+.metrics-stack .metric-card:nth-child(2) { animation-delay: 0.1s; }
+.metrics-stack .metric-card:nth-child(3) { animation-delay: 0.15s; }
+.metrics-stack .metric-card:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.metric-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #8FE9FF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.metric-card-value {
+  font-size: 48px;
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.metric-card-value-large {
+  font-size: 36px;
+  font-weight: 800;
+  color: #00FF41;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+}
+
+.metric-card-gauge {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.metric-card-gauge canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.metric-card-change {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.metric-card-flow {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Mobile adjustments for metric cards */
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 10px 8px;
+    min-height: 120px;
+    border-radius: 10px;
+  }
+  
+  .metric-card-title {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  
+  .metric-card-value {
+    font-size: 32px;
+  }
+  
+  .metric-card-value-large {
+    font-size: 24px;
+  }
+  
+  .metric-card-change {
+    font-size: 14px;
+  }
+}
+
+/* Desktop: Larger cards */
+@media (min-width: 769px) {
+  .metric-card {
+    padding: 20px 16px;
+    min-height: 200px;
+  }
+  
+  .metric-card-title {
+    font-size: 16px;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+  
+  .metric-card-value {
+    font-size: 64px;
+  }
+  
+  .metric-card-value-large {
+    font-size: 48px;
+  }
+  
+  .metric-card-change {
+    font-size: 22px;
+  }
+  
+  .metric-card-flow {
+    font-size: 14px;
+  }
+}
+
+/* Hide old banner and nav - replaced with slim header */
+.app-banner,
+.info-banner-bar,
+.top-nav {
+  display: none !important;
 }
 
 /* OLD .metric-value CSS - DISABLED - using .gauge-value-display instead */
