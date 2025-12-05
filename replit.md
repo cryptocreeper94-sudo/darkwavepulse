@@ -17,14 +17,18 @@
 - **IMPORTANT**: Always check with Jason before proceeding to verify any task - confirm changes look correct before moving on
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color (Nov 24, 2025)
 
+## Recent Changes (Dec 5, 2025)
+- **DESIGN CHANGE**: Reverted to solid black/dark gray theme
+  - Disabled animated gradient background, particles, and glow overlays
+  - Body background now solid #0f0f0f (dark gray/black)
+  - Theme variables updated to use solid dark colors instead of glassmorphism
+  - More stable and performant than gradient animations
+
 ## Recent Changes (Dec 2, 2025)
 - **REBRANDING**: Changed from "DarkWave Pulse" to just "Pulse"
   - App is now called "Pulse" with "Powered by DarkWave Studios" in footer
   - Updated page title, meta tags, hero banner, and all major references
   - Aligns with other DarkWave products (Orbit Finance, Orbee, GarageBot)
-- **CSS FIX**: Removed aggressive transparency overrides that were breaking the dashboard
-  - The "total transparency overhaul" CSS was making everything white/invisible
-  - Reverted to working CSS state with proper glassmorphism and backgrounds
 
 ## Recent Changes (Dec 1, 2025)
 - **PREMIUM UI/UX UPGRADE**: Enhanced visual experience with professional animations
