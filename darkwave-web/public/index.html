@@ -130,55 +130,128 @@
   <div class="glow-overlay"></div>
   <div class="particles-overlay" id="particlesOverlay"></div>
   
-  <!-- Banner Section -->
-  <div class="app-banner">
-    <div class="banner-scroll"></div>
-    <!-- Title Section - Right Third -->
-    <div class="banner-title-section">
-      <div class="banner-title-overlay"></div>
-      <div class="banner-title-wrapper">
-        <h1 class="banner-title">PULSE</h1>
-        <p class="banner-subtitle">Predictive Signals. Complete Ecosystem. Maximum Edge.</p>
+  <!-- Slim Header Bar -->
+  <header class="slim-header">
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()" aria-label="Menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+    <h1 class="header-title">PULSE</h1>
+    <span class="header-version">v2.0</span>
+  </header>
+
+  <!-- Hamburger Menu Dropdown -->
+  <nav class="hamburger-menu" id="hamburgerMenu">
+    <div class="hamburger-menu-content">
+      <div class="menu-section">
+        <div class="menu-section-title">Navigation</div>
+        <button class="menu-item active" data-tab="crypto" onclick="selectMenuItem(this, 'crypto')">
+          <span class="menu-icon">📊</span> Markets
+        </button>
+        <button class="menu-item" data-tab="projects" onclick="selectMenuItem(this, 'projects')">
+          <span class="menu-icon">🚀</span> Projects
+        </button>
+        <button class="menu-item" data-tab="truth" onclick="selectMenuItem(this, 'truth')">
+          <span class="menu-icon">💡</span> Learn
+        </button>
+        <button class="menu-item" data-tab="portfolio" onclick="selectMenuItem(this, 'portfolio')">
+          <span class="menu-icon">📈</span> Portfolio
+        </button>
+        <button class="menu-item" data-tab="staking" onclick="selectMenuItem(this, 'staking')">
+          <span class="menu-icon">💎</span> Staking
+        </button>
+        <button class="menu-item" data-tab="settings" onclick="selectMenuItem(this, 'settings')">
+          <span class="menu-icon">⚙️</span> Settings
+        </button>
+        <button class="menu-item" data-tab="v2-details" onclick="selectMenuItem(this, 'v2-details')">
+          <span class="menu-icon">📅</span> V2 Details
+        </button>
+      </div>
+      <div class="menu-section">
+        <div class="menu-section-title">Quick Actions</div>
+        <button class="menu-item" onclick="openAgentSelector(); closeHamburgerMenu();">
+          <span class="menu-icon">👤</span> Agent Builder
+        </button>
+        <button class="menu-item" onclick="themeManager.openThemeSelector(); closeHamburgerMenu();">
+          <span class="menu-icon">🎨</span> Change Theme
+        </button>
+        <button class="menu-item" onclick="openBugReportModal(); closeHamburgerMenu();">
+          <span class="menu-icon">🐛</span> Report Bug
+        </button>
+        <button class="menu-item" onclick="openDisclaimerModal(); closeHamburgerMenu();">
+          <span class="menu-icon">⚠️</span> Disclaimer
+        </button>
+        <button class="menu-item menu-item--logout" onclick="handleLogout(); closeHamburgerMenu();">
+          <span class="menu-icon">🚪</span> Logout
+        </button>
+      </div>
+      <div class="menu-footer">
+        <div class="menu-footer-text">Beta V1 - Founders Launch Dec 25</div>
+        <div id="searchCounter" class="menu-search-counter" style="display: none;"></div>
       </div>
     </div>
-  </div>
+  </nav>
+  
+  <!-- Menu Overlay for closing -->
+  <div class="menu-overlay" id="menuOverlay" onclick="closeHamburgerMenu()"></div>
 
   <div id="app"></div>
-
-  <!-- Unified Info Banner - Three Equal Buttons -->
-  <div id="infoBannerBar" class="info-banner-bar">
-    <button id="betaBtn" class="info-btn info-btn--beta" onclick="switchTab('staking')">
-      <span class="info-btn-text" data-emoji="🧪">🧪 BETA V1 - Founders Dec 25</span>
-    </button>
-    <button id="founderBtn" class="info-btn info-btn--founder" onclick="switchTab('staking')">
-      <span class="info-btn-text" data-emoji="💎">💎 LEGACY FOUNDER - <span id="founderCountdown">37 DAYS</span></span>
-    </button>
-    <button id="newHereBtn" class="info-btn info-btn--new" onclick="switchTab('truth')">
-      <span class="info-btn-text" data-emoji="💊">💊 NEW HERE? READ FIRST</span>
-    </button>
-  </div>
-
-    <!-- Top Navigation Menu - Simplified to 6 tabs for mobile fit -->
-    <nav class="top-nav">
-      <button class="nav-btn active" data-tab="crypto">📊 Markets</button>
-      <button class="nav-btn" data-tab="projects">🚀 Projects</button>
-      <button class="nav-btn" data-tab="truth">💡 Learn</button>
-      <button class="nav-btn" data-tab="portfolio">📈 Portfolio</button>
-      <button class="nav-btn" data-tab="community">💬 Community</button>
-      <button class="nav-btn" data-tab="settings">⚙️ Settings</button>
+  
+  <!-- Hamburger Menu JavaScript -->
+  <script>
+    // Hamburger menu functions
+    function toggleHamburgerMenu() {
+      const menu = document.getElementById('hamburgerMenu');
+      const btn = document.getElementById('hamburgerBtn');
+      const overlay = document.getElementById('menuOverlay');
       
-      <!-- Search Counter (Base/Trial users only) -->
-      <div id="searchCounter" style="display: none; align-items: center; padding: 6px 12px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 6px; font-size: 12px; font-weight: 600; color: #8FE9FF; flex-shrink: 0;"></div>
+      const isOpen = menu.classList.contains('open');
       
-      <!-- VERSION 2 DETAILS Button -->
-      <button id="v2DetailsMobileBtn" onclick="switchTab('v2-details')" style="padding: 6px 12px; background: linear-gradient(135deg, rgba(56, 97, 251, 0.3), rgba(131, 56, 236, 0.2)); border: 1px solid rgba(56, 97, 251, 0.4); border-radius: 6px; color: #8FE9FF; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;" title="Version 2 Details"><span class="v2-text">📅 V2 Details</span></button>
+      if (isOpen) {
+        closeHamburgerMenu();
+      } else {
+        menu.classList.add('open');
+        btn.classList.add('active');
+        overlay.classList.add('open');
+      }
+    }
+    
+    function closeHamburgerMenu() {
+      const menu = document.getElementById('hamburgerMenu');
+      const btn = document.getElementById('hamburgerBtn');
+      const overlay = document.getElementById('menuOverlay');
       
-      <button class="logout-icon-btn" onclick="openAgentSelector()" title="Agent Builder - Choose Your Agent">👤</button>
-      <button class="logout-icon-btn" id="themeSelectorBtn" onclick="themeManager.openThemeSelector()" title="Change Theme">🎨</button>
-      <button class="logout-icon-btn" onclick="openBugReportModal()" title="Report a Bug">🐛</button>
-      <button class="logout-icon-btn" onclick="handleLogout()" title="Logout">🚪</button>
-      <button class="disclaimer-icon-btn" onclick="openDisclaimerModal()" title="Legal Disclaimer">⚠️</button>
-    </nav>
+      menu.classList.remove('open');
+      btn.classList.remove('active');
+      overlay.classList.remove('open');
+    }
+    
+    function selectMenuItem(element, tabName) {
+      // Remove active class from all menu items
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked item
+      element.classList.add('active');
+      
+      // Switch to the tab
+      if (typeof switchTab === 'function') {
+        switchTab(tabName);
+      }
+      
+      // Close the menu
+      closeHamburgerMenu();
+    }
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeHamburgerMenu();
+      }
+    });
+  </script>
 
     <!-- Crypto Tab Content -->
     <div id="crypto" class="tab-pane active">
@@ -221,39 +294,40 @@
       </div>
     </div>
 
-    <!-- Metrics Stack - Perfect Square Boxes -->
+    <!-- Metrics Stack - Redesigned Cards -->
     <div class="metrics-section">
       <div class="metrics-stack">
-        <div class="metric-box-wide fear-greed-box" onclick="showMetricExplanation('feargreed')" style="cursor: pointer;">
-          <div class="metric-label metric-label-mobile">F&G</div>
-          <div class="metric-label metric-label-desktop">FEAR & GREED</div>
-          <div class="gauge-value-display" id="fearGreedValue">Loading...</div>
-          <div class="gauge-container">
+        <!-- Fear & Greed Card -->
+        <div class="metric-card" onclick="showMetricExplanation('feargreed')">
+          <div class="metric-card-title">FEAR & GREED INDEX</div>
+          <div class="metric-card-value" id="fearGreedValue">--</div>
+          <div class="metric-card-gauge">
             <canvas id="fearGreedGauge" width="600" height="300"></canvas>
           </div>
         </div>
-        <div class="metric-box-wide" onclick="showMetricExplanation('altseason')" style="cursor: pointer;">
-          <div class="metric-label metric-label-mobile">ALT</div>
-          <div class="metric-label metric-label-desktop">ALTCOIN SEASON</div>
-          <div class="gauge-value-display" id="altSeasonValue">Loading...</div>
-          <div class="gauge-container">
+        
+        <!-- Altcoin Season Card -->
+        <div class="metric-card" onclick="showMetricExplanation('altseason')">
+          <div class="metric-card-title">ALTCOIN SEASON INDEX</div>
+          <div class="metric-card-value" id="altSeasonValue">--</div>
+          <div class="metric-card-gauge">
             <canvas id="altSeasonGauge" width="600" height="300"></canvas>
           </div>
         </div>
-        <div class="metric-box-wide" onclick="showMetricExplanation('marketcap')" style="cursor: pointer;">
-          <div class="metric-label metric-label-mobile">CAP</div>
-          <div class="metric-label metric-label-desktop">MARKET CAP</div>
-          <div class="gauge-value-display" id="marketCapDisplay">Loading...</div>
-          <div class="metric-change" id="marketCapChange">—</div>
+        
+        <!-- Market Cap Card -->
+        <div class="metric-card" onclick="showMetricExplanation('marketcap')">
+          <div class="metric-card-title">TOTAL MARKET CAP</div>
+          <div class="metric-card-value-large" id="marketCapDisplay">--</div>
+          <div class="metric-card-change" id="marketCapChange">--</div>
         </div>
-        <div class="metric-box-wide" onclick="showMetricExplanation('volume24h')" style="cursor: pointer;">
-          <div class="metric-label metric-label-mobile">VOL</div>
-          <div class="metric-label metric-label-desktop">VOLUME</div>
-          <div class="gauge-value-display" id="volumeDisplay">Loading...</div>
-          <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; padding: 0 2px;">
-            <div class="metric-change" id="volumeChange">—</div>
-            <div class="volume-flow-indicator" id="volumeFlowIndicator">—</div>
-          </div>
+        
+        <!-- Volume Card -->
+        <div class="metric-card" onclick="showMetricExplanation('volume24h')">
+          <div class="metric-card-title">24H TRADING VOLUME</div>
+          <div class="metric-card-value-large" id="volumeDisplay">--</div>
+          <div class="metric-card-change" id="volumeChange">--</div>
+          <div class="metric-card-flow" id="volumeFlowIndicator">--</div>
         </div>
       </div>
     </div>

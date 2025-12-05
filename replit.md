@@ -1,158 +1,19 @@
 # Pulse - AI Trading Analysis Platform
 
 ## Overview
-**Pulse** (powered by DarkWave Studios) is a predictive trading platform built on the Mastra AI framework, offering predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its mission is to provide an AI-powered trading advantage by catching trends early (degen appeal) and offering risk-adjusted analytics (pro appeal). Key capabilities include real-time technical analysis, a dual-mode UI (Degen and Pro), DEX pair analysis with rug-risk detection, multi-chain wallet tracking, Telegram bot integration, cryptocurrency payment processing, and a community ecosystem featuring 18 AI personas and 20 NFT Trading Cards. The V2 Founders Launch is scheduled for December 25, 2025.
-
-## Branding
-- **Product Name**: Pulse
-- **Parent Company**: DarkWave Studios, LLC
-- **Token**: $PULSE
-- **Footer**: "Powered by DarkWave Studios"
-- **Other DarkWave Products**: Orbit Finance, Orbit Staffing, Orbee, GarageBot
+Pulse (powered by DarkWave Studios) is a predictive trading platform built on the Mastra AI framework, offering predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its mission is to provide an AI-powered trading advantage by catching trends early and offering risk-adjusted analytics. Key capabilities include real-time technical analysis, a dual-mode UI (Degen and Pro), DEX pair analysis with rug-risk detection, multi-chain wallet tracking, Telegram bot integration, cryptocurrency payment processing, and a community ecosystem featuring 18 AI personas and 20 NFT Trading Cards.
 
 ## User Preferences
 - User name: Jason
 - Preferred communication style: Simple, everyday language
 - Call him "Jason" not "DW"
 - **IMPORTANT**: Always check with Jason before proceeding to verify any task - confirm changes look correct before moving on
-- Agent diversity: Equal distribution across age groups, gender, race, and hair color (Nov 24, 2025)
-
-## Recent Changes (Dec 5, 2025)
-- **DESIGN CHANGE**: Reverted to solid black/dark gray theme
-  - Disabled animated gradient background, particles, and glow overlays
-  - Body background now solid #0f0f0f (dark gray/black)
-  - Theme variables updated to use solid dark colors instead of glassmorphism
-  - More stable and performant than gradient animations
-
-## Recent Changes (Dec 2, 2025)
-- **REBRANDING**: Changed from "DarkWave Pulse" to just "Pulse"
-  - App is now called "Pulse" with "Powered by DarkWave Studios" in footer
-  - Updated page title, meta tags, hero banner, and all major references
-  - Aligns with other DarkWave products (Orbit Finance, Orbee, GarageBot)
-
-## Recent Changes (Dec 1, 2025)
-- **PREMIUM UI/UX UPGRADE**: Enhanced visual experience with professional animations
-  - Animated gradient background using DarkWave colors (cyan, purple, blue)
-  - Floating particles effect (20 subtle particles with varying colors)
-  - Glow overlay with radial gradients for depth and atmosphere
-  - Enhanced card hover effects (translateY + glow + smooth cubic-bezier transitions)
-  - Stagger animations for coin table rows, nav buttons, and metric boxes (fadeInUp with delays)
-- **CSS IMPROVEMENTS**:
-  - Added premium hover effects only on pointer devices (@media hover: hover)
-  - Particle colors alternate between white, cyan, and purple
-  - All animations use cubic-bezier timing for smooth transitions
-
-## Recent Changes (Nov 30, 2025)
-- **SOLANA AUDIT TRAIL SYSTEM**: Built complete blockchain-backed audit trail
-  - Database tables: audit_events, hallmark_profiles, hallmark_mints, system_config
-  - SHA-256 hashing of all important events (account changes, payments, subscriptions, wallet actions)
-  - Helius API integration for posting hashes to Solana Memo program
-  - System is "dormant" until wallet credentials added - queues events in database ready to go live
-  - API endpoints: /api/audit-trail, /api/audit-trail/verify/:eventId, /api/audit-trail/stats
-- **HALLMARK NFT SYSTEM**: $1.99 collectible NFTs for users
-  - Unique serial numbers in format HW-{USERID}-{0001} (e.g., HW-JASON123-0001)
-  - Combines user's avatar, recent audit hashes, and on-chain verification
-  - Multiple templates: Classic, Premium Gold, Cyber Neon, Vintage
-  - API endpoints: /api/hallmark/profile, /api/hallmark/collection, /api/hallmark/create-draft, /api/hallmark/verify/:serialNumber
-- **DEVELOPER DASHBOARD**: Full system controls with accordion UI
-  - Real-time stats: subscriptions, users, audit events, hallmarks, revenue
-  - System configuration management (add wallet, update settings)
-  - Status indicators for Helius API and Solana wallet configuration
-  - Accessible via /api/dev/dashboard with admin code
-- **ACCORDION STYLING**: Applied throughout the app
-  - Collapsible sections for compact navigation
-  - Smooth open/close animations
-  - Consistent styling for all accordion components
-- **NEW FILES CREATED**:
-  - src/services/auditTrailService.ts - Blockchain audit trail service
-  - src/services/hallmarkService.ts - Hallmark NFT minting service
-  - darkwave-web/public/blockchain-trail.js - User's blockchain trail dashboard UI
-  - darkwave-web/public/dev-page.js - Developer dashboard page
-
-## Recent Changes (Nov 25, 2025)
-- **V2 LAUNCH CHECKLIST**: Converted V2 Details page to interactive checklist with 27 trackable tasks
-  - 6 categories: Core Platform, AI & Agents, Trading Features, Staking & Ecosystem, Mobile & Polish, Roadmap
-  - Progress bar shows completion percentage with localStorage persistence
-  - Checkboxes auto-save state and update progress in real-time
-  - Pre-checked items for features already live
-  - Countdown timer shows days/hours until Dec 25, 2025 launch
-- **STAKING TIER COLORS FIXED**: Changed bronze and silver from browns to pastels
-  - Bronze: Now purple gradient (#A78BFA → #8B5CF6)
-  - Silver: Now slate gradient (#94A3B8 → #64748B)
-- **V2 BUTTONS UPDATED**: Staking page buttons now link to v2-details tab instead of settings
-  - "🚀 UPGRADE FOR V2 ACCESS" → "🚀 V2 UPDATES & FEATURES"
-  - Hero CTA button text updated to "VIEW V2 FEATURES →"
-- **NAVIGATION UPDATED**: 7 tabs - Crypto, Stocks, Projects, Learn, Portfolio, Staking, Settings
-  - Removed Community tab
-  - Added Stocks tab back to main navigation
-- **INFO BANNER BUTTONS FIXED**: Moved from inline styles to CSS classes
-  - Responsive mobile layout (emoji-only on small screens, stack on very small)
-  - All 3 buttons now visible on 320px screens
-  - Touch targets 44px minimum height
-  - Added hover effects with subtle glow on pointer devices
-- **MOBILE LAYOUT REFINED**: Removed aggressive CSS rules that broke layouts
-  - Removed forced single-column grids
-  - Added targeted overflow fixes only where needed
-  - Better text containment with overflow-wrap
-- **VISUAL POLISH**: Added depth and hover effects to cards
-  - Metric boxes have subtle shadows and inner glow
-  - Hover effects on pointer devices only (no bouncy on touch)
-  - Cards scale slightly on hover for depth
-- **FLOATING BUTTON MODES FIXED**: All four modes now work correctly
-  - Off mode: Shows emoji buttons (🤖, 💬) at 40% opacity
-  - Agent mode: Shows agent cutout images
-  - Business/Casual cat mode: Shows Grumpy cat images from trading-cards directory
-  - Added fallback handling if images fail to load
-- **CAT IMAGE PATHS FIXED**: Updated all paths from /crypto-cat-images/ to /trading-cards/
-  - PersonaManager, app.js, and all modal/popup code now uses correct paths
-- **DATA FETCH RETRY LOGIC**: Added retryWithBackoff function for API calls
-  - 5 retries with exponential backoff (1s, 2s, 4s, 8s, 16s)
-  - Handles backend startup delays gracefully
-  - Loading states shown while retrying
-- **SENTRY FIXED**: Removed integrity attribute that was causing CDN blocking
-
-## Recent Changes (Nov 24, 2025)
-- **ANALYTICS BUTTON & MULTI-CHAIN SEARCH FIXES**: 
-  - Analytics button (₿) connects to coin search modal with support for all blockchains (BTC, ETH, SOL, BNB, ADA, XRP, DOT, DOGE, MATIC, AVAX, BONK, WIF, PEPE, SHIB)
-  - Suppressed "Error Loading Data" messages - modal now silently closes on error instead of displaying failure text, allowing user to try another ticker
-  - Coin search works for all supported chains, not just Solana
-- **VERSION 2 DETAILS BUTTON**: Added "📅 V2 DETAILS" button between Settings and Avatar icon in navigation
-  - Button is ~1 inch wide on desktop, styled with blue-purple gradient
-  - Pushes Disclaimer (⚠️) all the way to right edge, filling empty space
-  - Links to compact V2 Details page showing launch date, countdown, features, and roadmap
-  - Page features: Dec 25, 2025 countdown timer, 2-column feature list (Live Now vs V2 Exclusive), roadmap phases, Legacy Founder deadline
-  - On mobile: Shows only 📅 emoji to save space (text hidden via CSS)
-- **MOBILE SEARCH OPTIMIZATION**: Separated mobile and desktop layouts for search section
-  - **Desktop**: Grid layout with Web 3 Search (2fr) and Coin Analytics (1fr) side by side
-  - **Mobile**: Web 3 Search takes full width, Coin Analytics becomes small 📊 icon button beside it
-  - **Mobile Search Modal**: Clicking search input on mobile opens full-screen modal so user can see what they're typing
-  - Search query syncs between mobile modal and desktop input
-- **NAVIGATION CONSOLIDATION**: Simplified from 11 tabs to 6 tabs to fit mobile without horizontal scrolling
-  - 📊 Markets (combines Crypto + Stocks)
-  - 🚀 Projects
-  - 💡 Learn (combines Truth + Knowledge Base)
-  - 📈 Portfolio
-  - 💬 Community
-  - ⚙️ Settings
-  - All icon buttons (👤 Avatar, 🎨 Theme, 🐛 Bug, 🚪 Logout, ⚠️ Disclaimer) now visible on mobile
-- Changed "Investors" button in footer to "📊 Staking" (direct to sandbox with placeholder numbers)
-- Moved holographic refractor NFT to Projects page as Serial #1 (the first and rarest collectible)
-- Removed redundant staking landing page - users go straight to sandbox setup
-- Fixed coin table row click handlers: Replaced inline onclick handlers with proper event listeners using data attributes
-- Balanced 18 AI agents: 6 per age group (young/middle/old), 9 male/9 female, diverse racial representation, varied hair colors
-- **METRIC BOX LAYOUT REFINEMENT**: Perfected 4 metric boxes (Fear & Greed, Altcoin Season, Market Cap, Volume)
-  - Squeezed gauge boxes to remove excess gaps between number and gauge
-  - Market Cap & Volume titles now positioned on X-axis centerline with content below
-  - Added green/red percentage coloring for Market Cap & Volume changes
-  - All boxes now tight, balanced, and proportional with zero wasted space
-- **REMOVED DUPLICATE STAKING CONTENT**: Deleted "Coming Soon" section from Projects tab
-  - DARKWAVE COIN and $CRAZY token cards now only appear on dedicated Staking page
-  - Eliminated redundant content across multiple pages - each section stays on its own page
+- Agent diversity: Equal distribution across age groups, gender, race, and hair color
 
 ## System Architecture
 
 ### Frontend
-The frontend uses React 19 and Vite 7, featuring a CoinMarketCap-style market overview with a 9-column data table and 7 category tabs. The design is inspired by Crypto.com, utilizing dark navy backgrounds, a three-column responsive grid, elevated cards, angular dividers, and electric blue accents with gold and purple highlights. It includes a personalized 9-theme system with organic CSS gradient patterns and a toggleable Crypto Cat mascot. UI elements are designed for low-profile, compact presentation with consistent sizing and double-column layouts where appropriate. An Agent Builder feature allows users to select from 18 AI agents (perfectly balanced: 6 young/middle/old, 9 male/9 female, diverse races and hair colors), with subscription gating and responsive carousel UI. Coin table interactions use event listeners for robust click handling (Nov 24, 2025).
+The frontend uses React 19 and Vite 7, featuring a CoinMarketCap-style market overview with a 9-column data table and 7 category tabs. The design is inspired by Crypto.com, utilizing dark navy backgrounds, a three-column responsive grid, elevated cards, angular dividers, and electric blue accents with gold and purple highlights. It includes a personalized 9-theme system with organic CSS gradient patterns and a toggleable Crypto Cat mascot. UI elements are designed for low-profile, compact presentation with consistent sizing and double-column layouts where appropriate. An Agent Builder allows selection from 18 AI agents (perfectly balanced: 6 young/middle/old, 9 male/9 female, diverse races and hair colors), with subscription gating and responsive carousel UI. Coin table interactions use event listeners for robust click handling. The UI features a slim header (50px) with a hamburger menu for navigation and quick actions, redesigned metric cards with animations (Fear & Greed Index, Altcoin Season Index, Total Market Cap, 24H Trading Volume), and a solid dark theme for performance and stability.
 
 ### Backend and AI Agent
 The core AI agent, DarkWave-V2, is powered by the Mastra framework, enabling tool calling, memory management, and natural language processing. Workflow orchestration is handled by `createWorkflow` and `createStep`. A modular tool system (`createTool`) with Zod schemas encapsulates functionalities such as Market Data, Technical Analysis, Holdings, Scanner, Chart Generation, Dexscreener, DEX Analysis (including rug-risk detection), and NFT Tool.
@@ -164,10 +25,10 @@ The system integrates with OpenAI's GPT-4o-mini via Replit AI Integrations using
 Message processing involves Telegram webhooks, Inngest for event-driven workflows, the Mastra agent, and subsequent response formatting.
 
 ### Technical Implementation
-The project is built with TypeScript (strict mode, ES2022) and uses Zod for runtime validation. Pino logger provides structured JSON logging. Security features include browser-generated unique user IDs, an admin dashboard, and robust file upload validation. Access control supports an access code and email whitelist, with Free Trial, Basic, and Premium pricing tiers. Live data performance is optimized with 5-minute browser caching. Sniper trading features (buy/sell limit orders) are integrated and locked until the V2 launch. Candlestick charts refresh every 2 seconds with detailed error logging.
+The project is built with TypeScript (strict mode, ES2022) and uses Zod for runtime validation. Pino logger provides structured JSON logging. Security features include browser-generated unique user IDs, an admin dashboard, and robust file upload validation. Access control supports an access code and email whitelist, with Free Trial, Basic, and Premium pricing tiers. Live data performance is optimized with 5-minute browser caching. Sniper trading features (buy/sell limit orders) are integrated and locked until the V2 launch. Candlestick charts refresh every 2 seconds with detailed error logging. A blockchain-backed audit trail system using Solana Memo program for SHA-256 hashing of events and a Hallmark NFT system for collectible NFTs are implemented. Data fetch retry logic with exponential backoff is included for API calls.
 
 ### Feature Specifications
-Key features include DEX pair support with rug-risk detection and liquidity scoring, NFT collection analysis, a live trending carousel, and database-backed session management. It supports tracked, multi-chain wallets (Solana, Ethereum, Polygon, Arbitrum, Base, BSC). The system includes a subscription notification system, an admin dashboard, a professional token submission system with three-layer file validation, and cryptocurrency payments via Coinbase Commerce. A DarkWave Token Launchpad provides a live countdown, whitelist signup, and premium-gated access, alongside a "Bot Detection System" for DEX pair analysis.
+Key features include DEX pair support with rug-risk detection and liquidity scoring, NFT collection analysis, a live trending carousel, and database-backed session management. It supports tracked, multi-chain wallets (Solana, Ethereum, Polygon, Arbitrum, Base, BSC). The system includes a subscription notification system, an admin dashboard, a professional token submission system with three-layer file validation, and cryptocurrency payments via Coinbase Commerce. A DarkWave Token Launchpad provides a live countdown, whitelist signup, and premium-gated access, alongside a "Bot Detection System" for DEX pair analysis. A V2 launch checklist with trackable tasks and countdown timer is also integrated.
 
 ## External Dependencies
 

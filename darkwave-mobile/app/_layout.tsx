@@ -6,18 +6,11 @@ export default function RootLayout() {
     <View style={{ flex: 1, backgroundColor: '#0a0a0a' }}>
       <Stack
         screenOptions={{
-          headerStyle: {
-            backgroundColor: '#0a0a0a'
-          },
-          headerTintColor: '#00d9ff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-            color: '#fff'
-          },
-          cardStyle: { backgroundColor: '#0a0a0a' }
+          headerShown: false,
+          contentStyle: { backgroundColor: '#0a0a0a' }
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'DarkWave Pulse' }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
     </View>
   );

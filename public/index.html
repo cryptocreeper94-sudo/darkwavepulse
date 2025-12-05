@@ -192,8 +192,66 @@
       </div>
     </div>
   </nav>
+  
+  <!-- Menu Overlay for closing -->
+  <div class="menu-overlay" id="menuOverlay" onclick="closeHamburgerMenu()"></div>
 
   <div id="app"></div>
+  
+  <!-- Hamburger Menu JavaScript -->
+  <script>
+    // Hamburger menu functions
+    function toggleHamburgerMenu() {
+      const menu = document.getElementById('hamburgerMenu');
+      const btn = document.getElementById('hamburgerBtn');
+      const overlay = document.getElementById('menuOverlay');
+      
+      const isOpen = menu.classList.contains('open');
+      
+      if (isOpen) {
+        closeHamburgerMenu();
+      } else {
+        menu.classList.add('open');
+        btn.classList.add('active');
+        overlay.classList.add('open');
+      }
+    }
+    
+    function closeHamburgerMenu() {
+      const menu = document.getElementById('hamburgerMenu');
+      const btn = document.getElementById('hamburgerBtn');
+      const overlay = document.getElementById('menuOverlay');
+      
+      menu.classList.remove('open');
+      btn.classList.remove('active');
+      overlay.classList.remove('open');
+    }
+    
+    function selectMenuItem(element, tabName) {
+      // Remove active class from all menu items
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked item
+      element.classList.add('active');
+      
+      // Switch to the tab
+      if (typeof switchTab === 'function') {
+        switchTab(tabName);
+      }
+      
+      // Close the menu
+      closeHamburgerMenu();
+    }
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeHamburgerMenu();
+      }
+    });
+  </script>
 
     <!-- Crypto Tab Content -->
     <div id="crypto" class="tab-pane active">
