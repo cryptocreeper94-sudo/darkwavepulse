@@ -44,6 +44,11 @@ export const AUDIT_EVENT_TYPES = {
   // Hallmark Events
   HALLMARK_PURCHASED: 'hallmark.purchased',
   HALLMARK_MINTED: 'hallmark.minted',
+  
+  // System Events
+  SYSTEM_DEPLOYMENT: 'system.deployment',
+  SYSTEM_VERSION_STAMP: 'system.version_stamp',
+  SYSTEM_REPAIR_REPLACE: 'system.repair_replace',
 } as const;
 
 export type AuditEventType = typeof AUDIT_EVENT_TYPES[keyof typeof AUDIT_EVENT_TYPES];
@@ -56,6 +61,7 @@ export const EVENT_CATEGORIES = {
   PRESALE: 'presale',
   SECURITY: 'security',
   HALLMARK: 'hallmark',
+  SYSTEM: 'system',
 } as const;
 
 interface AuditEventPayload {
