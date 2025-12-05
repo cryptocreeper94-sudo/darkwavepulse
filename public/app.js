@@ -92,6 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set initial theme
   document.body.className = 'theme-dark';
   
+  // Check for tab query parameter (admin/owner redirect to dev dashboard)
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedTab = urlParams.get('tab');
+  if (requestedTab) {
+    console.log('📍 Tab requested via URL:', requestedTab);
+    // Wait for tabs to be initialized, then switch
+    setTimeout(() => {
+      if (typeof switchTab === 'function') {
+        switchTab(requestedTab);
+        // Clear the query param from URL without reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }, 500);
+  }
+  
   // Bind tab navigation
   bindTabs();
   

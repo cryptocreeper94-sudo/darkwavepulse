@@ -702,10 +702,10 @@
               // Update loading message
               loadingDiv.innerHTML = '✅ Welcome to DarkWave!<br><small style="font-size: 12px;">Redirecting...</small>';
               
-              // Redirect to app
+              // Redirect to app - Admins/Owners go straight to dev dashboard
               setTimeout(() => {
-                if (authResult.user.accessLevel === 'admin') {
-                  window.location.href = '/admin';
+                if (authResult.user.accessLevel === 'admin' || authResult.user.accessLevel === 'owner') {
+                  window.location.href = '/app?tab=dev';
                 } else {
                   window.location.href = '/app';
                 }
@@ -813,9 +813,9 @@
           if (data.user.uniqueCode) {
             showUniqueCodeModal(data.user.uniqueCode, data.user.accessLevel);
           } else {
-            // Redirect immediately if no unique code
-            if (data.user.accessLevel === 'admin') {
-              window.location.href = '/admin';
+            // Redirect immediately if no unique code - Admins/Owners go to dev tab
+            if (data.user.accessLevel === 'admin' || data.user.accessLevel === 'owner') {
+              window.location.href = '/app?tab=dev';
             } else {
               window.location.href = '/app';
             }
@@ -851,7 +851,8 @@
             if (retryData.user.uniqueCode) {
               showUniqueCodeModal(retryData.user.uniqueCode, retryData.user.accessLevel);
             } else {
-              window.location.href = retryData.user.accessLevel === 'admin' ? '/admin' : '/app';
+              const isAdminOrOwner = retryData.user.accessLevel === 'admin' || retryData.user.accessLevel === 'owner';
+              window.location.href = isAdminOrOwner ? '/app?tab=dev' : '/app';
             }
             return;
           } else {
@@ -882,9 +883,9 @@
             console.log('✅ Valid session found! Auto-logging in...');
             localStorage.setItem('dwp_user', JSON.stringify(data.user));
             
-            // Redirect based on access level
-            const redirectUrl = data.user.accessLevel === 'admin' ? '/admin' : '/app';
-            window.location.href = redirectUrl;
+            // Redirect based on access level - Admins/Owners go to dev tab
+            const isAdminOrOwner = data.user.accessLevel === 'admin' || data.user.accessLevel === 'owner';
+            window.location.href = isAdminOrOwner ? '/app?tab=dev' : '/app';
             return true; // Session valid, redirecting
           }
         }
