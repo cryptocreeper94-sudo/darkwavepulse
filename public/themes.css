@@ -1,66 +1,66 @@
 /* Premium Theme Skins System - DarkWave Pulse V1 */
-/* GLASSMORPHISM EDITION - All themes use translucent pastel backgrounds */
+/* SOLID DARK EDITION - Black and dark gray backgrounds */
 
-/* Default Dark Theme - Cyan/Purple Glassmorphism */
+/* Default Dark Theme - Solid Black/Gray */
 :root, body.theme-dark {
-  /* Translucent Glassmorphism Backgrounds - NO SOLID BLACK */
-  --bg-primary: rgba(13, 40, 71, 0.3);
-  --bg-secondary: rgba(20, 50, 90, 0.4);
-  --bg-card: rgba(15, 45, 80, 0.35);
-  --bg-hover: rgba(30, 60, 100, 0.5);
-  --bg-tertiary: rgba(25, 55, 95, 0.35);
-  --border-color: rgba(143, 233, 255, 0.25);
+  /* Solid Dark Backgrounds */
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #1a1a1a;
+  --bg-hover: #2a2a2a;
+  --bg-tertiary: #141414;
+  --border-color: #333333;
   
-  /* Pastel Text Colors */
+  /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  --text-dim: rgba(255, 255, 255, 0.6);
+  --text-secondary: #b3b3b3;
+  --text-dim: #777777;
   
-  /* Accent Colors - Soft Cyan/Lavender */
-  --accent-blue: #8FE9FF;
-  --accent-glow: rgba(143, 233, 255, 0.4);
-  --accent-purple: #B9A7FF;
+  /* Accent Colors */
+  --accent-blue: #3861FB;
+  --accent-glow: #3861FB;
+  --accent-purple: #7C3AED;
   
-  /* Pastel Status Colors */
-  --positive-green: #A8F0C4;
-  --negative-red: #FFB8A9;
-  --warning-yellow: #FFE8A3;
-  --text-green: #A8F0C4;
-  --text-red: #FFB8A9;
+  /* Status Colors */
+  --positive-green: #00C853;
+  --negative-red: #ff4444;
+  --warning-yellow: #FFD700;
+  --text-green: #00C853;
+  --text-red: #ff4444;
   
-  /* Glassmorphism Tokens */
-  --glass-bg: rgba(15, 45, 80, 0.35);
-  --glass-border: rgba(143, 233, 255, 0.2);
-  --glass-glow: rgba(143, 233, 255, 0.15);
-  --glass-blur: 12px;
+  /* Dark Theme Tokens */
+  --glass-bg: #1a1a1a;
+  --glass-border: #333333;
+  --glass-glow: #3861FB;
+  --glass-blur: 0;
   
   /* Surface layers */
-  --surface-primary: rgba(13, 40, 71, 0.3);
-  --surface-elevated: rgba(20, 50, 90, 0.45);
-  --surface-overlay: rgba(15, 45, 80, 0.6);
+  --surface-primary: #0f0f0f;
+  --surface-elevated: #1a1a1a;
+  --surface-overlay: #1a1a1a;
   
   /* Button backgrounds */
-  --btn-primary: rgba(143, 233, 255, 0.2);
-  --btn-primary-hover: rgba(143, 233, 255, 0.35);
-  --btn-secondary: rgba(185, 167, 255, 0.2);
-  --btn-secondary-hover: rgba(185, 167, 255, 0.35);
+  --btn-primary: #1a1a1a;
+  --btn-primary-hover: #2a2a2a;
+  --btn-secondary: #222222;
+  --btn-secondary-hover: #333333;
 }
 
-/* Jupiter Theme - Orange/Coral Glassmorphism */
+/* Jupiter Theme - Orange/Coral Solid Dark */
 body.theme-jupiter {
-  --bg-primary: rgba(60, 30, 20, 0.3);
-  --bg-secondary: rgba(80, 40, 25, 0.4);
-  --bg-card: rgba(70, 35, 22, 0.35);
-  --bg-hover: rgba(100, 50, 30, 0.5);
-  --bg-tertiary: rgba(75, 38, 24, 0.35);
-  --border-color: rgba(255, 180, 140, 0.25);
+  --bg-primary: #1a1210;
+  --bg-secondary: #251810;
+  --bg-card: #201510;
+  --bg-hover: #352518;
+  --bg-tertiary: #1d1310;
+  --border-color: #4a3020;
   
   --text-primary: #fff5f0;
-  --text-secondary: rgba(255, 220, 200, 0.9);
-  --text-dim: rgba(255, 200, 170, 0.7);
+  --text-secondary: #d4a080;
+  --text-dim: #9a7050;
   
   --accent-blue: #FFB899;
-  --accent-glow: rgba(255, 140, 100, 0.4);
+  --accent-glow: #FF9966;
   --accent-purple: #FF9966;
   
   --positive-green: #FFCC99;
@@ -69,35 +69,35 @@ body.theme-jupiter {
   --text-green: #FFCC99;
   --text-red: #FF8866;
   
-  --glass-bg: rgba(70, 35, 22, 0.35);
-  --glass-border: rgba(255, 180, 140, 0.2);
-  --glass-glow: rgba(255, 140, 100, 0.15);
+  --glass-bg: #201510;
+  --glass-border: #4a3020;
+  --glass-glow: #FF9966;
   
-  --surface-primary: rgba(60, 30, 20, 0.3);
-  --surface-elevated: rgba(80, 40, 25, 0.45);
-  --surface-overlay: rgba(70, 35, 22, 0.6);
+  --surface-primary: #1a1210;
+  --surface-elevated: #251810;
+  --surface-overlay: #201510;
   
-  --btn-primary: rgba(255, 140, 100, 0.25);
-  --btn-primary-hover: rgba(255, 140, 100, 0.4);
-  --btn-secondary: rgba(255, 180, 140, 0.2);
-  --btn-secondary-hover: rgba(255, 180, 140, 0.35);
+  --btn-primary: #251810;
+  --btn-primary-hover: #352518;
+  --btn-secondary: #2a1c12;
+  --btn-secondary-hover: #3a2518;
 }
 
-/* Pink Blossom Theme - Sakura/Rose Glassmorphism */
+/* Pink Blossom Theme - Sakura/Rose Solid Dark */
 body.theme-pink-blossom {
-  --bg-primary: rgba(60, 25, 50, 0.3);
-  --bg-secondary: rgba(80, 35, 65, 0.4);
-  --bg-card: rgba(70, 30, 55, 0.35);
-  --bg-hover: rgba(100, 45, 80, 0.5);
-  --bg-tertiary: rgba(75, 32, 60, 0.35);
-  --border-color: rgba(255, 180, 210, 0.25);
+  --bg-primary: #1a1018;
+  --bg-secondary: #251520;
+  --bg-card: #20121a;
+  --bg-hover: #352028;
+  --bg-tertiary: #1d1118;
+  --border-color: #4a2535;
   
   --text-primary: #fff0f8;
-  --text-secondary: rgba(255, 210, 230, 0.9);
-  --text-dim: rgba(255, 180, 210, 0.7);
+  --text-secondary: #d4a0b8;
+  --text-dim: #9a6080;
   
   --accent-blue: #FFB3D9;
-  --accent-glow: rgba(255, 150, 200, 0.4);
+  --accent-glow: #FF99CC;
   --accent-purple: #FF99CC;
   
   --positive-green: #FFCCE0;
@@ -106,23 +106,23 @@ body.theme-pink-blossom {
   --text-green: #FFCCE0;
   --text-red: #FF88B0;
   
-  --glass-bg: rgba(70, 30, 55, 0.35);
-  --glass-border: rgba(255, 180, 210, 0.2);
-  --glass-glow: rgba(255, 150, 200, 0.15);
+  --glass-bg: #20121a;
+  --glass-border: #4a2535;
+  --glass-glow: #FF99CC;
   
-  --surface-primary: rgba(60, 25, 50, 0.3);
-  --surface-elevated: rgba(80, 35, 65, 0.45);
-  --surface-overlay: rgba(70, 30, 55, 0.6);
+  --surface-primary: #1a1018;
+  --surface-elevated: #251520;
+  --surface-overlay: #20121a;
   
-  --btn-primary: rgba(255, 150, 200, 0.25);
-  --btn-primary-hover: rgba(255, 150, 200, 0.4);
-  --btn-secondary: rgba(255, 180, 210, 0.2);
-  --btn-secondary-hover: rgba(255, 180, 210, 0.35);
+  --btn-primary: #251520;
+  --btn-primary-hover: #352028;
+  --btn-secondary: #2a1820;
+  --btn-secondary-hover: #3a2028;
 }
 
-/* Sunny Field Theme - Golden/Warm Glassmorphism */
+/* Sunny Field Theme - Golden/Warm Solid Dark */
 body.theme-sunny-field {
-  --bg-primary: rgba(60, 50, 20, 0.3);
+  --bg-primary: #1a1810;
   --bg-secondary: rgba(80, 65, 30, 0.4);
   --bg-card: rgba(70, 55, 25, 0.35);
   --bg-hover: rgba(100, 80, 40, 0.5);
