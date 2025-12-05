@@ -15072,7 +15072,7 @@ body[class*="theme-"]::before {
   border-color: rgba(143, 233, 255, 0.4) !important;
 }
 
-/* All boxes, cards, panels, sections */
+/* All boxes, cards, panels, sections - semi-transparent dark for readability */
 .section-box,
 .web3-search-section,
 .search-box,
@@ -15097,16 +15097,34 @@ body[class*="theme-"]::before {
 .portfolio-section,
 .staking-section,
 .settings-section,
-.coin-row,
 .table-container,
 .data-table {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: rgba(10, 25, 50, 0.4) !important;
+  background-color: rgba(10, 25, 50, 0.4) !important;
   background-image: none !important;
-  border: 1px solid rgba(143, 233, 255, 0.2) !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1), 0 0 15px rgba(143, 233, 255, 0.1) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(143, 233, 255, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 0 15px rgba(143, 233, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* Table rows - subtle alternating */
+.coin-row,
+.stock-row,
+.project-row {
+  background: rgba(10, 25, 50, 0.25) !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(143, 233, 255, 0.1) !important;
+}
+
+.coin-row:nth-child(even),
+.stock-row:nth-child(even) {
+  background: rgba(10, 25, 50, 0.35) !important;
+}
+
+.coin-row:hover,
+.stock-row:hover {
+  background: rgba(143, 233, 255, 0.15) !important;
 }
 
 /* Modal overrides - Legacy Founder popup and all modals */
@@ -15168,29 +15186,25 @@ body[class*="theme-"]::before {
   background-color: transparent !important;
 }
 
-/* Table rows */
+/* Table structure */
 table,
 thead,
-tbody,
+tbody {
+  background: transparent !important;
+}
+
 tr,
 th,
-td,
-.coin-row,
-.stock-row,
-.project-row {
-  background: transparent !important;
-  background-color: transparent !important;
+td {
+  background: rgba(10, 25, 50, 0.2) !important;
 }
 
-/* Alternating row colors - very subtle */
-tr:nth-child(even),
-.coin-row:nth-child(even) {
-  background: rgba(143, 233, 255, 0.03) !important;
+tr:nth-child(even) {
+  background: rgba(10, 25, 50, 0.3) !important;
 }
 
-tr:hover,
-.coin-row:hover {
-  background: rgba(143, 233, 255, 0.08) !important;
+tr:hover {
+  background: rgba(143, 233, 255, 0.12) !important;
 }
 
 /* Dropdown menus */
