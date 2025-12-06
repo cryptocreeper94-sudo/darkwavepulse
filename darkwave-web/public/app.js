@@ -1600,14 +1600,15 @@ function setupMacroChartTouchHandlers() {
   });
 }
 
-// Sparkline Color Settings
+// Sparkline Color Settings - Neon Palette
 const sparklineColorPresets = {
-  purple: { lineColor: '#8338EC', topColor: 'rgba(131, 56, 236, 0.4)', bottomColor: 'rgba(131, 56, 236, 0)' },
-  blue: { lineColor: '#3B82F6', topColor: 'rgba(59, 130, 246, 0.4)', bottomColor: 'rgba(59, 130, 246, 0)' },
-  green: { lineColor: '#10B981', topColor: 'rgba(16, 185, 129, 0.4)', bottomColor: 'rgba(16, 185, 129, 0)' },
-  red: { lineColor: '#EF4444', topColor: 'rgba(239, 68, 68, 0.4)', bottomColor: 'rgba(239, 68, 68, 0)' },
+  neonBlue: { lineColor: '#00D4FF', topColor: 'rgba(0, 212, 255, 0.4)', bottomColor: 'rgba(0, 212, 255, 0)' },
+  neonPurple: { lineColor: '#9D4EDD', topColor: 'rgba(157, 78, 221, 0.4)', bottomColor: 'rgba(157, 78, 221, 0)' },
+  neonPink: { lineColor: '#FF006E', topColor: 'rgba(255, 0, 110, 0.4)', bottomColor: 'rgba(255, 0, 110, 0)' },
+  neonGreen: { lineColor: '#39FF14', topColor: 'rgba(57, 255, 20, 0.4)', bottomColor: 'rgba(57, 255, 20, 0)' },
   orange: { lineColor: '#F59E0B', topColor: 'rgba(245, 158, 11, 0.4)', bottomColor: 'rgba(245, 158, 11, 0)' },
-  pink: { lineColor: '#EC4899', topColor: 'rgba(236, 72, 153, 0.4)', bottomColor: 'rgba(236, 72, 153, 0)' }
+  red: { lineColor: '#EF4444', topColor: 'rgba(239, 68, 68, 0.4)', bottomColor: 'rgba(239, 68, 68, 0)' },
+  white: { lineColor: '#FFFFFF', topColor: 'rgba(255, 255, 255, 0.25)', bottomColor: 'rgba(255, 255, 255, 0)' }
 };
 
 function toggleColorSettings() {
@@ -1644,7 +1645,7 @@ function applySparklineColor(colorName) {
 
 // Apply saved color on load
 function applySavedSparklineColor() {
-  const savedColor = localStorage.getItem('sparklineColor') || 'pink';
+  const savedColor = localStorage.getItem('sparklineColor') || 'neonGreen';
   applySparklineColor(savedColor);
   setupMacroChartTouchHandlers();
 }
