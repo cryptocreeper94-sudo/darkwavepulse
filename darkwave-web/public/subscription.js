@@ -53,12 +53,12 @@ async function loadSubscriptionStatus() {
     } else if (tier === 'base') {
       currentTierDisplay.innerHTML = '💎 LEGACY FOUNDER - BETA V1';
       currentTierDisplay.style.color = '#10b981';
-      subscriptionDetails.innerHTML = `∞ Unlimited searches • $4/month • 35,000 PULSE tokens Dec 25!`;
+      subscriptionDetails.innerHTML = `∞ Unlimited searches • $4/month • 35,000 DWAV tokens Feb 14!`;
       if (cancelButton) cancelButton.style.display = 'block';
     } else if (tier === 'premium') {
       currentTierDisplay.innerHTML = '💎 LEGACY FOUNDER - BETA V1';
       currentTierDisplay.style.color = '#10b981';
-      subscriptionDetails.innerHTML = '∞ Unlimited searches • $4/month • 35,000 PULSE tokens Dec 25!';
+      subscriptionDetails.innerHTML = '∞ Unlimited searches • $4/month • 35,000 DWAV tokens Feb 14!';
       if (cancelButton) cancelButton.style.display = 'block';
     } else if (tier === 'expired_trial') {
       currentTierDisplay.innerHTML = '❌ TRIAL EXPIRED';
@@ -94,7 +94,7 @@ async function upgradeBase() {
       return;
     }
     
-    const confirmMessage = '💳 Base Subscription\n\n$4/month recurring:\n\n✅ Unlimited searches\n✅ All premium features\n\n❌ No PULSE token rewards\n❌ No lifetime access (recurring monthly)\n\nContinue?';
+    const confirmMessage = '💳 Base Subscription\n\n$4/month recurring:\n\n✅ Unlimited searches\n✅ All premium features\n\n❌ No DWAV token rewards\n❌ No lifetime access (recurring monthly)\n\nContinue?';
     
     if (!confirm(confirmMessage)) {
       return;
@@ -148,7 +148,7 @@ async function upgradeLegacyFounder() {
       return;
     }
     
-    const confirmMessage = '💎 Become a Legacy Founder?\n\n$24 one-time payment for:\n\n✅ 6 months guaranteed access\n✅ FREE lifetime access after\n✅ 35,000 PULSE tokens (Dec 25)\n✅ Unlimited searches\n✅ All premium features\n\n⏰ Offer closes Dec 25, 2025!';
+    const confirmMessage = '💎 Become a Legacy Founder?\n\n$24 one-time payment for:\n\n✅ 6 months guaranteed access\n✅ FREE lifetime access after\n✅ 35,000 DWAV tokens (Feb 14)\n✅ Unlimited searches\n✅ All premium features\n\n⏰ Offer closes Feb 14, 2026!';
     
     if (!confirm(confirmMessage)) {
       return;
@@ -201,7 +201,7 @@ async function upgradeAnnual() {
       return;
     }
     
-    const confirmMessage = '💳 Annual Subscription\n\n$80/year recurring:\n\n✅ Unlimited searches\n✅ All premium features\n✅ Save $16/year (2 months free)\n\n❌ No PULSE token rewards\n\nContinue?';
+    const confirmMessage = '💳 Annual Subscription\n\n$80/year recurring:\n\n✅ Unlimited searches\n✅ All premium features\n✅ Save $16/year (2 months free)\n\n❌ No DWAV token rewards\n\nContinue?';
     
     if (!confirm(confirmMessage)) {
       return;
@@ -293,7 +293,7 @@ async function upgradeToStripe(tier) {
       return;
     }
     
-    const confirmMessage = 'Become a Legacy Founder for $4/month?\n\n✅ Unlimited searches\n✅ All premium features\n✅ Knowledge Base + Glossary\n✅ Market cycle predictions\n✅ 35,000 PULSE tokens\n✅ FREE lifetime access after 6 months\n✅ $4 rate locked FOREVER';
+    const confirmMessage = 'Become a Legacy Founder for $4/month?\n\n✅ Unlimited searches\n✅ All premium features\n✅ Knowledge Base + Glossary\n✅ Market cycle predictions\n✅ 35,000 DWAV tokens\n✅ FREE lifetime access after 6 months\n✅ $4 rate locked FOREVER';
     
     if (!confirm(confirmMessage)) {
       return;
@@ -550,7 +550,7 @@ async function upgradeLegacyFounderCrypto() {
       return;
     }
     
-    const confirmMessage = '₿ Pay $24 with Crypto\n\nLegacy Founder (6 months + lifetime):\n• 35,000 PULSE tokens (Dec 25)\n• FREE lifetime access after 6 months\n• All premium features\n\nAccepted: BTC, ETH, SOL, USDC, USDT\n\nContinue?';
+    const confirmMessage = '₿ Pay $24 with Crypto\n\nLegacy Founder (6 months + lifetime):\n• 35,000 DWAV tokens (Feb 14)\n• FREE lifetime access after 6 months\n• All premium features\n\nAccepted: BTC, ETH, SOL, USDC, USDT\n\nContinue?';
     
     if (!confirm(confirmMessage)) {
       return;

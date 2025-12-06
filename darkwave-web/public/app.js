@@ -281,7 +281,7 @@ function unlockStakingPreview() {
     // Populate with mock data
     document.getElementById('dashTotalStaked').textContent = '25,000 PULSE';
     document.getElementById('dashTotalStakedUSD').textContent = '$12,500.00';
-    document.getElementById('dashActiveSince').textContent = 'Dec 25, 2025';
+    document.getElementById('dashActiveSince').textContent = 'Feb 14, 2026';
     document.getElementById('dashDaysActive').textContent = '45 days';
     document.getElementById('dashLockPeriod').textContent = '60 Days';
     document.getElementById('dashTimeRemaining').textContent = '15 days left';
@@ -365,11 +365,11 @@ function openStakingFeaturePopup(feature) {
       title: '🌐 Multi-Token Platform (100+ Tokens)',
       content: `
         <p><strong>ONE Platform. UNLIMITED Tokens.</strong></p>
-        <p>Stake <strong>any</strong> token and earn <strong>PULSE rewards</strong>:</p>
+        <p>Stake <strong>any</strong> token and earn <strong>DWAV rewards</strong>:</p>
         <div style="background: rgba(56, 97, 251, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
           <h4 style="color: #3861FB; margin: 0 0 10px 0;">Supported Tokens:</h4>
           <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li><strong>PULSE</strong> - Native DarkWave token (highest APY)</li>
+            <li><strong>DWAV</strong> - Native DarkWave Studios token (highest APY)</li>
             <li><strong>SOL, BTC, ETH</strong> - Major cryptocurrencies</li>
             <li><strong>USDC, USDT</strong> - Stablecoins for safe yields</li>
             <li><strong>Community Tokens</strong> - 100+ verified projects</li>
@@ -516,15 +516,15 @@ function refreshStakingDashboard() {
 }
 
 function openStakeMoreModal() {
-  alert('Stake More feature coming with V2 launch on Dec 25, 2025');
+  alert('Stake More feature coming with V2 launch on Feb 14, 2026');
 }
 
 function openUnstakeModal() {
-  alert('Unstake feature coming with V2 launch on Dec 25, 2025');
+  alert('Unstake feature coming with V2 launch on Feb 14, 2026');
 }
 
 function claimRewards() {
-  alert('Claim Rewards feature coming with V2 launch on Dec 25, 2025');
+  alert('Claim Rewards feature coming with V2 launch on Feb 14, 2026');
 }
 
 function toggleAutoCompound() {
@@ -544,7 +544,7 @@ function toggleAutoCompound() {
 }
 
 function openSwitchPoolModal() {
-  alert('Switch Pool feature coming with V2 launch on Dec 25, 2025');
+  alert('Switch Pool feature coming with V2 launch on Feb 14, 2026');
 }
 
 function openWinDetailPopup(type) {
@@ -589,10 +589,10 @@ function openWinDetailPopup(type) {
     community: {
       title: '100 COMMUNITY TOKENS - ONE PLATFORM',
       content: `
-        <p><strong>The Netflix model for staking:</strong> DarkWave isn't just for PULSE. We're building the ecosystem where ANY crypto project can launch staking pools.</p>
+        <p><strong>The Netflix model for staking:</strong> DarkWave isn't just for DWAV. We're building the ecosystem where ANY crypto project can launch staking pools.</p>
         <p class="highlight">How it works:</p>
         <ul>
-          <li>PULSE is the native token (stake for highest APY)</li>
+          <li>DWAV is the native token (stake for highest APY)</li>
           <li>Partner projects can create their own pools (e.g., stake $MEME coin, earn $MEME rewards)</li>
           <li>One dashboard tracks everything (no juggling 20 different platforms)</li>
         </ul>
@@ -657,7 +657,7 @@ const featureDetails = {
       
       <p><strong>Fixed 1 Billion supply means scarcity works in your favor.</strong> No infinite minting. No team dumps. 30% of subscription revenue funds the hourly reward pool, creating sustainable passive income for holders. Multi-tier benefits unlock as you stake more: exclusive avatars, priority support, governance voting power, and early access to partner token launches. This is what utility looks like—real benefits tied to real revenue.</p>
       
-      <p><strong>The bottom line:</strong> DWAV combines the viral appeal of meme coins with institutional-grade tokenomics. We're launching on Solana for lightning-fast transactions and pennies in fees, then expanding to Ethereum, Polygon, and BSC to capture every major chain. Join the revolution that treats holders like owners, not exit liquidity. December 25th, 2025. Be there.</p>
+      <p><strong>The bottom line:</strong> DWAV combines the viral appeal of meme coins with institutional-grade tokenomics. We're launching on Solana for lightning-fast transactions and pennies in fees, then expanding to Ethereum, Polygon, and BSC to capture every major chain. Join the revolution that treats holders like owners, not exit liquidity. February 14th, 2026. Be there.</p>
     `
   },
   staking: {
@@ -670,20 +670,20 @@ const featureDetails = {
       
       <p><strong>Here's why this destroys the competition:</strong> Other tokens promise big APYs but pay monthly (or never). We pay hourly, so your rewards auto-compound 720 times per month instead of once. The math is insane—50% APY compounded hourly beats 50% compounded monthly by a landslide. Plus, we're backed by real platform revenue (30% of subscription fees), not thin-air token printing.</p>
       
-      <p><strong>Bonus perks for stakers:</strong> Lock 10k+ DWAV tokens and unlock exclusive community badges, priority customer support, early access to partner token pools, and governance voting rights. This isn't just yield farming—it's joining an elite club of holders who actually get rewarded for their loyalty. Launch day: December 25th, 2025. Founders' pools fill up fast.</p>
+      <p><strong>Bonus perks for stakers:</strong> Lock 10k+ DWAV tokens and unlock exclusive community badges, priority customer support, early access to partner token pools, and governance voting rights. This isn't just yield farming—it's joining an elite club of holders who actually get rewarded for their loyalty. Launch day: February 14th, 2026. Founders' pools fill up fast.</p>
     `
   },
   airdrops: {
     icon: '🎁',
     title: 'Subscriber Airdrops — Loyalty Pays Literally',
     content: `
-      <p><strong>Airdrops shouldn't be random giveaways to bots and farmers.</strong> DarkWave Pulse rewards REAL users—the subscribers who believed in us early and stuck around. If you're subscribed to Beta V1 Legacy Founder tier before December 25th, 2025, you're getting PULSE tokens for free. No hoops, no referral pyramids, just pure appreciation for being early.</p>
+      <p><strong>Airdrops shouldn't be random giveaways to bots and farmers.</strong> DarkWave Pulse rewards REAL users—the subscribers who believed in us early and stuck around. If you're subscribed to Beta V1 Legacy Founder tier before February 14th, 2026, you're getting DWAV tokens for free. No hoops, no referral pyramids, just pure appreciation for being early.</p>
       
-      <p><strong>How it works:</strong> Every Legacy Founder ($4/month) receives 27,000-35,000 PULSE tokens after 6 months of subscription. That's instant equity in the ecosystem—tokens you can stake, hold for appreciation, or trade. At launch prices, that's thousands of dollars in free value for users who believed in us early.</p>
+      <p><strong>How it works:</strong> Every Legacy Founder ($4/month) receives 27,000-35,000 DWAV tokens after 6 months of subscription. That's instant equity in the ecosystem—tokens you can stake, hold for appreciation, or trade. At launch prices, that's thousands of dollars in free value for users who believed in us early.</p>
       
       <p><strong>Why this matters:</strong> Most projects airdrop to wallet addresses that vanish overnight. We're airdropping to engaged community members who actually use the platform. This creates a decentralized holder base of real people, not whales and bots. And because you're already using DarkWave Pulse for trading signals, you'll know exactly when to hold and when to take profits. It's insider info, legally.</p>
       
-      <p><strong>Future airdrops planned:</strong> Partner token launches will prioritize DarkWave subscribers. When we onboard the next Bonk or Pepe to our multi-token staking platform, subscribers get first dibs on their airdrops too. This is recurring value, not a one-time gimmick. Subscribe now, earn forever. Launch: December 25th, 2025. The clock is ticking.</p>
+      <p><strong>Future airdrops planned:</strong> Partner token launches will prioritize DarkWave subscribers. When we onboard the next Bonk or Pepe to our multi-token staking platform, subscribers get first dibs on their airdrops too. This is recurring value, not a one-time gimmick. Subscribe now, earn forever. Launch: February 14th, 2026. The clock is ticking.</p>
       
       <div style="margin-top: 24px; text-align: center;">
         <button onclick="closeFeatureDetail(); window.showPricingModal();" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px 32px; border-radius: 8px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);">
@@ -713,7 +713,7 @@ const featureDetails = {
       
       <p><strong>DWAV Holder Perks:</strong> Stake 10k+ DWAV tokens and unlock advanced customization features like animated effects, holographic borders, and AR-enabled 3D renders. Stake 50k+ DWAV? Get priority access to our artist commission queue for fully custom 1-of-1 designs. Your avatar becomes a living status symbol that evolves with your commitment to the platform.</p>
       
-      <p><strong>Future Utility:</strong> Avatars will unlock token-gated Discord channels, priority support, early beta access, and exclusive partner platform perks. Think American Express Black Card benefits, but for crypto. Other platforms treat avatars as throwaway cosmetics. We're building a digital identity system that compounds value over time. Launch: December 25th, 2025. Upload yours on day one.</p>
+      <p><strong>Future Utility:</strong> Avatars will unlock token-gated Discord channels, priority support, early beta access, and exclusive partner platform perks. Think American Express Black Card benefits, but for crypto. Other platforms treat avatars as throwaway cosmetics. We're building a digital identity system that compounds value over time. Launch: February 14th, 2026. Upload yours on day one.</p>
     `
   },
   platform: {
@@ -726,7 +726,7 @@ const featureDetails = {
       
       <p><strong>Revenue-backed sustainability:</strong> Unlike Ponzi staking platforms that print tokens out of thin air, our multi-token pools are funded by platform fees from DarkWave Pulse subscriptions AND staking fees from partner tokens. This creates a diversified revenue stream that doesn't rely on infinite new users. We're building for the long haul, not the pump-and-dump.</p>
       
-      <p><strong>Partner token benefits:</strong> New projects launching their tokens? They can apply to launch a staking pool on DarkWave, instantly accessing our community of engaged traders. We curate the best projects, reject the rugs, and give YOU access to early-stage opportunities with institutional-grade infrastructure. It's like Y Combinator for meme coins, and DWAV holders get first-class seats. Launch: December 25th, 2025. First 100 partner tokens will be absolute gems.</p>
+      <p><strong>Partner token benefits:</strong> New projects launching their tokens? They can apply to launch a staking pool on DarkWave, instantly accessing our community of engaged traders. We curate the best projects, reject the rugs, and give YOU access to early-stage opportunities with institutional-grade infrastructure. It's like Y Combinator for meme coins, and DWAV holders get first-class seats. Launch: February 14th, 2026. First 100 partner tokens will be absolute gems.</p>
     `
   },
   multichain: {
@@ -739,7 +739,7 @@ const featureDetails = {
       
       <p><strong>Liquidity strategy:</strong> We're launching liquidity pools on all major DEXs—Raydium (Solana), Uniswap (Ethereum), QuickSwap (Polygon), PancakeSwap (BSC). This creates deep, fragmented liquidity that's harder for whales to manipulate. No single exchange can rug you. No single chain can kill the project. True decentralization through multi-chain presence.</p>
       
-      <p><strong>Future-proof tokenomics:</strong> As new Layer 1s and Layer 2s emerge (Sui, Aptos, Base, etc.), we'll expand there too. DarkWave isn't married to one blockchain—we go wherever the users are. This flexibility ensures longevity while other projects fade into irrelevance on dying chains. We're building the Coca-Cola of crypto: available everywhere, trusted by everyone. Launch: Solana first on December 25th, 2025. Other chains follow in Q1 2026.</p>
+      <p><strong>Future-proof tokenomics:</strong> As new Layer 1s and Layer 2s emerge (Sui, Aptos, Base, etc.), we'll expand there too. DarkWave isn't married to one blockchain—we go wherever the users are. This flexibility ensures longevity while other projects fade into irrelevance on dying chains. We're building the Coca-Cola of crypto: available everywhere, trusted by everyone. Launch: Solana first on February 14th, 2026. Other chains follow in Q1 2026.</p>
     `
   },
   filters: {
@@ -752,7 +752,7 @@ const featureDetails = {
       
       <p><strong>Blockchain badge system:</strong> Each coin displays its chain (SOL/ETH/POLY/BSC/MULTI) with color-coded gradient badges. This instant visual clarity helps you spot cross-chain opportunities and avoid ecosystem confusion. We even pull live data from CoinGecko's API, so you're always seeing real-time rankings and price changes. No stale data. No guesswork.</p>
       
-      <p><strong>V2 exclusive access:</strong> Right now, only VIP beta testers can use this feature. On December 25th, 2025, it goes live for ALL subscribers (BASE and TOP tier). Trial users will see a subscription gate encouraging upgrade. This is how we reward early believers while keeping the platform financially sustainable. Try it today if you're a VIP beta tester. If not, subscribe now and lock in your V2 beta access before launch. The future of crypto research is already here.</p>
+      <p><strong>V2 exclusive access:</strong> Right now, only VIP beta testers can use this feature. On February 14th, 2026, it goes live for ALL subscribers (BASE and TOP tier). Trial users will see a subscription gate encouraging upgrade. This is how we reward early believers while keeping the platform financially sustainable. Try it today if you're a VIP beta tester. If not, subscribe now and lock in your V2 beta access before launch. The future of crypto research is already here.</p>
     `
   },
   mobileapps: {
@@ -774,24 +774,24 @@ const featureDetails = {
   },
   earlybird: {
     icon: '💎',
-    title: 'Legacy Founder Program — Lock In $4/Month + 35K PULSE Tokens Before Dec 25',
+    title: 'Legacy Founder Program — Lock In $4/Month + 35K DWAV Tokens Before Feb 14',
     content: `
-      <p><strong>This is NOT a permanent price.</strong> DarkWave Pulse Beta V1 is $4/month—less than a single coffee—but this is strictly an early adopter reward. On December 26, 2025, pricing DOUBLES to $8/month with NO token rewards. And pricing will continue rising to $20/month as we add features. Subscribe NOW and lock in $4/month FOREVER + earn FREE lifetime access after 6 months.</p>
+      <p><strong>This is NOT a permanent price.</strong> DarkWave Pulse Beta V1 is $4/month—less than a single coffee—but this is strictly an early adopter reward. On February 15, 2026, pricing DOUBLES to $8/month with NO token rewards. And pricing will continue rising to $20/month as we add features. Subscribe NOW and lock in $4/month FOREVER + earn FREE lifetime access after 6 months.</p>
       
-      <p><strong>Why we're doing this:</strong> Early believers take the biggest risk. You're joining when the platform is in Beta V1, helping us test and improve. You deserve to be rewarded with pricing that never increases AND massive PULSE token rewards. This isn't a "first month discount"—this is permanent grandfathered pricing for life PLUS 27,000-35,000 PULSE tokens worth thousands at launch.</p>
+      <p><strong>Why we're doing this:</strong> Early believers take the biggest risk. You're joining when the platform is in Beta V1, helping us test and improve. You deserve to be rewarded with pricing that never increases AND massive DWAV token rewards. This isn't a "first month discount"—this is permanent grandfathered pricing for life PLUS 27,000-35,000 DWAV tokens worth thousands at launch.</p>
       
       <p><strong>The pricing jump (don't miss this):</strong></p>
       <ul style="font-size: 14px; line-height: 1.8; margin: 10px 0; padding-left: 20px;">
-        <li><strong>NOW - Dec 25, 2025:</strong> $4/month + 35K PULSE tokens + lifetime access (first 10,000 only)</li>
-        <li><strong>V2 Launch (Dec 26+):</strong> $8/month — NO token rewards, NO lifetime access</li>
+        <li><strong>NOW - Feb 14, 2026:</strong> $4/month + 35K DWAV tokens + lifetime access (first 10,000 only)</li>
+        <li><strong>V2 Launch (Feb 15+):</strong> $8/month — NO token rewards, NO lifetime access</li>
         <li><strong>Future Versions:</strong> Pricing continues rising to $20/month as features expand</li>
       </ul>
       
-      <p><strong>What you get as Legacy Founder:</strong> Unlimited crypto & stock analysis, TradingView charts, all technical indicators (RSI, MACD, EMA, Golden/Death Cross), AI-powered Crypto Cat commentary, 143-term glossary, 8-chapter Knowledge Base, portfolio tracking, V2 category filters, staking dashboard, AND 35,000 PULSE tokens at launch. Future users will pay $20/month for the SAME features without ANY tokens.</p>
+      <p><strong>What you get as Legacy Founder:</strong> Unlimited crypto & stock analysis, TradingView charts, all technical indicators (RSI, MACD, EMA, Golden/Death Cross), AI-powered Crypto Cat commentary, 143-term glossary, 8-chapter Knowledge Base, portfolio tracking, V2 category filters, staking dashboard, AND 35,000 DWAV tokens at launch. Future users will pay $20/month for the SAME features without ANY tokens.</p>
       
       <p><strong>Save 50% vs V2 pricing, 70% vs future pricing:</strong> TradingView Pro costs $15/month. CoinMarketCap Diamond is $33/month. Crypto.com's advanced tier is $25/month. DarkWave Pulse at $4/month is absurdly underpriced—but only for the first 10,000 Legacy Founders who believed before V2 launch.</p>
       
-      <p><strong>Lifetime lock guarantee:</strong> Your $4 rate NEVER increases. Not when V3 launches. Not when mobile apps drop. Not when we hit 100,000 users paying $20/month. You're locked at $4 forever PLUS you go completely FREE after 6 months. This is how we reward our founding believers. Deadline: December 25th, 2025. Miss it, pay double (or more).</p>
+      <p><strong>Lifetime lock guarantee:</strong> Your $4 rate NEVER increases. Not when V3 launches. Not when mobile apps drop. Not when we hit 100,000 users paying $20/month. You're locked at $4 forever PLUS you go completely FREE after 6 months. This is how we reward our founding believers. Deadline: February 14th, 2026. Miss it, pay double (or more).</p>
     `
   }
 };
@@ -4932,10 +4932,10 @@ function openComingSoonPopup(projectId) {
       name: "DarkWave Coin",
       ticker: "DWAV",
       image: "/darkwave-coin.png",
-      description: "🚀 THE MOST REVOLUTIONARY ECOSYSTEM TOKEN IN CRYPTO HISTORY. DarkWave Coin isn't just another token - it's the Netflix of decentralized finance, the iPhone of Web3, and the greatest innovation since Bitcoin itself. This isn't hype. This is the future of sustainable, revenue-backed tokenomics. While other meme coins pump and dump with zero utility, DWAV delivers REAL hourly rewards funded by REAL platform revenue. Staking that actually pays. Airdrops that reward loyalty. A multi-token platform that lets YOU earn passive income from ANY coin you love. This is what crypto was always meant to be - and it launches Christmas Day 2025. The revolution starts here. 🎄⚡",
-      launchDate: "December 25th, 2025",
+      description: "🚀 THE MOST REVOLUTIONARY ECOSYSTEM TOKEN IN CRYPTO HISTORY. DarkWave Coin isn't just another token - it's the Netflix of decentralized finance, the iPhone of Web3, and the greatest innovation since Bitcoin itself. This isn't hype. This is the future of sustainable, revenue-backed tokenomics. While other meme coins pump and dump with zero utility, DWAV delivers REAL hourly rewards funded by REAL platform revenue. Staking that actually pays. Airdrops that reward loyalty. A multi-token platform that lets YOU earn passive income from ANY coin you love. This is what crypto was always meant to be - and it launches February 14th, 2026. The revolution starts here. 💝⚡",
+      launchDate: "February 14th, 2026",
       details: [
-        "🎄 Christmas Day 2025 launch - The gift that keeps giving",
+        "💝 Valentine's Day 2026 launch - Fall in love with DWAV",
         "💎 1 Billion total supply - Deflationary & scarce",
         "⚡ HOURLY staking rewards - Not monthly, not daily, HOURLY",
         "🏆 Multi-token staking platform - Earn passive income from ANY coin",
@@ -5316,7 +5316,7 @@ function showV2FeatureLock(featureName, description) {
       </div>
       
       <div class="v2-lock-launch">
-        <p class="v2-lock-date">🎄 LAUNCHING DECEMBER 25TH, 2025 🎄</p>
+        <p class="v2-lock-date">💝 LAUNCHING FEBRUARY 14TH, 2026 💝</p>
         <p class="v2-lock-upgrade-text">Subscribe now to unlock V2 features on launch day!</p>
       </div>
       
@@ -5676,7 +5676,7 @@ function displayDarkWaveSection(dwavToken) {
 
 // Show coming soon modal for V2 features
 function showComingSoon(featureName) {
-  alert(`${featureName} is coming in Version 2!\n\nThis feature will be available after the DarkWave Coin launch on December 25th, 2025.`);
+  alert(`${featureName} is coming in Version 2!\n\nThis feature will be available after the DarkWave Coin launch on February 14th, 2026.`);
 }
 
 // Initialize Portfolio and Educational tabs when switching to them

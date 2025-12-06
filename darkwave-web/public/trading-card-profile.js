@@ -284,7 +284,7 @@ function initTradingCardProfile() {
         <div class="profile-footer">
           <p>🎴 DarkWave Pulse NFT Trading Card</p>
           <p>Limited Series #1 - Collectible Edition</p>
-          <p>December 25, 2025 Launch</p>
+          <p>February 14, 2026 Launch</p>
         </div>
 
         <div style="text-align: center; margin-top: 20px;">

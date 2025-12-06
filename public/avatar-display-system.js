@@ -326,7 +326,7 @@ const avatarDisplaySystem = {
   openAvatarBuilder() {
     const userData = window.userData || {};
     if (userData.accessLevel !== 'admin') {
-      alert('⚠️ Avatar Builder is locked until V2 release on December 25, 2025');
+      alert('⚠️ Avatar Builder is locked until V2 release on February 14, 2026');
       return;
     }
     

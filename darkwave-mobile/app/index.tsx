@@ -155,7 +155,7 @@ export default function HomeScreen() {
           <MenuItem icon="🚪" label="Logout" isLogout onPress={toggleMenu} />
           
           <View style={styles.menuFooter}>
-            <Text style={styles.menuFooterText}>Beta V1 - Founders Launch Dec 25</Text>
+            <Text style={styles.menuFooterText}>Beta V1 - DWAV Launch Feb 14, 2026</Text>
           </View>
         </View>
       </Animated.View>

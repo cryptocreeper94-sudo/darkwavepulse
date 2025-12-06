@@ -1,4 +1,4 @@
-// V2 Feature Lock System - Controls locked features until V2 launch (Dec 25)
+// V2 Feature Lock System - Controls locked features until V2 launch (Feb 14)
 console.log('✅ V2 Feature Lock system loaded');
 
 // Feature lock configuration
@@ -68,7 +68,7 @@ function showV2LockModal(featureId) {
           <div class="countdown-number">${daysLeft}</div>
           <div class="countdown-label">days until launch</div>
         </div>
-        <p class="v2-launch-date">Founders Launch - Dec 25</p>
+        <p class="v2-launch-date">February 14, 2026</p>
       </div>
       <div class="v2-lock-footer">
         <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">V2 features will be fully accessible to all users</p>
