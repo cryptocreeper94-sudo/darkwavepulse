@@ -58,7 +58,7 @@ function drawRegularNeedle(ctx, centerX, centerY, radius, angle, needleLength) {
   ctx.fill();
   
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = '#3861FB';
+  ctx.strokeStyle = '#00D4FF';
   ctx.lineWidth = 3;
   ctx.stroke();
   
@@ -127,7 +127,7 @@ function drawFearGreedGauge(canvasId, value, options = {}) {
     // Draw center circle only for regular needle
     ctx.beginPath();
     ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
-    ctx.fillStyle = '#3861FB';
+    ctx.fillStyle = '#00D4FF';
     ctx.fill();
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;

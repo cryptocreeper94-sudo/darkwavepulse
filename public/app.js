@@ -349,7 +349,7 @@ function openStakingFeaturePopup(feature) {
             <div style="font-weight: 700; margin-bottom: 4px;">🥈 SILVER POOL</div>
             <div style="font-size: 13px; color: #DDD;">30-Day Lock: <strong>10% APY</strong></div>
           </div>
-          <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(184, 134, 11, 0.2)); padding: 12px; border-radius: 6px; border-left: 4px solid #FFD700;">
+          <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(184, 134, 11, 0.2)); padding: 12px; border-radius: 6px; border-left: 4px solid #9D4EDD;">
             <div style="font-weight: 700; margin-bottom: 4px;">🥇 GOLD POOL</div>
             <div style="font-size: 13px; color: #DDD;">90-Day Lock: <strong>25% APY</strong></div>
           </div>
@@ -383,8 +383,8 @@ function openStakingFeaturePopup(feature) {
       title: '🎁 Early Bird 2x Launch Bonuses',
       content: `
         <p><strong>First 500 stakers get DOUBLE rewards for 90 days.</strong></p>
-        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2)); padding: 20px; border-radius: 8px; margin: 15px 0; border: 2px solid #FFD700;">
-          <h4 style="color: #FFD700; margin: 0 0 10px 0; font-size: 16px;">🔥 EARLY BIRD PERKS:</h4>
+        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2)); padding: 20px; border-radius: 8px; margin: 15px 0; border: 2px solid #9D4EDD;">
+          <h4 style="color: #9D4EDD; margin: 0 0 10px 0; font-size: 16px;">🔥 EARLY BIRD PERKS:</h4>
           <ul style="margin: 0; padding-left: 20px; line-height: 2;">
             <li><strong>2x APY Multiplier</strong> for first 90 days</li>
             <li><strong>Priority Access</strong> to new staking pools</li>
@@ -6938,7 +6938,7 @@ function subscribeNewsletter() {
   }
   
   msgDiv.textContent = '⏳ Subscribing...';
-  msgDiv.style.color = '#FFD700';
+  msgDiv.style.color = '#9D4EDD';
   
   fetch('/api/newsletter/subscribe', {
     method: 'POST',
