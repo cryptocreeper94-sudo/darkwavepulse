@@ -2378,7 +2378,8 @@ body.theme-light .banner-title {
   font-size: 14px;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary);
+  color: #00D4FF;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
   text-transform: uppercase;
   letter-spacing: 1px;
   flex: 1;
@@ -2669,11 +2670,13 @@ body.theme-light .banner-title {
 
 .coin-table tbody tr {
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
+  background: #141414;
 }
 
 .coin-table tbody tr:hover {
-  background: var(--glass-bg, rgba(13, 40, 71, 0.35));
+  background: #1a1a1a;
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.2);
 }
 
 .coin-table td {
@@ -2804,8 +2807,8 @@ body.theme-light .banner-title {
 }
 
 .project-card:hover {
-  border-color: var(--accent-blue);
-  box-shadow: var(--glow-blue);
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -4132,13 +4135,13 @@ body.theme-light .banner-title {
 }
 
 .stock-selector select:hover {
-  border-color: var(--accent);
+  border-color: rgba(0, 212, 255, 0.4);
 }
 
 .stock-selector select:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(56, 97, 251, 0.1);
+  border-color: #00D4FF;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
 }
 
 .market-timeframes-main,
@@ -14288,8 +14291,8 @@ header,
 .nav-button:hover,
 .tab-button:hover {
   background: transparent !important;
-  color: #ffffff !important;
-  filter: drop-shadow(0 0 8px rgba(143, 233, 255, 0.6));
+  color: #00D4FF !important;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
 }
 
 .nav-tab.active,
@@ -14299,7 +14302,8 @@ header,
   background: transparent !important;
   border-bottom-color: #00D4FF !important;
   color: #00D4FF !important;
-  filter: drop-shadow(0 0 10px rgba(56, 97, 251, 0.8));
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.8));
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 /* Cards, panels, and boxes */
@@ -14381,7 +14385,8 @@ thead {
 .data-table tbody tr:hover,
 table tbody tr:hover,
 tbody tr:hover {
-  background: #222222 !important;
+  background: #1a1a1a !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.2);
 }
 
 /* Buttons - Standard */
