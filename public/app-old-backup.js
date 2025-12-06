@@ -1080,11 +1080,11 @@ function showUpgradeLimitModal(feature, limit) {
       <p style="margin-bottom: 20px; opacity: 0.9;">
         You've used all ${limit} ${featureNames[feature]} on the free plan today.
       </p>
-      <p style="margin-bottom: 25px; color: #FFD700; font-weight: bold;">
+      <p style="margin-bottom: 25px; color: #9D4EDD; font-weight: bold;">
         Upgrade to Premium for unlimited ${featureNames[feature]}! 🚀
       </p>
       
-      <button class="action-btn" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; width: 100%; margin-bottom: 10px;" onclick="this.closest('.modal-backdrop').remove(); showUpgradeModal();">
+      <button class="action-btn" style="background: linear-gradient(135deg, #9D4EDD, #FFA500); color: #000; font-weight: bold; width: 100%; margin-bottom: 10px;" onclick="this.closest('.modal-backdrop').remove(); showUpgradeModal();">
         👑 Upgrade to Premium
       </button>
       
@@ -2942,7 +2942,7 @@ function updateSubscriptionUI() {
   
   if (isPremium) {
     planBadge.textContent = '👑 Premium';
-    planBadge.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
+    planBadge.style.background = 'linear-gradient(135deg, #9D4EDD, #FFA500)';
     planBadge.style.color = '#000';
     statusEl.innerHTML = `
       <p style="color: #4ADE80;">✅ Active subscription</p>
@@ -2956,7 +2956,7 @@ function updateSubscriptionUI() {
     planBadge.style.color = '#fff';
     statusEl.innerHTML = `
       <p style="opacity: 0.8;">Limited to 10 searches/day</p>
-      <p style="font-size: 0.9rem; color: #FFD700;">Upgrade for unlimited access! 🚀</p>
+      <p style="font-size: 0.9rem; color: #9D4EDD;">Upgrade for unlimited access! 🚀</p>
     `;
     upgradeBtn.textContent = '👑 Upgrade to Premium';
     upgradeBtn.onclick = showUpgradeModal;
@@ -2982,9 +2982,9 @@ async function showUpgradeModal() {
           </ul>
         </div>
         
-        <div style="padding: 15px; border: 2px solid #FFD700; border-radius: 8px; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1));">
-          <h4 style="margin: 0 0 10px 0; color: #FFD700;">👑 Premium</h4>
-          <p style="font-size: 2rem; margin: 0; color: #FFD700;">$5<span style="font-size: 1rem;">/mo</span></p>
+        <div style="padding: 15px; border: 2px solid #9D4EDD; border-radius: 8px; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1));">
+          <h4 style="margin: 0 0 10px 0; color: #9D4EDD;">👑 Premium</h4>
+          <p style="font-size: 2rem; margin: 0; color: #9D4EDD;">$5<span style="font-size: 1rem;">/mo</span></p>
           <ul style="list-style: none; padding: 0; margin: 15px 0 0 0; text-align: left;">
             <li style="margin: 8px 0;">✅ Unlimited searches</li>
             <li style="margin: 8px 0;">✅ Advanced charts</li>
@@ -2997,7 +2997,7 @@ async function showUpgradeModal() {
       <div style="margin-top: 20px;">
         <p style="margin-bottom: 12px; font-size: 0.9rem; opacity: 0.8; text-align: center;">Choose your payment method:</p>
         
-        <button class="action-btn" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; width: 100%; margin-bottom: 12px;" onclick="initiateCheckout()">
+        <button class="action-btn" style="background: linear-gradient(135deg, #9D4EDD, #FFA500); color: #000; font-weight: bold; width: 100%; margin-bottom: 12px;" onclick="initiateCheckout()">
           💳 Pay with Card - $5/month
         </button>
         
@@ -3170,8 +3170,8 @@ async function showManageSubscription() {
     <div class="modal-content" style="max-width: 400px;">
       <h3 style="margin-bottom: 20px;">👑 Manage Subscription</h3>
       
-      <div style="padding: 20px; background: rgba(255,215,0,0.1); border: 1px solid #FFD700; border-radius: 8px; margin-bottom: 20px;">
-        <p style="margin: 0 0 10px 0; color: #FFD700; font-weight: bold;">Premium Plan Active</p>
+      <div style="padding: 20px; background: rgba(255,215,0,0.1); border: 1px solid #9D4EDD; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0 0 10px 0; color: #9D4EDD; font-weight: bold;">Premium Plan Active</p>
         <p style="margin: 0; font-size: 0.9rem;">
           ${state.subscription.expiryDate ? `Renews: ${new Date(state.subscription.expiryDate).toLocaleDateString()}` : 'Active subscription'}
         </p>
@@ -4165,7 +4165,7 @@ function openSubscriptionPage() {
           <!-- Premium Tier (Recommended) -->
           <div class="pricing-card premium-tier recommended">
             <div class="recommended-badge">⭐ RECOMMENDED</div>
-            <h3 style="margin: 0 0 10px 0; color: #FFD700;">Premium</h3>
+            <h3 style="margin: 0 0 10px 0; color: #9D4EDD;">Premium</h3>
             <div class="price-tag">
               <span class="price">$5</span>
               <span class="period">/month</span>
@@ -7285,7 +7285,7 @@ async function performUniversalSearch() {
     if (analysisContent) {
       analysisContent.innerHTML = `
         <div class="analysis-result" style="padding: 20px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1)); border: 2px solid rgba(37, 99, 235, 0.3); border-radius: 12px; margin: 16px 0;">
-          <h3 style="color: #FFD700; margin-bottom: 12px;">📊 Analysis: ${query}</h3>
+          <h3 style="color: #9D4EDD; margin-bottom: 12px;">📊 Analysis: ${query}</h3>
           <div style="color: var(--text-primary); line-height: 1.8; white-space: pre-wrap;">${fullResponse}</div>
         </div>
       `;
@@ -7389,13 +7389,13 @@ async function updateSentimentTracker() {
       const trend = marketCapChangePercent > 1 ? '↗️ Bullish' : marketCapChangePercent > -1 ? '→ Neutral' : '↘️ Bearish';
       
       socialEl.textContent = `${socialSentiment} ${Math.round(socialScore)}%`;
-      socialEl.style.color = socialScore > 65 ? '#00ff88' : socialScore > 45 ? '#FFD700' : '#ff6b6b';
+      socialEl.style.color = socialScore > 65 ? '#00ff88' : socialScore > 45 ? '#9D4EDD' : '#ff6b6b';
       
       newsEl.textContent = `${newsSentiment} ${Math.round(newsScore)}%`;
-      newsEl.style.color = newsScore > 60 ? '#00ff88' : newsScore > 40 ? '#FFD700' : '#ff6b6b';
+      newsEl.style.color = newsScore > 60 ? '#00ff88' : newsScore > 40 ? '#9D4EDD' : '#ff6b6b';
       
       trendEl.textContent = trend;
-      trendEl.style.color = trend.includes('Bullish') ? '#00ff88' : trend.includes('Neutral') ? '#FFD700' : '#ff6b6b';
+      trendEl.style.color = trend.includes('Bullish') ? '#00ff88' : trend.includes('Neutral') ? '#9D4EDD' : '#ff6b6b';
     }
   } catch (error) {
     console.error('Sentiment update error:', error);
@@ -7432,8 +7432,8 @@ async function updateMarketPulse() {
       strengthText.style.color = '#60A5FA';
       pulseText.textContent = '📊 Moderate bullish trend in progress';
     } else if (strength > 30) {
-      strengthBar.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
-      strengthText.style.color = '#FFD700';
+      strengthBar.style.background = 'linear-gradient(90deg, #9D4EDD, #FFA500)';
+      strengthText.style.color = '#9D4EDD';
       pulseText.textContent = '⚖️ Neutral market conditions';
     } else {
       strengthBar.style.background = 'linear-gradient(90deg, #ff6b6b, #ff4444)';
@@ -7477,7 +7477,7 @@ function openDetailedAnalysis() {
   // Build detailed analysis content
   const signal = data.recommendation || 'HOLD';
   const signalClass = signal.includes('BUY') ? 'buy' : signal.includes('SELL') ? 'sell' : 'hold';
-  const signalColor = signal.includes('BUY') ? '#00FF88' : signal.includes('SELL') ? '#FF4444' : '#FFD700';
+  const signalColor = signal.includes('BUY') ? '#00FF88' : signal.includes('SELL') ? '#FF4444' : '#9D4EDD';
   
   let analysisHTML = `
     <div style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(147, 51, 234, 0.1)); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid ${signalColor}40;">
@@ -7503,7 +7503,7 @@ function openDetailedAnalysis() {
     
     const indicators = data.technicalIndicators;
     if (indicators.rsi !== undefined) {
-      const rsiColor = indicators.rsi > 70 ? '#FF4444' : indicators.rsi < 30 ? '#00FF88' : '#FFD700';
+      const rsiColor = indicators.rsi > 70 ? '#FF4444' : indicators.rsi < 30 ? '#00FF88' : '#9D4EDD';
       analysisHTML += `
         <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border-left: 4px solid ${rsiColor};">
           <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 4px;">RSI (14)</div>
@@ -7933,7 +7933,7 @@ function updateFearGreedGauge() {
     const colorStops = [
       { min: 0, max: 24, color: '#FF4444' },     // Extreme Fear
       { min: 25, max: 44, color: '#FF8844' },    // Fear
-      { min: 45, max: 55, color: '#FFD700' },    // Neutral
+      { min: 45, max: 55, color: '#9D4EDD' },    // Neutral
       { min: 56, max: 75, color: '#00FF88' },    // Greed
       { min: 76, max: 100, color: '#00DD66' }    // Extreme Greed
     ];
@@ -7963,7 +7963,7 @@ function updateRSIGauge() {
   if (container) {
     const colorStops = [
       { min: 0, max: 30, color: '#00FF88' },     // Oversold (opportunity)
-      { min: 31, max: 69, color: '#FFD700' },    // Neutral
+      { min: 31, max: 69, color: '#9D4EDD' },    // Neutral
       { min: 70, max: 100, color: '#FF4444' }    // Overbought (warning)
     ];
     

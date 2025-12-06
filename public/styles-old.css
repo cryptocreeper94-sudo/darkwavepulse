@@ -189,7 +189,7 @@ body.theme-sunset {
   --text-secondary: #D4A574;
   --accent-cyan: #FFB347;
   --success-green: #FF8C42;
-  --warning-amber: #FFD700;
+  --warning-amber: #9D4EDD;
   --danger-red: #FF4500;
   
   --digital-green: #FF6B35;
@@ -200,7 +200,7 @@ body.theme-sunset {
   --neon-pink-glow: 0 0 25px rgba(255, 69, 0, 0.7), 0 0 50px rgba(255, 69, 0, 0.35);
   --red-glow: 0 0 15px rgba(255, 107, 53, 0.5), 0 0 30px rgba(255, 107, 53, 0.25);
   
-  --gradient-primary: linear-gradient(135deg, #FF4500, #FF6B35, #FFD700);
+  --gradient-primary: linear-gradient(135deg, #FF4500, #FF6B35, #9D4EDD);
   --gradient-card: linear-gradient(135deg, #2D1F1A, #1A0F0A);
   --gradient-glow: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 215, 0, 0.1));
   --button-glow: var(--neon-pink-glow);
@@ -223,7 +223,7 @@ body.theme-ocean {
   --text-secondary: #80DEEA;
   --accent-cyan: #00CED1;
   --success-green: #00CED1;
-  --warning-amber: #FFD700;
+  --warning-amber: #9D4EDD;
   --danger-red: #FF6B6B;
   
   --digital-green: #00CED1;
@@ -630,7 +630,7 @@ body::before {
 
 .ticker-symbol {
   font-weight: 700;
-  color: #FFD700;
+  color: #9D4EDD;
 }
 
 .ticker-price {
@@ -856,7 +856,7 @@ body::before {
   .upgrade-banner {
     background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.15)) !important;
     backdrop-filter: blur(10px);
-    border: 2px solid #FFD700 !important;
+    border: 2px solid #9D4EDD !important;
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 12px 0 16px 0 !important;
@@ -2811,7 +2811,7 @@ body::before {
 }
 
 .chat-message-user .chat-avatar {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: linear-gradient(135deg, #9D4EDD, #FFA500);
 }
 
 .chat-message-assistant .chat-avatar {
@@ -2974,7 +2974,7 @@ body::before {
 
 .news-sentiment.neutral {
   background: rgba(255, 215, 0, 0.2);
-  color: #FFD700;
+  color: #9D4EDD;
   border: 1px solid rgba(255, 215, 0, 0.3);
 }
 

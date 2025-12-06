@@ -226,7 +226,7 @@
         <img src="/darkwave-coin.png" alt="DarkWave Pulse" class="loading-logo" style="opacity:0.5">
         <div style="color: #ff4444; font-size: 16px; margin-bottom: 12px;">Error</div>
         <div style="color: rgba(255,255,255,0.6); font-size: 14px; max-width: 280px; text-align: center;">${message}</div>
-        <button onclick="location.reload()" style="margin-top: 24px; padding: 12px 24px; background: #8B1538; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">
+        <button onclick="location.reload()" style="margin-top: 24px; padding: 12px 24px; background: #0f0f0f; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer;">
           Retry
         </button>
       `;

@@ -63,7 +63,7 @@ const THEMES_CONFIG = {
         description: 'Clean professional look',
         icon: '💼',
         requiresSubscription: false,
-        colors: { bg: '#000000', accent: '#3861FB', primary: '#1A1A1A' },
+        colors: { bg: '#000000', accent: '#00D4FF', primary: '#1A1A1A' },
         watermark: null
       },
       'light': {
@@ -71,7 +71,7 @@ const THEMES_CONFIG = {
         description: 'Bright professional look',
         icon: '☀️',
         requiresSubscription: false,
-        colors: { bg: '#D4D4D4', accent: '#3861FB', primary: '#E8E8E8' },
+        colors: { bg: '#D4D4D4', accent: '#00D4FF', primary: '#E8E8E8' },
         watermark: null
       },
       'cyberpunk': {

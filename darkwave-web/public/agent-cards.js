@@ -34,8 +34,8 @@ function showAgentRefractorModal(agent) {
         <!-- Front of card -->
         <div class="refractor-front">
           <div class="refractor-header">
-            <h2 style="margin: 0; font-family: Orbitron; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">AGENT REFRACTOR</h2>
-            <p style="margin: 4px 0 0 0; font-size: 11px; color: #FFD700; letter-spacing: 2px;">${agent.rarity.toUpperCase()}</p>
+            <h2 style="margin: 0; font-family: Orbitron; color: #9D4EDD; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">AGENT REFRACTOR</h2>
+            <p style="margin: 4px 0 0 0; font-size: 11px; color: #9D4EDD; letter-spacing: 2px;">${agent.rarity.toUpperCase()}</p>
           </div>
           
           <div style="position: relative; margin: 16px 0;">
@@ -67,7 +67,7 @@ function showAgentRefractorModal(agent) {
           </div>
           
           <div class="refractor-serial">
-            <span style="font-size: 9px; font-weight: 700; background: linear-gradient(90deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-transform: uppercase;">✨ Serial: ${agent.serialNumber} ✨</span>
+            <span style="font-size: 9px; font-weight: 700; background: linear-gradient(90deg, #9D4EDD, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; text-transform: uppercase;">✨ Serial: ${agent.serialNumber} ✨</span>
           </div>
           
           <div class="refractor-qr-section">

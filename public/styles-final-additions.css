@@ -155,7 +155,7 @@ body.theme-coinbase {
   --success-bg: rgba(0, 82, 255, 0.1);
   --danger: #FF6B6B;
   --danger-bg: rgba(255, 107, 107, 0.1);
-  --warning: #FFD700;
+  --warning: #9D4EDD;
   --warning-bg: rgba(255, 215, 0, 0.1);
   --info: #00CED1;
   --info-bg: rgba(0, 206, 209, 0.1);
@@ -229,7 +229,7 @@ body.theme-sunset {
   --success-bg: rgba(255, 140, 66, 0.1);
   --danger: #FF4500;
   --danger-bg: rgba(255, 69, 0, 0.1);
-  --warning: #FFD700;
+  --warning: #9D4EDD;
   --warning-bg: rgba(255, 215, 0, 0.1);
   --info: #FF6B35;
   --info-bg: rgba(255, 107, 53, 0.1);
@@ -266,7 +266,7 @@ body.theme-ocean {
   --success-bg: rgba(0, 206, 209, 0.1);
   --danger: #FF6B6B;
   --danger-bg: rgba(255, 107, 107, 0.1);
-  --warning: #FFD700;
+  --warning: #9D4EDD;
   --warning-bg: rgba(255, 215, 0, 0.1);
   --info: #48D1CC;
   --info-bg: rgba(72, 209, 204, 0.1);
