@@ -1580,9 +1580,9 @@ body.theme-light .banner-title {
 
 .metric-card:hover {
   background: #1a1a1a;
-  border-color: #3861FB;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 97, 251, 0.3);
+  border-color: rgba(0, 212, 255, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 212, 255, 0.25);
 }
 
 /* Stagger animation for metric cards */
@@ -1610,11 +1610,12 @@ body.theme-light .banner-title {
 .metric-card-title {
   font-size: 14px;
   font-weight: 700;
-  color: #8FE9FF;
+  color: #00D4FF;
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
   margin-bottom: 12px;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 .metric-card-value {
@@ -1630,11 +1631,11 @@ body.theme-light .banner-title {
 .metric-card-value-large {
   font-size: 36px;
   font-weight: 800;
-  color: #00FF41;
+  color: #39FF14;
   text-align: center;
   line-height: 1;
   margin-bottom: 8px;
-  text-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+  text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
 }
 
 .metric-card-gauge {
