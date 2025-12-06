@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="/darkwave-coin.png">
+  <link rel="stylesheet" href="/design-system.css?v=1206a">
   <style>
     * {
       margin: 0;
@@ -942,7 +943,7 @@
     }
 
     .badge-pending {
-      background: #ffa500;
+      background: #9D4EDD;
       color: white;
     }
 
@@ -1118,7 +1119,7 @@
     }
 
     .severity-high {
-      background: #ffa500;
+      background: #9D4EDD;
       color: white;
     }
 
@@ -1149,6 +1150,7 @@
   </style>
 </head>
 <body>
+  <div class="watermark-bg"></div>
   <!-- Wave & Candle Chart Banner -->
   <div class="app-banner">
     <div class="banner-wave"></div>
@@ -1180,7 +1182,7 @@
       </div>
       <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
         <div class="stat-label" style="margin-bottom: 8px;">Pending Submissions</div>
-        <div class="stat" id="totalPending" style="color: #ffa500;">-</div>
+        <div class="stat" id="totalPending" style="color: #9D4EDD;">-</div>
       </div>
       <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
         <div class="stat-label" style="margin-bottom: 8px;">Approved</div>
@@ -1291,8 +1293,8 @@
         </div>
         <div class="collapsible-content" id="airdropContent">
           <!-- Airdrop Documentation -->
-          <div style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #FFD700; margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 14px;">DWAV Token Airdrop System</h4>
+          <div style="background: rgba(157, 78, 221, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #9D4EDD; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #9D4EDD; font-size: 14px;">DWAV Token Airdrop System</h4>
             <div style="font-size: 13px; color: #DDD; line-height: 1.6;">
               <p style="margin: 0 0 8px 0;"><strong>Eligibility:</strong> All VIP beta testers AND active subscribers (Base/Premium) are eligible for PULSE airdrops based on platform engagement.</p>
               <p style="margin: 0 0 8px 0;"><strong>Total Supply:</strong> 1,000,000,000 PULSE (1 Billion) | <strong>Decimals:</strong> 9 | <strong>Launch Price:</strong> $0.0001 - $0.001</p>
@@ -1320,7 +1322,7 @@
             </div>
             <div style="text-align: center;">
               <div style="font-size: 11px; color: #888; margin-bottom: 5px;">Est. Value @ $0.0001</div>
-              <div style="font-size: 20px; font-weight: 700; color: #FFD700;" id="totalValue">-</div>
+              <div style="font-size: 20px; font-weight: 700; color: #39FF14;" id="totalValue">-</div>
             </div>
           </div>
 
@@ -1532,7 +1534,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
                   <span style="color: #AAA;">🏆 Legacy Founder (6 months)</span>
-                  <span style="color: #FFD700; font-weight: 600;">$24 one-time</span>
+                  <span style="color: #39FF14; font-weight: 600;">$24 one-time</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
                   <span style="color: #AAA;">📅 Annual Subscription</span>
@@ -1553,10 +1555,10 @@
       </div>
 
       <!-- Coinbase Commerce Integration -->
-      <div style="background: #222; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 3px solid #ffa500;">
+      <div style="background: #222; border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 3px solid #9D4EDD;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
           <div>
-            <h3 style="color: #ffa500; margin: 0 0 10px 0; font-size: 18px;">₿ Coinbase Commerce (Crypto Payments)</h3>
+            <h3 style="color: #9D4EDD; margin: 0 0 10px 0; font-size: 18px;">₿ Coinbase Commerce (Crypto Payments)</h3>
             <p style="color: #888; font-size: 13px; margin: 0 0 10px 0; line-height: 1.6;">
               Accept Bitcoin, Ethereum, USDC, and more for subscriptions.
             </p>
@@ -1581,7 +1583,7 @@
               Configure authentication and subscription system for Telegram Mini App (tomorrow's session).
             </p>
             <div style="color: #666; font-size: 12px;">
-              <strong>Status:</strong> <span style="color: #ffa500;">⏳ Scheduled (6-7 PM tomorrow)</span>
+              <strong>Status:</strong> <span style="color: #9D4EDD;">⏳ Scheduled (6-7 PM tomorrow)</span>
             </div>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -2222,7 +2224,7 @@
       // Group documents by category
       const categories = {
         core: { name: '🎯 CORE VISION (Study First!)', color: '#ff4444' },
-        tokenomics: { name: '💰 TOKENOMICS & REVENUE', color: '#ffd700' },
+        tokenomics: { name: '💰 TOKENOMICS & REVENUE', color: '#9D4EDD' },
         marketing: { name: '🎨 MARKETING & GROWTH', color: '#0ea5e9' },
         technical: { name: '🔧 TECHNICAL IMPLEMENTATION', color: '#4CAF50' },
         operations: { name: '📋 DAILY OPERATIONS', color: '#9c27b0' }
@@ -2522,7 +2524,7 @@
           <div><span class="user-badge ${user.is_whitelisted ? 'badge-active' : 'badge-inactive'}">${user.is_whitelisted ? 'VIP Beta' : 'Standard'}</span></div>
           <div>
             ${user.is_beta_tester ? 
-              `<span class="user-badge" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; cursor: pointer;" onclick="toggleBetaTester(${user.id}, false)" title="Click to remove Beta Tester status (Trial extended to Feb 14)">⭐ BETA TESTER</span>` : 
+              `<span class="user-badge" style="background: linear-gradient(135deg, #9D4EDD, #00D4FF); color: #000; font-weight: bold; cursor: pointer;" onclick="toggleBetaTester(${user.id}, false)" title="Click to remove Beta Tester status (Trial extended to Feb 14)">⭐ BETA TESTER</span>` : 
               user.is_whitelisted ? 
                 `<button class="btn btn-small" style="padding: 4px 8px; font-size: 11px; background: #3861FB;" onclick="toggleBetaTester(${user.id}, true)" title="Grant extended trial until Feb 14, 2026">Make Beta Tester</button>` : 
                 `<span style="font-size: 11px; color: #555;">-</span>`
@@ -3449,7 +3451,7 @@
                   ${admin.admin_level !== 'owner' ? `
                     <button onclick="editAdmin(${admin.id})" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Edit</button>
                     <button onclick="removeAdmin(${admin.id}, '${admin.name}')" class="btn" style="padding: 6px 12px; font-size: 12px; background: #dc3545;">Remove</button>
-                  ` : '<span style="color: #FFD700; font-size: 11px; font-weight: 700;">👑 OWNER</span>'}
+                  ` : '<span style="color: #39FF14; font-size: 11px; font-weight: 700;">👑 OWNER</span>'}
                 </div>
               </div>
               ${admin.contact_info ? `
@@ -3480,7 +3482,7 @@
     // Get permission level badge HTML
     function getLevelBadge(level) {
       const badges = {
-        owner: '<span style="background: #FFD700; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">OWNER</span>',
+        owner: '<span style="background: #39FF14; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">OWNER</span>',
         full_admin: '<span style="background: #dc3545; color: #FFF; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">FULL ADMIN</span>',
         contributor: '<span style="background: #007bff; color: #FFF; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">CONTRIBUTOR</span>',
         viewer: '<span style="background: #6c757d; color: #FFF; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">VIEWER</span>'
@@ -3623,7 +3625,7 @@
       if (searches >= 20 || logins >= 10) {
         return { name: 'Platinum', amount: 500000, color: '#E5E4E2' };
       } else if (searches >= 10 || logins >= 5) {
-        return { name: 'Gold', amount: 100000, color: '#FFD700' };
+        return { name: 'Gold', amount: 100000, color: '#9D4EDD' };
       } else if (searches >= 3 || logins >= 2) {
         return { name: 'Silver', amount: 25000, color: '#C0C0C0' };
       } else {
@@ -3754,7 +3756,7 @@
         <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h3 style="margin: 0; color: #FFF;">Phase 2: V2.5 Quick Wins Package</h3>
-            <span style="font-size: 14px; font-weight: 700; color: #FFA500;">PLANNED</span>
+            <span style="font-size: 14px; font-weight: 700; color: #9D4EDD;">PLANNED</span>
           </div>
           <div style="font-size: 13px; color: #888; margin-bottom: 10px;"><strong>Timeline:</strong> Q1 2026 | <strong>Budget:</strong> $200-275 (revenue-funded)</div>
           <ul style="font-size: 13px; color: #DDD; margin: 0; padding-left: 20px;">
