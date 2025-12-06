@@ -36,7 +36,7 @@ class TradingCardCarousel {
             <h2>🎴 NFT Trading Cards Collection</h2>
             <div class="trading-lock-badge">
               <span class="lock-icon">🔒</span>
-              <span class="lock-text">Unlocks Dec 25</span>
+              <span class="lock-text">Unlocks Feb 14</span>
             </div>
           </div>
           <div class="trading-carousel-preview">

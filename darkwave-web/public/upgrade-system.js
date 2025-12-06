@@ -53,7 +53,7 @@ function showFloatingUpgradeBanner() {
       <div style="font-size: 20px; margin-bottom: 4px;">⚡</div>
       <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: white;">Become a Legacy Founder</h3>
       <p style="margin: 8px 0 0; font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.4;">
-        Get <strong>unlimited everything</strong> + <strong>35K PULSE tokens</strong> + <strong>FREE lifetime access</strong> for just <strong>$4/month</strong>
+        Get <strong>unlimited everything</strong> + <strong>35K DWAV tokens</strong> + <strong>FREE lifetime access</strong> for just <strong>$4/month</strong>
       </p>
     </div>
     
@@ -62,7 +62,7 @@ function showFloatingUpgradeBanner() {
     </button>
     
     <p style="margin: 8px 0 0; font-size: 10px; color: rgba(255,255,255,0.7); text-align: center;">
-      💎 First 10,000 lock in $4/month + 35K PULSE tokens
+      💎 First 10,000 lock in $4/month + 35K DWAV tokens
     </p>
   `;
   
@@ -204,7 +204,7 @@ function showUpgradeModal(context = 'general') {
   
   // Different messaging based on context
   let headline = 'Become a Legacy Founder';
-  let subheadline = 'Get unlimited access + 35K PULSE tokens for just $4/month';
+  let subheadline = 'Get unlimited access + 35K DWAV tokens for just $4/month';
   
   if (context === 'search_limit') {
     headline = '🚀 You\'ve Used All Your Searches!';
@@ -282,7 +282,7 @@ function showUpgradeModal(context = 'general') {
             <div style="text-align: center; margin-bottom: 12px;">
               <h3 style="margin: 0 0 4px; font-size: 16px; font-weight: 700; color: white;">Legacy Founder</h3>
               <p style="margin: 0; font-size: 20px; font-weight: 700; color: var(--accent-blue);">$4<span style="font-size: 12px; font-weight: 400; color: #888;">/mo</span></p>
-              <p style="margin: 4px 0 0; font-size: 9px; color: #10b981;">Lock in + 35K PULSE ⚡</p>
+              <p style="margin: 4px 0 0; font-size: 9px; color: #10b981;">Lock in + 35K DWAV ⚡</p>
             </div>
             
             <div style="font-size: 11px; line-height: 1.5; color: #fff;">
@@ -325,7 +325,7 @@ function showUpgradeModal(context = 'general') {
         <!-- Value Proposition -->
         <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 12px;">
           <p style="margin: 0; font-size: 12px; color: #10b981; font-weight: 600; line-height: 1.4;">
-            💰 Legacy Founder = Lifetime access + 35K PULSE tokens + $4 rate locked forever
+            💰 Legacy Founder = Lifetime access + 35K DWAV tokens + $4 rate locked forever
           </p>
           <p style="margin: 6px 0 0; font-size: 10px; color: #888; line-height: 1.3;">
             V2 pricing jumps to $8/month on Dec 26. Prices rise to $20/month in future. Lock in $4 now, forever.
