@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { fetchCoinAnalysis } from '../../services/api'
+import AnalysisChart from '../charts/AnalysisChart'
 
 function formatNumber(num) {
   if (!num && num !== 0) return '—'
@@ -65,67 +66,51 @@ function generateMockLevels(price) {
   }
 }
 
-function generateSparklineData(isPositive) {
-  const points = []
-  let value = 50
-  for (let i = 0; i < 48; i++) {
-    value += (Math.random() - (isPositive ? 0.45 : 0.55)) * 3
-    value = Math.max(20, Math.min(80, value))
-    points.push(value)
-  }
-  return points
-}
-
-function SparklineChart({ data, isPositive }) {
-  const width = 300
-  const height = 100
-  const padding = 5
-  
-  const min = Math.min(...data)
-  const max = Math.max(...data)
-  const range = max - min || 1
-  
-  const points = data.map((val, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - 2 * padding)
-    const y = height - padding - ((val - min) / range) * (height - 2 * padding)
-    return `${x},${y}`
-  }).join(' ')
-  
-  const areaPoints = `${padding},${height - padding} ${points} ${width - padding},${height - padding}`
-  
-  return (
-    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-      <defs>
-        <linearGradient id={`sparkGrad-${isPositive ? 'up' : 'down'}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={isPositive ? 'rgba(57, 255, 20, 0.3)' : 'rgba(255, 68, 68, 0.3)'} />
-          <stop offset="100%" stopColor="transparent" />
-        </linearGradient>
-      </defs>
-      <polygon 
-        points={areaPoints} 
-        fill={`url(#sparkGrad-${isPositive ? 'up' : 'down'})`}
-      />
-      <polyline
-        points={points}
-        fill="none"
-        stroke={isPositive ? '#39FF14' : '#FF4444'}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function IndicatorRow({ label, value, status }) {
+function IndicatorToggle({ label, value, status, isActive, onToggle, canToggle }) {
   let statusColor = 'var(--text-secondary)'
-  if (status === 'bullish') statusColor = 'var(--neon-green)'
-  if (status === 'bearish') statusColor = 'var(--accent-red)'
-  if (status === 'neutral') statusColor = 'var(--text-muted)'
+  if (status === 'bullish') statusColor = '#39FF14'
+  if (status === 'bearish') statusColor = '#FF4444'
+  if (status === 'neutral') statusColor = 'rgba(255,255,255,0.5)'
+  
+  const handleClick = () => {
+    if (canToggle && onToggle) {
+      onToggle()
+    }
+  }
   
   return (
-    <div className="analysis-indicator-row">
-      <span className="analysis-indicator-label">{label}</span>
+    <div 
+      className={`analysis-indicator-row ${canToggle ? 'clickable' : ''} ${isActive ? 'active' : ''}`}
+      onClick={handleClick}
+      style={{
+        cursor: canToggle ? 'pointer' : 'default',
+        background: isActive ? 'rgba(0, 212, 255, 0.15)' : 'transparent',
+        border: isActive ? '1px solid rgba(0, 212, 255, 0.4)' : '1px solid transparent',
+        borderRadius: '8px',
+        padding: '8px 12px',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      <span className="analysis-indicator-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {canToggle && (
+          <span style={{
+            width: '16px',
+            height: '16px',
+            borderRadius: '4px',
+            border: isActive ? '2px solid #00D4FF' : '2px solid rgba(255,255,255,0.3)',
+            background: isActive ? '#00D4FF' : 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            color: '#000',
+            transition: 'all 0.2s ease',
+          }}>
+            {isActive && '✓'}
+          </span>
+        )}
+        {label}
+      </span>
       <span className="analysis-indicator-value" style={{ color: statusColor }}>{value}</span>
     </div>
   )
@@ -150,16 +135,169 @@ function LoadingSpinner() {
   )
 }
 
+function Notepad({ coinSymbol }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [notes, setNotes] = useState('')
+  const storageKey = `analysis-notes-${coinSymbol}`
+  
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        setNotes(saved)
+      } else {
+        setNotes('')
+      }
+    } catch (e) {
+      console.log('Could not load notes from localStorage')
+    }
+  }, [storageKey])
+  
+  const handleNotesChange = useCallback((e) => {
+    const value = e.target.value
+    setNotes(value)
+    try {
+      localStorage.setItem(storageKey, value)
+    } catch (e) {
+      console.log('Could not save notes to localStorage')
+    }
+  }, [storageKey])
+  
+  return (
+    <div style={notepadStyles.container}>
+      <button 
+        style={notepadStyles.header}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span style={notepadStyles.headerTitle}>
+          📝 Analysis Notes
+          {notes.length > 0 && <span style={notepadStyles.badge}>{notes.length}</span>}
+        </span>
+        <span style={{
+          ...notepadStyles.arrow,
+          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}>
+          ▼
+        </span>
+      </button>
+      
+      {isExpanded && (
+        <div style={notepadStyles.content}>
+          <textarea
+            style={notepadStyles.textarea}
+            value={notes}
+            onChange={handleNotesChange}
+            placeholder={`Add your analysis notes for ${coinSymbol}...\n\nYour notes are automatically saved.`}
+            rows={5}
+          />
+          <div style={notepadStyles.footer}>
+            <span style={notepadStyles.autosave}>
+              <span style={notepadStyles.saveDot} />
+              Auto-saved locally
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const notepadStyles = {
+  container: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    marginTop: '16px',
+  },
+  header: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 16px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'background 0.2s ease',
+    color: '#fff',
+  },
+  headerTitle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '14px',
+    fontWeight: '600',
+  },
+  badge: {
+    background: 'rgba(0, 212, 255, 0.2)',
+    color: '#00D4FF',
+    fontSize: '10px',
+    fontWeight: '700',
+    padding: '2px 6px',
+    borderRadius: '10px',
+  },
+  arrow: {
+    fontSize: '10px',
+    color: 'rgba(255, 255, 255, 0.5)',
+    transition: 'transform 0.3s ease',
+  },
+  content: {
+    padding: '0 16px 16px',
+  },
+  textarea: {
+    width: '100%',
+    background: 'rgba(0, 0, 0, 0.3)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '8px',
+    padding: '12px',
+    fontSize: '14px',
+    lineHeight: '1.5',
+    color: '#fff',
+    resize: 'vertical',
+    minHeight: '100px',
+    fontFamily: 'inherit',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '8px',
+  },
+  autosave: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '11px',
+    color: 'rgba(255, 255, 255, 0.4)',
+  },
+  saveDot: {
+    width: '6px',
+    height: '6px',
+    background: '#39FF14',
+    borderRadius: '50%',
+  },
+}
+
 export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [apiData, setApiData] = useState(null)
   const [usingMockData, setUsingMockData] = useState(false)
+  const [activeIndicators, setActiveIndicators] = useState({
+    rsi: false,
+    macd: false,
+    sma: false,
+    ema: false,
+  })
   
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
       setTimeout(() => setIsVisible(true), 10)
+      
+      setActiveIndicators({ rsi: false, macd: false, sma: false, ema: false })
       
       if (coin?.symbol) {
         setIsLoading(true)
@@ -195,6 +333,13 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
   const handleClose = () => {
     setIsVisible(false)
     setTimeout(onClose, 300)
+  }
+  
+  const toggleIndicator = (indicator) => {
+    setActiveIndicators(prev => ({
+      ...prev,
+      [indicator]: !prev[indicator],
+    }))
   }
   
   const indicators = useMemo(() => {
@@ -242,12 +387,6 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
     }
     return coin ? generateMockLevels(coin.price) : null
   }, [coin, apiData])
-  
-  const sparklineData = useMemo(() => {
-    if (!coin) return []
-    const isPositive = parseFloat(coin.change) > 0
-    return generateSparklineData(isPositive)
-  }, [coin])
   
   if (!isOpen || !coin) return null
   
@@ -301,44 +440,44 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
           ) : (
             <>
               <div className="analysis-section">
-                <h3 className="analysis-section-title">📈 Price Chart (48h)</h3>
-                <div className="analysis-chart-container">
-                  <SparklineChart data={sparklineData} isPositive={isPositive} />
-                </div>
+                <h3 className="analysis-section-title">📈 Interactive Price Chart</h3>
+                <AnalysisChart coin={coin} activeIndicators={activeIndicators} />
               </div>
               
               <div className="analysis-section">
-                <h3 className="analysis-section-title">📊 Technical Indicators</h3>
+                <h3 className="analysis-section-title">📊 Technical Indicators <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', fontWeight: '400' }}>(tap to overlay on chart)</span></h3>
                 <div className="analysis-indicators-grid">
-                  <IndicatorRow 
+                  <IndicatorToggle 
                     label="RSI (14)" 
                     value={typeof indicators?.rsi === 'number' ? indicators.rsi.toFixed(2) : indicators?.rsi} 
                     status={getRSIStatus(indicators?.rsi || 50)}
+                    isActive={activeIndicators.rsi}
+                    onToggle={() => toggleIndicator('rsi')}
+                    canToggle={false}
                   />
-                  <IndicatorRow 
+                  <IndicatorToggle 
                     label="MACD" 
                     value={indicators?.macd?.value} 
                     status={getMACDStatus(indicators?.macd || { histogram: '0' })}
+                    isActive={activeIndicators.macd}
+                    onToggle={() => toggleIndicator('macd')}
+                    canToggle={false}
                   />
-                  <IndicatorRow 
-                    label="Signal Line" 
-                    value={indicators?.macd?.signal} 
-                    status={getMACDStatus(indicators?.macd || { histogram: '0' })}
-                  />
-                  <IndicatorRow 
+                  <IndicatorToggle 
                     label="SMA (20)" 
                     value={formatPrice(indicators?.sma20)} 
                     status={currentPrice > (indicators?.sma20 || 0) ? 'bullish' : 'bearish'}
+                    isActive={activeIndicators.sma}
+                    onToggle={() => toggleIndicator('sma')}
+                    canToggle={true}
                   />
-                  <IndicatorRow 
-                    label="SMA (50)" 
-                    value={formatPrice(indicators?.sma50)} 
-                    status={currentPrice > (indicators?.sma50 || 0) ? 'bullish' : 'bearish'}
-                  />
-                  <IndicatorRow 
+                  <IndicatorToggle 
                     label="EMA (12)" 
                     value={formatPrice(indicators?.ema12)} 
                     status={currentPrice > (indicators?.ema12 || 0) ? 'bullish' : 'bearish'}
+                    isActive={activeIndicators.ema}
+                    onToggle={() => toggleIndicator('ema')}
+                    canToggle={true}
                   />
                 </div>
               </div>
@@ -401,6 +540,8 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
                   <StatBox label="Volatility" value={apiData?.volatility ? `${apiData.volatility.toFixed(1)}%` : '—'} subValue={usingMockData ? 'Loading...' : ''} />
                 </div>
               </div>
+              
+              <Notepad coinSymbol={coin.symbol} />
             </>
           )}
           
