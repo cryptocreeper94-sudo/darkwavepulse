@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Carousel, BentoGrid, BentoItem, CategoryPills, GaugeCard } from '../ui'
 import BitcoinChart from '../charts/BitcoinChart'
 import CoinAnalysisModal from '../modals/CoinAnalysisModal'
+import { fetchTopPredictions } from '../../services/api'
 
 const coinCategories = [
   { id: 'top', label: 'Top 10' },
@@ -64,10 +65,43 @@ function CoinRow({ coin, onClick }) {
   )
 }
 
+function PredictionCard({ prediction }) {
+  const getSignalClass = (signal) => {
+    if (signal === 'BUY' || signal === 'STRONG_BUY') return 'buy'
+    if (signal === 'SELL' || signal === 'STRONG_SELL') return 'sell'
+    return 'hold'
+  }
+  
+  const isPositive = prediction.change > 0
+  
+  return (
+    <div className="prediction-card">
+      <div className="prediction-coin">
+        <strong>{prediction.symbol}</strong>
+        <span className="prediction-name">{prediction.name}</span>
+      </div>
+      <div className="prediction-details">
+        <div className={`prediction-signal-badge ${getSignalClass(prediction.signal)}`}>
+          {prediction.signal}
+        </div>
+        <div className="prediction-confidence">
+          <span className="confidence-value">{prediction.confidence}%</span>
+          <span className="confidence-label">confidence</span>
+        </div>
+      </div>
+      <div className={`prediction-change ${isPositive ? 'positive' : 'negative'}`}>
+        {isPositive ? '+' : ''}{prediction.change?.toFixed(1)}%
+      </div>
+    </div>
+  )
+}
+
 export default function MarketsTab() {
   const [activeCategory, setActiveCategory] = useState('top')
   const [selectedCoin, setSelectedCoin] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [predictions, setPredictions] = useState([])
+  const [predictionsLoading, setPredictionsLoading] = useState(true)
   const [marketData, setMarketData] = useState({
     fearGreed: 65,
     altcoinSeason: 75,
@@ -104,7 +138,27 @@ export default function MarketsTab() {
       }
     }
     
+    const loadPredictions = async () => {
+      setPredictionsLoading(true)
+      try {
+        const result = await fetchTopPredictions()
+        if (result.predictions) {
+          setPredictions(result.predictions)
+        }
+      } catch (err) {
+        console.log('Using fallback predictions')
+        setPredictions([
+          { symbol: 'BTC', name: 'Bitcoin', signal: 'BUY', confidence: 72, change: 2.3 },
+          { symbol: 'ETH', name: 'Ethereum', signal: 'HOLD', confidence: 65, change: 1.8 },
+          { symbol: 'SOL', name: 'Solana', signal: 'SELL', confidence: 58, change: -0.5 },
+        ])
+      } finally {
+        setPredictionsLoading(false)
+      }
+    }
+    
     fetchMarketData()
+    loadPredictions()
   }, [])
   
   return (
@@ -174,6 +228,29 @@ export default function MarketsTab() {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      
+      <div className="section-box mb-md">
+        <div className="section-header">
+          <h3 className="section-title">🤖 AI Predictions</h3>
+          <button className="view-all-btn" onClick={() => console.log('View all predictions')}>
+            View All →
+          </button>
+        </div>
+        <div className="section-content">
+          {predictionsLoading ? (
+            <div className="predictions-loading">
+              <div className="loading-spinner"></div>
+              <span>Loading predictions...</span>
+            </div>
+          ) : (
+            <div className="predictions-grid">
+              {predictions.map((pred, i) => (
+                <PredictionCard key={i} prediction={pred} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
       

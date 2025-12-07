@@ -1870,3 +1870,203 @@ img {
     width: 100%;
   }
 }
+
+/* ============================================ */
+/* LOADING SPINNER                             */
+/* ============================================ */
+
+.analysis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 16px;
+}
+
+.analysis-loading span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.analysis-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--neon-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--neon-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.predictions-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ============================================ */
+/* MOCK DATA BADGE                             */
+/* ============================================ */
+
+.analysis-mock-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 165, 0, 0.2);
+  color: #FFA500;
+  border: 1px solid #FFA500;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* ============================================ */
+/* PREDICTIONS SECTION                         */
+/* ============================================ */
+
+.predictions-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.prediction-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.prediction-card:hover {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 15px var(--neon-blue-glow);
+}
+
+.prediction-coin {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prediction-coin strong {
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.prediction-name {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.prediction-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.prediction-signal-badge {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.prediction-signal-badge.buy,
+.prediction-signal-badge.strong_buy {
+  background: rgba(57, 255, 20, 0.2);
+  color: var(--neon-green);
+  border: 1px solid var(--neon-green);
+}
+
+.prediction-signal-badge.sell,
+.prediction-signal-badge.strong_sell {
+  background: rgba(255, 68, 68, 0.2);
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+}
+
+.prediction-signal-badge.hold {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+}
+
+.prediction-confidence {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.prediction-confidence .confidence-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.prediction-confidence .confidence-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.prediction-change {
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: right;
+}
+
+.prediction-change.positive {
+  color: var(--neon-green);
+}
+
+.prediction-change.negative {
+  color: var(--accent-red);
+}
+
+.view-all-btn {
+  background: transparent;
+  border: none;
+  color: var(--neon-blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background: rgba(0, 212, 255, 0.15);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
