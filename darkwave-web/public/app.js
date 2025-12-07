@@ -69,7 +69,7 @@ function showTruthSection(section) {
   }
   
   // Highlight active tab
-  event.target.style.background = '#3861FB';
+  event.target.style.background = '#00D4FF';
   event.target.style.border = 'none';
   event.target.classList.add('truth-tab-active');
 }
@@ -324,8 +324,8 @@ function openStakingFeaturePopup(feature) {
       content: `
         <p><strong>Most platforms?</strong> Pay rewards monthly or weekly.</p>
         <p><strong>DarkWave Pulse?</strong> Rewards distributed <strong>EVERY SINGLE HOUR</strong>.</p>
-        <div style="background: rgba(56, 97, 251, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <h4 style="color: #3861FB; margin: 0 0 10px 0;">Why This Matters:</h4>
+        <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <h4 style="color: #00D4FF; margin: 0 0 10px 0;">Why This Matters:</h4>
           <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
             <li><strong>Compound Effect:</strong> Your rewards earn rewards faster</li>
             <li><strong>Real-Time Growth:</strong> Watch your balance grow every hour</li>
@@ -353,7 +353,7 @@ function openStakingFeaturePopup(feature) {
             <div style="font-weight: 700; margin-bottom: 4px;">🥇 GOLD POOL</div>
             <div style="font-size: 13px; color: #DDD;">90-Day Lock: <strong>25% APY</strong></div>
           </div>
-          <div style="background: linear-gradient(135deg, rgba(56, 97, 251, 0.3), rgba(131, 56, 236, 0.3)); padding: 12px; border-radius: 6px; border-left: 4px solid #3861FB;">
+          <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(131, 56, 236, 0.3)); padding: 12px; border-radius: 6px; border-left: 4px solid #00D4FF;">
             <div style="font-weight: 700; margin-bottom: 4px;">💎 PLATINUM POOL</div>
             <div style="font-size: 13px; color: #DDD;">180-Day Lock: <strong>50% APY</strong></div>
           </div>
@@ -366,8 +366,8 @@ function openStakingFeaturePopup(feature) {
       content: `
         <p><strong>ONE Platform. UNLIMITED Tokens.</strong></p>
         <p>Stake <strong>any</strong> token and earn <strong>DWAV rewards</strong>:</p>
-        <div style="background: rgba(56, 97, 251, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <h4 style="color: #3861FB; margin: 0 0 10px 0;">Supported Tokens:</h4>
+        <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <h4 style="color: #00D4FF; margin: 0 0 10px 0;">Supported Tokens:</h4>
           <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
             <li><strong>DWAV</strong> - Native DarkWave Studios token (highest APY)</li>
             <li><strong>SOL, BTC, ETH</strong> - Major cryptocurrencies</li>
@@ -429,7 +429,7 @@ function openStakingFeaturePopup(feature) {
   modal.innerHTML = `
     <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
       <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
-      <h2 style="font-family: 'Orbitron', sans-serif; color: #3861FB; margin-bottom: 20px;">${data.title}</h2>
+      <h2 style="font-family: 'Orbitron', sans-serif; color: #00D4FF; margin-bottom: 20px;">${data.title}</h2>
       <div style="line-height: 1.7; color: #DDD;">
         ${data.content}
       </div>
@@ -2554,9 +2554,9 @@ async function initStockCharts() {
       });
       
       stockSparklineSeries = stockSparklineChart.addAreaSeries({
-        lineColor: '#3861FB',
-        topColor: 'rgba(56, 97, 251, 0.4)',
-        bottomColor: 'rgba(56, 97, 251, 0)',
+        lineColor: '#00D4FF',
+        topColor: 'rgba(0, 212, 255, 0.4)',
+        bottomColor: 'rgba(0, 212, 255, 0)',
         lineWidth: 2
       });
       console.log('✅ Stock sparkline chart created');
@@ -3025,7 +3025,7 @@ function drawMarketBreadthGauge(value) {
   
   // Blue stroke for definition
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = '#3861FB';
+  ctx.strokeStyle = '#00D4FF';
   ctx.lineWidth = 3;
   ctx.stroke();
   
@@ -3034,7 +3034,7 @@ function drawMarketBreadthGauge(value) {
   // Draw larger center circle
   ctx.beginPath();
   ctx.arc(centerX, centerY, 12, 0, 2 * Math.PI);
-  ctx.fillStyle = '#3861FB';
+  ctx.fillStyle = '#00D4FF';
   ctx.fill();
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 4;
@@ -4352,7 +4352,7 @@ function drawAltSeasonGauge(canvas, value, options = {}) {
     // Draw center circle only for regular needle
     ctx.beginPath();
     ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
-    ctx.fillStyle = '#3861FB';
+    ctx.fillStyle = '#00D4FF';
     ctx.fill();
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 2;
@@ -7092,7 +7092,7 @@ function loadChatMessages() {
           const themeColor = getThemeColor(msg.theme || 'dark');
           
           const msgEl = document.createElement('div');
-          msgEl.style.cssText = 'background: rgba(56, 97, 251, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #10b981; display: flex; gap: 10px; align-items: flex-start;';
+          msgEl.style.cssText = 'background: rgba(0, 212, 255, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #10b981; display: flex; gap: 10px; align-items: flex-start;';
           
           const timeString = new Date(msg.created_at).toLocaleTimeString('en-US', { 
             hour: '2-digit', 
@@ -7108,7 +7108,7 @@ function loadChatMessages() {
           msgEl.innerHTML = `
             <div style="width: 32px; height: 32px; border-radius: 50%; background: ${themeColor}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; position: relative;">
               ${initials}
-              ${msg.isAssetHolder ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #10b981; border: 2px solid rgba(56, 97, 251, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white;">✓</div>' : ''}
+              ${msg.isAssetHolder ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #10b981; border: 2px solid rgba(0, 212, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white;">✓</div>' : ''}
             </div>
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;">

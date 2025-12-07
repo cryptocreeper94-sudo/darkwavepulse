@@ -94,7 +94,7 @@ const landscapeChartController = {
       <!-- Header with Controls -->
       <div style="padding: 12px 16px; background: rgba(20, 20, 30, 0.95); border-bottom: 1px solid rgba(100, 150, 255, 0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; gap: 8px; align-items: center;">
-          <select id="landscape-timeframe-select" style="padding: 6px 10px; background: rgba(56, 97, 251, 0.1); border: 2px solid rgba(56, 97, 251, 0.3); border-radius: 4px; color: #ffffff; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase;" onchange="landscapeChartController.changeTimeframe(this.value)">
+          <select id="landscape-timeframe-select" style="padding: 6px 10px; background: rgba(0, 212, 255, 0.1); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 4px; color: #ffffff; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase;" onchange="landscapeChartController.changeTimeframe(this.value)">
             <option value="1s">1 Second</option>
             <option value="5m">5 Minutes</option>
             <option value="1h">1 Hour</option>
@@ -121,7 +121,7 @@ const landscapeChartController = {
           
           <!-- Zoom & Status Indicators -->
           <div style="padding: 8px 12px; background: rgba(20, 20, 30, 0.8); border-top: 1px solid rgba(100, 150, 255, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
-            <span id="landscape-zoom-indicator" style="color: #3861FB; font-weight: 600;">Zoom: 1.0x</span>
+            <span id="landscape-zoom-indicator" style="color: #00D4FF; font-weight: 600;">Zoom: 1.0x</span>
             <span id="landscape-status" style="color: #10B981;">Ready</span>
           </div>
         </div>
@@ -130,7 +130,7 @@ const landscapeChartController = {
         <div style="flex: 1; background: rgba(20, 20, 30, 0.9); border-left: 1px solid rgba(100, 150, 255, 0.1); overflow-y: auto; padding: 16px; display: flex; flex-direction: column;">
           <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(100, 150, 255, 0.1);">
             <h3 style="margin: 0; font-size: 16px; color: #ffffff; margin-bottom: 6px;">${this.assetData?.displayName || this.assetData?.name || 'Asset'}</h3>
-            <div style="font-size: 20px; font-weight: 700; color: #3861FB;">${this.formatPrice(this.assetData?.price)}</div>
+            <div style="font-size: 20px; font-weight: 700; color: #00D4FF;">${this.formatPrice(this.assetData?.price)}</div>
           </div>
           
           <div style="flex: 1; overflow-y: auto; font-size: 13px;">
@@ -345,16 +345,16 @@ const landscapeChartController = {
       crosshair: {
         mode: LightweightCharts.CrosshairMode.Magnet,
         vertLine: {
-          color: '#3861FB',
+          color: '#00D4FF',
           width: 2,
           style: LightweightCharts.LineStyle.Solid,
-          labelBackgroundColor: '#3861FB',
+          labelBackgroundColor: '#00D4FF',
         },
         horzLine: {
-          color: '#3861FB',
+          color: '#00D4FF',
           width: 2,
           style: LightweightCharts.LineStyle.Solid,
-          labelBackgroundColor: '#3861FB',
+          labelBackgroundColor: '#00D4FF',
         },
       },
       timeScale: {
@@ -393,9 +393,9 @@ const landscapeChartController = {
       });
     } else {
       this.chartSeries = this.chart.addAreaSeries({
-        lineColor: '#3861FB',
-        topColor: 'rgba(56, 97, 251, 0.4)',
-        bottomColor: 'rgba(56, 97, 251, 0.0)',
+        lineColor: '#00D4FF',
+        topColor: 'rgba(0, 212, 255, 0.4)',
+        bottomColor: 'rgba(0, 212, 255, 0.0)',
         lineWidth: 2,
       });
     }

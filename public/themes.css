@@ -17,21 +17,21 @@
   --text-dim: #777777;
   
   /* Accent Colors */
-  --accent-blue: #3861FB;
-  --accent-glow: #3861FB;
+  --accent-blue: #00D4FF;
+  --accent-glow: #00D4FF;
   --accent-purple: #7C3AED;
   
   /* Status Colors */
-  --positive-green: #00C853;
+  --positive-green: #39FF14;
   --negative-red: #ff4444;
   --warning-yellow: #9D4EDD;
-  --text-green: #00C853;
+  --text-green: #39FF14;
   --text-red: #ff4444;
   
   /* Dark Theme Tokens */
   --glass-bg: #1a1a1a;
   --glass-border: #333333;
-  --glass-glow: #3861FB;
+  --glass-glow: #00D4FF;
   --glass-blur: 0;
   
   /* Surface layers */

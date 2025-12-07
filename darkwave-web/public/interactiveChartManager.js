@@ -46,16 +46,16 @@ const interactiveChartManager = {
       crosshair: {
         mode: LightweightCharts.CrosshairMode.Magnet,
         vertLine: {
-          color: '#3861FB',
+          color: '#00D4FF',
           width: 1,
           style: LightweightCharts.LineStyle.Dashed,
-          labelBackgroundColor: '#3861FB',
+          labelBackgroundColor: '#00D4FF',
         },
         horzLine: {
-          color: '#3861FB',
+          color: '#00D4FF',
           width: 1,
           style: LightweightCharts.LineStyle.Dashed,
-          labelBackgroundColor: '#3861FB',
+          labelBackgroundColor: '#00D4FF',
         },
       },
       timeScale: {
@@ -148,7 +148,7 @@ const interactiveChartManager = {
       position: absolute;
       display: none;
       background: rgba(26, 26, 26, 0.95);
-      border: 1px solid #3861FB;
+      border: 1px solid #00D4FF;
       border-radius: 6px;
       padding: 8px 12px;
       font-size: 12px;
@@ -296,9 +296,9 @@ const interactiveChartManager = {
     // Create or update area series
     if (!this.areaSeries) {
       this.areaSeries = this.chart.addAreaSeries({
-        lineColor: '#3861FB',
-        topColor: 'rgba(56, 97, 251, 0.4)',
-        bottomColor: 'rgba(56, 97, 251, 0.0)',
+        lineColor: '#00D4FF',
+        topColor: 'rgba(0, 212, 255, 0.4)',
+        bottomColor: 'rgba(0, 212, 255, 0.0)',
         lineWidth: 2,
       });
     }
@@ -332,7 +332,7 @@ const interactiveChartManager = {
     // Create or update histogram series for volume
     if (!this.histogramSeries) {
       this.histogramSeries = this.chart.addHistogramSeries({
-        color: '#3861FB',
+        color: '#00D4FF',
         priceFormat: {
           type: 'volume',
         },

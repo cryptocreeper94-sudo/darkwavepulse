@@ -211,7 +211,7 @@ class TradingCardCarousel {
       'Topaz Aurora': 'linear-gradient(135deg, #ffaa00, #ffdd00)',
       'Sapphire Dusk': 'linear-gradient(135deg, #0044aa, #6600ff)'
     };
-    return gradients[color] || 'linear-gradient(135deg, #3861fb, #ff0088)';
+    return gradients[color] || 'linear-gradient(135deg, #00D4FF, #ff0088)';
   }
 }
 
