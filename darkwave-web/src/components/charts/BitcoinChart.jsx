@@ -2,9 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { createChart, CandlestickSeries, AreaSeries } from 'lightweight-charts'
 
 const TIMEFRAMES = [
+  { id: '1S', label: '1S', days: 0, isLive: true },
   { id: '1D', label: '1D', days: 1 },
   { id: '7D', label: '7D', days: 7 },
   { id: '30D', label: '30D', days: 30 },
+  { id: '1Y', label: '1Y', days: 365 },
+  { id: 'ALL', label: 'ALL', days: 'max' },
 ]
 
 const DEFAULT_COLORS = {
@@ -70,8 +73,63 @@ export default function BitcoinChart() {
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState([])
 
+  const fetchLivePrice = useCallback(async () => {
+    try {
+      const response = await fetch('/api/crypto/btc-price')
+      if (response.ok) {
+        const priceData = await response.json()
+        if (priceData && priceData.price) {
+          const now = Math.floor(Date.now() / 1000)
+          const price = priceData.price
+          
+          setData(prev => {
+            const newPoint = {
+              time: now,
+              open: price,
+              high: price,
+              low: price,
+              close: price,
+            }
+            
+            if (prev.length === 0) {
+              return [newPoint]
+            }
+            
+            const updated = [...prev]
+            const lastPoint = updated[updated.length - 1]
+            
+            if (now - lastPoint.time < 1) {
+              lastPoint.close = price
+              lastPoint.high = Math.max(lastPoint.high, price)
+              lastPoint.low = Math.min(lastPoint.low, price)
+            } else {
+              updated.push(newPoint)
+              if (updated.length > 120) updated.shift()
+            }
+            
+            return updated
+          })
+          
+          setLastPrice(price)
+          if (data.length > 0) {
+            const firstPrice = data[0].open
+            const change = ((price - firstPrice) / firstPrice) * 100
+            setPriceChange(change.toFixed(2))
+          }
+        }
+      }
+    } catch (err) {
+      console.log('Live price fetch error')
+    }
+  }, [data])
+
   const fetchData = useCallback(async () => {
     const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+    
+    if (selectedTimeframe.isLive) {
+      setData([])
+      return
+    }
     
     try {
       const response = await fetch(`/api/crypto/btc-history?days=${selectedTimeframe.days}`)
@@ -86,19 +144,25 @@ export default function BitcoinChart() {
       console.log('API unavailable, using sample data')
     }
     
-    setData(generateSampleData(selectedTimeframe.days))
+    const numDays = selectedTimeframe.days === 'max' ? 1825 : selectedTimeframe.days
+    setData(generateSampleData(numDays))
   }, [timeframe])
 
   useEffect(() => {
+    const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+    
     fetchData()
     setIsLoading(false)
     
-    const refreshInterval = setInterval(() => {
-      fetchData()
-    }, 30000)
-    
-    return () => clearInterval(refreshInterval)
-  }, [fetchData])
+    if (selectedTimeframe.isLive) {
+      fetchLivePrice()
+      const liveInterval = setInterval(fetchLivePrice, 1000)
+      return () => clearInterval(liveInterval)
+    } else {
+      const refreshInterval = setInterval(fetchData, 30000)
+      return () => clearInterval(refreshInterval)
+    }
+  }, [fetchData, fetchLivePrice, timeframe])
 
   useEffect(() => {
     if (!chartContainerRef.current || data.length === 0) return
