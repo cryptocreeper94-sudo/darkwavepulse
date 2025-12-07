@@ -697,6 +697,90 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Live BTC Price - 1 second ticker updates
+      {
+        path: "/api/crypto/btc-price",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          // Check cache (5 second TTL for live price)
+          const cached = apiCache.get<any>('btc-live-price');
+          if (cached) {
+            return c.json(cached);
+          }
+          
+          try {
+            const data = await coinGeckoClient.getSimplePrice('bitcoin', 'usd');
+            const price = data?.bitcoin?.usd || 0;
+            const change24h = data?.bitcoin?.usd_24h_change || 0;
+            
+            const result = {
+              price,
+              change24h,
+              timestamp: Date.now()
+            };
+            
+            // Cache for 5 seconds
+            apiCache.set('btc-live-price', result, 5);
+            
+            return c.json(result);
+          } catch (error: any) {
+            logger?.error('❌ [BTCPrice] Error', { error: error.message });
+            return c.json({ price: 0, change24h: 0, error: 'Failed to fetch price' }, 500);
+          }
+        }
+      },
+      // BTC History - OHLC data for chart
+      {
+        path: "/api/crypto/btc-history",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const days = c.req.query('days') || '7';
+          
+          logger?.info('📊 [BTCHistory] Request', { days });
+          
+          // Check cache
+          const cacheKey = `btc-ohlc:${days}`;
+          const cached = apiCache.get<any[]>(cacheKey);
+          if (cached) {
+            logger?.info('📦 [BTCHistory] Returning cached data', { days });
+            return c.json(cached);
+          }
+          
+          try {
+            // Convert 'max' to number for API call
+            const daysNum = days === 'max' ? 1825 : parseInt(days);
+            
+            const ohlcData = await coinGeckoClient.getOHLC('bitcoin', daysNum);
+            
+            if (!ohlcData || !Array.isArray(ohlcData) || ohlcData.length === 0) {
+              logger?.warn('⚠️ [BTCHistory] No data from CoinGecko');
+              return c.json([]);
+            }
+            
+            // Transform to chart format
+            const chartData = ohlcData.map((candle: number[]) => ({
+              time: Math.floor(candle[0] / 1000),
+              open: candle[1],
+              high: candle[2],
+              low: candle[3],
+              close: candle[4]
+            }));
+            
+            // Cache based on timeframe
+            const cacheTTL = daysNum <= 1 ? 60 : daysNum <= 7 ? 300 : 600;
+            apiCache.set(cacheKey, chartData, cacheTTL);
+            
+            logger?.info('✅ [BTCHistory] Data fetched', { days, points: chartData.length });
+            return c.json(chartData);
+          } catch (error: any) {
+            logger?.error('❌ [BTCHistory] Error', { error: error.message });
+            return c.json({ error: 'Failed to fetch history' }, 500);
+          }
+        }
+      },
       // Crypto Category Filter Routes - Used by coin table filter buttons
       {
         path: "/api/crypto/category/:category",

@@ -108,13 +108,14 @@ class CoinGeckoClient {
     });
   }
 
-  async getSimplePrice(ids: string, vsCurrencies: string = 'usd', includeMarketCap: boolean = true, include24hrVol: boolean = true) {
+  async getSimplePrice(ids: string, vsCurrencies: string = 'usd', includeMarketCap: boolean = true, include24hrVol: boolean = true, include24hrChange: boolean = true) {
     return this.get('/simple/price', {
       params: {
         ids,
         vs_currencies: vsCurrencies,
         include_market_cap: includeMarketCap,
         include_24hr_vol: include24hrVol,
+        include_24hr_change: include24hrChange,
         include_market_cap_change_percentage_24h_in: vsCurrencies
       }
     });
