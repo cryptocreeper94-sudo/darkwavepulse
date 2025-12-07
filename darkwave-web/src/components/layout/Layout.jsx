@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import Header from './Header'
 import HamburgerMenu from './HamburgerMenu'
+import BugReportModal from '../modals/BugReportModal'
+import DisclaimerModal from '../modals/DisclaimerModal'
 
 export default function Layout({ children, activeTab, onTabChange }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isBugModalOpen, setIsBugModalOpen] = useState(false)
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false)
   
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -16,16 +20,18 @@ export default function Layout({ children, activeTab, onTabChange }) {
   const handleAction = (actionId) => {
     switch (actionId) {
       case 'agent':
-        console.log('Open agent builder')
+        console.log('Opening Agent Builder')
+        alert('Agent Builder coming soon!')
         break
       case 'theme':
-        console.log('Open theme selector')
+        console.log('Opening Theme Selector')
+        document.body.classList.toggle('theme-light')
         break
       case 'bug':
-        console.log('Open bug report')
+        setIsBugModalOpen(true)
         break
       case 'disclaimer':
-        console.log('Open disclaimer')
+        setIsDisclaimerOpen(true)
         break
       case 'logout':
         window.location.href = '/lockscreen.html'
@@ -33,6 +39,10 @@ export default function Layout({ children, activeTab, onTabChange }) {
       default:
         break
     }
+  }
+
+  const handleHomeClick = () => {
+    onTabChange('markets')
   }
   
   return (
@@ -53,6 +63,26 @@ export default function Layout({ children, activeTab, onTabChange }) {
       <main className="app-content">
         {children}
       </main>
+
+      {activeTab !== 'markets' && (
+        <button 
+          className="floating-home-btn"
+          onClick={handleHomeClick}
+          title="Back to Markets"
+        >
+          🏠
+        </button>
+      )}
+
+      <BugReportModal 
+        isOpen={isBugModalOpen} 
+        onClose={() => setIsBugModalOpen(false)} 
+      />
+      
+      <DisclaimerModal 
+        isOpen={isDisclaimerOpen} 
+        onClose={() => setIsDisclaimerOpen(false)} 
+      />
     </div>
   )
 }

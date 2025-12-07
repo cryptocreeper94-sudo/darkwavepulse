@@ -25,6 +25,17 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
       
       <nav className={`hamburger-menu ${isOpen ? 'open' : ''}`}>
         <div className="menu-content">
+          <button
+            className="menu-home-btn"
+            onClick={() => {
+              onTabChange('markets')
+              onClose()
+            }}
+          >
+            <span className="menu-home-icon">🏠</span>
+            <span>Home</span>
+          </button>
+
           <div className="menu-section">
             <div className="menu-section-title">Navigation</div>
             {menuItems.map(item => (

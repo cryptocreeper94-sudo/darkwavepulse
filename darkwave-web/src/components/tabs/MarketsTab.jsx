@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Carousel, BentoGrid, BentoItem, CategoryPills, GaugeCard } from '../ui'
 import BitcoinChart from '../charts/BitcoinChart'
+import CoinAnalysisModal from '../modals/CoinAnalysisModal'
 
 const coinCategories = [
   { id: 'top', label: 'Top 10' },
@@ -9,8 +10,8 @@ const coinCategories = [
   { id: 'bluechip', icon: '🏆', label: 'Blue Chips' },
 ]
 
-function MetricCard({ title, value, change, onClick }) {
-  const isPositive = change && change.startsWith('+')
+function MetricCard({ title, value, change, subLabel, flowDirection, onClick }) {
+  const isPositive = change && (change.startsWith('+') || parseFloat(change) > 0)
   
   return (
     <div className="metric-card" onClick={onClick}>
@@ -18,7 +19,12 @@ function MetricCard({ title, value, change, onClick }) {
       <div className="metric-value">{value}</div>
       {change && (
         <div className={`metric-change ${isPositive ? 'positive' : 'negative'}`}>
-          {change}
+          {isPositive ? '▲' : '▼'} {change}
+        </div>
+      )}
+      {subLabel && (
+        <div className={`metric-sublabel ${flowDirection === 'inflow' ? 'positive' : flowDirection === 'outflow' ? 'negative' : ''}`}>
+          {flowDirection === 'inflow' ? '↑ Inflow' : flowDirection === 'outflow' ? '↓ Outflow' : subLabel}
         </div>
       )}
     </div>
@@ -60,11 +66,16 @@ function CoinRow({ coin, onClick }) {
 
 export default function MarketsTab() {
   const [activeCategory, setActiveCategory] = useState('top')
+  const [selectedCoin, setSelectedCoin] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [marketData, setMarketData] = useState({
     fearGreed: 65,
     altcoinSeason: 75,
     marketCap: '$3.14T',
+    marketCapChange: '+1.5%',
     volume: '$64.1B',
+    volumeChange: '+2.8%',
+    volumeFlow: 'inflow',
   })
   const [coins, setCoins] = useState([
     { symbol: 'BTC', name: 'Bitcoin', logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png', price: '$97,234', change: '+2.3%', volume: '$28.5B' },
@@ -111,16 +122,20 @@ export default function MarketsTab() {
         />
       </div>
       
-      <Carousel itemWidth={160} showDots={true}>
+      <div className="metrics-row">
         <MetricCard 
           title="MARKET CAP" 
           value={marketData.marketCap}
+          change={marketData.marketCapChange}
         />
         <MetricCard 
           title="24H VOLUME" 
           value={marketData.volume}
+          change={marketData.volumeChange}
+          flowDirection={marketData.volumeFlow}
+          subLabel="Volume Flow"
         />
-      </Carousel>
+      </div>
       
       <BitcoinChart />
       
@@ -150,7 +165,10 @@ export default function MarketsTab() {
                   <CoinRow 
                     key={coin.symbol} 
                     coin={coin}
-                    onClick={() => console.log('Open analysis for', coin.symbol)}
+                    onClick={() => {
+                      setSelectedCoin(coin)
+                      setIsModalOpen(true)
+                    }}
                   />
                 ))}
               </tbody>
@@ -171,6 +189,15 @@ export default function MarketsTab() {
           </Carousel>
         </div>
       </div>
+      
+      <CoinAnalysisModal 
+        coin={selectedCoin}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedCoin(null)
+        }}
+      />
     </div>
   )
 }
