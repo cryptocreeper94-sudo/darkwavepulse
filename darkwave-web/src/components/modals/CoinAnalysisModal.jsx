@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { fetchCoinAnalysis } from '../../services/api'
 
 function formatNumber(num) {
   if (!num && num !== 0) return '—'
@@ -140,13 +141,47 @@ function StatBox({ label, value, subValue }) {
   )
 }
 
+function LoadingSpinner() {
+  return (
+    <div className="analysis-loading">
+      <div className="analysis-spinner"></div>
+      <span>Loading analysis...</span>
+    </div>
+  )
+}
+
 export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [apiData, setApiData] = useState(null)
+  const [usingMockData, setUsingMockData] = useState(false)
   
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
       setTimeout(() => setIsVisible(true), 10)
+      
+      if (coin?.symbol) {
+        setIsLoading(true)
+        setApiData(null)
+        setUsingMockData(false)
+        
+        fetchCoinAnalysis(coin.symbol)
+          .then(result => {
+            if (result.success && result.data) {
+              setApiData(result.data)
+              setUsingMockData(false)
+            } else {
+              setUsingMockData(true)
+            }
+          })
+          .catch(() => {
+            setUsingMockData(true)
+          })
+          .finally(() => {
+            setIsLoading(false)
+          })
+      }
     } else {
       setIsVisible(false)
       document.body.style.overflow = ''
@@ -155,16 +190,59 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOpen])
+  }, [isOpen, coin?.symbol])
   
   const handleClose = () => {
     setIsVisible(false)
     setTimeout(onClose, 300)
   }
   
-  const indicators = useMemo(() => coin ? generateMockIndicators(coin) : null, [coin])
-  const prediction = useMemo(() => indicators ? generateMockPrediction(indicators) : null, [indicators])
-  const levels = useMemo(() => coin ? generateMockLevels(coin.price) : null, [coin])
+  const indicators = useMemo(() => {
+    if (apiData) {
+      return {
+        rsi: apiData.rsi || 50,
+        macd: {
+          value: apiData.macd?.value?.toFixed(4) || '0.0000',
+          signal: apiData.macd?.signal?.toFixed(4) || '0.0000',
+          histogram: apiData.macd?.histogram?.toFixed(4) || '0.0000'
+        },
+        sma20: apiData.sma50 || 0,
+        sma50: apiData.sma200 || apiData.sma50 || 0,
+        ema12: apiData.ema9 || 0,
+        ema26: apiData.ema21 || 0
+      }
+    }
+    return coin ? generateMockIndicators(coin) : null
+  }, [coin, apiData])
+  
+  const prediction = useMemo(() => {
+    if (apiData?.recommendation) {
+      const signal = apiData.recommendation
+      const bullish = apiData.signalCount?.bullish || 0
+      const bearish = apiData.signalCount?.bearish || 0
+      const total = bullish + bearish
+      let confidence = 50
+      if (total > 0) {
+        const dominant = Math.max(bullish, bearish)
+        confidence = Math.round((dominant / total) * 100)
+      }
+      return { signal, confidence }
+    }
+    return indicators ? generateMockPrediction(indicators) : null
+  }, [indicators, apiData])
+  
+  const levels = useMemo(() => {
+    if (apiData?.support && apiData?.resistance) {
+      return {
+        resistance1: apiData.resistance,
+        resistance2: apiData.resistance * 1.03,
+        support1: apiData.support,
+        support2: apiData.support * 0.97
+      }
+    }
+    return coin ? generateMockLevels(coin.price) : null
+  }, [coin, apiData])
+  
   const sparklineData = useMemo(() => {
     if (!coin) return []
     const isPositive = parseFloat(coin.change) > 0
@@ -204,6 +282,9 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
             <div className="analysis-coin-info">
               <h2 className="analysis-coin-name">{coin.name}</h2>
               <span className="analysis-coin-symbol">{coin.symbol}</span>
+              {usingMockData && (
+                <span className="analysis-mock-badge">Demo Data</span>
+              )}
             </div>
             <div className="analysis-price-block">
               <div className={`analysis-current-price ${isPositive ? 'positive' : 'negative'}`}>
@@ -215,107 +296,113 @@ export default function CoinAnalysisModal({ coin, isOpen, onClose }) {
             </div>
           </div>
           
-          <div className="analysis-section">
-            <h3 className="analysis-section-title">📈 Price Chart (48h)</h3>
-            <div className="analysis-chart-container">
-              <SparklineChart data={sparklineData} isPositive={isPositive} />
-            </div>
-          </div>
-          
-          <div className="analysis-section">
-            <h3 className="analysis-section-title">📊 Technical Indicators</h3>
-            <div className="analysis-indicators-grid">
-              <IndicatorRow 
-                label="RSI (14)" 
-                value={indicators.rsi} 
-                status={getRSIStatus(indicators.rsi)}
-              />
-              <IndicatorRow 
-                label="MACD" 
-                value={indicators.macd.value} 
-                status={getMACDStatus(indicators.macd)}
-              />
-              <IndicatorRow 
-                label="Signal Line" 
-                value={indicators.macd.signal} 
-                status={getMACDStatus(indicators.macd)}
-              />
-              <IndicatorRow 
-                label="SMA (20)" 
-                value={formatPrice(indicators.sma20)} 
-                status={currentPrice > indicators.sma20 ? 'bullish' : 'bearish'}
-              />
-              <IndicatorRow 
-                label="SMA (50)" 
-                value={formatPrice(indicators.sma50)} 
-                status={currentPrice > indicators.sma50 ? 'bullish' : 'bearish'}
-              />
-              <IndicatorRow 
-                label="EMA (12)" 
-                value={formatPrice(indicators.ema12)} 
-                status={currentPrice > indicators.ema12 ? 'bullish' : 'bearish'}
-              />
-            </div>
-          </div>
-          
-          <div className="analysis-section">
-            <h3 className="analysis-section-title">🤖 AI Prediction</h3>
-            <div className="analysis-prediction-card">
-              <div className={`analysis-signal-badge ${prediction.signal.toLowerCase()}`}>
-                {prediction.signal}
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <div className="analysis-section">
+                <h3 className="analysis-section-title">📈 Price Chart (48h)</h3>
+                <div className="analysis-chart-container">
+                  <SparklineChart data={sparklineData} isPositive={isPositive} />
+                </div>
               </div>
-              <div className="analysis-confidence">
-                <span className="analysis-confidence-label">Confidence</span>
-                <span className="analysis-confidence-value">{prediction.confidence}%</span>
+              
+              <div className="analysis-section">
+                <h3 className="analysis-section-title">📊 Technical Indicators</h3>
+                <div className="analysis-indicators-grid">
+                  <IndicatorRow 
+                    label="RSI (14)" 
+                    value={typeof indicators?.rsi === 'number' ? indicators.rsi.toFixed(2) : indicators?.rsi} 
+                    status={getRSIStatus(indicators?.rsi || 50)}
+                  />
+                  <IndicatorRow 
+                    label="MACD" 
+                    value={indicators?.macd?.value} 
+                    status={getMACDStatus(indicators?.macd || { histogram: '0' })}
+                  />
+                  <IndicatorRow 
+                    label="Signal Line" 
+                    value={indicators?.macd?.signal} 
+                    status={getMACDStatus(indicators?.macd || { histogram: '0' })}
+                  />
+                  <IndicatorRow 
+                    label="SMA (20)" 
+                    value={formatPrice(indicators?.sma20)} 
+                    status={currentPrice > (indicators?.sma20 || 0) ? 'bullish' : 'bearish'}
+                  />
+                  <IndicatorRow 
+                    label="SMA (50)" 
+                    value={formatPrice(indicators?.sma50)} 
+                    status={currentPrice > (indicators?.sma50 || 0) ? 'bullish' : 'bearish'}
+                  />
+                  <IndicatorRow 
+                    label="EMA (12)" 
+                    value={formatPrice(indicators?.ema12)} 
+                    status={currentPrice > (indicators?.ema12 || 0) ? 'bullish' : 'bearish'}
+                  />
+                </div>
               </div>
-              <div className="analysis-confidence-bar">
-                <div 
-                  className="analysis-confidence-fill" 
-                  style={{ 
-                    width: `${prediction.confidence}%`,
-                    background: prediction.signal === 'BUY' ? 'var(--neon-green)' : 
-                               prediction.signal === 'SELL' ? 'var(--accent-red)' : 'var(--neon-blue)'
-                  }}
-                />
+              
+              <div className="analysis-section">
+                <h3 className="analysis-section-title">🤖 AI Prediction</h3>
+                <div className="analysis-prediction-card">
+                  <div className={`analysis-signal-badge ${prediction?.signal?.toLowerCase() || 'hold'}`}>
+                    {prediction?.signal || 'HOLD'}
+                  </div>
+                  <div className="analysis-confidence">
+                    <span className="analysis-confidence-label">Confidence</span>
+                    <span className="analysis-confidence-value">{prediction?.confidence || 50}%</span>
+                  </div>
+                  <div className="analysis-confidence-bar">
+                    <div 
+                      className="analysis-confidence-fill" 
+                      style={{ 
+                        width: `${prediction?.confidence || 50}%`,
+                        background: prediction?.signal === 'BUY' || prediction?.signal === 'STRONG_BUY' ? 'var(--neon-green)' : 
+                                   prediction?.signal === 'SELL' || prediction?.signal === 'STRONG_SELL' ? 'var(--accent-red)' : 'var(--neon-blue)'
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="analysis-section">
-            <h3 className="analysis-section-title">📍 Support & Resistance</h3>
-            <div className="analysis-levels-grid">
-              <div className="analysis-level resistance">
-                <span className="level-label">R2</span>
-                <span className="level-value">{formatPrice(levels.resistance2)}</span>
+              
+              <div className="analysis-section">
+                <h3 className="analysis-section-title">📍 Support & Resistance</h3>
+                <div className="analysis-levels-grid">
+                  <div className="analysis-level resistance">
+                    <span className="level-label">R2</span>
+                    <span className="level-value">{formatPrice(levels?.resistance2)}</span>
+                  </div>
+                  <div className="analysis-level resistance">
+                    <span className="level-label">R1</span>
+                    <span className="level-value">{formatPrice(levels?.resistance1)}</span>
+                  </div>
+                  <div className="analysis-level current">
+                    <span className="level-label">Current</span>
+                    <span className="level-value">{coin.price}</span>
+                  </div>
+                  <div className="analysis-level support">
+                    <span className="level-label">S1</span>
+                    <span className="level-value">{formatPrice(levels?.support1)}</span>
+                  </div>
+                  <div className="analysis-level support">
+                    <span className="level-label">S2</span>
+                    <span className="level-value">{formatPrice(levels?.support2)}</span>
+                  </div>
+                </div>
               </div>
-              <div className="analysis-level resistance">
-                <span className="level-label">R1</span>
-                <span className="level-value">{formatPrice(levels.resistance1)}</span>
+              
+              <div className="analysis-section">
+                <h3 className="analysis-section-title">📋 Key Statistics</h3>
+                <div className="analysis-stats-grid">
+                  <StatBox label="24h High" value={formatPrice(high24h)} />
+                  <StatBox label="24h Low" value={formatPrice(low24h)} />
+                  <StatBox label="24h Volume" value={coin.volume} />
+                  <StatBox label="Volatility" value={apiData?.volatility ? `${apiData.volatility.toFixed(1)}%` : '—'} subValue={usingMockData ? 'Loading...' : ''} />
+                </div>
               </div>
-              <div className="analysis-level current">
-                <span className="level-label">Current</span>
-                <span className="level-value">{coin.price}</span>
-              </div>
-              <div className="analysis-level support">
-                <span className="level-label">S1</span>
-                <span className="level-value">{formatPrice(levels.support1)}</span>
-              </div>
-              <div className="analysis-level support">
-                <span className="level-label">S2</span>
-                <span className="level-value">{formatPrice(levels.support2)}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="analysis-section">
-            <h3 className="analysis-section-title">📋 Key Statistics</h3>
-            <div className="analysis-stats-grid">
-              <StatBox label="24h High" value={formatPrice(high24h)} />
-              <StatBox label="24h Low" value={formatPrice(low24h)} />
-              <StatBox label="24h Volume" value={coin.volume} />
-              <StatBox label="Market Cap" value="—" subValue="Loading..." />
-            </div>
-          </div>
+            </>
+          )}
           
           <button className="analysis-close-btn" onClick={handleClose}>
             Close Analysis
