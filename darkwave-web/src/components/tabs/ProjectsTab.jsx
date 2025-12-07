@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Carousel, CategoryPills, Accordion, AccordionItem } from '../ui'
+import AvatarCreator from '../ui/AvatarCreator'
 
 const coinCategories = [
   { id: 'cryptocat', icon: '🐱', label: 'Crypto Cat' },
@@ -180,6 +181,7 @@ export default function ProjectsTab() {
   const [agentStyle, setAgentStyle] = useState(() => {
     return localStorage.getItem('pulse-agent-style') || 'pixar'
   })
+  const [showAvatarCreator, setShowAvatarCreator] = useState(false)
   
   useEffect(() => {
     localStorage.setItem('pulse-agent-style', agentStyle)
@@ -187,6 +189,10 @@ export default function ProjectsTab() {
   
   const handleCoinClick = (coin) => {
     console.log('Open coin details for', coin.name)
+  }
+  
+  const handleAvatarSave = (avatar) => {
+    console.log('Avatar saved:', avatar)
   }
   
   return (
@@ -224,8 +230,41 @@ export default function ProjectsTab() {
               <AgentCard key={agent.id} agent={agent} style={agentStyle} />
             ))}
           </Carousel>
+          
+          <button
+            onClick={() => setShowAvatarCreator(true)}
+            style={{
+              width: '100%',
+              marginTop: 16,
+              padding: '14px 20px',
+              background: 'linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(0, 212, 255, 0.2))',
+              border: '1px solid rgba(157, 78, 221, 0.4)',
+              borderRadius: 12,
+              color: '#c084fc',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            🎨 Create Your Custom Avatar
+          </button>
+          <div style={{ fontSize: 10, color: '#888', textAlign: 'center', marginTop: 6 }}>
+            Customize skin tone, hair, beard, clothing & more
+          </div>
         </div>
       </div>
+      
+      <AvatarCreator 
+        isOpen={showAvatarCreator}
+        onClose={() => setShowAvatarCreator(false)}
+        onSave={handleAvatarSave}
+        isPremium={false}
+      />
       
       <div className="section-box mb-md">
         <div className="section-header">
