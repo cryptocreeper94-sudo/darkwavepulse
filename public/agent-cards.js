@@ -39,12 +39,12 @@ function showAgentRefractorModal(agent) {
           </div>
           
           <div style="position: relative; margin: 16px 0;">
-            <img src="${agent.image}" alt="${agent.name}" style="width: 100%; max-width: 220px; border-radius: 12px; border: 3px solid rgba(255, 215, 0, 0.3); box-shadow: 0 0 25px rgba(56, 97, 251, 0.4);" />
+            <img src="${agent.image}" alt="${agent.name}" style="width: 100%; max-width: 220px; border-radius: 12px; border: 3px solid rgba(255, 215, 0, 0.3); box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);" />
           </div>
           
           <div class="refractor-name-block">
             <h3 style="margin: 0; font-size: 16px; font-weight: 900;">${agent.name}</h3>
-            <p style="margin: 4px 0; font-size: 12px; color: #3861FB;">${agent.title}</p>
+            <p style="margin: 4px 0; font-size: 12px; color: #00D4FF;">${agent.title}</p>
           </div>
           
           <div class="refractor-stats-grid">

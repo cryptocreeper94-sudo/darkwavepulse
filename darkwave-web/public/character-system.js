@@ -299,8 +299,8 @@ class CharacterSystem {
         width: 70px;
         height: 70px;
         border-radius: 50%;
-        background: linear-gradient(135deg, rgba(56, 97, 251, 0.3), rgba(131, 56, 236, 0.3));
-        border: 2px solid rgba(56, 97, 251, 0.6);
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(131, 56, 236, 0.3));
+        border: 2px solid rgba(0, 212, 255, 0.6);
         cursor: pointer;
         z-index: 9999;
         display: flex;
@@ -308,13 +308,13 @@ class CharacterSystem {
         justify-content: center;
         overflow: hidden;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(56, 97, 251, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
       }
       
       .character-floating-btn:hover {
         transform: scale(1.1);
-        box-shadow: 0 6px 30px rgba(56, 97, 251, 0.5);
-        border-color: #3861fb;
+        box-shadow: 0 6px 30px rgba(0, 212, 255, 0.5);
+        border-color: #00D4FF;
       }
       
       .character-btn-img {
@@ -482,7 +482,7 @@ class CharacterSystem {
         height: 200px;
         width: auto;
         object-fit: contain;
-        filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 15px rgba(56, 97, 251, 0.2));
+        filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 15px rgba(0, 212, 255, 0.2));
         cursor: pointer;
         transition: transform 0.2s ease;
       }

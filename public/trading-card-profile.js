@@ -45,11 +45,11 @@ function initTradingCardProfile() {
           max-width: 500px;
           width: 100%;
           background: rgba(0, 0, 0, 0.6);
-          border: 2px solid rgba(56, 97, 251, 0.4);
+          border: 2px solid rgba(0, 212, 255, 0.4);
           border-radius: 20px;
           padding: 32px 24px;
           backdrop-filter: blur(10px);
-          box-shadow: 0 20px 60px rgba(56, 97, 251, 0.3);
+          box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
         }
 
         .profile-header {
@@ -62,7 +62,7 @@ function initTradingCardProfile() {
           font-weight: 900;
           margin-bottom: 4px;
           letter-spacing: 1px;
-          color: var(--accent-blue, #3861FB);
+          color: var(--accent-blue, #00D4FF);
         }
 
         .profile-header p {
@@ -79,8 +79,8 @@ function initTradingCardProfile() {
           border-radius: 16px;
           overflow: hidden;
           margin: 0 auto 24px;
-          border: 3px solid rgba(56, 97, 251, 0.3);
-          box-shadow: 0 0 30px rgba(56, 97, 251, 0.2);
+          border: 3px solid rgba(0, 212, 255, 0.3);
+          box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
         }
 
         .profile-image img {
@@ -97,8 +97,8 @@ function initTradingCardProfile() {
         }
 
         .info-item {
-          background: rgba(56, 97, 251, 0.1);
-          border: 1px solid rgba(56, 97, 251, 0.3);
+          background: rgba(0, 212, 255, 0.1);
+          border: 1px solid rgba(0, 212, 255, 0.3);
           border-radius: 10px;
           padding: 12px;
           text-align: center;
@@ -115,12 +115,12 @@ function initTradingCardProfile() {
         .info-value {
           font-size: 14px;
           font-weight: 700;
-          color: var(--accent-blue, #3861FB);
+          color: var(--accent-blue, #00D4FF);
         }
 
         .profile-details {
           background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(56, 97, 251, 0.2);
+          border: 1px solid rgba(0, 212, 255, 0.2);
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 24px;
@@ -149,8 +149,8 @@ function initTradingCardProfile() {
         }
 
         .profile-serial {
-          background: rgba(56, 97, 251, 0.15);
-          border-left: 3px solid var(--accent-blue, #3861FB);
+          background: rgba(0, 212, 255, 0.15);
+          border-left: 3px solid var(--accent-blue, #00D4FF);
           padding: 12px;
           border-radius: 8px;
           text-align: center;
@@ -167,7 +167,7 @@ function initTradingCardProfile() {
         .serial-number {
           font-size: 11px;
           font-weight: 700;
-          color: var(--accent-blue, #3861FB);
+          color: var(--accent-blue, #00D4FF);
           letter-spacing: 1px;
         }
 
@@ -175,7 +175,7 @@ function initTradingCardProfile() {
           text-align: center;
           font-size: 10px;
           color: #666;
-          border-top: 1px solid rgba(56, 97, 251, 0.2);
+          border-top: 1px solid rgba(0, 212, 255, 0.2);
           padding-top: 16px;
         }
 
@@ -187,9 +187,9 @@ function initTradingCardProfile() {
           display: inline-block;
           margin-top: 20px;
           padding: 8px 16px;
-          background: rgba(56, 97, 251, 0.2);
-          border: 1px solid rgba(56, 97, 251, 0.4);
-          color: var(--accent-blue, #3861FB);
+          background: rgba(0, 212, 255, 0.2);
+          border: 1px solid rgba(0, 212, 255, 0.4);
+          color: var(--accent-blue, #00D4FF);
           text-decoration: none;
           border-radius: 6px;
           font-size: 12px;
@@ -197,7 +197,7 @@ function initTradingCardProfile() {
         }
 
         .back-link:hover {
-          background: rgba(56, 97, 251, 0.4);
+          background: rgba(0, 212, 255, 0.4);
           transform: translateX(-4px);
         }
 
@@ -205,7 +205,7 @@ function initTradingCardProfile() {
           text-align: center;
           margin-top: 24px;
           padding-top: 20px;
-          border-top: 1px solid rgba(56, 97, 251, 0.2);
+          border-top: 1px solid rgba(0, 212, 255, 0.2);
         }
 
         .qr-label {
@@ -220,7 +220,7 @@ function initTradingCardProfile() {
           padding: 12px;
           border-radius: 10px;
           display: inline-block;
-          border: 2px solid rgba(56, 97, 251, 0.3);
+          border: 2px solid rgba(0, 212, 255, 0.3);
         }
 
         .qr-display canvas {

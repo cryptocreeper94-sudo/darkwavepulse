@@ -229,12 +229,12 @@ function showHideSeekPopup(spotId) {
           max-width: 140px;
           height: auto;
           object-fit: contain;
-          filter: drop-shadow(0 0 8px rgba(56, 97, 251, 0.4));
+          filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));
         " />
         <div style="
           font-size: 11px;
           font-weight: 700;
-          color: #3861fb;
+          color: #00D4FF;
           margin-top: 6px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -291,12 +291,12 @@ function showAllCatsFoundPopup() {
           max-width: 140px;
           height: auto;
           object-fit: contain;
-          filter: drop-shadow(0 0 8px rgba(56, 97, 251, 0.4));
+          filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));
         " />
         <div style="
           font-size: 11px;
           font-weight: 700;
-          color: #3861fb;
+          color: #00D4FF;
           margin-top: 6px;
           text-transform: uppercase;
           letter-spacing: 0.5px;

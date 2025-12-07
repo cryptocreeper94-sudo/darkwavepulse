@@ -73,7 +73,7 @@ class ChartIndicatorManager {
           transition: all 0.2s ease;
         ">
           <input type="checkbox" id="toggle-macd" style="cursor: pointer;" />
-          <span style="font-size: 13px; font-weight: 500; color: #ffd700;">MACD</span>
+          <span style="font-size: 13px; font-weight: 500; color: #9D4EDD;">MACD</span>
         </label>
 
         <!-- EMA Toggle -->

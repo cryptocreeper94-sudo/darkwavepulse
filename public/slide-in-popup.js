@@ -125,7 +125,7 @@ function showSlideInPopup(options) {
     height: 180px;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 15px rgba(56, 97, 251, 0.3));
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 15px rgba(0, 212, 255, 0.3));
     cursor: pointer;
     transition: transform 0.3s ease;
   `;

@@ -101,7 +101,7 @@ function drawFearGreedGaugeClean(canvasId, value) {
   // Draw center dot
   ctx.beginPath();
   ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-  ctx.fillStyle = '#3861FB';
+  ctx.fillStyle = '#00D4FF';
   ctx.fill();
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 2;
@@ -182,7 +182,7 @@ function drawAltSeasonGaugeClean(canvas, value) {
   // Draw center dot
   ctx.beginPath();
   ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-  ctx.fillStyle = '#3861FB';
+  ctx.fillStyle = '#00D4FF';
   ctx.fill();
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 2;
