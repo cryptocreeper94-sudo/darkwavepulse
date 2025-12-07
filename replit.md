@@ -40,6 +40,7 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
 - Dark theme UI (solid black/gray, no transparency)
 - 18 AI Agent personas with NFT Trading Cards
 - Knowledge Base (8 chapters, 143-term glossary)
+- **NEW: Prediction Tracking System** - Logs every signal, tracks outcomes at 1hr/4hr/24hr/7d, calculates accuracy stats
 
 ### NEEDS ATTENTION
 - CoinGecko API rate limiting (429 errors) - using Pro API now
@@ -145,9 +146,19 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
 
 ### Backend Services
 - `src/services/auditTrailService.ts` - Solana blockchain stamping
+- `src/services/predictionTrackingService.ts` - Prediction logging & accuracy tracking
 - `src/mastra/agents/index.ts` - AI agent configuration
+- `src/mastra/inngest/predictionWorker.ts` - Inngest workflow for outcome verification
 - `server.ts` - Express server entry point
 - `run-dev.sh` - Development startup script
+
+### Prediction Tracking System
+- **Database Tables**: `prediction_events`, `prediction_outcomes`, `prediction_accuracy_stats`
+- **Time Horizons**: 1hr, 4hr, 24hr, 7d outcome verification
+- **Blockchain Stamping**: Every prediction SHA-256 hashed and stamped to Solana
+- **API Endpoint**: `GET /api/prediction-accuracy` - Returns accuracy stats
+- **Inngest Workers**: Hourly cron job + per-prediction scheduled checks
+- **Evaluation Logic**: BUY correct if price rises, SELL correct if price drops, HOLD correct if stable
 
 ### Mobile App
 - `darkwave-mobile/app/index.tsx` - Main mobile entry point

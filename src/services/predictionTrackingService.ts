@@ -204,15 +204,14 @@ class PredictionTrackingService {
       const priceChange = input.priceAtCheck - originalPrice;
       const priceChangePercent = (priceChange / originalPrice) * 100;
 
-      // Determine if prediction was correct
+      // Determine if prediction was correct based on signal direction
       const isCorrect = this.evaluateOutcome(
         prediction.signal,
         priceChangePercent
       );
 
-      // Classify outcome
-      const outcome = priceChangePercent > 0.5 ? 'WIN' : 
-                      priceChangePercent < -0.5 ? 'LOSS' : 'NEUTRAL';
+      // Classify outcome based on signal type and price movement
+      const outcome = this.classifyOutcome(prediction.signal, priceChangePercent);
 
       const outcomeId = `out_${Date.now().toString(36)}_${randomBytes(4).toString('hex')}`;
 
@@ -255,22 +254,49 @@ class PredictionTrackingService {
 
   /**
    * Evaluate if prediction was correct based on signal and price movement
+   * BUY/STRONG_BUY: Correct if price went UP (positive return)
+   * SELL/STRONG_SELL: Correct if price went DOWN (negative return)
+   * HOLD: Correct if price stayed stable (within tolerance band)
    */
   private evaluateOutcome(signal: string, priceChangePercent: number): boolean {
-    const threshold = 0.5; // 0.5% threshold for "correct"
+    const winThreshold = 0.5; // 0.5% minimum move to count as win
+    const holdTolerance = 2.0; // HOLD is correct if price moves less than 2%
 
     switch (signal) {
       case 'STRONG_BUY':
       case 'BUY':
-        return priceChangePercent > threshold;
+        // BUY is correct when price goes UP
+        return priceChangePercent > winThreshold;
       case 'STRONG_SELL':
       case 'SELL':
-        return priceChangePercent < -threshold;
+        // SELL is correct when price goes DOWN
+        return priceChangePercent < -winThreshold;
       case 'HOLD':
-        return Math.abs(priceChangePercent) < threshold * 2;
+        // HOLD is correct when price stays relatively stable
+        return Math.abs(priceChangePercent) < holdTolerance;
       default:
         return false;
     }
+  }
+
+  /**
+   * Classify outcome as WIN/LOSS/NEUTRAL based on signal type
+   */
+  private classifyOutcome(signal: string, priceChangePercent: number): 'WIN' | 'LOSS' | 'NEUTRAL' {
+    const isCorrect = this.evaluateOutcome(signal, priceChangePercent);
+    const threshold = 0.5;
+
+    if (signal === 'HOLD') {
+      // For HOLD, success is when price stays stable
+      return isCorrect ? 'WIN' : 'LOSS';
+    }
+
+    // For BUY/SELL signals
+    if (Math.abs(priceChangePercent) < threshold) {
+      return 'NEUTRAL'; // Price barely moved
+    }
+
+    return isCorrect ? 'WIN' : 'LOSS';
   }
 
   /**
