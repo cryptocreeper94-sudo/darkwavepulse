@@ -27,11 +27,15 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
 
 ### WORKING
 - Core platform operational on Vite + Express backend
+- **React 19 Conversion Complete** - Full migration from vanilla JS to React components
 - User authentication system (email whitelist + access codes)
 - Slim 50px header with hamburger menu navigation
 - Slim single-line footer: "Powered by DarkWave Studios, LLC © 2025 | v2.0.6"
-- Redesigned metric cards (Fear & Greed, Altcoin Season, Market Cap, Volume)
-- Live candlestick charts with 30-second refresh
+- **SVG Gauge Components** - Fear & Greed and Altcoin Season with animated needles
+- **Metric Cards** - Market Cap and Volume with % change arrows and inflow/outflow indicators
+- **Bitcoin Chart** - lightweight-charts v5 with candlestick/sparkline toggle, timeframes, color presets
+- **Coin Analysis Modal** - Technical indicators, AI predictions, support/resistance when clicking coins
+- **Navigation** - Floating home button, hamburger menu quick actions all wired
 - Bitcoin and crypto price tracking via CoinGecko API
 - Admin dashboard with full user management
 - Telegram bot integration
@@ -40,7 +44,7 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
 - Dark theme UI (solid black/gray, no transparency)
 - 18 AI Agent personas with NFT Trading Cards
 - Knowledge Base (8 chapters, 143-term glossary)
-- **NEW: Prediction Tracking System** - Logs every signal, tracks outcomes at 1hr/4hr/24hr/7d, calculates accuracy stats
+- **Prediction Tracking System** - Logs every signal, tracks outcomes at 1hr/4hr/24hr/7d, calculates accuracy stats
 
 ### NEEDS ATTENTION
 - CoinGecko API rate limiting (429 errors) - using Pro API now
