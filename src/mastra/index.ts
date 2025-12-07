@@ -41,6 +41,7 @@ import { botDetectionTool } from "./tools/botDetectionTool";
 import { sentimentTool } from "./tools/sentimentTool";
 import { predictionTrackingService } from "../services/predictionTrackingService.js";
 import { predictionLearningService } from "../services/predictionLearningService.js";
+import { ecosystemService } from "../services/ecosystemService.js";
 import { inngest as inngestClient } from "./inngest/client";
 
 class ProductionPinoLogger extends MastraLogger {
@@ -2157,6 +2158,140 @@ export const mastra = new Mastra({
               success: false, 
               error: 'Failed to trigger model training',
             }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Status API
+      {
+        path: "/api/ecosystem/status",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            logger?.info('🌐 [Ecosystem] Status request');
+            const status = await ecosystemService.getHubStatus();
+            return c.json({ success: true, ...status });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Status error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Activity Logs
+      {
+        path: "/api/ecosystem/logs",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            const limit = parseInt(c.req.query('limit') || '50');
+            const offset = parseInt(c.req.query('offset') || '0');
+            
+            logger?.info('🌐 [Ecosystem] Logs request', { limit, offset });
+            const logs = await ecosystemService.getActivityLogs(limit, offset);
+            return c.json({ success: true, ...logs });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Logs error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Log Activity (for internal use)
+      {
+        path: "/api/ecosystem/log",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            // Check admin access
+            const { checkAccessSession } = await import('./middleware/accessControl.js');
+            const sessionCheck = await checkAccessSession(c) as any;
+            if (!sessionCheck.valid || !['admin', 'owner'].includes(sessionCheck.accessLevel || '')) {
+              return c.json({ error: 'Admin access required' }, 403);
+            }
+            
+            const { action, details } = await c.req.json();
+            logger?.info('🌐 [Ecosystem] Log activity', { action });
+            
+            const success = await ecosystemService.logAppActivity(action, details);
+            return c.json({ success });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Log error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Push Snippet (for code sharing)
+      {
+        path: "/api/ecosystem/snippets",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            // Check admin access
+            const { checkAccessSession } = await import('./middleware/accessControl.js');
+            const sessionCheck = await checkAccessSession(c) as any;
+            if (!sessionCheck.valid || !['admin', 'owner'].includes(sessionCheck.accessLevel || '')) {
+              return c.json({ error: 'Admin access required' }, 403);
+            }
+            
+            const { name, code, language, category, tags } = await c.req.json();
+            logger?.info('🌐 [Ecosystem] Push snippet', { name, language, category });
+            
+            const result = await ecosystemService.pushCodeSnippet(name, code, language, category, tags);
+            return c.json({ success: true, snippet: result });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Snippet error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Get Snippet
+      {
+        path: "/api/ecosystem/snippets/:snippetId",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            const snippetId = c.req.param('snippetId');
+            logger?.info('🌐 [Ecosystem] Get snippet', { snippetId });
+            
+            const snippet = await ecosystemService.getCodeSnippet(snippetId);
+            return c.json({ success: true, snippet });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Snippet error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
+          }
+        },
+      },
+      // ORBIT Ecosystem Report Metrics (for dashboard integration)
+      {
+        path: "/api/ecosystem/metrics",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          
+          try {
+            // Check admin access
+            const { checkAccessSession } = await import('./middleware/accessControl.js');
+            const sessionCheck = await checkAccessSession(c) as any;
+            if (!sessionCheck.valid || !['admin', 'owner'].includes(sessionCheck.accessLevel || '')) {
+              return c.json({ error: 'Admin access required' }, 403);
+            }
+            
+            const metrics = await c.req.json();
+            logger?.info('🌐 [Ecosystem] Report metrics', metrics);
+            
+            const success = await ecosystemService.reportMetrics(metrics);
+            return c.json({ success });
+          } catch (error: any) {
+            logger?.error('❌ [Ecosystem] Metrics error', { error: error.message });
+            return c.json({ success: false, error: error.message }, 500);
           }
         },
       },
