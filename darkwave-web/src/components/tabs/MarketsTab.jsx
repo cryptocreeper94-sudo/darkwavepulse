@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Carousel, BentoGrid, BentoItem, CategoryPills } from '../ui'
+import { Carousel, BentoGrid, BentoItem, CategoryPills, GaugeCard } from '../ui'
+import BitcoinChart from '../charts/BitcoinChart'
 
 const coinCategories = [
   { id: 'top', label: 'Top 10' },
@@ -97,17 +98,20 @@ export default function MarketsTab() {
   
   return (
     <div className="markets-tab">
-      <Carousel itemWidth={160} showDots={true}>
-        <MetricCard 
+      <div className="gauge-row">
+        <GaugeCard 
           title="FEAR & GREED" 
           value={marketData.fearGreed}
-          change={marketData.fearGreed > 50 ? 'Greed' : 'Fear'}
+          type="fearGreed"
         />
-        <MetricCard 
+        <GaugeCard 
           title="ALTCOIN SEASON" 
           value={marketData.altcoinSeason}
-          change={marketData.altcoinSeason > 50 ? 'Alt Season' : 'BTC Season'}
+          type="altcoinSeason"
         />
+      </div>
+      
+      <Carousel itemWidth={160} showDots={true}>
         <MetricCard 
           title="MARKET CAP" 
           value={marketData.marketCap}
@@ -117,6 +121,8 @@ export default function MarketsTab() {
           value={marketData.volume}
         />
       </Carousel>
+      
+      <BitcoinChart />
       
       <div className="section-box mb-md">
         <div className="section-header">
