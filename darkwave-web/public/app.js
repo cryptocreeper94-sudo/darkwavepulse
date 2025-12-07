@@ -3,6 +3,102 @@
 const API_BASE = '';
 let currentCatMode = 'normal';
 
+// ============================================
+// METRICS CAROUSEL - Mobile Navigation
+// ============================================
+let currentMetricIndex = 0;
+const totalMetrics = 4;
+
+function navigateMetrics(direction) {
+  currentMetricIndex += direction;
+  
+  // Wrap around
+  if (currentMetricIndex < 0) currentMetricIndex = totalMetrics - 1;
+  if (currentMetricIndex >= totalMetrics) currentMetricIndex = 0;
+  
+  updateMetricsCarousel();
+}
+
+function goToMetric(index) {
+  currentMetricIndex = index;
+  updateMetricsCarousel();
+}
+
+function updateMetricsCarousel() {
+  const track = document.querySelector('.metrics-carousel-track');
+  const dots = document.querySelectorAll('.metrics-dot');
+  
+  if (!track) return;
+  
+  // Only apply carousel on mobile
+  if (window.innerWidth <= 768) {
+    const cardWidth = track.querySelector('.metric-card')?.offsetWidth || 0;
+    const containerWidth = track.parentElement?.offsetWidth || 0;
+    const offset = currentMetricIndex * containerWidth;
+    
+    track.style.transform = `translateX(-${offset}px)`;
+  } else {
+    track.style.transform = 'none';
+  }
+  
+  // Update dots
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentMetricIndex);
+  });
+}
+
+// Initialize carousel on load and resize
+function initMetricsCarousel() {
+  // Reset on resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      const track = document.querySelector('.metrics-carousel-track');
+      if (track) track.style.transform = 'none';
+    } else {
+      updateMetricsCarousel();
+    }
+  });
+  
+  // Touch/swipe support for mobile
+  const carousel = document.querySelector('.metrics-carousel');
+  if (carousel) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    carousel.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          navigateMetrics(1); // Swipe left = next
+        } else {
+          navigateMetrics(-1); // Swipe right = prev
+        }
+      }
+    }
+  }
+  
+  // Initial update
+  updateMetricsCarousel();
+}
+
+// Auto-init when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMetricsCarousel);
+} else {
+  initMetricsCarousel();
+}
+
 // Cat images for Altcoin Season gauge disabled - using clean gauges instead (Nov 26 2025)
 const businessCatAltSeasonImages = {
   grumpyFace: null,
