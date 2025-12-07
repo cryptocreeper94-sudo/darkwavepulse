@@ -46,6 +46,18 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
 - Knowledge Base (8 chapters, 143-term glossary)
 - **Prediction Tracking System** - Logs every signal, tracks outcomes at 1hr/4hr/24hr/7d, calculates accuracy stats
 - **Custom Avatar Creator** - Full character customization with 17 hairstyles (including bald, afro, dreads, cornrows), 8 skin tones, 6 eye colors, facial hair options (beard, mustache, goatee), 13 clothing styles, 13 accessories, face shapes, backgrounds. Avatar appears in header and replaces agents when in custom mode.
+- **Personal Dashboard System (NEW)** - Each user gets their own dashboard as landing page with:
+  - Unique Hallmark ID (PULSE-XXXX-YYYY format) generated per user
+  - Favorites widget showing saved coins with quick analysis access
+  - Market gauges (Fear & Greed, Altcoin Season)
+  - Customizable main chart widget
+  - Landing page selector in Settings (Dashboard, Markets, Portfolio, Projects)
+- **Favorites System (NEW)** - Users can save favorite coins:
+  - Star toggle (☆/★) on each coin in Markets tab
+  - Favorites category filter to view only favorites
+  - Favorites persist to database per user
+  - Quick access to analysis modal from favorites
+  - FavoritesContext for app-wide state management
 
 ### NEEDS ATTENTION
 - CoinGecko API rate limiting (429 errors) - using Pro API now
