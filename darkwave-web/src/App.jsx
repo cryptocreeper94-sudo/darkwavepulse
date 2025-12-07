@@ -11,6 +11,7 @@ import {
 } from './components/tabs'
 import { GlossaryPopup } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
+import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         </div>
       </Layout>
       <GlossaryPopup />
+      <CryptoCatPopup enabled={true} interval={90000} />
     </GlossaryProvider>
   )
 }
