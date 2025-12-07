@@ -3,6 +3,7 @@
   --neon-green: #39FF14;
   --neon-purple: #9D4EDD;
   --neon-pink: #FF006E;
+  --accent-red: #FF4444;
 
   --neon-blue-glow: rgba(0, 212, 255, 0.5);
   --neon-green-glow: rgba(57, 255, 20, 0.5);
@@ -14,11 +15,15 @@
   --bg-surface: #141414;
   --bg-surface-2: #1a1a1a;
   --bg-surface-3: #222222;
+  --bg-hover: rgba(255, 255, 255, 0.05);
 
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.4);
+  --text-dim: rgba(255, 255, 255, 0.4);
 
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-light: rgba(255, 255, 255, 0.08);
   --border-subtle: rgba(255, 255, 255, 0.1);
   --border-medium: rgba(255, 255, 255, 0.15);
 
@@ -50,5 +55,6 @@
   --transition-slow: 0.5s ease;
 
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Orbitron', sans-serif;
 }
