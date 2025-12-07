@@ -131,26 +131,28 @@ function switchAgentInPopup() {
   }
 }
 
-// Initialize popup mode - ALWAYS sync with commentary mode for consistency
+// Initialize popup mode - sync with commentary mode if not explicitly set
 function initAgentPopupSystem() {
-  // Get commentary mode (the master mode that controls all features)
-  const commentaryMode = localStorage.getItem('cryptoCatMode') || 'off';
-  let targetMode;
+  // Check if agentPopupMode was explicitly set
+  let savedMode = localStorage.getItem('agentPopupMode');
   
-  // Map commentary modes to popup modes
-  if (commentaryMode === 'agent') {
-    targetMode = 'business'; // Agents use business-style responses
-  } else if (commentaryMode === 'business' || commentaryMode === 'casual') {
-    targetMode = commentaryMode;
-  } else {
-    targetMode = 'off';
+  // If not set, sync with commentary mode (cryptoCatMode)
+  if (!savedMode) {
+    const commentaryMode = localStorage.getItem('cryptoCatMode') || 'off';
+    // Map commentary modes to popup modes
+    if (commentaryMode === 'agent') {
+      savedMode = 'business'; // Agents use business-style responses
+    } else if (commentaryMode === 'business' || commentaryMode === 'casual') {
+      savedMode = commentaryMode;
+    } else {
+      savedMode = 'off';
+    }
+    // Save for future loads
+    localStorage.setItem('agentPopupMode', savedMode);
   }
   
-  // Always sync to match commentary mode
-  agentPopupMode = targetMode;
-  localStorage.setItem('agentPopupMode', targetMode);
-  
-  console.log('✅ Agent popup mode:', agentPopupMode, '(synced from commentary:', commentaryMode + ')');
+  agentPopupMode = savedMode;
+  console.log('✅ Agent popup mode:', agentPopupMode);
 }
 
 // Export functions globally

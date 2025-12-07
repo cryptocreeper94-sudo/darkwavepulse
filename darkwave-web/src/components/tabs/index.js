@@ -1,0 +1,6 @@
+export { default as MarketsTab } from './MarketsTab'
+export { default as ProjectsTab } from './ProjectsTab'
+export { default as LearnTab } from './LearnTab'
+export { default as PortfolioTab } from './PortfolioTab'
+export { default as StakingTab } from './StakingTab'
+export { default as SettingsTab } from './SettingsTab'
