@@ -1803,11 +1803,12 @@ body.theme-light .banner-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   background: #0a0a0a;
   border-top: 1px solid #222;
-  padding: 10px 16px;
+  padding: 8px 16px;
   margin-top: 20px;
+  white-space: nowrap;
 }
 
 .app-footer-slim .footer-text {
@@ -1821,11 +1822,6 @@ body.theme-light .banner-title {
   font-size: 11px;
 }
 
-.app-footer-slim .footer-copyright {
-  font-size: 11px;
-  color: #666;
-}
-
 .app-footer-slim .footer-version {
   font-size: 10px;
   color: #00D4FF;
@@ -1835,12 +1831,14 @@ body.theme-light .banner-title {
 
 @media (max-width: 480px) {
   .app-footer-slim {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 12px;
+    gap: 6px;
+    padding: 8px 10px;
   }
   .app-footer-slim .footer-text {
-    font-size: 10px;
+    font-size: 9px;
+  }
+  .app-footer-slim .footer-version {
+    font-size: 9px;
   }
 }
 
