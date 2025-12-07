@@ -1007,3 +1007,102 @@ img {
 .clickable-row:hover {
   background: var(--bg-hover);
 }
+
+/* ============================================ */
+/* GAUGE COMPONENTS                            */
+/* ============================================ */
+
+.gauge-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gauge-row::-webkit-scrollbar {
+  display: none;
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-sentiment {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.gauge-card {
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
+  background: linear-gradient(145deg, var(--bg-surface-2) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gauge-card:hover {
+  background: linear-gradient(145deg, #1f1f1f 0%, #141414 100%);
+  border-color: rgba(0, 212, 255, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 25px var(--neon-blue-glow);
+}
+
+.gauge-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--neon-blue);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px var(--neon-blue-glow);
+}
+
+@media (max-width: 768px) {
+  .gauge-row {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .gauge-card {
+    min-width: 150px;
+    max-width: 180px;
+    padding: 12px 8px 8px;
+  }
+  
+  .gauge-card-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  
+  .gauge-sentiment {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gauge-row {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .gauge-card {
+    min-width: 140px;
+    max-width: 160px;
+  }
+}
