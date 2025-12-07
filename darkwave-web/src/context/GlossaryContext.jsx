@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { getGlossaryTerm } from '../data/glossary'
+
+const SASS_MODE_KEY = 'pulse-sass-mode'
 
 const GlossaryContext = createContext(null)
 
@@ -7,8 +9,9 @@ export function GlossaryProvider({ children }) {
   const [activeTerm, setActiveTerm] = useState(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [sassMode, setSassMode] = useState(() => {
-    return localStorage.getItem('pulse-sass-mode') !== 'false'
+    return localStorage.getItem(SASS_MODE_KEY) !== 'false'
   })
+  const [termListeners, setTermListeners] = useState([])
   
   const showDefinition = useCallback((term, event) => {
     const termData = getGlossaryTerm(term)
@@ -36,10 +39,24 @@ export function GlossaryProvider({ children }) {
   const toggleSassMode = useCallback(() => {
     setSassMode(prev => {
       const newValue = !prev
-      localStorage.setItem('pulse-sass-mode', String(newValue))
+      localStorage.setItem(SASS_MODE_KEY, String(newValue))
+      window.dispatchEvent(new CustomEvent('pulse-sass-mode-changed', { detail: newValue }))
       return newValue
     })
   }, [])
+  
+  const onTermShow = useCallback((callback) => {
+    setTermListeners(prev => [...prev, callback])
+    return () => {
+      setTermListeners(prev => prev.filter(cb => cb !== callback))
+    }
+  }, [])
+  
+  useEffect(() => {
+    if (activeTerm) {
+      termListeners.forEach(cb => cb(activeTerm))
+    }
+  }, [activeTerm, termListeners])
   
   return (
     <GlossaryContext.Provider value={{
@@ -48,7 +65,8 @@ export function GlossaryProvider({ children }) {
       sassMode,
       showDefinition,
       hideDefinition,
-      toggleSassMode
+      toggleSassMode,
+      onTermShow
     }}>
       {children}
     </GlossaryContext.Provider>
