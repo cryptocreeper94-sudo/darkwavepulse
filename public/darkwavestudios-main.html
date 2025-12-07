@@ -6,6 +6,7 @@
   <meta name="description" content="DarkWave Studios - AI-powered trading intelligence platform with professional-grade crypto & stock analysis">
   <meta name="theme-color" content="#000000">
   <title>DarkWave Studios | AI Trading Intelligence Platform</title>
+  <link rel="stylesheet" href="/design-system.css?v=1206a">
   <style>
     * {
       margin: 0;
@@ -35,17 +36,19 @@
       font-weight: 700;
       letter-spacing: -0.01em;
       margin-bottom: 2rem;
-      background: linear-gradient(135deg, #6496ff 0%, #64e6ff 100%);
+      background: linear-gradient(135deg, #9D4EDD 0%, #00D4FF 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      text-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
     }
 
     h3 {
       font-size: 1.3rem;
       font-weight: 600;
       margin-bottom: 0.8rem;
-      color: #64e6ff;
+      color: #00D4FF;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 
     p {
@@ -66,9 +69,9 @@
       position: fixed;
       top: 0;
       width: 100%;
-      background: rgba(0, 0, 0, 0.95);
+      background: rgba(15, 15, 15, 0.95);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(100, 150, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
       z-index: 1000;
       padding: 1rem 0;
     }
@@ -85,7 +88,7 @@
     .nav-logo {
       font-size: 1.5rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #6496ff 0%, #64e6ff 100%);
+      background: linear-gradient(135deg, #9D4EDD 0%, #00D4FF 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -107,7 +110,7 @@
     }
 
     .nav-links a:hover {
-      color: #64e6ff;
+      color: #00D4FF;
     }
 
     @media (max-width: 768px) {
@@ -127,13 +130,13 @@
 
     .hero-badge {
       display: inline-block;
-      background: rgba(100, 150, 255, 0.1);
-      border: 1px solid rgba(100, 150, 255, 0.3);
+      background: rgba(157, 78, 221, 0.1);
+      border: 1px solid rgba(157, 78, 221, 0.3);
       padding: 0.6rem 1.2rem;
       border-radius: 50px;
       margin-bottom: 2rem;
       font-size: 0.85rem;
-      color: #64e6ff;
+      color: #00D4FF;
       font-weight: 600;
     }
 
@@ -170,31 +173,31 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #6496ff 0%, #64e6ff 100%);
+      background: linear-gradient(135deg, #9D4EDD 0%, #00D4FF 100%);
       color: #000000;
-      box-shadow: 0 10px 30px rgba(100, 150, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(100, 150, 255, 0.3);
+      box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
     }
 
     .btn-secondary {
       background: transparent;
-      border: 1.5px solid rgba(100, 150, 255, 0.3);
-      color: #64e6ff;
+      border: 1.5px solid rgba(0, 212, 255, 0.3);
+      color: #00D4FF;
     }
 
     .btn-secondary:hover {
-      background: rgba(100, 150, 255, 0.1);
-      border-color: #64e6ff;
+      background: rgba(0, 212, 255, 0.1);
+      border-color: #00D4FF;
     }
 
     /* Section */
     section {
       padding: 80px 0;
-      border-bottom: 1px solid rgba(100, 150, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
     }
 
     section:last-child {
@@ -210,8 +213,8 @@
     }
 
     .product-card {
-      background: linear-gradient(135deg, rgba(20, 30, 60, 0.4) 0%, rgba(10, 15, 40, 0.3) 100%);
-      border: 1px solid rgba(100, 150, 255, 0.15);
+      background: linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.15);
       border-radius: 12px;
       padding: 2rem;
       transition: all 0.3s ease;
@@ -226,13 +229,14 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(100, 150, 255, 0.5), transparent);
+      background: linear-gradient(90deg, transparent, rgba(157, 78, 221, 0.5), transparent);
     }
 
     .product-card:hover {
-      border-color: rgba(100, 150, 255, 0.4);
-      background: linear-gradient(135deg, rgba(30, 50, 100, 0.5) 0%, rgba(15, 25, 50, 0.4) 100%);
+      border-color: rgba(0, 212, 255, 0.4);
+      background: linear-gradient(135deg, rgba(20, 20, 30, 0.9) 0%, rgba(15, 15, 25, 0.7) 100%);
       transform: translateY(-5px);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
     }
 
     .product-icon {
@@ -270,8 +274,8 @@
     }
 
     .stat-box {
-      background: rgba(100, 150, 255, 0.05);
-      border: 1px solid rgba(100, 150, 255, 0.15);
+      background: rgba(157, 78, 221, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.15);
       border-radius: 8px;
       padding: 2rem;
       text-align: center;
@@ -280,8 +284,9 @@
     .stat-number {
       font-size: 2.5rem;
       font-weight: 700;
-      color: #64e6ff;
+      color: #00D4FF;
       margin-bottom: 0.5rem;
+      text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
     }
 
     .stat-label {
@@ -299,15 +304,16 @@
 
     .feature-item {
       padding: 2rem;
-      background: rgba(10, 20, 50, 0.3);
-      border-left: 3px solid #6496ff;
+      background: rgba(15, 15, 15, 0.6);
+      border-left: 3px solid #9D4EDD;
       border-radius: 4px;
     }
 
     .feature-item h4 {
-      color: #64e6ff;
+      color: #00D4FF;
       margin-bottom: 0.8rem;
       font-size: 1.1rem;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 
     .feature-item p {
@@ -328,7 +334,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: linear-gradient(180deg, rgba(100, 150, 255, 0.5), transparent);
+      background: linear-gradient(180deg, rgba(157, 78, 221, 0.6), transparent);
     }
 
     .roadmap-item {
@@ -345,12 +351,13 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #6496ff;
+      background: #9D4EDD;
       border: 3px solid #000000;
+      box-shadow: 0 0 10px rgba(157, 78, 221, 0.6);
     }
 
     .roadmap-date {
-      color: #64e6ff;
+      color: #00D4FF;
       font-weight: 600;
       margin-bottom: 0.3rem;
       font-size: 0.95rem;
@@ -370,8 +377,8 @@
 
     /* Footer CTA */
     .footer-cta {
-      background: linear-gradient(135deg, rgba(100, 150, 255, 0.1) 0%, rgba(100, 230, 255, 0.05) 100%);
-      border: 1px solid rgba(100, 150, 255, 0.2);
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+      border: 1px solid rgba(157, 78, 221, 0.3);
       border-radius: 12px;
       padding: 3rem 2rem;
       text-align: center;
@@ -385,8 +392,8 @@
 
     /* Footer */
     footer {
-      background: rgba(0, 0, 0, 0.5);
-      border-top: 1px solid rgba(100, 150, 255, 0.1);
+      background: rgba(15, 15, 15, 0.8);
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
       padding: 3rem 0 2rem;
       text-align: center;
     }
@@ -413,7 +420,7 @@
     }
 
     .footer-links a:hover {
-      color: #64e6ff;
+      color: #00D4FF;
     }
 
     .footer-copyright {
@@ -442,6 +449,7 @@
   </style>
 </head>
 <body>
+  <div class="watermark-bg"></div>
   <!-- Navigation -->
   <nav>
     <div class="nav-container">
