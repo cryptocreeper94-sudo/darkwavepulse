@@ -2,12 +2,56 @@ const API_BASE = '/api';
 
 export async function fetchCoinAnalysis(symbol) {
   try {
+    const coinId = symbol.toLowerCase() === 'btc' ? 'bitcoin' : 
+                   symbol.toLowerCase() === 'eth' ? 'ethereum' :
+                   symbol.toLowerCase() === 'sol' ? 'solana' :
+                   symbol.toLowerCase() === 'xrp' ? 'ripple' :
+                   symbol.toLowerCase() === 'bnb' ? 'binancecoin' :
+                   symbol.toLowerCase() === 'doge' ? 'dogecoin' :
+                   symbol.toLowerCase() === 'ada' ? 'cardano' :
+                   symbol.toLowerCase() === 'trx' ? 'tron' :
+                   symbol.toLowerCase() === 'avax' ? 'avalanche-2' :
+                   symbol.toLowerCase();
+    
+    const historyResponse = await fetch(`${API_BASE}/crypto/btc-history?days=30&coinId=${coinId}`);
+    let prices = [];
+    let currentPrice = 0;
+    let priceChange24h = 0;
+    let priceChangePercent24h = 0;
+    
+    if (historyResponse.ok) {
+      const historyData = await historyResponse.json();
+      if (Array.isArray(historyData) && historyData.length > 0) {
+        prices = historyData.map(p => p.close || p[1] || p);
+        currentPrice = prices[prices.length - 1] || 0;
+        const price24hAgo = prices[Math.max(0, prices.length - 6)] || currentPrice;
+        priceChange24h = currentPrice - price24hAgo;
+        priceChangePercent24h = price24hAgo > 0 ? ((currentPrice - price24hAgo) / price24hAgo) * 100 : 0;
+      } else if (historyData.prices && historyData.prices.length > 0) {
+        prices = historyData.prices.map(p => p[1] || p);
+        currentPrice = prices[prices.length - 1] || 0;
+        const price24hAgo = prices[Math.max(0, prices.length - 24)] || currentPrice;
+        priceChange24h = currentPrice - price24hAgo;
+        priceChangePercent24h = price24hAgo > 0 ? ((currentPrice - price24hAgo) / price24hAgo) * 100 : 0;
+      }
+    }
+    
+    if (prices.length < 10) {
+      return { success: false, error: 'Insufficient price data' };
+    }
+    
     const response = await fetch(`${API_BASE}/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ticker: symbol.toUpperCase() }),
+      body: JSON.stringify({ 
+        ticker: symbol.toUpperCase(),
+        currentPrice,
+        priceChange24h,
+        priceChangePercent24h,
+        prices
+      }),
     });
     
     if (!response.ok) {
