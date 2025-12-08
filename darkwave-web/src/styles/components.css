@@ -1070,12 +1070,14 @@ img {
 }
 
 .gauge-sentiment {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 4px;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
   text-shadow: 0 0 10px currentColor;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .gauge-card {
@@ -1129,7 +1131,8 @@ img {
   }
   
   .gauge-sentiment {
-    font-size: 10px;
+    font-size: 9px;
+    letter-spacing: 0;
   }
 }
 
