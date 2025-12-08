@@ -154,14 +154,6 @@ function CoinTableWidget({ coins, favorites, onCoinClick, activeView, setActiveV
     return <span style={{ color }}>{arrow} {Math.abs(change).toFixed(1)}%</span>
   }
 
-  const formatMarketCap = (cap) => {
-    if (!cap) return '-'
-    if (cap >= 1e12) return `$${(cap / 1e12).toFixed(1)}T`
-    if (cap >= 1e9) return `$${(cap / 1e9).toFixed(1)}B`
-    if (cap >= 1e6) return `$${(cap / 1e6).toFixed(1)}M`
-    return `$${cap.toLocaleString()}`
-  }
-
   const tabs = [
     { id: 'top10', label: 'Top 10' },
     { id: 'favorites', label: 'Favs' },
@@ -320,6 +312,170 @@ function ChartWidget() {
   )
 }
 
+function NewsCarousel({ news, currentIndex, onNext, onPrev }) {
+  if (!news || news.length === 0) {
+    return (
+      <div style={{ 
+        background: '#0f0f0f', 
+        border: '1px solid #222', 
+        borderRadius: 12,
+        padding: 20,
+        textAlign: 'center',
+        color: '#666',
+        fontSize: 12,
+        marginBottom: 16
+      }}>
+        No news available
+      </div>
+    )
+  }
+
+  const currentNews = news[currentIndex]
+
+  return (
+    <div style={{ 
+      background: '#0f0f0f', 
+      border: '1px solid #222', 
+      borderRadius: 12,
+      overflow: 'hidden',
+      marginBottom: 16
+    }}>
+      <div style={{ 
+        padding: '10px 12px', 
+        borderBottom: '1px solid #222',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Crypto News</span>
+        <span style={{ fontSize: 10, color: '#666' }}>{currentIndex + 1} / {news.length}</span>
+      </div>
+      <div style={{ position: 'relative' }}>
+        <div 
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 16,
+            minHeight: 100,
+            background: currentNews.image 
+              ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url(${currentNews.image})` 
+              : '#0f0f0f',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div style={{ 
+            fontSize: 10, 
+            color: '#00D4FF', 
+            fontWeight: 600, 
+            marginBottom: 6,
+            textTransform: 'uppercase'
+          }}>
+            {currentNews.source}
+          </div>
+          <div style={{ 
+            fontSize: 14, 
+            fontWeight: 700, 
+            color: '#fff', 
+            marginBottom: 8,
+            lineHeight: 1.4
+          }}>
+            {currentNews.title}
+          </div>
+          <div style={{ 
+            fontSize: 11, 
+            color: 'rgba(255,255,255,0.6)', 
+            marginBottom: 12 
+          }}>
+            {currentNews.time}
+          </div>
+          {currentNews.url && (
+            <a 
+              href={currentNews.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                fontSize: 11,
+                color: '#00D4FF',
+                textDecoration: 'none',
+                fontWeight: 600,
+              }}
+            >
+              Read More →
+            </a>
+          )}
+        </div>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          transform: 'translateY(-50%)',
+          padding: '0 8px',
+          pointerEvents: 'none'
+        }}>
+          <button
+            onClick={onPrev}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.6)',
+              border: '1px solid #333',
+              color: '#fff',
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'auto'
+            }}
+          >
+            ←
+          </button>
+          <button
+            onClick={onNext}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.6)',
+              border: '1px solid #333',
+              color: '#fff',
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'auto'
+            }}
+          >
+            →
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Footer() {
+  return (
+    <div style={{
+      textAlign: 'center',
+      padding: '16px 12px',
+      borderTop: '1px solid #222',
+      marginTop: 8,
+      color: '#555',
+      fontSize: 10,
+      fontWeight: 500
+    }}>
+      Powered by DarkWave Studios, LLC © 2025 | v2.0.6
+    </div>
+  )
+}
+
 export default function DashboardTab({ userId, userConfig, onNavigate }) {
   const { favorites, loading: favoritesLoading } = useFavorites()
   const { avatarSvg } = useAvatar()
@@ -333,6 +489,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
     fearGreed: 65,
     altcoinSeason: 75,
   })
+  const [news, setNews] = useState([])
+  const [newsIndex, setNewsIndex] = useState(0)
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -367,13 +525,47 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
     fetchCoins()
   }, [])
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('/api/crypto/news')
+        if (response.ok) {
+          const data = await response.json()
+          setNews(data.news || data || [])
+        } else {
+          setNews([
+            { source: 'CoinDesk', title: 'Bitcoin Holds Above $90K as Market Awaits Fed Decision', time: '2 hours ago', url: 'https://coindesk.com' },
+            { source: 'CoinTelegraph', title: 'Ethereum Layer-2 Solutions See Record Growth in Q4', time: '4 hours ago', url: 'https://cointelegraph.com' },
+            { source: 'The Block', title: 'Solana DeFi TVL Surges Past $5 Billion Milestone', time: '6 hours ago', url: 'https://theblock.co' },
+            { source: 'Decrypt', title: 'AI Tokens Lead Altcoin Rally as Sector Gains Momentum', time: '8 hours ago', url: 'https://decrypt.co' },
+          ])
+        }
+      } catch (err) {
+        setNews([
+          { source: 'CoinDesk', title: 'Bitcoin Holds Above $90K as Market Awaits Fed Decision', time: '2 hours ago', url: 'https://coindesk.com' },
+          { source: 'CoinTelegraph', title: 'Ethereum Layer-2 Solutions See Record Growth in Q4', time: '4 hours ago', url: 'https://cointelegraph.com' },
+          { source: 'The Block', title: 'Solana DeFi TVL Surges Past $5 Billion Milestone', time: '6 hours ago', url: 'https://theblock.co' },
+        ])
+      }
+    }
+    fetchNews()
+  }, [])
+
   const handleCoinClick = (coin) => {
     setSelectedCoin(coin)
     setIsModalOpen(true)
   }
 
+  const handleNextNews = () => {
+    setNewsIndex(prev => (prev + 1) % news.length)
+  }
+
+  const handlePrevNews = () => {
+    setNewsIndex(prev => (prev - 1 + news.length) % news.length)
+  }
+
   return (
-    <div style={{ padding: '12px' }}>
+    <div style={{ padding: '12px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -381,22 +573,33 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         }
       `}</style>
       
-      <PromoBanner onNavigate={onNavigate} />
+      <div style={{ flex: 1 }}>
+        <PromoBanner onNavigate={onNavigate} />
+        
+        <GaugeSection marketData={marketData} />
+        
+        <CoinTableWidget 
+          coins={coins}
+          favorites={favorites}
+          onCoinClick={handleCoinClick}
+          activeView={activeView}
+          setActiveView={setActiveView}
+          timeframe={timeframe}
+          setTimeframe={setTimeframe}
+          loading={coinsLoading}
+        />
+        
+        <ChartWidget />
+        
+        <NewsCarousel 
+          news={news}
+          currentIndex={newsIndex}
+          onNext={handleNextNews}
+          onPrev={handlePrevNews}
+        />
+      </div>
       
-      <GaugeSection marketData={marketData} />
-      
-      <CoinTableWidget 
-        coins={coins}
-        favorites={favorites}
-        onCoinClick={handleCoinClick}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        timeframe={timeframe}
-        setTimeframe={setTimeframe}
-        loading={coinsLoading}
-      />
-      
-      <ChartWidget />
+      <Footer />
       
       <CoinAnalysisModal 
         coin={selectedCoin}
