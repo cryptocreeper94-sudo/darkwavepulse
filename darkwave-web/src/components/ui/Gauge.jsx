@@ -67,9 +67,9 @@ export default function Gauge({
   const needleColor = getColorFunc(animatedValue)
   
   const centerX = size / 2
-  const centerY = size * 0.85
-  const radius = size * 0.4
-  const arcWidth = size * 0.12
+  const centerY = size * 0.65
+  const radius = size * 0.45
+  const arcWidth = size * 0.14
   
   const angle = Math.PI + (Math.PI * (animatedValue / 100))
   const needleLength = radius + 8
@@ -122,8 +122,8 @@ export default function Gauge({
   }
   
   return (
-    <div className="gauge-container" style={{ width: size, height: size * 0.7 }}>
-      <svg width={size} height={size * 0.7} viewBox={`0 0 ${size} ${size * 0.7}`}>
+    <div className="gauge-container" style={{ width: size, height: size * 0.6 }}>
+      <svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
         <defs>
           <filter id={`glow-${type}`} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
