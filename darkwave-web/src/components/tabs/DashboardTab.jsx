@@ -579,7 +579,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
   }
 
   return (
-    <div style={{ padding: '12px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '12px 12px 0' }}>
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -587,31 +587,29 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         }
       `}</style>
       
-      <div style={{ flex: 1 }}>
-        <PromoBanner onNavigate={onNavigate} />
-        
-        <GaugeSection marketData={marketData} />
-        
-        <CoinTableWidget 
-          coins={coins}
-          favorites={favorites}
-          onCoinClick={handleCoinClick}
-          activeView={activeView}
-          setActiveView={setActiveView}
-          timeframe={timeframe}
-          setTimeframe={setTimeframe}
-          loading={coinsLoading}
-        />
-        
-        <ChartWidget />
-        
-        <NewsCarousel 
-          news={news}
-          currentIndex={newsIndex}
-          onNext={handleNextNews}
-          onPrev={handlePrevNews}
-        />
-      </div>
+      <PromoBanner onNavigate={onNavigate} />
+      
+      <GaugeSection marketData={marketData} />
+      
+      <CoinTableWidget 
+        coins={coins}
+        favorites={favorites}
+        onCoinClick={handleCoinClick}
+        activeView={activeView}
+        setActiveView={setActiveView}
+        timeframe={timeframe}
+        setTimeframe={setTimeframe}
+        loading={coinsLoading}
+      />
+      
+      <ChartWidget />
+      
+      <NewsCarousel 
+        news={news}
+        currentIndex={newsIndex}
+        onNext={handleNextNews}
+        onPrev={handlePrevNews}
+      />
       
       <Footer />
       
