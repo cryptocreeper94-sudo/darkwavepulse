@@ -67,9 +67,9 @@ export default function Gauge({
   const needleColor = getColorFunc(animatedValue)
   
   const centerX = size / 2
-  const centerY = size * 0.65
-  const radius = size * 0.45
-  const arcWidth = size * 0.14
+  const centerY = size * 0.55
+  const radius = size * 0.42
+  const arcWidth = size * 0.12
   
   const angle = Math.PI + (Math.PI * (animatedValue / 100))
   const needleLength = radius + 8
