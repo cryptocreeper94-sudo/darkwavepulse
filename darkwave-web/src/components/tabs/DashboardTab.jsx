@@ -210,46 +210,47 @@ function CoinTableWidget({ coins, favorites, onCoinClick, activeView, setActiveV
         alignItems: 'center', 
         padding: '10px 12px', 
         borderBottom: '1px solid #222',
-        flexWrap: 'wrap',
-        gap: 8
       }}>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveView(tab.id)}
               style={{
-                padding: '5px 10px',
+                padding: '6px 12px',
                 fontSize: 11,
+                height: 28,
                 background: activeView === tab.id ? '#00D4FF' : '#1a1a1a',
                 color: activeView === tab.id ? '#000' : '#888',
-                border: activeView === tab.id ? 'none' : '1px solid #333',
+                border: activeView === tab.id ? '1px solid #00D4FF' : '1px solid #333',
                 borderRadius: 4,
                 cursor: 'pointer',
                 fontWeight: activeView === tab.id ? 700 : 500,
+                whiteSpace: 'nowrap',
               }}
             >
               {tab.label}
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {['1h', '24h'].map(tf => (
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          {['1H', '24H'].map(tf => (
             <button
               key={tf}
-              onClick={() => setTimeframe(tf)}
+              onClick={() => setTimeframe(tf.toLowerCase())}
               style={{
-                padding: '4px 8px',
+                padding: '6px 10px',
                 fontSize: 10,
-                background: timeframe === tf ? '#1a1a1a' : 'transparent',
-                color: timeframe === tf ? '#00D4FF' : '#555',
-                border: timeframe === tf ? '1px solid #00D4FF' : '1px solid #333',
-                borderRadius: 3,
+                height: 28,
+                background: timeframe === tf.toLowerCase() ? '#1a1a1a' : 'transparent',
+                color: timeframe === tf.toLowerCase() ? '#00D4FF' : '#555',
+                border: timeframe === tf.toLowerCase() ? '1px solid #00D4FF' : '1px solid #333',
+                borderRadius: 4,
                 cursor: 'pointer',
                 fontWeight: 600,
               }}
             >
-              {tf.toUpperCase()}
+              {tf}
             </button>
           ))}
         </div>
