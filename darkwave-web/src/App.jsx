@@ -51,7 +51,7 @@ function App() {
   const renderTab = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardTab userId={userId} userConfig={userConfig} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} />
       case 'markets':
         return <MarketsTab />
       case 'projects':
@@ -69,7 +69,7 @@ function App() {
       case 'v2-details':
         return <V2DetailsTab />
       default:
-        return <DashboardTab userId={userId} userConfig={userConfig} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} />
     }
   }
   
