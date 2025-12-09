@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
+import BentoGrid, { BentoItem } from '../ui/BentoGrid'
+import './SniperBotTab.css'
 
 const API_BASE = ''
 
@@ -63,7 +65,7 @@ function LiveCandleChart({ tokenSymbol, priceData, entryPrice, takeProfitPrice, 
         horzLines: { color: 'rgba(255,255,255,0.03)' },
       },
       width: chartContainerRef.current.clientWidth,
-      height: 200,
+      height: 180,
       timeScale: {
         timeVisible: true,
         secondsVisible: true,
@@ -144,439 +146,287 @@ function LiveCandleChart({ tokenSymbol, priceData, entryPrice, takeProfitPrice, 
   }, [priceData])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <div style={{
-        position: 'absolute',
-        top: 8,
-        left: 12,
-        zIndex: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-      }}>
-        <span style={{ 
-          fontSize: 12, 
-          fontWeight: 700, 
-          color: '#00D4FF',
-          textShadow: '0 0 10px rgba(0,212,255,0.5)',
-        }}>
-          {tokenSymbol || 'SELECT TOKEN'}
-        </span>
-        <span style={{
-          padding: '2px 6px',
-          borderRadius: 4,
-          fontSize: 9,
-          background: 'rgba(57, 255, 20, 0.2)',
-          border: '1px solid #39FF14',
-          color: '#39FF14',
-        }}>
-          1s
-        </span>
+    <div className="sniper-chart-container">
+      <div className="sniper-chart-header">
+        <span className="sniper-chart-symbol">{tokenSymbol || 'SELECT TOKEN'}</span>
+        <span className="sniper-chart-timeframe">1s</span>
       </div>
-      <div ref={chartContainerRef} style={{ borderRadius: 8, overflow: 'hidden' }} />
+      <div ref={chartContainerRef} className="sniper-chart-canvas" />
+    </div>
+  )
+}
+
+function SessionStatsCard({ stats, isActive }) {
+  return (
+    <div className="section-box sniper-stats-card">
+      <div className="sniper-stats-header">
+        <div className="sniper-status-indicator">
+          <span className={`sniper-status-dot ${isActive ? 'active' : ''}`} />
+          <span className="sniper-status-text">
+            {isActive ? 'SESSION ACTIVE' : 'SESSION IDLE'}
+          </span>
+        </div>
+      </div>
+      <div className="sniper-stats-grid">
+        <div className="sniper-stat-item">
+          <div className="sniper-stat-label">TRADES</div>
+          <div className="sniper-stat-value cyan">
+            {stats?.tradesExecuted || 0}
+            <span className="sniper-stat-max">/{stats?.maxTrades || 10}</span>
+          </div>
+        </div>
+        <div className="sniper-stat-item">
+          <div className="sniper-stat-label">WIN RATE</div>
+          <div className={`sniper-stat-value ${(stats?.winRate || 0) >= 50 ? 'green' : 'red'}`}>
+            {(stats?.winRate || 0).toFixed(0)}%
+          </div>
+        </div>
+        <div className="sniper-stat-item">
+          <div className="sniper-stat-label">SOL USED</div>
+          <div className="sniper-stat-value cyan">
+            {(stats?.solUsed || 0).toFixed(2)}
+            <span className="sniper-stat-max">/{stats?.maxSol || 5}</span>
+          </div>
+        </div>
+        <div className="sniper-stat-item">
+          <div className="sniper-stat-label">P&L</div>
+          <div className={`sniper-stat-value ${(stats?.totalPnl || 0) >= 0 ? 'green' : 'red'}`}>
+            {(stats?.totalPnl || 0) >= 0 ? '+' : ''}{(stats?.totalPnl || 0).toFixed(3)}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
 function ActivePositionCard({ position, onClose }) {
   const pnlPercent = ((position.currentPrice - position.entryPrice) / position.entryPrice) * 100
-  const pnlColor = pnlPercent >= 0 ? '#39FF14' : '#FF4444'
+  const isProfit = pnlPercent >= 0
   const pnlSol = position.amountSol * (pnlPercent / 100)
 
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,20,20,0.95))',
-      border: `1px solid ${pnlPercent >= 0 ? 'rgba(57,255,20,0.4)' : 'rgba(255,68,68,0.4)'}`,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
-      boxShadow: `0 0 20px ${pnlPercent >= 0 ? 'rgba(57,255,20,0.1)' : 'rgba(255,68,68,0.1)'}`,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 40,
-            height: 40,
-            borderRadius: 8,
-            background: 'linear-gradient(135deg, #00D4FF, #9D4EDD)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 800,
-            fontSize: 14,
-          }}>
+    <div className={`section-box sniper-position-card ${isProfit ? 'profit' : 'loss'}`}>
+      <div className="sniper-position-header">
+        <div className="sniper-position-token">
+          <div className="sniper-token-icon">
             {position.symbol?.slice(0, 2) || '??'}
           </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 16 }}>{position.symbol}</div>
-            <div style={{ fontSize: 10, color: '#888' }}>
-              via {position.dex} • {position.age}
-            </div>
+          <div className="sniper-token-info">
+            <div className="sniper-token-symbol">{position.symbol}</div>
+            <div className="sniper-token-meta">via {position.dex} • {position.age}</div>
           </div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ 
-            fontSize: 24, 
-            fontWeight: 800, 
-            color: pnlColor,
-            textShadow: `0 0 15px ${pnlColor}40`,
-          }}>
-            {pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%
+        <div className="sniper-position-pnl">
+          <div className={`sniper-pnl-percent ${isProfit ? 'green' : 'red'}`}>
+            {isProfit ? '+' : ''}{pnlPercent.toFixed(2)}%
           </div>
-          <div style={{ fontSize: 11, color: pnlColor }}>
-            {pnlSol >= 0 ? '+' : ''}{pnlSol.toFixed(4)} SOL
+          <div className={`sniper-pnl-sol ${isProfit ? 'green' : 'red'}`}>
+            {isProfit ? '+' : ''}{pnlSol.toFixed(4)} SOL
           </div>
         </div>
       </div>
-
-      <LiveCandleChart
-        tokenSymbol={position.symbol}
-        priceData={position.priceHistory || []}
-        entryPrice={position.entryPrice}
-        takeProfitPrice={position.entryPrice * (1 + position.takeProfitPercent / 100)}
-        stopLossPrice={position.entryPrice * (1 - position.stopLossPercent / 100)}
-      />
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: 8, 
-        marginTop: 12,
-        padding: 10,
-        background: '#0a0a0a',
-        borderRadius: 8,
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666' }}>ENTRY</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#00D4FF' }}>
-            ${position.entryPrice?.toFixed(8)}
-          </div>
+      <div className="sniper-position-prices">
+        <div className="sniper-price-item">
+          <span className="sniper-price-label">Entry</span>
+          <span className="sniper-price-value">${position.entryPrice?.toFixed(8)}</span>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666' }}>CURRENT</div>
-          <div style={{ fontSize: 12, fontWeight: 600 }}>
-            ${position.currentPrice?.toFixed(8)}
-          </div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666' }}>TP TARGET</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#39FF14' }}>
-            +{position.takeProfitPercent}%
-          </div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666' }}>SL LIMIT</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#FF4444' }}>
-            -{position.stopLossPercent}%
-          </div>
+        <div className="sniper-price-item">
+          <span className="sniper-price-label">Current</span>
+          <span className="sniper-price-value">${position.currentPrice?.toFixed(8)}</span>
         </div>
       </div>
-
-      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        <button
-          onClick={() => onClose?.(position.id, 'manual')}
-          style={{
-            flex: 1,
-            padding: '10px 16px',
-            fontSize: 11,
-            fontWeight: 700,
-            background: 'linear-gradient(135deg, #FF4444, #CC0000)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-          }}
-        >
-          CLOSE POSITION
+      <div className="sniper-position-actions">
+        <button className="sniper-btn-close" onClick={() => onClose(position.id, 'manual')}>
+          Close Position
         </button>
-        <button
-          style={{
-            padding: '10px 16px',
-            fontSize: 11,
-            fontWeight: 700,
-            background: '#1a1a1a',
-            color: '#888',
-            border: '1px solid #333',
-            borderRadius: 6,
-            cursor: 'pointer',
-          }}
-        >
-          ADJUST TP/SL
-        </button>
+        <button className="sniper-btn-adjust">Adjust TP/SL</button>
       </div>
     </div>
   )
 }
 
-function DiscoveredTokenCard({ token, onSnipe, onWatch, isSelected }) {
-  const getScoreColor = (score) => {
-    if (score >= 70) return '#39FF14'
-    if (score >= 45) return '#FFD700'
-    return '#FF4444'
-  }
+function DiscoveredTokenCard({ token, onSnipe, onWatch }) {
+  const scoreColor = token.aiScore >= 70 ? '#39FF14' : token.aiScore >= 50 ? '#FFD700' : '#FF4444'
+  const dexColor = token.dex === 'pumpfun' ? '#FF69B4' : '#9D4EDD'
 
   return (
-    <div
-      style={{
-        background: isSelected ? 'rgba(0,212,255,0.08)' : '#0a0a0a',
-        border: isSelected ? '1px solid rgba(0,212,255,0.4)' : '1px solid #1a1a1a',
-        borderRadius: 10,
-        padding: 14,
-        marginBottom: 10,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 36,
-            height: 36,
-            borderRadius: 8,
-            background: `linear-gradient(135deg, ${getScoreColor(token.aiScore)}30, #00D4FF30)`,
-            border: `1px solid ${getScoreColor(token.aiScore)}50`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 11,
-            fontWeight: 800,
-          }}>
-            {token.symbol?.slice(0, 3)}
+    <div className="section-box sniper-token-card">
+      <div className="sniper-token-row">
+        <div className="sniper-token-left">
+          <div className="sniper-ai-score" style={{ '--score-color': scoreColor }}>
+            <span className="sniper-score-value">{token.aiScore}</span>
           </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 14 }}>{token.symbol}</div>
-            <div style={{ fontSize: 10, color: '#666' }}>{token.name?.slice(0, 20)}</div>
+          <div className="sniper-token-details">
+            <div className="sniper-token-name">{token.symbol}</div>
+            <div className="sniper-token-dex" style={{ color: dexColor }}>{token.dex}</div>
           </div>
         </div>
-        <div style={{ 
-          textAlign: 'right',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: 4,
-        }}>
-          <div style={{
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            background: `conic-gradient(${getScoreColor(token.aiScore)} ${token.aiScore}%, #1a1a1a ${token.aiScore}%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: '#0a0a0a',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 12,
-              fontWeight: 800,
-              color: getScoreColor(token.aiScore),
-            }}>
-              {token.aiScore}
-            </div>
-          </div>
+        <div className="sniper-token-right">
+          <span className={`sniper-recommendation ${token.recommendation?.toLowerCase()}`}>
+            {token.recommendation}
+          </span>
         </div>
       </div>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: 6, 
-        marginTop: 12,
-        padding: 8,
-        background: '#050505',
-        borderRadius: 6,
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 8, color: '#555', textTransform: 'uppercase' }}>Liquidity</div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#00D4FF' }}>
-            ${((token.liquidityUsd || 0) / 1000).toFixed(1)}K
-          </div>
+      <div className="sniper-token-metrics">
+        <div className="sniper-metric">
+          <span className="sniper-metric-label">Liq</span>
+          <span className="sniper-metric-value">${(token.liquidity / 1000).toFixed(1)}K</span>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 8, color: '#555', textTransform: 'uppercase' }}>5m Change</div>
-          <div style={{ 
-            fontSize: 11, 
-            fontWeight: 600, 
-            color: (token.priceChange5m || 0) >= 0 ? '#39FF14' : '#FF4444' 
-          }}>
-            {(token.priceChange5m || 0) >= 0 ? '+' : ''}{(token.priceChange5m || 0).toFixed(1)}%
-          </div>
+        <div className="sniper-metric">
+          <span className="sniper-metric-label">5m</span>
+          <span className={`sniper-metric-value ${token.priceChange5m >= 0 ? 'green' : 'red'}`}>
+            {token.priceChange5m >= 0 ? '+' : ''}{token.priceChange5m?.toFixed(1)}%
+          </span>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 8, color: '#555', textTransform: 'uppercase' }}>Volume</div>
-          <div style={{ fontSize: 11, fontWeight: 600 }}>
-            {(token.volumeMultiplier || 1).toFixed(1)}x
-          </div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 8, color: '#555', textTransform: 'uppercase' }}>DEX</div>
-          <div style={{ 
-            fontSize: 10, 
-            fontWeight: 600,
-            color: token.dex === 'pumpfun' ? '#FF006E' : '#9D4EDD',
-          }}>
-            {token.dex}
-          </div>
+        <div className="sniper-metric">
+          <span className="sniper-metric-label">Vol</span>
+          <span className="sniper-metric-value">{token.volumeMultiplier?.toFixed(1)}x</span>
         </div>
       </div>
+      <div className="sniper-token-actions">
+        <button className="sniper-btn-snipe" onClick={() => onSnipe(token)}>Snipe</button>
+        <button className="sniper-btn-watch" onClick={() => onWatch(token)}>Watch</button>
+      </div>
+    </div>
+  )
+}
 
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginTop: 10,
-        paddingTop: 10,
-        borderTop: '1px solid #1a1a1a',
-      }}>
-        <div style={{
-          padding: '4px 10px',
-          borderRadius: 4,
-          fontSize: 10,
-          fontWeight: 700,
-          background: token.aiRecommendation === 'snipe' 
-            ? 'rgba(57,255,20,0.15)' 
-            : token.aiRecommendation === 'watch'
-              ? 'rgba(255,215,0,0.15)'
-              : 'rgba(255,68,68,0.15)',
-          border: `1px solid ${
-            token.aiRecommendation === 'snipe' 
-              ? '#39FF14' 
-              : token.aiRecommendation === 'watch'
-                ? '#FFD700'
-                : '#FF4444'
-          }`,
-          color: token.aiRecommendation === 'snipe' 
-            ? '#39FF14' 
-            : token.aiRecommendation === 'watch'
-              ? '#FFD700'
-              : '#FF4444',
-        }}>
-          {token.aiRecommendation === 'snipe' ? '🎯 SNIPE' : 
-           token.aiRecommendation === 'watch' ? '👀 WATCH' : '⚠️ AVOID'}
+function SmartAutoModePanel({ isActive, onToggle, config }) {
+  return (
+    <div className="section-box sniper-automode-panel">
+      <div className="sniper-automode-header">
+        <div>
+          <h4 className="sniper-automode-title">Smart Auto Mode</h4>
+          <p className="sniper-automode-desc">AI-powered autonomous trading</p>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            onClick={(e) => { e.stopPropagation(); onWatch?.(token); }}
-            style={{
-              padding: '6px 12px',
-              fontSize: 10,
-              fontWeight: 600,
-              background: '#1a1a1a',
-              color: '#888',
-              border: '1px solid #333',
-              borderRadius: 4,
-              cursor: 'pointer',
-            }}
-          >
-            Watch
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onSnipe?.(token); }}
-            style={{
-              padding: '6px 14px',
-              fontSize: 10,
-              fontWeight: 700,
-              background: 'linear-gradient(135deg, #00D4FF, #39FF14)',
-              color: '#000',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-            }}
-          >
-            SNIPE
-          </button>
+        <button 
+          className={`sniper-automode-btn ${isActive ? 'active' : ''}`}
+          onClick={onToggle}
+        >
+          {isActive ? 'STOP' : 'START'}
+        </button>
+      </div>
+      <div className="sniper-automode-limits">
+        <div className="sniper-limit-item">
+          <span className="sniper-limit-label">Max Trades</span>
+          <span className="sniper-limit-value">{config?.autoModeSettings?.maxTradesPerSession || 10}</span>
+        </div>
+        <div className="sniper-limit-item">
+          <span className="sniper-limit-label">Max SOL</span>
+          <span className="sniper-limit-value">{config?.autoModeSettings?.maxSolPerSession || 5}</span>
+        </div>
+        <div className="sniper-limit-item">
+          <span className="sniper-limit-label">Cooldown</span>
+          <span className="sniper-limit-value">{config?.autoModeSettings?.cooldownSeconds || 60}s</span>
+        </div>
+        <div className="sniper-limit-item">
+          <span className="sniper-limit-label">Auto-Stop</span>
+          <span className="sniper-limit-value">{config?.autoModeSettings?.maxConsecutiveLosses || 3} losses</span>
         </div>
       </div>
     </div>
   )
 }
 
-function SessionStatsPanel({ stats, isActive }) {
+function QuickSettingsPanel({ config, updateConfig, expanded, onToggle }) {
   return (
-    <div style={{
-      background: isActive 
-        ? 'linear-gradient(135deg, rgba(57,255,20,0.05), rgba(0,212,255,0.05))'
-        : '#0a0a0a',
-      border: isActive ? '1px solid rgba(57,255,20,0.3)' : '1px solid #1a1a1a',
-      borderRadius: 12,
-      padding: 16,
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: 16,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 10,
-            height: 10,
-            borderRadius: '50%',
-            background: isActive ? '#39FF14' : '#444',
-            boxShadow: isActive ? '0 0 10px #39FF14' : 'none',
-            animation: isActive ? 'pulse 2s infinite' : 'none',
-          }} />
-          <span style={{ 
-            fontSize: 12, 
-            fontWeight: 700,
-            color: isActive ? '#39FF14' : '#666',
-          }}>
-            {isActive ? 'SESSION ACTIVE' : 'SESSION IDLE'}
-          </span>
+    <div className="section-box sniper-settings-panel">
+      <button className="sniper-accordion-header" onClick={onToggle}>
+        <span className="sniper-accordion-title">Quick Settings</span>
+        <span className={`sniper-accordion-arrow ${expanded ? 'expanded' : ''}`}>▼</span>
+      </button>
+      {expanded && (
+        <div className="sniper-settings-grid">
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Buy Amount (SOL)</span>
+            <input
+              type="number"
+              step="0.1"
+              value={config.tradeControls.buyAmountSol}
+              onChange={(e) => updateConfig('tradeControls', 'buyAmountSol', parseFloat(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Slippage %</span>
+            <input
+              type="number"
+              value={config.tradeControls.slippagePercent}
+              onChange={(e) => updateConfig('tradeControls', 'slippagePercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Take Profit %</span>
+            <input
+              type="number"
+              value={config.tradeControls.takeProfitPercent}
+              onChange={(e) => updateConfig('tradeControls', 'takeProfitPercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Stop Loss %</span>
+            <input
+              type="number"
+              value={config.tradeControls.stopLossPercent}
+              onChange={(e) => updateConfig('tradeControls', 'stopLossPercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
         </div>
-        {isActive && (
-          <span style={{ fontSize: 10, color: '#888' }}>
-            {stats?.duration || '00:00:00'}
-          </span>
-        )}
-      </div>
+      )}
+    </div>
+  )
+}
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: 12,
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>TRADES</div>
-          <div style={{ fontSize: 20, fontWeight: 800 }}>
-            {stats?.tradesExecuted || 0}
-            <span style={{ fontSize: 10, color: '#666' }}>/{stats?.maxTrades || 10}</span>
-          </div>
+function SafetyFiltersPanel({ config, updateConfig, expanded, onToggle }) {
+  return (
+    <div className="section-box sniper-settings-panel">
+      <button className="sniper-accordion-header" onClick={onToggle}>
+        <span className="sniper-accordion-title">Safety Filters</span>
+        <span className={`sniper-accordion-arrow ${expanded ? 'expanded' : ''}`}>▼</span>
+      </button>
+      {expanded && (
+        <div className="sniper-settings-grid">
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Max Bot %</span>
+            <input
+              type="number"
+              value={config.safetyFilters.maxBotPercent}
+              onChange={(e) => updateConfig('safetyFilters', 'maxBotPercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Max Bundle %</span>
+            <input
+              type="number"
+              value={config.safetyFilters.maxBundlePercent}
+              onChange={(e) => updateConfig('safetyFilters', 'maxBundlePercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Max Top10 %</span>
+            <input
+              type="number"
+              value={config.safetyFilters.maxTop10HoldersPercent}
+              onChange={(e) => updateConfig('safetyFilters', 'maxTop10HoldersPercent', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
+          <label className="sniper-setting-item">
+            <span className="sniper-setting-label">Min Liquidity $</span>
+            <input
+              type="number"
+              value={config.safetyFilters.minLiquidityUsd}
+              onChange={(e) => updateConfig('safetyFilters', 'minLiquidityUsd', parseInt(e.target.value))}
+              className="sniper-input"
+            />
+          </label>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>WIN RATE</div>
-          <div style={{ 
-            fontSize: 20, 
-            fontWeight: 800,
-            color: (stats?.winRate || 0) >= 50 ? '#39FF14' : '#FF4444',
-          }}>
-            {(stats?.winRate || 0).toFixed(0)}%
-          </div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>SOL USED</div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#00D4FF' }}>
-            {(stats?.solUsed || 0).toFixed(2)}
-            <span style={{ fontSize: 10, color: '#666' }}>/{stats?.maxSol || 5}</span>
-          </div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>P&L</div>
-          <div style={{ 
-            fontSize: 20, 
-            fontWeight: 800,
-            color: (stats?.totalPnl || 0) >= 0 ? '#39FF14' : '#FF4444',
-            textShadow: `0 0 10px ${(stats?.totalPnl || 0) >= 0 ? '#39FF1440' : '#FF444440'}`,
-          }}>
-            {(stats?.totalPnl || 0) >= 0 ? '+' : ''}{(stats?.totalPnl || 0).toFixed(3)}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -589,9 +439,10 @@ export default function SniperBotTab() {
   const [activePositions, setActivePositions] = useState([])
   const [stats, setStats] = useState({ tradesExecuted: 0, winRate: 0, solUsed: 0, totalPnl: 0, maxTrades: 10, maxSol: 5 })
   const [solPrice, setSolPrice] = useState(0)
-  const [selectedToken, setSelectedToken] = useState(null)
   const [autoModeActive, setAutoModeActive] = useState(false)
   const [scanInterval, setScanInterval] = useState(null)
+  const [expandedSettings, setExpandedSettings] = useState(false)
+  const [expandedSafety, setExpandedSafety] = useState(false)
 
   useEffect(() => {
     fetchSolPrice()
@@ -640,7 +491,10 @@ export default function SniperBotTab() {
 
   const handleSnipe = async (token) => {
     console.log('Sniping token:', token)
-    setSelectedToken(token)
+  }
+
+  const handleWatch = async (token) => {
+    console.log('Watching token:', token)
   }
 
   const updateConfig = (section, field, value) => {
@@ -654,78 +508,27 @@ export default function SniperBotTab() {
   }
 
   return (
-    <div className="sniper-bot-tab" style={{ maxWidth: 1400, margin: '0 auto' }}>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 5px rgba(0,212,255,0.3); }
-          50% { box-shadow: 0 0 20px rgba(0,212,255,0.6); }
-        }
-      `}</style>
-
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-        padding: '16px 20px',
-        background: 'linear-gradient(90deg, rgba(0,212,255,0.1), rgba(157,78,221,0.1), rgba(57,255,20,0.05))',
-        borderRadius: 12,
-        border: '1px solid rgba(0,212,255,0.2)',
-      }}>
-        <div>
-          <h1 style={{ 
-            fontSize: 28, 
-            fontWeight: 800, 
-            margin: 0,
-            background: 'linear-gradient(90deg, #00D4FF, #9D4EDD, #39FF14)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            AI SNIPER BOT
-          </h1>
-          <p style={{ fontSize: 12, color: '#666', margin: '4px 0 0' }}>
-            Real-time token discovery with intelligent execution
-          </p>
+    <div className="sniper-tab">
+      <div className="sniper-header section-box">
+        <div className="sniper-header-left">
+          <h1 className="sniper-title">AI SNIPER BOT</h1>
+          <p className="sniper-subtitle">Real-time token discovery</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 10, color: '#666' }}>SOL PRICE</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#00D4FF' }}>
-              ${solPrice.toFixed(2)}
-            </div>
+        <div className="sniper-header-right">
+          <div className="sniper-sol-price">
+            <span className="sniper-sol-label">SOL</span>
+            <span className="sniper-sol-value">${solPrice.toFixed(2)}</span>
           </div>
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div className="sniper-mode-toggle">
             <button
+              className={`sniper-mode-btn ${mode === 'simple' ? 'active' : ''}`}
               onClick={() => setMode('simple')}
-              style={{
-                padding: '8px 16px',
-                fontSize: 11,
-                fontWeight: mode === 'simple' ? 700 : 500,
-                background: mode === 'simple' ? '#00D4FF' : 'transparent',
-                color: mode === 'simple' ? '#000' : '#666',
-                border: mode === 'simple' ? 'none' : '1px solid #333',
-                borderRadius: 6,
-                cursor: 'pointer',
-              }}
             >
               Simple
             </button>
             <button
+              className={`sniper-mode-btn ${mode === 'advanced' ? 'active' : ''}`}
               onClick={() => setMode('advanced')}
-              style={{
-                padding: '8px 16px',
-                fontSize: 11,
-                fontWeight: mode === 'advanced' ? 700 : 500,
-                background: mode === 'advanced' ? '#9D4EDD' : 'transparent',
-                color: mode === 'advanced' ? '#fff' : '#666',
-                border: mode === 'advanced' ? 'none' : '1px solid #333',
-                borderRadius: 6,
-                cursor: 'pointer',
-              }}
             >
               Advanced
             </button>
@@ -733,297 +536,100 @@ export default function SniperBotTab() {
         </div>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: mode === 'advanced' ? '1fr 380px' : '1fr 380px',
-        gap: 20,
-      }}>
-        <div>
-          <SessionStatsPanel stats={stats} isActive={autoModeActive} />
+      <BentoGrid columns={2} gap="md">
+        <BentoItem span={2}>
+          <SessionStatsCard stats={stats} isActive={autoModeActive} />
+        </BentoItem>
 
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '20px 0 12px',
-          }}>
-            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
-              Active Positions ({activePositions.length})
-            </h3>
-          </div>
+        <BentoItem span={2}>
+          <SmartAutoModePanel 
+            isActive={autoModeActive} 
+            onToggle={() => setAutoModeActive(!autoModeActive)}
+            config={config}
+          />
+        </BentoItem>
 
-          {activePositions.length > 0 ? (
-            activePositions.map(pos => (
-              <ActivePositionCard 
-                key={pos.id} 
-                position={pos} 
-                onClose={(id, reason) => console.log('Close position', id, reason)}
-              />
-            ))
-          ) : (
-            <div style={{
-              padding: 40,
-              textAlign: 'center',
-              background: '#0a0a0a',
-              borderRadius: 12,
-              border: '1px dashed #222',
-            }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>🎯</div>
-              <div style={{ color: '#666', fontSize: 12 }}>
-                No active positions
-              </div>
-              <div style={{ color: '#444', fontSize: 11, marginTop: 4 }}>
-                Snipe a token to see live tracking here
-              </div>
+        <BentoItem span={2} className="sniper-positions-section">
+          <div className="section-box">
+            <div className="sniper-section-header">
+              <h3 className="sniper-section-title">Active Positions ({activePositions.length})</h3>
             </div>
-          )}
-
-          {mode === 'advanced' && (
-            <div style={{
-              marginTop: 20,
-              padding: 16,
-              background: '#0a0a0a',
-              borderRadius: 12,
-              border: '1px solid #1a1a1a',
-            }}>
-              <h4 style={{ margin: '0 0 12px', fontSize: 12, color: '#00D4FF' }}>
-                QUICK SETTINGS
-              </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 10, color: '#666' }}>Buy Amount (SOL)</span>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={config.tradeControls.buyAmountSol}
-                    onChange={(e) => updateConfig('tradeControls', 'buyAmountSol', parseFloat(e.target.value))}
-                    style={{
-                      padding: '8px 10px',
-                      background: '#050505',
-                      border: '1px solid #222',
-                      borderRadius: 6,
-                      color: '#fff',
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 10, color: '#666' }}>Slippage %</span>
-                  <input
-                    type="number"
-                    value={config.tradeControls.slippagePercent}
-                    onChange={(e) => updateConfig('tradeControls', 'slippagePercent', parseInt(e.target.value))}
-                    style={{
-                      padding: '8px 10px',
-                      background: '#050505',
-                      border: '1px solid #222',
-                      borderRadius: 6,
-                      color: '#fff',
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 10, color: '#39FF14' }}>Take Profit %</span>
-                  <input
-                    type="number"
-                    value={config.tradeControls.takeProfitPercent}
-                    onChange={(e) => updateConfig('tradeControls', 'takeProfitPercent', parseInt(e.target.value))}
-                    style={{
-                      padding: '8px 10px',
-                      background: '#050505',
-                      border: '1px solid #39FF1420',
-                      borderRadius: 6,
-                      color: '#39FF14',
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 10, color: '#FF4444' }}>Stop Loss %</span>
-                  <input
-                    type="number"
-                    value={config.tradeControls.stopLossPercent}
-                    onChange={(e) => updateConfig('tradeControls', 'stopLossPercent', parseInt(e.target.value))}
-                    style={{
-                      padding: '8px 10px',
-                      background: '#050505',
-                      border: '1px solid #FF444420',
-                      borderRadius: 6,
-                      color: '#FF4444',
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div style={{
-            background: '#0a0a0a',
-            borderRadius: 12,
-            border: '1px solid #1a1a1a',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              padding: '12px 16px',
-              borderBottom: '1px solid #1a1a1a',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-              <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>
-                Token Discovery
-              </h3>
-              <button
-                onClick={discoverTokens}
-                disabled={isScanning}
-                style={{
-                  padding: '6px 14px',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  background: isScanning ? '#222' : 'linear-gradient(135deg, #00D4FF, #9D4EDD)',
-                  color: isScanning ? '#666' : '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  cursor: isScanning ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isScanning ? 'Scanning...' : 'SCAN NOW'}
-              </button>
-            </div>
-
-            <div style={{ 
-              padding: 12, 
-              maxHeight: 500, 
-              overflowY: 'auto',
-            }}>
-              {discoveredTokens.length > 0 ? (
-                discoveredTokens.map((token, i) => (
-                  <DiscoveredTokenCard
-                    key={token.address || i}
-                    token={token}
-                    isSelected={selectedToken?.address === token.address}
-                    onSnipe={handleSnipe}
-                    onWatch={(t) => console.log('Watch', t)}
+            <div className="sniper-positions-content">
+              {activePositions.length > 0 ? (
+                activePositions.map(pos => (
+                  <ActivePositionCard 
+                    key={pos.id} 
+                    position={pos} 
+                    onClose={(id, reason) => console.log('Close position', id, reason)}
                   />
                 ))
               ) : (
-                <div style={{
-                  padding: 40,
-                  textAlign: 'center',
-                  color: '#444',
-                }}>
-                  <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
-                  <div style={{ fontSize: 11 }}>
-                    Click "SCAN NOW" to discover tokens
-                  </div>
+                <div className="sniper-empty-state">
+                  <div className="sniper-empty-icon">🎯</div>
+                  <div className="sniper-empty-text">No active positions</div>
+                  <div className="sniper-empty-hint">Snipe a token to see live tracking here</div>
                 </div>
               )}
             </div>
           </div>
+        </BentoItem>
 
-          <div style={{
-            marginTop: 16,
-            padding: 16,
-            background: autoModeActive 
-              ? 'linear-gradient(135deg, rgba(57,255,20,0.08), rgba(0,0,0,0.95))'
-              : '#0a0a0a',
-            borderRadius: 12,
-            border: autoModeActive 
-              ? '1px solid rgba(57,255,20,0.3)'
-              : '1px solid #1a1a1a',
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: 12,
-            }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 13 }}>Smart Auto Mode</div>
-                <div style={{ fontSize: 10, color: '#666' }}>
-                  AI executes trades automatically
-                </div>
-              </div>
-              <button
-                onClick={() => setAutoModeActive(!autoModeActive)}
-                style={{
-                  padding: '10px 24px',
-                  fontSize: 12,
-                  fontWeight: 800,
-                  background: autoModeActive 
-                    ? 'linear-gradient(135deg, #FF4444, #CC0000)'
-                    : 'linear-gradient(135deg, #39FF14, #00CC00)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  boxShadow: autoModeActive
-                    ? '0 0 20px rgba(255,68,68,0.3)'
-                    : '0 0 20px rgba(57,255,20,0.3)',
-                }}
+        <BentoItem span={2} className="sniper-discovery-section">
+          <div className="section-box">
+            <div className="sniper-section-header">
+              <h3 className="sniper-section-title">Token Discovery</h3>
+              <button 
+                className={`sniper-scan-btn ${isScanning ? 'scanning' : ''}`}
+                onClick={discoverTokens}
+                disabled={isScanning}
               >
-                {autoModeActive ? '⏹ STOP' : '▶ START'}
+                {isScanning ? 'Scanning...' : 'Scan Now'}
               </button>
             </div>
-            
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(2, 1fr)', 
-              gap: 8,
-              fontSize: 11,
-            }}>
-              <div style={{ 
-                padding: 10, 
-                background: '#050505', 
-                borderRadius: 6,
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-                <span style={{ color: '#666' }}>Max Trades</span>
-                <span style={{ fontWeight: 600 }}>{config.autoModeSettings.maxTradesPerSession}</span>
-              </div>
-              <div style={{ 
-                padding: 10, 
-                background: '#050505', 
-                borderRadius: 6,
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-                <span style={{ color: '#666' }}>Max SOL</span>
-                <span style={{ fontWeight: 600, color: '#00D4FF' }}>{config.autoModeSettings.maxSolPerSession}</span>
-              </div>
-              <div style={{ 
-                padding: 10, 
-                background: '#050505', 
-                borderRadius: 6,
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-                <span style={{ color: '#666' }}>Cooldown</span>
-                <span style={{ fontWeight: 600 }}>{config.autoModeSettings.cooldownSeconds}s</span>
-              </div>
-              <div style={{ 
-                padding: 10, 
-                background: '#050505', 
-                borderRadius: 6,
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-                <span style={{ color: '#666' }}>Auto-Stop</span>
-                <span style={{ fontWeight: 600, color: '#FF4444' }}>{config.autoModeSettings.maxConsecutiveLosses} losses</span>
-              </div>
+            <div className="sniper-discovery-content">
+              {discoveredTokens.length > 0 ? (
+                <div className="sniper-token-list">
+                  {discoveredTokens.map((token, i) => (
+                    <DiscoveredTokenCard 
+                      key={token.address || i}
+                      token={token}
+                      onSnipe={handleSnipe}
+                      onWatch={handleWatch}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="sniper-empty-state">
+                  <div className="sniper-empty-icon">🔍</div>
+                  <div className="sniper-empty-text">No tokens discovered</div>
+                  <div className="sniper-empty-hint">Click "Scan Now" or enable Auto Mode</div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </div>
+        </BentoItem>
+
+        {mode === 'advanced' && (
+          <>
+            <BentoItem span={2}>
+              <QuickSettingsPanel 
+                config={config}
+                updateConfig={updateConfig}
+                expanded={expandedSettings}
+                onToggle={() => setExpandedSettings(!expandedSettings)}
+              />
+            </BentoItem>
+            <BentoItem span={2}>
+              <SafetyFiltersPanel 
+                config={config}
+                updateConfig={updateConfig}
+                expanded={expandedSafety}
+                onToggle={() => setExpandedSafety(!expandedSafety)}
+              />
+            </BentoItem>
+          </>
+        )}
+      </BentoGrid>
     </div>
   )
 }
