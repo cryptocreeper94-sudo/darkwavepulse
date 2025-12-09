@@ -57,7 +57,7 @@ function PromoBanner({ onNavigate }) {
     }}>
       <div style={{ 
         display: 'inline-block',
-        background: '#39FF14',
+        background: 'linear-gradient(90deg, #00D4FF, #39FF14)',
         color: '#000',
         padding: '3px 8px',
         borderRadius: 3,
@@ -67,7 +67,7 @@ function PromoBanner({ onNavigate }) {
         letterSpacing: 1,
         marginBottom: 8,
       }}>
-        Coming Soon
+        NEW
       </div>
       <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 800, color: '#fff' }}>
         AI Sniper Bot
@@ -76,7 +76,7 @@ function PromoBanner({ onNavigate }) {
         Set parameters, let AI find opportunities.
       </p>
       <button
-        onClick={() => onNavigate && onNavigate('trading')}
+        onClick={() => onNavigate && onNavigate('sniper')}
         style={{
           background: 'linear-gradient(135deg, #00D4FF 0%, #0099cc 100%)',
           color: '#000',
@@ -88,7 +88,7 @@ function PromoBanner({ onNavigate }) {
           cursor: 'pointer',
         }}
       >
-        Learn More
+        Try It Now
       </button>
     </div>
   )
