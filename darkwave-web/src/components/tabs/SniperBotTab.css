@@ -1,0 +1,814 @@
+/* ============================================ */
+/* SNIPER BOT TAB - MOBILE FIRST RESPONSIVE    */
+/* ============================================ */
+
+.sniper-tab {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 12px;
+}
+
+/* ============================================ */
+/* HEADER                                       */
+/* ============================================ */
+
+.sniper-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(157,78,221,0.05));
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
+.sniper-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.sniper-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(90deg, #00D4FF, #9D4EDD, #39FF14);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sniper-subtitle {
+  font-size: 11px;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+.sniper-header-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sniper-sol-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sniper-sol-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.sniper-sol-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #00D4FF;
+}
+
+.sniper-mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.sniper-mode-btn {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 500;
+  background: transparent;
+  color: #666;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sniper-mode-btn.active {
+  background: #00D4FF;
+  color: #000;
+  border-color: #00D4FF;
+  font-weight: 700;
+}
+
+.sniper-mode-btn:hover:not(.active) {
+  border-color: #00D4FF;
+  color: #00D4FF;
+}
+
+@media (min-width: 480px) {
+  .sniper-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .sniper-title {
+    font-size: 24px;
+  }
+}
+
+/* ============================================ */
+/* SESSION STATS                                */
+/* ============================================ */
+
+.sniper-stats-card {
+  padding: 16px;
+}
+
+.sniper-stats-header {
+  margin-bottom: 12px;
+}
+
+.sniper-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sniper-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+}
+
+.sniper-status-dot.active {
+  background: #39FF14;
+  box-shadow: 0 0 10px #39FF14;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.sniper-status-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sniper-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .sniper-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sniper-stat-item {
+  text-align: center;
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+}
+
+.sniper-stat-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.sniper-stat-value {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.sniper-stat-value.cyan { color: #00D4FF; }
+.sniper-stat-value.green { color: #39FF14; }
+.sniper-stat-value.red { color: #FF4444; }
+
+.sniper-stat-max {
+  font-size: 10px;
+  color: #666;
+  font-weight: 400;
+}
+
+/* ============================================ */
+/* AUTO MODE PANEL                              */
+/* ============================================ */
+
+.sniper-automode-panel {
+  padding: 16px;
+}
+
+.sniper-automode-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sniper-automode-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00D4FF;
+  margin: 0;
+}
+
+.sniper-automode-desc {
+  font-size: 11px;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+.sniper-automode-btn {
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #39FF14, #00D4FF);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.sniper-automode-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px rgba(57, 255, 20, 0.5);
+}
+
+.sniper-automode-btn.active {
+  background: linear-gradient(135deg, #FF4444, #FF6B6B);
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+}
+
+.sniper-automode-limits {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 480px) {
+  .sniper-automode-limits {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sniper-limit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+}
+
+.sniper-limit-label {
+  font-size: 9px;
+  color: #666;
+}
+
+.sniper-limit-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ============================================ */
+/* SECTION HEADERS                              */
+/* ============================================ */
+
+.sniper-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #222;
+}
+
+.sniper-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.sniper-scan-btn {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0, 212, 255, 0.1);
+  color: #00D4FF;
+  border: 1px solid #00D4FF;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-scan-btn:hover:not(:disabled) {
+  background: #00D4FF;
+  color: #000;
+}
+
+.sniper-scan-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sniper-scan-btn.scanning {
+  animation: pulse 1s infinite;
+}
+
+/* ============================================ */
+/* POSITIONS & DISCOVERY CONTENT                */
+/* ============================================ */
+
+.sniper-positions-content,
+.sniper-discovery-content {
+  padding: 12px;
+}
+
+.sniper-empty-state {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.sniper-empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.sniper-empty-text {
+  font-size: 13px;
+  color: #666;
+}
+
+.sniper-empty-hint {
+  font-size: 11px;
+  color: #444;
+  margin-top: 4px;
+}
+
+/* ============================================ */
+/* POSITION CARD                                */
+/* ============================================ */
+
+.sniper-position-card {
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.sniper-position-card.profit {
+  border-color: rgba(57, 255, 20, 0.3);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);
+}
+
+.sniper-position-card.loss {
+  border-color: rgba(255, 68, 68, 0.3);
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.1);
+}
+
+.sniper-position-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sniper-position-token {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sniper-token-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.sniper-token-info {
+  min-width: 0;
+}
+
+.sniper-token-symbol {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.sniper-token-meta {
+  font-size: 10px;
+  color: #888;
+}
+
+.sniper-position-pnl {
+  text-align: right;
+}
+
+.sniper-pnl-percent {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.sniper-pnl-percent.green {
+  color: #39FF14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+}
+
+.sniper-pnl-percent.red {
+  color: #FF4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+}
+
+.sniper-pnl-sol {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sniper-pnl-sol.green { color: #39FF14; }
+.sniper-pnl-sol.red { color: #FF4444; }
+
+.sniper-position-prices {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.sniper-price-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.sniper-price-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.sniper-price-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  font-family: monospace;
+}
+
+.sniper-position-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sniper-btn-close {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 68, 68, 0.15);
+  color: #FF4444;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-btn-close:hover {
+  background: rgba(255, 68, 68, 0.3);
+}
+
+.sniper-btn-adjust {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-btn-adjust:hover {
+  border-color: #00D4FF;
+  color: #00D4FF;
+}
+
+/* ============================================ */
+/* DISCOVERED TOKEN CARD                        */
+/* ============================================ */
+
+.sniper-token-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sniper-token-card {
+  padding: 12px;
+}
+
+.sniper-token-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.sniper-token-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sniper-ai-score {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--score-color) calc(var(--score-color) * 3.6deg),
+    #222 0deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.sniper-ai-score::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: #0f0f0f;
+  border-radius: 50%;
+}
+
+.sniper-score-value {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.sniper-token-details {
+  min-width: 0;
+}
+
+.sniper-token-name {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sniper-token-dex {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sniper-token-right {
+  flex-shrink: 0;
+}
+
+.sniper-recommendation {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sniper-recommendation.snipe {
+  background: rgba(57, 255, 20, 0.15);
+  color: #39FF14;
+  border: 1px solid rgba(57, 255, 20, 0.4);
+}
+
+.sniper-recommendation.watch {
+  background: rgba(255, 215, 0, 0.15);
+  color: #FFD700;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+.sniper-recommendation.avoid {
+  background: rgba(255, 68, 68, 0.15);
+  color: #FF4444;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+}
+
+.sniper-token-metrics {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.sniper-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.sniper-metric-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.sniper-metric-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sniper-metric-value.green { color: #39FF14; }
+.sniper-metric-value.red { color: #FF4444; }
+
+.sniper-token-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sniper-btn-snipe {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-btn-snipe:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
+
+.sniper-btn-watch {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-btn-watch:hover {
+  border-color: #FFD700;
+  color: #FFD700;
+}
+
+/* ============================================ */
+/* ACCORDION SETTINGS PANELS                    */
+/* ============================================ */
+
+.sniper-settings-panel {
+  overflow: hidden;
+}
+
+.sniper-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sniper-accordion-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #00D4FF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sniper-accordion-arrow {
+  font-size: 10px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.sniper-accordion-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.sniper-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+@media (min-width: 600px) {
+  .sniper-settings-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sniper-setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sniper-setting-label {
+  font-size: 10px;
+  color: #666;
+}
+
+.sniper-input {
+  padding: 10px 12px;
+  background: #050505;
+  border: 1px solid #222;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.sniper-input:focus {
+  outline: none;
+  border-color: #00D4FF;
+}
+
+/* ============================================ */
+/* CHART                                        */
+/* ============================================ */
+
+.sniper-chart-container {
+  position: relative;
+  background: #0a0a0a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sniper-chart-header {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sniper-chart-symbol {
+  font-size: 12px;
+  font-weight: 700;
+  color: #00D4FF;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.sniper-chart-timeframe {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  background: rgba(57, 255, 20, 0.2);
+  border: 1px solid #39FF14;
+  color: #39FF14;
+}
+
+.sniper-chart-canvas {
+  border-radius: 8px;
+  overflow: hidden;
+}
