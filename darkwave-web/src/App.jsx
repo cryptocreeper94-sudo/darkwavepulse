@@ -16,6 +16,7 @@ import { GlossaryPopup } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
 import { AvatarProvider } from './context/AvatarContext'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
 
@@ -78,17 +79,19 @@ function App() {
   
   return (
     <AvatarProvider>
-      <FavoritesProvider userId={userId}>
-        <GlossaryProvider>
-          <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-            <div style={{ padding: '0 12px' }}>
-              {renderTab()}
-            </div>
-          </Layout>
-          <GlossaryPopup />
-          <CryptoCatPopup enabled={true} interval={90000} />
-        </GlossaryProvider>
-      </FavoritesProvider>
+      <BuiltInWalletProvider>
+        <FavoritesProvider userId={userId}>
+          <GlossaryProvider>
+            <Layout activeTab={activeTab} onTabChange={setActiveTab}>
+              <div style={{ padding: '0 12px' }}>
+                {renderTab()}
+              </div>
+            </Layout>
+            <GlossaryPopup />
+            <CryptoCatPopup enabled={true} interval={90000} />
+          </GlossaryProvider>
+        </FavoritesProvider>
+      </BuiltInWalletProvider>
     </AvatarProvider>
   )
 }

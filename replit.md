@@ -65,10 +65,20 @@ Pulse (powered by DarkWave Studios, LLC) is a predictive trading platform built 
   - User signs transaction on frontend (wallet security preserved)
   - Status lifecycle: PENDING → WATCHING → READY_TO_EXECUTE → FILLED_ENTRY → READY_TO_EXIT/STOP → FILLED_EXIT/STOPPED_OUT
   - Wallet connect button in header for Phantom/Solflare integration
+- **Multi-Chain Built-in Wallet (NEW)** - Custom HD wallet with Trust Wallet-style UX:
+  - Supports Solana, Ethereum, Polygon, Base, Arbitrum, BSC
+  - BIP39 mnemonic generation (12/24 words)
+  - Proper ed25519 derivation for Solana (SLIP-0010)
+  - AES-256-GCM encrypted storage in localStorage
+  - Balance checking and transaction sending
+  - Wallet tab with create/import/send UI
+  - Integrated into Sniper Bot with wallet source toggle (external vs built-in)
+  - Inline unlock prompt in Sniper Bot tab
 
 ### NEEDS ATTENTION
 - CoinGecko API rate limiting (429 errors) - using Pro API now
 - Backend startup timing (API errors during cold start)
+- **Built-in Wallet Security**: Currently sends mnemonic to backend for operations. Before production, move all crypto operations to client-side using browser-compatible libraries (bip39-browser, ed25519-hd-key)
 
 ### NOT YET BUILT
 - DWAV token smart contract

@@ -1207,3 +1207,124 @@
   font-weight: 700;
   text-align: center;
 }
+
+/* Wallet Source Selector */
+.sniper-wallet-source {
+  margin-bottom: 16px;
+}
+
+.sniper-wallet-source-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sniper-wallet-source-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.sniper-wallet-source-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.sniper-wallet-src-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-wallet-src-btn:hover {
+  border-color: var(--neon-blue);
+}
+
+.sniper-wallet-src-btn.active {
+  background: var(--neon-blue);
+  border-color: var(--neon-blue);
+  color: #000;
+}
+
+.sniper-wallet-unlock {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+}
+
+.sniper-wallet-unlock p {
+  margin: 0;
+  font-size: 12px;
+  color: #ffc107;
+}
+
+/* Built-in Wallet Unlock Form */
+.sniper-wallet-unlock-form {
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--bg-surface-2);
+  border-radius: 8px;
+}
+
+.sniper-wallet-unlock-form p {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.sniper-unlock-row {
+  display: flex;
+  gap: 8px;
+}
+
+.sniper-unlock-input {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.sniper-unlock-input:focus {
+  outline: none;
+  border-color: var(--neon-blue);
+}
+
+.sniper-unlock-btn {
+  padding: 10px 20px;
+  background: var(--neon-blue);
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-unlock-btn:hover:not(:disabled) {
+  background: #00e5ff;
+}
+
+.sniper-unlock-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sniper-unlock-error {
+  margin: 8px 0 0 0;
+  font-size: 11px;
+  color: var(--accent-red);
+}
