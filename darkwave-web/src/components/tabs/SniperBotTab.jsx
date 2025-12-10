@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import BentoGrid, { BentoItem } from '../ui/BentoGrid'
 import { useWalletState } from '../../context/WalletContext'
+import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
 import ManualWatchlist from '../trading/ManualWatchlist'
 import './SniperBotTab.css'
 
@@ -339,6 +340,48 @@ function SmartAutoModePanel({ isActive, onToggle, config, disabled }) {
   )
 }
 
+function BuiltInWalletUnlock({ onUnlock, loading }) {
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  const handleUnlock = async () => {
+    if (!password) {
+      setError('Please enter your password')
+      return
+    }
+    setError('')
+    try {
+      await onUnlock(password)
+    } catch (err) {
+      setError(err.message || 'Invalid password')
+    }
+  }
+
+  return (
+    <div className="sniper-wallet-unlock-form">
+      <p>Enter password to unlock your built-in wallet:</p>
+      <div className="sniper-unlock-row">
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Wallet password"
+          className="sniper-unlock-input"
+          onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+        />
+        <button
+          className="sniper-unlock-btn"
+          onClick={handleUnlock}
+          disabled={loading}
+        >
+          {loading ? 'Unlocking...' : 'Unlock'}
+        </button>
+      </div>
+      {error && <p className="sniper-unlock-error">{error}</p>}
+    </div>
+  )
+}
+
 function QuickSettingsPanel({ config, updateConfig, expanded, onToggle }) {
   return (
     <div className="section-box sniper-settings-panel">
@@ -557,7 +600,9 @@ function RPCSettingsPanel({ rpcStatus, customRPC, setCustomRPC, onSaveCustomRPC,
 }
 
 export default function SniperBotTab() {
-  const wallet = useWalletState()
+  const externalWallet = useWalletState()
+  const builtInWallet = useBuiltInWallet()
+  const [walletSource, setWalletSource] = useState('external')
   const [mode, setMode] = useState('simple')
   const [config, setConfig] = useState(DEFAULT_CONFIG)
   const [discoveredTokens, setDiscoveredTokens] = useState([])
@@ -572,6 +617,20 @@ export default function SniperBotTab() {
   const [expandedRPC, setExpandedRPC] = useState(false)
   const [rpcStatus, setRpcStatus] = useState(null)
   const [customRPC, setCustomRPC] = useState('')
+  
+  const wallet = walletSource === 'external' 
+    ? { 
+        connected: externalWallet.connected, 
+        address: externalWallet.address,
+        shortAddress: externalWallet.shortAddress,
+        balance: externalWallet.balance 
+      }
+    : { 
+        connected: builtInWallet.isUnlocked, 
+        address: builtInWallet.solanaAddress,
+        shortAddress: builtInWallet.solanaAddress?.slice(0, 4) + '...' + builtInWallet.solanaAddress?.slice(-4),
+        balance: builtInWallet.solanaBalance?.toFixed(4)
+      }
 
   useEffect(() => {
     fetchSolPrice()
@@ -718,12 +777,42 @@ export default function SniperBotTab() {
         </div>
       </div>
 
+      <div className="sniper-wallet-source section-box">
+        <div className="sniper-wallet-source-header">
+          <span className="sniper-wallet-source-label">Wallet Source</span>
+          <div className="sniper-wallet-source-toggle">
+            <button
+              className={`sniper-wallet-src-btn ${walletSource === 'external' ? 'active' : ''}`}
+              onClick={() => setWalletSource('external')}
+            >
+              External (Phantom)
+            </button>
+            <button
+              className={`sniper-wallet-src-btn ${walletSource === 'builtin' ? 'active' : ''}`}
+              onClick={() => setWalletSource('builtin')}
+            >
+              Built-in Wallet
+            </button>
+          </div>
+        </div>
+        {walletSource === 'builtin' && builtInWallet.hasWallet && !builtInWallet.isUnlocked && (
+          <BuiltInWalletUnlock onUnlock={builtInWallet.unlock} loading={builtInWallet.loading} />
+        )}
+        {walletSource === 'builtin' && !builtInWallet.hasWallet && (
+          <div className="sniper-wallet-unlock">
+            <p>No built-in wallet found. Go to Wallet tab to create one.</p>
+          </div>
+        )}
+      </div>
+
       {!wallet.connected && (
         <div className="sniper-wallet-warning section-box">
           <div className="sniper-warning-icon">⚠️</div>
           <div className="sniper-warning-text">
             <strong>Wallet Required</strong>
-            <p>Connect your Solana wallet (Phantom or Solflare) to start sniping tokens</p>
+            <p>{walletSource === 'external' 
+              ? 'Connect your Solana wallet (Phantom or Solflare) to start sniping tokens'
+              : 'Unlock your built-in wallet to start sniping tokens'}</p>
           </div>
         </div>
       )}

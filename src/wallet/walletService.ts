@@ -176,16 +176,8 @@ class MultiChainWalletService {
     
     for (const [chainId, config] of Object.entries(SUPPORTED_CHAINS)) {
       if (chainId === 'solana') {
-        const solPath = "m/44'/501'/0'/0'";
-        const solNode = hdNode.derivePath(solPath);
-        const seed = Buffer.from(solNode.privateKey.slice(2), 'hex');
-        const keypair = Keypair.fromSeed(seed.subarray(0, 32));
-        
-        accounts.push({
-          chain: 'solana',
-          address: keypair.publicKey.toBase58(),
-          path: solPath
-        });
+        const solanaAccount = this.deriveSolanaAddress(mnemonic);
+        accounts.push(solanaAccount);
       } else {
         const evmPath = `m/44'/${config.coinType}'/0'/0/0`;
         const evmNode = hdNode.derivePath(evmPath);
@@ -201,17 +193,36 @@ class MultiChainWalletService {
     return accounts;
   }
 
+  private deriveSolanaAddress(mnemonic: string): WalletAccount {
+    const { mnemonicToSeedSync } = require('bip39');
+    const { derivePath } = require('ed25519-hd-key');
+    
+    const seed = mnemonicToSeedSync(mnemonic);
+    const path = "m/44'/501'/0'/0'";
+    const { key } = derivePath(path, seed.toString('hex'));
+    const keypair = Keypair.fromSeed(key);
+    
+    return {
+      chain: 'solana',
+      address: keypair.publicKey.toBase58(),
+      path
+    };
+  }
+
   getPrivateKey(mnemonic: string, chain: string): string {
-    const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
     const config = SUPPORTED_CHAINS[chain];
     
     if (chain === 'solana') {
-      const solPath = "m/44'/501'/0'/0'";
-      const solNode = hdNode.derivePath(solPath);
-      const seed = Buffer.from(solNode.privateKey.slice(2), 'hex');
-      const keypair = Keypair.fromSeed(seed.subarray(0, 32));
+      const { mnemonicToSeedSync } = require('bip39');
+      const { derivePath } = require('ed25519-hd-key');
+      
+      const seed = mnemonicToSeedSync(mnemonic);
+      const path = "m/44'/501'/0'/0'";
+      const { key } = derivePath(path, seed.toString('hex'));
+      const keypair = Keypair.fromSeed(key);
       return bs58.encode(keypair.secretKey);
     } else {
+      const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
       const evmPath = `m/44'/${config.coinType}'/0'/0/0`;
       const evmNode = hdNode.derivePath(evmPath);
       return evmNode.privateKey;
