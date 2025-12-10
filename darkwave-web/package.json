@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "cd .. && npx tsx scripts/bumpVersion.ts",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bump": "cd .. && npx tsx scripts/bumpVersion.ts",
+    "bump:minor": "cd .. && npx tsx scripts/bumpVersion.ts minor",
+    "launch-v2": "cd .. && npx tsx scripts/promoteToV2.ts"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",

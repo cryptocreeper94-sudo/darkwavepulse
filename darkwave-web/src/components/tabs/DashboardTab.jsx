@@ -6,6 +6,7 @@ import CoinAnalysisModal from '../modals/CoinAnalysisModal'
 import Gauge from '../ui/Gauge'
 import FlipCarousel from '../ui/FlipCarousel'
 import MobileCardCarousel from '../ui/MobileCardCarousel'
+import versionData from '/version.json'
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -651,7 +652,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         fontSize: 10,
         borderTop: '1px solid #1a1a1a',
       }}>
-        Powered by DarkWave Studios, LLC © 2025 | v2.0.6
+        Powered by DarkWave Studios, LLC © 2025 | v{versionData.version}
       </div>
       
       <CoinAnalysisModal 
