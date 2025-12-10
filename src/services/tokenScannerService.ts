@@ -5,6 +5,7 @@ import {
   DiscoveredToken, 
   SnipePresetConfig 
 } from './sniperBotService';
+import { tokenAuthorityService } from './tokenAuthorityService';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const HELIUS_RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
@@ -171,24 +172,37 @@ class TokenScannerService {
   // SAFETY ANALYSIS
   // ============================================
 
-  async analyzeSafetyMetrics(tokenAddress: string): Promise<TokenSafetyMetrics> {
+  async analyzeSafetyMetrics(tokenAddress: string, pairAddress?: string): Promise<TokenSafetyMetrics & {
+    mintAuthorityActive: boolean;
+    freezeAuthorityActive: boolean;
+    isHoneypot: boolean;
+    liquidityLocked: boolean;
+    isPumpFun: boolean;
+    allRisks: string[];
+  }> {
     try {
-      // Get holder distribution using Helius
-      const holderData = await this.getHolderDistribution(tokenAddress);
-      
-      // Check creator wallet
-      const creatorRisky = await this.checkCreatorWallet(tokenAddress);
+      const [holderData, creatorRisky, comprehensiveSafety] = await Promise.all([
+        this.getHolderDistribution(tokenAddress),
+        this.checkCreatorWallet(tokenAddress),
+        tokenAuthorityService.getComprehensiveSafetyCheck(tokenAddress, pairAddress)
+      ]);
       
       return {
         botPercent: holderData.botPercent,
-        bundlePercent: 0, // Would need more sophisticated analysis
+        bundlePercent: 0,
         top10HoldersPercent: holderData.top10Percent,
-        liquidityUsd: 0, // Already checked in discovery
+        liquidityUsd: 0,
         holderCount: holderData.totalHolders,
         creatorWalletRisky: creatorRisky,
+        mintAuthorityActive: comprehensiveSafety.authorities.authorities.mintAuthority !== null,
+        freezeAuthorityActive: comprehensiveSafety.authorities.authorities.freezeAuthority !== null,
+        isHoneypot: comprehensiveSafety.honeypot.isHoneypot,
+        liquidityLocked: comprehensiveSafety.liquidity.isLocked || comprehensiveSafety.liquidity.isBurned,
+        isPumpFun: comprehensiveSafety.authorities.isPumpFun,
+        allRisks: comprehensiveSafety.allRisks,
       };
     } catch (error) {
-      // Return safe defaults if analysis fails
+      console.error('[TokenScanner] Safety analysis error:', error);
       return {
         botPercent: 50,
         bundlePercent: 50,
@@ -196,6 +210,12 @@ class TokenScannerService {
         liquidityUsd: 0,
         holderCount: 0,
         creatorWalletRisky: true,
+        mintAuthorityActive: true,
+        freezeAuthorityActive: true,
+        isHoneypot: true,
+        liquidityLocked: false,
+        isPumpFun: false,
+        allRisks: ['Safety analysis failed - blocking trade'],
       };
     }
   }
