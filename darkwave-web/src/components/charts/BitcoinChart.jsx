@@ -270,8 +270,17 @@ export default function BitcoinChart() {
 
       window.addEventListener('resize', handleResize)
       handleResize()
+      
+      // Delayed resize for mobile - ensure container is properly sized
+      const delayedResize = setTimeout(() => {
+        handleResize()
+        if (chartRef.current) {
+          chartRef.current.timeScale().fitContent()
+        }
+      }, 100)
 
       return () => {
+        clearTimeout(delayedResize)
         isActive = false
         window.removeEventListener('resize', handleResize)
         if (chart) {
@@ -647,6 +656,7 @@ export default function BitcoinChart() {
 
         .chart-wrapper {
           height: 300px;
+          width: 100%;
           position: relative;
           border-radius: 8px;
           overflow: hidden;
@@ -789,6 +799,8 @@ export default function BitcoinChart() {
 
           .chart-wrapper {
             height: 250px;
+            width: 100%;
+            min-width: 0;
           }
         }
       `}</style>
