@@ -812,3 +812,95 @@
   border-radius: 8px;
   overflow: hidden;
 }
+
+/* ============================================ */
+/* WALLET CONNECT                               */
+/* ============================================ */
+
+.sniper-wallet-balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 12px;
+  background: rgba(57, 255, 20, 0.1);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: 8px;
+}
+
+.sniper-wallet-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.sniper-wallet-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #39FF14;
+}
+
+.sniper-wallet-connect .wallet-adapter-button {
+  height: 36px !important;
+  padding: 0 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD) !important;
+  border: none !important;
+  color: #000 !important;
+  transition: all 0.2s ease !important;
+}
+
+.sniper-wallet-connect .wallet-adapter-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4) !important;
+}
+
+.sniper-wallet-connect .wallet-adapter-button-trigger {
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD) !important;
+}
+
+.sniper-wallet-connect .wallet-adapter-button:not([disabled]):hover {
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD) !important;
+}
+
+.sniper-wallet-warning {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  border-radius: 12px;
+}
+
+.sniper-warning-icon {
+  font-size: 24px;
+}
+
+.sniper-warning-text strong {
+  color: #FFA500;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sniper-warning-text p {
+  color: #888;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Disabled states */
+.sniper-automode-panel.disabled {
+  opacity: 0.6;
+}
+
+.sniper-automode-btn:disabled,
+.sniper-btn-snipe:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #333 !important;
+  border-color: #444 !important;
+}
