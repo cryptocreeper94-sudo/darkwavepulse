@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
+import InfoTooltip, { TRADING_DEFINITIONS } from '../ui/InfoTooltip'
 
 const STORAGE_KEY = 'darkwave_manual_watchlist'
 const STATUS = {
@@ -104,6 +105,18 @@ function PriceIndicator({ currentPrice, entryPrice, exitPrice, stopLoss }) {
   )
 }
 
+const STATUS_TOOLTIPS = {
+  [STATUS.EMPTY]: null,
+  [STATUS.WATCHING]: TRADING_DEFINITIONS.statusWatching,
+  [STATUS.READY_TO_EXECUTE]: TRADING_DEFINITIONS.statusReadyToBuy,
+  [STATUS.FILLED_ENTRY]: TRADING_DEFINITIONS.statusPositionOpen,
+  [STATUS.READY_TO_EXIT]: TRADING_DEFINITIONS.statusReadyToSell,
+  [STATUS.READY_TO_STOP]: TRADING_DEFINITIONS.statusStopLossHit,
+  [STATUS.FILLED_EXIT]: null,
+  [STATUS.STOPPED_OUT]: null,
+  [STATUS.PAUSED]: null,
+}
+
 function StatusBadge({ status }) {
   const statusConfig = {
     [STATUS.EMPTY]: { label: 'Empty', color: '#666' },
@@ -118,6 +131,7 @@ function StatusBadge({ status }) {
   }
 
   const config = statusConfig[status] || statusConfig[STATUS.EMPTY]
+  const tooltip = STATUS_TOOLTIPS[status]
 
   return (
     <span 
@@ -129,6 +143,7 @@ function StatusBadge({ status }) {
       }}
     >
       {config.label}
+      {tooltip && <InfoTooltip {...tooltip} position="right" />}
     </span>
   )
 }
@@ -233,9 +248,13 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
       </div>
 
       <form onSubmit={handleAddressSubmit} className="watchlist-address-form">
+        <div className="watchlist-address-label">
+          <span>Token Address</span>
+          <InfoTooltip {...TRADING_DEFINITIONS.tokenAddress} position="left" />
+        </div>
         <input
           type="text"
-          placeholder="Token address..."
+          placeholder="Paste Solana token address..."
           value={addressInput}
           onChange={handleAddressChange}
           onBlur={handleAddressBlur}
@@ -265,7 +284,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
             </div>
           </div>
           <div className="watchlist-token-price">
-            <span className="watchlist-price-label">Current</span>
+            <span className="watchlist-price-label">
+              Current
+              <InfoTooltip {...TRADING_DEFINITIONS.currentPrice} position="right" />
+            </span>
             <span className="watchlist-price-value">
               ${parseFloat(slot.currentPrice || 0).toFixed(8)}
             </span>
@@ -275,7 +297,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
 
       <div className="watchlist-inputs-grid">
         <label className="watchlist-input-item">
-          <span className="watchlist-input-label">Entry Price ($)</span>
+          <span className="watchlist-input-label">
+            Entry Price ($)
+            <InfoTooltip {...TRADING_DEFINITIONS.entryPrice} position="left" />
+          </span>
           <input
             type="number"
             step="0.00000001"
@@ -286,7 +311,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
           />
         </label>
         <label className="watchlist-input-item">
-          <span className="watchlist-input-label">Take Profit ($)</span>
+          <span className="watchlist-input-label">
+            Take Profit ($)
+            <InfoTooltip {...TRADING_DEFINITIONS.exitPrice} position="right" />
+          </span>
           <input
             type="number"
             step="0.00000001"
@@ -297,7 +325,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
           />
         </label>
         <label className="watchlist-input-item">
-          <span className="watchlist-input-label">Stop Loss ($)</span>
+          <span className="watchlist-input-label">
+            Stop Loss ($)
+            <InfoTooltip {...TRADING_DEFINITIONS.stopLoss} position="left" />
+          </span>
           <input
             type="number"
             step="0.00000001"
@@ -308,7 +339,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
           />
         </label>
         <label className="watchlist-input-item">
-          <span className="watchlist-input-label">Buy Amount (SOL)</span>
+          <span className="watchlist-input-label">
+            Buy Amount (SOL)
+            <InfoTooltip {...TRADING_DEFINITIONS.buyAmount} position="right" />
+          </span>
           <input
             type="number"
             step="0.01"

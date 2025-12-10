@@ -1018,6 +1018,16 @@
   margin-bottom: 10px;
 }
 
+.watchlist-address-label {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .watchlist-address-input {
   font-size: 11px !important;
   padding: 8px 10px !important;
