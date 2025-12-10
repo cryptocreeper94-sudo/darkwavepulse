@@ -153,6 +153,7 @@ function CarouselRow({ children, title, showArrows = false }) {
         ref={scrollRef}
         style={{
           display: 'flex',
+          flexWrap: 'nowrap',
           gap: 10,
           overflowX: 'auto',
           scrollbarWidth: 'none',
@@ -192,7 +193,7 @@ function BentoCard({ children, onClick, style = {} }) {
 
 function QuickActionCard({ icon, title, subtitle, onClick, accentColor = '#00D4FF' }) {
   return (
-    <BentoCard onClick={onClick} style={{ flex: '1 0 18%', minWidth: 100, scrollSnapAlign: 'start' }}>
+    <BentoCard onClick={onClick} style={{ flexShrink: 0, width: 'calc((100% - 40px) / 5)', minWidth: 110, scrollSnapAlign: 'start' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ 
           fontSize: 16, 
@@ -219,7 +220,7 @@ function QuickActionCard({ icon, title, subtitle, onClick, accentColor = '#00D4F
 function MetricCard({ title, value, change, inflow }) {
   const isPositive = change >= 0
   return (
-    <BentoCard style={{ flex: '1 0 22%', minWidth: 100, scrollSnapAlign: 'start' }}>
+    <BentoCard style={{ flexShrink: 0, width: 'calc((100% - 30px) / 4)', minWidth: 120, scrollSnapAlign: 'start' }}>
       <div style={{ fontSize: 9, color: '#666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
         {title}
       </div>
@@ -242,7 +243,7 @@ function MetricCard({ title, value, change, inflow }) {
 
 function GaugeCard({ title, value, type, accentColor }) {
   return (
-    <BentoCard style={{ flex: '1 0 22%', minWidth: 100, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <BentoCard style={{ flexShrink: 0, width: 'calc((100% - 30px) / 4)', minWidth: 120, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ color: accentColor, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
         {title}
       </div>
@@ -488,7 +489,7 @@ function TrendingCoinCard({ coin, onClick, isFavorite }) {
   }
   
   return (
-    <BentoCard onClick={onClick} style={{ flex: '1 0 8%', minWidth: 90, scrollSnapAlign: 'start' }}>
+    <BentoCard onClick={onClick} style={{ flexShrink: 0, width: 95, minWidth: 95, scrollSnapAlign: 'start' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
         {coin.image && (
           <img 
@@ -520,7 +521,7 @@ function NewsCard({ news }) {
   return (
     <BentoCard 
       onClick={() => news.url && window.open(news.url, '_blank')}
-      style={{ flex: '1 0 22%', minWidth: 160, scrollSnapAlign: 'start' }}
+      style={{ flexShrink: 0, width: 'calc((100% - 30px) / 4)', minWidth: 180, scrollSnapAlign: 'start' }}
     >
       <div style={{ fontSize: 9, color: '#00D4FF', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase' }}>
         {news.source}
