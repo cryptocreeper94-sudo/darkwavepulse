@@ -1,14 +1,9 @@
 import axios from 'axios';
 import { Connection, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { SnipePresetConfig } from './sniperBotService';
+import { rpcService } from './rpcService';
 
-const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
-const HELIUS_RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-
-// Jupiter API
 const JUPITER_API = 'https://quote-api.jup.ag/v6';
-
-// SOL mint address
 const SOL_MINT = 'So11111111111111111111111111111111111111112';
 
 interface JupiterQuote {
@@ -32,22 +27,17 @@ interface SwapResult {
   priceImpact?: string;
 }
 
+interface QuoteWithFee extends JupiterQuote {
+  estimatedPriorityFee: number;
+  feeLevel: string;
+}
+
 class TradeExecutorService {
-  private connection: Connection;
-
-  constructor() {
-    this.connection = new Connection(HELIUS_RPC || 'https://api.mainnet-beta.solana.com');
-  }
-
-  // ============================================
-  // JUPITER SWAP QUOTES
-  // ============================================
-
   async getSwapQuote(
     inputMint: string,
     outputMint: string,
     amountLamports: string,
-    slippageBps: number = 500 // 5% default
+    slippageBps: number = 500
   ): Promise<JupiterQuote | null> {
     try {
       const response = await axios.get(`${JUPITER_API}/quote`, {
@@ -89,18 +79,39 @@ class TradeExecutorService {
     return this.getSwapQuote(tokenMint, SOL_MINT, tokenAmount, slippageBps);
   }
 
-  // ============================================
-  // SWAP TRANSACTION BUILDING
-  // ============================================
+  async getBuyQuoteWithFee(
+    tokenMint: string,
+    solAmount: number,
+    slippagePercent: number = 5,
+    priorityLevel: 'min' | 'low' | 'medium' | 'high' | 'veryHigh' | 'auto' = 'auto'
+  ): Promise<QuoteWithFee | null> {
+    const quote = await this.getBuyQuote(tokenMint, solAmount, slippagePercent);
+    if (!quote) return null;
+
+    const priorityFee = await rpcService.getOptimalPriorityFee(priorityLevel, [
+      SOL_MINT,
+      tokenMint,
+    ]);
+
+    return {
+      ...quote,
+      estimatedPriorityFee: priorityFee,
+      feeLevel: priorityLevel,
+    };
+  }
 
   async buildSwapTransaction(
     quote: JupiterQuote,
     userPublicKey: string,
-    priorityFee: 'low' | 'medium' | 'high' | 'auto' = 'auto'
-  ): Promise<{ transaction: string; lastValidBlockHeight: number } | null> {
+    priorityLevel: 'min' | 'low' | 'medium' | 'high' | 'veryHigh' | 'auto' = 'auto'
+  ): Promise<{ transaction: string; lastValidBlockHeight: number; priorityFee: number } | null> {
     try {
-      // Determine priority fee
-      const priorityFeeLamports = this.getPriorityFeeLamports(priorityFee);
+      const priorityFee = await rpcService.getOptimalPriorityFee(priorityLevel, [
+        quote.inputMint,
+        quote.outputMint,
+      ]);
+
+      console.log(`[TradeExecutor] Building swap with priority fee: ${priorityFee} microLamports`);
 
       const response = await axios.post(
         `${JUPITER_API}/swap`,
@@ -108,7 +119,7 @@ class TradeExecutorService {
           quoteResponse: quote,
           userPublicKey,
           wrapAndUnwrapSol: true,
-          computeUnitPriceMicroLamports: priorityFeeLamports,
+          computeUnitPriceMicroLamports: priorityFee,
           dynamicComputeUnitLimit: true,
         },
         { timeout: 15000 }
@@ -117,6 +128,7 @@ class TradeExecutorService {
       return {
         transaction: response.data.swapTransaction,
         lastValidBlockHeight: response.data.lastValidBlockHeight,
+        priorityFee,
       };
     } catch (error: any) {
       console.error('[TradeExecutor] Build swap error:', error.message);
@@ -124,79 +136,108 @@ class TradeExecutorService {
     }
   }
 
-  private getPriorityFeeLamports(level: 'low' | 'medium' | 'high' | 'auto'): number {
-    switch (level) {
-      case 'low':
-        return 1000; // 0.001 SOL
-      case 'medium':
-        return 10000; // 0.01 SOL
-      case 'high':
-        return 100000; // 0.1 SOL
-      case 'auto':
-      default:
-        return 5000; // 0.005 SOL - balanced
-    }
-  }
+  async buildSwapTransactionWithRetry(
+    quote: JupiterQuote,
+    userPublicKey: string,
+    maxAttempts: number = 3
+  ): Promise<{ transaction: string; lastValidBlockHeight: number; priorityFee: number; attempt: number } | null> {
+    const feeProgression: Array<'medium' | 'high' | 'veryHigh'> = ['medium', 'high', 'veryHigh'];
 
-  // ============================================
-  // EXECUTE SWAP (Requires wallet signing)
-  // ============================================
-
-  async executeSwap(
-    signedTransaction: string
-  ): Promise<SwapResult> {
-    try {
-      // Decode the signed transaction
-      const txBuffer = Buffer.from(signedTransaction, 'base64');
+    for (let attempt = 0; attempt < Math.min(maxAttempts, feeProgression.length); attempt++) {
+      const result = await this.buildSwapTransaction(quote, userPublicKey, feeProgression[attempt]);
       
-      // Send transaction
-      const signature = await this.connection.sendRawTransaction(txBuffer, {
-        skipPreflight: false,
-        preflightCommitment: 'confirmed',
-        maxRetries: 3,
-      });
-
-      // Wait for confirmation
-      const confirmation = await this.connection.confirmTransaction(signature, 'confirmed');
-      
-      if (confirmation.value.err) {
-        return {
-          success: false,
-          error: `Transaction failed: ${JSON.stringify(confirmation.value.err)}`,
-          inputAmount: '0',
-        };
+      if (result) {
+        return { ...result, attempt: attempt + 1 };
       }
 
+      console.log(`[TradeExecutor] Build attempt ${attempt + 1} failed, trying higher fee...`);
+    }
+
+    return null;
+  }
+
+  async executeSwap(signedTransaction: string): Promise<SwapResult> {
+    const result = await rpcService.sendTransaction(signedTransaction, {
+      maxRetries: 3,
+      skipPreflight: false,
+      commitment: 'confirmed',
+    });
+
+    if (result.success) {
       return {
         success: true,
-        txSignature: signature,
-        inputAmount: '0', // Would be filled from actual tx
-      };
-    } catch (error: any) {
-      console.error('[TradeExecutor] Execute swap error:', error.message);
-      return {
-        success: false,
-        error: error.message,
+        txSignature: result.signature,
         inputAmount: '0',
       };
     }
+
+    return {
+      success: false,
+      error: result.error,
+      inputAmount: '0',
+    };
   }
 
-  // ============================================
-  // POSITION MONITORING
-  // ============================================
+  async executeSwapWithRetry(
+    signedTransaction: string,
+    quote: JupiterQuote,
+    userPublicKey: string
+  ): Promise<SwapResult & { retryTransaction?: string; retryPriorityFee?: number }> {
+    const firstAttempt = await this.executeSwap(signedTransaction);
+    
+    if (firstAttempt.success) {
+      return firstAttempt;
+    }
+
+    console.log('[TradeExecutor] First attempt failed, rebuilding with higher fee for retry...');
+
+    const newTx = await this.buildSwapTransaction(quote, userPublicKey, 'high');
+    
+    if (!newTx) {
+      return {
+        ...firstAttempt,
+        error: `${firstAttempt.error} (retry build failed)`,
+      };
+    }
+
+    return {
+      ...firstAttempt,
+      retryTransaction: newTx.transaction,
+      retryPriorityFee: newTx.priorityFee,
+      error: `${firstAttempt.error} - retry transaction built with higher fee (${newTx.priorityFee} microLamports). Sign and submit retryTransaction to retry.`,
+    };
+  }
+
+  async prepareRetryTransaction(
+    quote: JupiterQuote,
+    userPublicKey: string,
+    previousFeeLevel: 'medium' | 'high' | 'veryHigh' = 'medium'
+  ): Promise<{ transaction: string; priorityFee: number; feeLevel: string } | null> {
+    const feeProgression: Array<'medium' | 'high' | 'veryHigh'> = ['medium', 'high', 'veryHigh'];
+    const currentIndex = feeProgression.indexOf(previousFeeLevel);
+    const nextLevel = feeProgression[Math.min(currentIndex + 1, feeProgression.length - 1)];
+    
+    const result = await this.buildSwapTransaction(quote, userPublicKey, nextLevel);
+    
+    if (!result) return null;
+    
+    return {
+      transaction: result.transaction,
+      priorityFee: result.priorityFee,
+      feeLevel: nextLevel,
+    };
+  }
 
   async checkTokenPrice(tokenMint: string): Promise<{
     priceUsd: number;
     priceSol: number;
   } | null> {
     try {
-      // Get a tiny quote to determine current price
       const quote = await this.getSwapQuote(
         tokenMint,
         SOL_MINT,
-        '1000000000', // 1 billion tokens (arbitrary for price check)
-        50 // 0.5% slippage
+        '1000000000',
+        50
       );
 
       if (!quote) return null;
@@ -205,7 +246,6 @@ class TradeExecutorService {
       const solOut = parseFloat(quote.outAmount) / 1e9;
       const priceSol = solOut / tokensIn;
       
-      // Get SOL price in USD
       const solPrice = await this.getSolPrice();
       const priceUsd = priceSol * solPrice;
 
@@ -228,10 +268,6 @@ class TradeExecutorService {
     }
   }
 
-  // ============================================
-  // STOP LOSS / TAKE PROFIT CHECKS
-  // ============================================
-
   shouldTriggerExit(
     entryPriceSol: number,
     currentPriceSol: number,
@@ -239,35 +275,19 @@ class TradeExecutorService {
   ): { trigger: boolean; reason: 'take_profit' | 'stop_loss' | 'trailing_stop' | null } {
     const changePercent = ((currentPriceSol - entryPriceSol) / entryPriceSol) * 100;
 
-    // Check take profit
     if (changePercent >= config.tradeControls.takeProfitPercent) {
       return { trigger: true, reason: 'take_profit' };
     }
 
-    // Check stop loss
     if (changePercent <= -config.tradeControls.stopLossPercent) {
       return { trigger: true, reason: 'stop_loss' };
     }
 
-    // Trailing stop would need tracking of highest price reached
-    // This is simplified - real implementation would track max price
-
     return { trigger: false, reason: null };
   }
 
-  // ============================================
-  // WALLET BALANCE
-  // ============================================
-
   async getWalletSolBalance(walletAddress: string): Promise<number> {
-    try {
-      const pubkey = new PublicKey(walletAddress);
-      const balance = await this.connection.getBalance(pubkey);
-      return balance / 1e9; // Convert lamports to SOL
-    } catch (error) {
-      console.error('[TradeExecutor] Balance check error:', error);
-      return 0;
-    }
+    return rpcService.getBalance(walletAddress);
   }
 
   async getWalletTokenBalance(
@@ -275,10 +295,11 @@ class TradeExecutorService {
     tokenMint: string
   ): Promise<{ amount: string; decimals: number } | null> {
     try {
+      const connection = rpcService.getActiveConnection();
       const walletPubkey = new PublicKey(walletAddress);
       const mintPubkey = new PublicKey(tokenMint);
 
-      const accounts = await this.connection.getParsedTokenAccountsByOwner(
+      const accounts = await connection.getParsedTokenAccountsByOwner(
         walletPubkey,
         { mint: mintPubkey }
       );
@@ -296,10 +317,6 @@ class TradeExecutorService {
     }
   }
 
-  // ============================================
-  // SIMULATION (for testing without real trades)
-  // ============================================
-
   async simulateBuy(
     tokenMint: string,
     solAmount: number,
@@ -308,9 +325,10 @@ class TradeExecutorService {
     success: boolean;
     expectedTokens: string;
     priceImpact: string;
+    estimatedPriorityFee?: number;
     error?: string;
   }> {
-    const quote = await this.getBuyQuote(tokenMint, solAmount, slippagePercent);
+    const quote = await this.getBuyQuoteWithFee(tokenMint, solAmount, slippagePercent, 'auto');
     
     if (!quote) {
       return {
@@ -325,6 +343,7 @@ class TradeExecutorService {
       success: true,
       expectedTokens: quote.outAmount,
       priceImpact: quote.priceImpactPct,
+      estimatedPriorityFee: quote.estimatedPriorityFee,
     };
   }
 
@@ -353,6 +372,34 @@ class TradeExecutorService {
       success: true,
       expectedSol: (parseFloat(quote.outAmount) / 1e9).toFixed(6),
       priceImpact: quote.priceImpactPct,
+    };
+  }
+
+  async getTransactionFeeEstimate(
+    tokenMint: string,
+    priorityLevel: 'min' | 'low' | 'medium' | 'high' | 'veryHigh' | 'auto' = 'auto'
+  ): Promise<{
+    priorityFee: number;
+    priorityFeeSol: number;
+    estimatedTotalFee: number;
+    level: string;
+  }> {
+    const priorityFee = await rpcService.getOptimalPriorityFee(priorityLevel, [
+      SOL_MINT,
+      tokenMint,
+    ]);
+
+    const baseFee = 5000;
+    const computeUnits = 200000;
+    
+    const priorityFeeLamports = (priorityFee * computeUnits) / 1_000_000;
+    const totalFeeLamports = baseFee + priorityFeeLamports;
+
+    return {
+      priorityFee,
+      priorityFeeSol: priorityFeeLamports / 1e9,
+      estimatedTotalFee: totalFeeLamports / 1e9,
+      level: priorityLevel,
     };
   }
 }

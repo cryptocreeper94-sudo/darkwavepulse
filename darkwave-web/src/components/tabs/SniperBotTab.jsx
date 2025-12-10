@@ -431,6 +431,120 @@ function SafetyFiltersPanel({ config, updateConfig, expanded, onToggle }) {
   )
 }
 
+function RPCSettingsPanel({ rpcStatus, customRPC, setCustomRPC, onSaveCustomRPC, expanded, onToggle }) {
+  const getStatusColor = (status) => {
+    if (status === 'healthy') return '#39FF14'
+    if (status === 'degraded') return '#FFD700'
+    return '#FF4444'
+  }
+
+  return (
+    <div className="section-box sniper-settings-panel">
+      <button className="sniper-accordion-header" onClick={onToggle}>
+        <span className="sniper-accordion-title">RPC Configuration</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span 
+            className="sniper-rpc-badge"
+            style={{
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '9px',
+              fontWeight: 700,
+              background: rpcStatus?.type === 'helius' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(157, 78, 221, 0.2)',
+              color: rpcStatus?.type === 'helius' ? '#00D4FF' : '#9D4EDD',
+              border: `1px solid ${rpcStatus?.type === 'helius' ? 'rgba(0, 212, 255, 0.4)' : 'rgba(157, 78, 221, 0.4)'}`,
+            }}
+          >
+            {rpcStatus?.active || 'Loading...'}
+          </span>
+          <span className={`sniper-accordion-arrow ${expanded ? 'expanded' : ''}`}>▼</span>
+        </div>
+      </button>
+      {expanded && (
+        <div style={{ padding: '0 16px 16px' }}>
+          <div className="sniper-rpc-status" style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap',
+            gap: '16px', 
+            marginBottom: '16px',
+            padding: '12px',
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '8px',
+          }}>
+            <div>
+              <div style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase' }}>Status</div>
+              <div style={{ 
+                fontSize: '13px', 
+                fontWeight: 700, 
+                color: getStatusColor(rpcStatus?.status),
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}>
+                <span style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: getStatusColor(rpcStatus?.status),
+                  boxShadow: `0 0 8px ${getStatusColor(rpcStatus?.status)}`,
+                }} />
+                {rpcStatus?.status?.toUpperCase() || 'CHECKING'}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase' }}>Latency</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>
+                {rpcStatus?.latencyMs ? `${rpcStatus.latencyMs}ms` : '--'}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '9px', color: '#666', textTransform: 'uppercase' }}>Type</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#00D4FF' }}>
+                {rpcStatus?.type === 'helius' ? 'Premium (Helius)' : rpcStatus?.type === 'custom' ? 'Custom' : 'Public'}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '6px' }}>
+              <span style={{ fontSize: '10px', color: '#666' }}>Custom RPC Endpoint (Optional)</span>
+            </label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <input
+                type="text"
+                placeholder="https://your-rpc-endpoint.com"
+                value={customRPC}
+                onChange={(e) => setCustomRPC(e.target.value)}
+                className="sniper-input"
+                style={{ flex: 1, minWidth: '200px' }}
+              />
+              <button
+                onClick={onSaveCustomRPC}
+                style={{
+                  padding: '10px 16px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  background: customRPC ? 'rgba(0, 212, 255, 0.15)' : 'rgba(255, 68, 68, 0.15)',
+                  color: customRPC ? '#00D4FF' : '#FF4444',
+                  border: `1px solid ${customRPC ? 'rgba(0, 212, 255, 0.4)' : 'rgba(255, 68, 68, 0.4)'}`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {customRPC ? 'Set Custom RPC' : 'Use Default'}
+              </button>
+            </div>
+            <div style={{ fontSize: '10px', color: '#444', marginTop: '6px' }}>
+              Power users can use their own Helius, QuickNode, or Triton endpoint for faster execution
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SniperBotTab() {
   const [mode, setMode] = useState('simple')
   const [config, setConfig] = useState(DEFAULT_CONFIG)
@@ -443,11 +557,19 @@ export default function SniperBotTab() {
   const [scanInterval, setScanInterval] = useState(null)
   const [expandedSettings, setExpandedSettings] = useState(false)
   const [expandedSafety, setExpandedSafety] = useState(false)
+  const [expandedRPC, setExpandedRPC] = useState(false)
+  const [rpcStatus, setRpcStatus] = useState(null)
+  const [customRPC, setCustomRPC] = useState('')
 
   useEffect(() => {
     fetchSolPrice()
+    fetchRPCStatus()
     const interval = setInterval(fetchSolPrice, 30000)
-    return () => clearInterval(interval)
+    const rpcInterval = setInterval(fetchRPCStatus, 60000)
+    return () => {
+      clearInterval(interval)
+      clearInterval(rpcInterval)
+    }
   }, [])
 
   useEffect(() => {
@@ -470,6 +592,36 @@ export default function SniperBotTab() {
       if (data.price) setSolPrice(data.price)
     } catch (err) {
       console.error('Error fetching SOL price:', err)
+    }
+  }
+
+  const fetchRPCStatus = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/sniper/rpc/status`)
+      const data = await res.json()
+      setRpcStatus(data)
+    } catch (err) {
+      console.error('Error fetching RPC status:', err)
+      setRpcStatus({ status: 'unhealthy', active: 'Unknown', type: 'unknown' })
+    }
+  }
+
+  const saveCustomRPC = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/sniper/rpc/custom`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: customRPC || null })
+      })
+      const data = await res.json()
+      if (data.success) {
+        await fetchRPCStatus()
+      } else {
+        alert(data.error || 'Failed to set custom RPC')
+      }
+    } catch (err) {
+      console.error('Error saving custom RPC:', err)
+      alert('Failed to connect to RPC endpoint')
     }
   }
 
@@ -625,6 +777,16 @@ export default function SniperBotTab() {
                 updateConfig={updateConfig}
                 expanded={expandedSafety}
                 onToggle={() => setExpandedSafety(!expandedSafety)}
+              />
+            </BentoItem>
+            <BentoItem span={2}>
+              <RPCSettingsPanel 
+                rpcStatus={rpcStatus}
+                customRPC={customRPC}
+                setCustomRPC={setCustomRPC}
+                onSaveCustomRPC={saveCustomRPC}
+                expanded={expandedRPC}
+                onToggle={() => setExpandedRPC(!expandedRPC)}
               />
             </BentoItem>
           </>
