@@ -104,9 +104,11 @@ function MetricContent({ title, value, change }) {
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
+      alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
       padding: 8,
+      textAlign: 'center',
     }}>
       <div style={{ fontSize: 10, color: '#666', fontWeight: 600, textTransform: 'uppercase', marginBottom: 8 }}>
         {title}
@@ -120,6 +122,7 @@ function MetricContent({ title, value, change }) {
         color: isPositive ? '#39FF14' : '#ff4444',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 4,
       }}>
         <span>{isPositive ? '▲' : '▼'}</span>
