@@ -22,12 +22,12 @@ function formatPrice(price) {
   return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function BentoTile({ children, gridArea, style = {}, onClick }) {
+function BentoTile({ children, className = '', style = {}, onClick }) {
   return (
     <div
+      className={className}
       onClick={onClick}
       style={{
-        gridArea,
         background: '#0f0f0f',
         border: '1px solid #222',
         borderRadius: 12,
@@ -389,17 +389,60 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
   ]
 
   return (
-    <div style={{ 
-      height: 'calc(100vh - 100px)',
-      padding: 12,
-      display: 'grid',
-      gridTemplateColumns: 'repeat(12, 1fr)',
-      gridTemplateRows: 'repeat(4, 1fr)',
-      gap: 10,
-      overflow: 'hidden',
-    }}>
+    <>
+      <style>{`
+        .bento-dashboard {
+          height: calc(100vh - 100px);
+          padding: 12px;
+          display: grid;
+          grid-template-columns: repeat(12, 1fr);
+          grid-template-rows: repeat(4, 1fr);
+          gap: 10px;
+          overflow: hidden;
+        }
+        .bento-quick { grid-area: 1 / 1 / 3 / 4; }
+        .bento-market { grid-area: 1 / 4 / 3 / 7; }
+        .bento-trending { grid-area: 1 / 7 / 3 / 10; }
+        .bento-news { grid-area: 1 / 10 / 3 / 13; }
+        .bento-table { grid-area: 3 / 1 / 5 / 5; }
+        .bento-chart { grid-area: 3 / 5 / 5 / 13; }
+        
+        @media (max-width: 1024px) {
+          .bento-dashboard {
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, minmax(120px, 1fr));
+            height: calc(100vh - 80px);
+            gap: 8px;
+            padding: 8px;
+          }
+          .bento-quick { grid-area: 1 / 1 / 2 / 4; }
+          .bento-market { grid-area: 1 / 4 / 2 / 7; }
+          .bento-trending { grid-area: 2 / 1 / 3 / 4; }
+          .bento-news { grid-area: 2 / 4 / 3 / 7; }
+          .bento-table { grid-area: 3 / 1 / 5 / 4; }
+          .bento-chart { grid-area: 3 / 4 / 6 / 7; }
+        }
+        
+        @media (max-width: 640px) {
+          .bento-dashboard {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            height: calc(100vh - 80px);
+            gap: 6px;
+            padding: 6px;
+            overflow: hidden;
+          }
+          .bento-quick { grid-area: 1 / 1 / 2 / 3; }
+          .bento-market { grid-area: 1 / 3 / 2 / 5; }
+          .bento-trending { grid-area: 2 / 1 / 3 / 3; }
+          .bento-news { grid-area: 2 / 3 / 3 / 5; }
+          .bento-table { grid-area: 3 / 1 / 4 / 3; }
+          .bento-chart { grid-area: 3 / 3 / 5 / 5; }
+        }
+      `}</style>
+      <div className="bento-dashboard">
       
-      <BentoTile gridArea="1 / 1 / 3 / 4">
+      <BentoTile className="bento-quick">
         <TileLabel>Quick Actions</TileLabel>
         <div style={{ height: 'calc(100% - 24px)' }}>
           <FlipCarousel
@@ -419,7 +462,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         </div>
       </BentoTile>
 
-      <BentoTile gridArea="1 / 4 / 3 / 7">
+      <BentoTile className="bento-market">
         <TileLabel>Market Overview</TileLabel>
         <div style={{ height: 'calc(100% - 24px)' }}>
           <FlipCarousel
@@ -436,7 +479,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         </div>
       </BentoTile>
 
-      <BentoTile gridArea="1 / 7 / 3 / 10">
+      <BentoTile className="bento-trending">
         <TileLabel>Trending</TileLabel>
         <div style={{ height: 'calc(100% - 24px)' }}>
           {coinsLoading ? (
@@ -459,7 +502,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         </div>
       </BentoTile>
 
-      <BentoTile gridArea="1 / 10 / 3 / 13">
+      <BentoTile className="bento-news">
         <TileLabel>News</TileLabel>
         <div style={{ height: 'calc(100% - 24px)' }}>
           <FlipCarousel
@@ -472,11 +515,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         </div>
       </BentoTile>
 
-      <BentoTile gridArea="3 / 1 / 5 / 5">
+      <BentoTile className="bento-table">
         <MiniCoinTable coins={coins} onCoinClick={handleCoinClick} favorites={favorites} />
       </BentoTile>
 
-      <BentoTile gridArea="3 / 5 / 5 / 13" style={{ padding: 8 }}>
+      <BentoTile className="bento-chart" style={{ padding: 8 }}>
         <TileLabel>Bitcoin Chart</TileLabel>
         <div style={{ height: 'calc(100% - 28px)' }}>
           <BitcoinChart compact={true} />
@@ -507,5 +550,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         }}
       />
     </div>
+    </>
   )
 }
