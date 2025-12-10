@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export default function FlipCarousel({ 
   items, 
@@ -11,27 +11,30 @@ export default function FlipCarousel({
   style = {}
 }) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [nextIndex, setNextIndex] = useState(1)
   const [isFlipping, setIsFlipping] = useState(false)
   const [flipDirection, setFlipDirection] = useState('next')
+  const touchStartRef = useRef({ x: 0, y: 0 })
 
   const goTo = useCallback((index, direction = 'next') => {
     if (isFlipping || items.length <= 1) return
     setFlipDirection(direction)
+    setNextIndex(index)
     setIsFlipping(true)
     setTimeout(() => {
       setCurrentIndex(index)
-      setTimeout(() => setIsFlipping(false), 300)
-    }, 300)
+      setIsFlipping(false)
+    }, 600)
   }, [isFlipping, items.length])
 
   const next = useCallback(() => {
-    const nextIndex = (currentIndex + 1) % items.length
-    goTo(nextIndex, 'next')
+    const idx = (currentIndex + 1) % items.length
+    goTo(idx, 'next')
   }, [currentIndex, items.length, goTo])
 
   const prev = useCallback(() => {
-    const prevIndex = (currentIndex - 1 + items.length) % items.length
-    goTo(prevIndex, 'prev')
+    const idx = (currentIndex - 1 + items.length) % items.length
+    goTo(idx, 'prev')
   }, [currentIndex, items.length, goTo])
 
   useEffect(() => {
@@ -40,19 +43,26 @@ export default function FlipCarousel({
     return () => clearInterval(timer)
   }, [autoPlay, interval, next, items.length])
 
-  const handleSwipe = (e) => {
+  const handleTouchStart = useCallback((e) => {
+    const touch = e.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }, [])
+
+  const handleTouchEnd = useCallback((e) => {
     const touch = e.changedTouches?.[0]
     if (!touch) return
-    const startX = e.target.dataset.startX
-    const diff = touch.clientX - startX
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? prev() : next()
+    const diffX = touch.clientX - touchStartRef.current.x
+    const diffY = touch.clientY - touchStartRef.current.y
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      diffX > 0 ? prev() : next()
     }
-  }
+  }, [prev, next])
 
   if (!items || items.length === 0) {
     return <div style={{ ...style }} className={className}>No items</div>
   }
+
+  const flipRotation = flipDirection === 'next' ? 180 : -180
 
   return (
     <div 
@@ -61,7 +71,7 @@ export default function FlipCarousel({
         position: 'relative',
         width: '100%',
         height: '100%',
-        perspective: '1000px',
+        perspective: '1200px',
         overflow: 'hidden',
         ...style 
       }}
@@ -72,49 +82,97 @@ export default function FlipCarousel({
           width: '100%',
           height: '100%',
           transformStyle: 'preserve-3d',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: isFlipping 
-            ? flipDirection === 'next' 
-              ? 'rotateY(-15deg) scale(0.95)' 
-              : 'rotateY(15deg) scale(0.95)'
-            : 'rotateY(0deg) scale(1)',
+          transition: isFlipping ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+          transform: isFlipping ? `rotateY(${flipRotation}deg)` : 'rotateY(0deg)',
         }}
-        onTouchStart={(e) => {
-          e.target.dataset.startX = e.touches[0].clientX
-        }}
-        onTouchEnd={handleSwipe}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div
           style={{
             position: 'absolute',
             inset: 0,
             backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
             borderRadius: 12,
             overflow: 'hidden',
-            opacity: isFlipping ? 0.7 : 1,
-            transition: 'opacity 0.3s ease',
           }}
         >
           {renderItem(items[currentIndex], currentIndex)}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(
+                135deg, 
+                rgba(255,255,255,0.15) 0%, 
+                rgba(255,255,255,0.05) 25%,
+                transparent 50%, 
+                rgba(255,255,255,0.03) 75%,
+                rgba(255,255,255,0.1) 100%
+              )`,
+              pointerEvents: 'none',
+              opacity: isFlipping ? 1 : 0,
+              transition: 'opacity 0.2s ease',
+              borderRadius: 12,
+              backdropFilter: isFlipping ? 'blur(2px) saturate(1.2)' : 'none',
+              WebkitBackdropFilter: isFlipping ? 'blur(2px) saturate(1.2)' : 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
+              pointerEvents: 'none',
+              opacity: isFlipping ? 0.6 : 0,
+              transition: 'opacity 0.15s ease',
+              borderRadius: 12,
+              transform: 'skewX(-15deg)',
+            }}
+          />
         </div>
-        
+
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
-            pointerEvents: 'none',
-            opacity: isFlipping ? 0.8 : 0,
-            transition: 'opacity 0.3s ease',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
             borderRadius: 12,
+            overflow: 'hidden',
+            transform: `rotateY(${-flipRotation}deg)`,
           }}
-        />
+        >
+          {isFlipping && renderItem(items[nextIndex], nextIndex)}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(
+                -135deg, 
+                rgba(255,255,255,0.15) 0%, 
+                rgba(255,255,255,0.05) 25%,
+                transparent 50%, 
+                rgba(255,255,255,0.03) 75%,
+                rgba(255,255,255,0.1) 100%
+              )`,
+              pointerEvents: 'none',
+              opacity: isFlipping ? 1 : 0,
+              transition: 'opacity 0.2s ease',
+              borderRadius: 12,
+              backdropFilter: isFlipping ? 'blur(2px) saturate(1.2)' : 'none',
+              WebkitBackdropFilter: isFlipping ? 'blur(2px) saturate(1.2)' : 'none',
+            }}
+          />
+        </div>
       </div>
 
       {showArrows && items.length > 1 && (
         <>
           <button
             onClick={prev}
+            disabled={isFlipping}
             style={{
               position: 'absolute',
               left: 4,
@@ -127,21 +185,22 @@ export default function FlipCarousel({
               border: '1px solid #333',
               color: '#fff',
               fontSize: 14,
-              cursor: 'pointer',
+              cursor: isFlipping ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 10,
-              opacity: 0.7,
+              opacity: isFlipping ? 0.4 : 0.7,
               transition: 'opacity 0.2s',
             }}
-            onMouseEnter={(e) => e.target.style.opacity = 1}
-            onMouseLeave={(e) => e.target.style.opacity = 0.7}
+            onMouseEnter={(e) => !isFlipping && (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = isFlipping ? '0.4' : '0.7')}
           >
             ‹
           </button>
           <button
             onClick={next}
+            disabled={isFlipping}
             style={{
               position: 'absolute',
               right: 4,
@@ -154,16 +213,16 @@ export default function FlipCarousel({
               border: '1px solid #333',
               color: '#fff',
               fontSize: 14,
-              cursor: 'pointer',
+              cursor: isFlipping ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 10,
-              opacity: 0.7,
+              opacity: isFlipping ? 0.4 : 0.7,
               transition: 'opacity 0.2s',
             }}
-            onMouseEnter={(e) => e.target.style.opacity = 1}
-            onMouseLeave={(e) => e.target.style.opacity = 0.7}
+            onMouseEnter={(e) => !isFlipping && (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = isFlipping ? '0.4' : '0.7')}
           >
             ›
           </button>
@@ -184,13 +243,14 @@ export default function FlipCarousel({
             <button
               key={idx}
               onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
+              disabled={isFlipping}
               style={{
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
                 background: idx === currentIndex ? '#00D4FF' : '#444',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: isFlipping ? 'default' : 'pointer',
                 padding: 0,
                 transition: 'background 0.2s',
               }}
