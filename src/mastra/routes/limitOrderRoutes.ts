@@ -79,6 +79,10 @@ export const limitOrderRoutes = [
         }
         
         if (status) {
+          const validStatuses = ['PENDING', 'WATCHING', 'READY_TO_EXECUTE', 'FILLED_ENTRY', 'READY_TO_EXIT', 'READY_TO_STOP', 'FILLED_EXIT', 'STOPPED_OUT', 'CANCELLED'];
+          if (!validStatuses.includes(status)) {
+            return c.json({ error: `Invalid status. Valid values: ${validStatuses.join(', ')}` }, 400);
+          }
           await limitOrderService.updateOrderStatus(orderId, status as LimitOrderStatus);
         }
         
@@ -114,12 +118,16 @@ export const limitOrderRoutes = [
           return c.json({ error: 'Order ID is required' }, 400);
         }
         
+        if (!userId) {
+          return c.json({ error: 'userId is required for authorization' }, 400);
+        }
+        
         const existingOrder = await limitOrderService.getOrderById(orderId);
         if (!existingOrder) {
           return c.json({ error: 'Order not found' }, 404);
         }
         
-        if (userId && existingOrder.userId !== userId) {
+        if (existingOrder.userId !== userId) {
           return c.json({ error: 'Unauthorized' }, 403);
         }
         

@@ -1,13 +1,32 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 const STORAGE_KEY = 'darkwave_manual_watchlist'
 const STATUS = {
   EMPTY: 'empty',
   WATCHING: 'watching',
+  READY_TO_EXECUTE: 'ready_to_execute',
   FILLED_ENTRY: 'filled_entry',
+  READY_TO_EXIT: 'ready_to_exit',
+  READY_TO_STOP: 'ready_to_stop',
   FILLED_EXIT: 'filled_exit',
   STOPPED_OUT: 'stopped_out',
   PAUSED: 'paused',
+}
+
+function mapBackendStatusToFrontend(backendStatus) {
+  const statusMap = {
+    'PENDING': STATUS.WATCHING,
+    'WATCHING': STATUS.WATCHING,
+    'READY_TO_EXECUTE': STATUS.READY_TO_EXECUTE,
+    'FILLED_ENTRY': STATUS.FILLED_ENTRY,
+    'READY_TO_EXIT': STATUS.READY_TO_EXIT,
+    'READY_TO_STOP': STATUS.READY_TO_STOP,
+    'FILLED_EXIT': STATUS.FILLED_EXIT,
+    'STOPPED_OUT': STATUS.STOPPED_OUT,
+    'CANCELLED': STATUS.EMPTY,
+  }
+  return statusMap[backendStatus] || STATUS.EMPTY
 }
 
 const defaultSlot = {
@@ -89,8 +108,11 @@ function StatusBadge({ status }) {
   const statusConfig = {
     [STATUS.EMPTY]: { label: 'Empty', color: '#666' },
     [STATUS.WATCHING]: { label: 'Watching', color: '#00D4FF' },
-    [STATUS.FILLED_ENTRY]: { label: 'Filled Entry', color: '#39FF14' },
-    [STATUS.FILLED_EXIT]: { label: 'Filled Exit', color: '#FFD700' },
+    [STATUS.READY_TO_EXECUTE]: { label: '⚡ Ready to Buy', color: '#FFD700' },
+    [STATUS.FILLED_ENTRY]: { label: 'Position Open', color: '#39FF14' },
+    [STATUS.READY_TO_EXIT]: { label: '⚡ Ready to Sell', color: '#FFD700' },
+    [STATUS.READY_TO_STOP]: { label: '⚡ Stop Loss Hit', color: '#FF6B00' },
+    [STATUS.FILLED_EXIT]: { label: 'Sold', color: '#39FF14' },
     [STATUS.STOPPED_OUT]: { label: 'Stopped Out', color: '#FF4444' },
     [STATUS.PAUSED]: { label: 'Paused', color: '#888' },
   }
@@ -312,6 +334,10 @@ function WatchlistSlot({ slot, index, onUpdate, onClear, onToggle }) {
 }
 
 export default function ManualWatchlist() {
+  const { publicKey } = useWallet()
+  const walletAddress = publicKey?.toBase58() || null
+  const syncedOrderIds = useRef(new Map())
+  
   const [slots, setSlots] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -326,6 +352,126 @@ export default function ManualWatchlist() {
     }
     return Array(4).fill(null).map((_, i) => ({ ...defaultSlot, id: `slot-${i}` }))
   })
+  
+  const syncSlotToBackend = useCallback(async (slot, index) => {
+    if (!walletAddress || !slot.address || !slot.entryPrice) return
+    
+    const orderId = syncedOrderIds.current.get(index)
+    
+    try {
+      if (orderId && slot.status !== STATUS.EMPTY) {
+        const protectedStatuses = [
+          STATUS.READY_TO_EXECUTE, 
+          STATUS.READY_TO_EXIT, 
+          STATUS.READY_TO_STOP,
+          STATUS.FILLED_ENTRY,
+          STATUS.FILLED_EXIT,
+          STATUS.STOPPED_OUT
+        ]
+        
+        const updatePayload = {
+          userId: walletAddress,
+          entryPrice: slot.entryPrice,
+          exitPrice: slot.exitPrice || null,
+          stopLoss: slot.stopLoss || null,
+          buyAmountSol: slot.buyAmount,
+        }
+        
+        if (!slot.isActive) {
+          updatePayload.status = 'CANCELLED'
+        } else if (!protectedStatuses.includes(slot.status)) {
+          updatePayload.status = slot.status === STATUS.WATCHING ? 'WATCHING' : 'PENDING'
+        }
+        
+        await fetch(`/api/limit-orders/${orderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatePayload)
+        })
+      } else if (slot.address && slot.entryPrice && slot.status !== STATUS.EMPTY) {
+        const res = await fetch('/api/limit-orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: walletAddress,
+            tokenAddress: slot.address,
+            tokenSymbol: slot.tokenInfo?.symbol || 'UNKNOWN',
+            entryPrice: slot.entryPrice,
+            exitPrice: slot.exitPrice || null,
+            stopLoss: slot.stopLoss || null,
+            buyAmountSol: slot.buyAmount,
+            walletAddress
+          })
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.order?.id) {
+            syncedOrderIds.current.set(index, data.order.id)
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to sync slot to backend:', err)
+    }
+  }, [walletAddress])
+
+  useEffect(() => {
+    const loadOrdersFromBackend = async () => {
+      if (!walletAddress) return
+      
+      try {
+        const res = await fetch(`/api/limit-orders?userId=${walletAddress}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.orders && data.orders.length > 0) {
+            const activeOrders = data.orders.filter(o => 
+              !['CANCELLED', 'FILLED_EXIT', 'STOPPED_OUT'].includes(o.status)
+            ).slice(0, 4)
+            
+            if (activeOrders.length > 0) {
+              setSlots(prev => {
+                const updated = [...prev]
+                activeOrders.forEach((order, i) => {
+                  if (i < 4) {
+                    syncedOrderIds.current.set(i, order.id)
+                    updated[i] = {
+                      ...defaultSlot,
+                      id: order.id,
+                      address: order.tokenAddress,
+                      tokenInfo: { symbol: order.tokenSymbol, name: order.tokenSymbol },
+                      entryPrice: order.entryPrice,
+                      exitPrice: order.exitPrice || '',
+                      stopLoss: order.stopLoss || '',
+                      buyAmount: order.buyAmountSol,
+                      isActive: order.status !== 'CANCELLED',
+                      status: mapBackendStatusToFrontend(order.status),
+                      currentPrice: null,
+                      lastUpdated: null,
+                    }
+                  }
+                })
+                return updated
+              })
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load orders from backend:', err)
+      }
+    }
+    
+    loadOrdersFromBackend()
+  }, [walletAddress])
+  
+  useEffect(() => {
+    if (walletAddress) {
+      slots.forEach((slot, index) => {
+        if (slot.status === STATUS.WATCHING && slot.isActive) {
+          syncSlotToBackend(slot, index)
+        }
+      })
+    }
+  }, [slots.map(s => `${s.address}-${s.entryPrice}-${s.exitPrice}-${s.stopLoss}-${s.isActive}`).join(','), walletAddress, syncSlotToBackend])
 
   useEffect(() => {
     try {
@@ -395,7 +541,16 @@ export default function ManualWatchlist() {
     })
   }, [])
 
-  const handleClear = useCallback((index) => {
+  const handleClear = useCallback(async (index) => {
+    const orderId = syncedOrderIds.current.get(index)
+    if (orderId) {
+      try {
+        await fetch(`/api/limit-orders/${orderId}`, { method: 'DELETE' })
+        syncedOrderIds.current.delete(index)
+      } catch (err) {
+        console.error('Failed to cancel order:', err)
+      }
+    }
     setSlots(prev => {
       const updated = [...prev]
       updated[index] = { ...defaultSlot, id: `slot-${index}` }
