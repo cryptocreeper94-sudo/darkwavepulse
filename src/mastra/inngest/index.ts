@@ -4,6 +4,7 @@ import { registerApiRoute as originalRegisterApiRoute } from "@mastra/core/serve
 import { type Mastra } from "@mastra/core";
 import { type Inngest, InngestFunction, NonRetriableError } from "inngest";
 import { predictionWorkerFunctions } from "./predictionWorker.js";
+import { limitOrderMonitorWorker } from "./limitOrderWorker.js";
 
 // Initialize Inngest with Mastra to get Inngest-compatible workflow helpers
 const {
@@ -113,7 +114,7 @@ export function inngestServe({
   return originalInngestServe({
     mastra,
     inngest,
-    functions: [...inngestFunctions, ...predictionWorkerFunctions],
+    functions: [...inngestFunctions, ...predictionWorkerFunctions, limitOrderMonitorWorker],
     registerOptions: { serveHost },
   });
 }

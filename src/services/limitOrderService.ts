@@ -11,7 +11,10 @@ const logger = pino({ name: 'LimitOrderService' });
 export type LimitOrderStatus = 
   | 'PENDING'
   | 'WATCHING'
+  | 'READY_TO_EXECUTE'
   | 'FILLED_ENTRY'
+  | 'READY_TO_EXIT'
+  | 'READY_TO_STOP'
   | 'FILLED_EXIT'
   | 'STOPPED_OUT'
   | 'CANCELLED';
@@ -182,65 +185,47 @@ class LimitOrderService {
       
       if (order.status === 'PENDING' || order.status === 'WATCHING') {
         if (currentPrice <= entryPrice) {
-          logger.info({ orderId: order.id, currentPrice, entryPrice }, '[LimitOrder] Entry price hit, executing buy');
+          logger.info({ orderId: order.id, currentPrice, entryPrice }, '[LimitOrder] Entry price hit - flagging for execution');
           
-          const quote = await tradeExecutorService.getBuyQuote(
-            order.tokenAddress,
-            parseFloat(order.buyAmountSol),
-            5
-          );
+          await db.update(limitOrders)
+            .set({ 
+              status: 'READY_TO_EXECUTE',
+              updatedAt: new Date(),
+            })
+            .where(eq(limitOrders.id, order.id));
           
-          if (quote) {
-            await this.updateOrderStatus(order.id, 'FILLED_ENTRY');
-            await db.update(limitOrders)
-              .set({ 
-                actualEntryPrice: tokenDetails.priceUsd,
-                status: 'FILLED_ENTRY',
-                filledEntryAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(eq(limitOrders.id, order.id));
-            
-            logger.info({ orderId: order.id }, '[LimitOrder] Entry filled successfully');
-            return { executed: true, action: 'entry' };
-          } else {
-            logger.error({ orderId: order.id }, '[LimitOrder] Failed to get buy quote');
-            return { executed: false, error: 'Failed to get buy quote' };
-          }
+          logger.info({ orderId: order.id }, '[LimitOrder] Order marked ready for entry execution');
+          return { executed: true, action: 'entry', pendingUserAction: true, currentPrice: tokenDetails.priceUsd };
         }
       }
       
       if (order.status === 'FILLED_ENTRY') {
         if (stopLoss && currentPrice <= stopLoss) {
-          logger.info({ orderId: order.id, currentPrice, stopLoss }, '[LimitOrder] Stop loss hit, executing sell');
+          logger.info({ orderId: order.id, currentPrice, stopLoss }, '[LimitOrder] Stop loss hit - flagging for execution');
           
           await db.update(limitOrders)
             .set({ 
-              actualExitPrice: tokenDetails.priceUsd,
-              status: 'STOPPED_OUT',
-              filledExitAt: new Date(),
+              status: 'READY_TO_STOP',
               updatedAt: new Date(),
             })
             .where(eq(limitOrders.id, order.id));
           
-          logger.info({ orderId: order.id }, '[LimitOrder] Stop loss executed');
-          return { executed: true, action: 'stop_loss' };
+          logger.info({ orderId: order.id }, '[LimitOrder] Order marked ready for stop loss execution');
+          return { executed: true, action: 'stop_loss', pendingUserAction: true, currentPrice: tokenDetails.priceUsd };
         }
         
         if (exitPrice && currentPrice >= exitPrice) {
-          logger.info({ orderId: order.id, currentPrice, exitPrice }, '[LimitOrder] Exit price hit, executing sell');
+          logger.info({ orderId: order.id, currentPrice, exitPrice }, '[LimitOrder] Exit price hit - flagging for execution');
           
           await db.update(limitOrders)
             .set({ 
-              actualExitPrice: tokenDetails.priceUsd,
-              status: 'FILLED_EXIT',
-              filledExitAt: new Date(),
+              status: 'READY_TO_EXIT',
               updatedAt: new Date(),
             })
             .where(eq(limitOrders.id, order.id));
           
-          logger.info({ orderId: order.id }, '[LimitOrder] Exit filled successfully');
-          return { executed: true, action: 'exit' };
+          logger.info({ orderId: order.id }, '[LimitOrder] Order marked ready for exit execution');
+          return { executed: true, action: 'exit', pendingUserAction: true, currentPrice: tokenDetails.priceUsd };
         }
       }
       
