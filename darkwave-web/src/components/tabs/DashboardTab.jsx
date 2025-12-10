@@ -32,10 +32,11 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
         border: '1px solid #222',
         borderRadius: 12,
         padding: 12,
-        overflow: 'hidden',
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'border-color 0.2s, box-shadow 0.2s',
+        display: 'flex',
+        flexDirection: 'column',
         ...style,
       }}
       onMouseEnter={(e) => {
@@ -392,13 +393,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
     <>
       <style>{`
         .bento-dashboard {
-          height: calc(100vh - 100px);
           padding: 12px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: repeat(4, 1fr);
+          grid-template-rows: minmax(220px, auto) minmax(220px, auto) minmax(300px, auto) minmax(300px, auto);
           gap: 10px;
-          overflow: hidden;
         }
         .bento-quick { grid-area: 1 / 1 / 3 / 4; }
         .bento-market { grid-area: 1 / 4 / 3 / 7; }
@@ -409,42 +408,40 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         
         @media (max-width: 1024px) {
           .bento-dashboard {
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(6, minmax(120px, 1fr));
-            height: calc(100vh - 80px);
-            gap: 8px;
-            padding: 8px;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto;
+            gap: 10px;
+            padding: 10px;
           }
-          .bento-quick { grid-area: 1 / 1 / 2 / 4; }
-          .bento-market { grid-area: 1 / 4 / 2 / 7; }
-          .bento-trending { grid-area: 2 / 1 / 3 / 4; }
-          .bento-news { grid-area: 2 / 4 / 3 / 7; }
-          .bento-table { grid-area: 3 / 1 / 5 / 4; }
-          .bento-chart { grid-area: 3 / 4 / 6 / 7; }
+          .bento-quick, .bento-market, .bento-trending, .bento-news,
+          .bento-table, .bento-chart {
+            grid-area: auto;
+          }
+          .bento-quick { min-height: 200px; }
+          .bento-market { min-height: 200px; }
+          .bento-trending { min-height: 200px; }
+          .bento-news { min-height: 200px; }
+          .bento-table { min-height: 350px; grid-column: 1 / -1; }
+          .bento-chart { min-height: 400px; grid-column: 1 / -1; }
         }
         
         @media (max-width: 640px) {
           .bento-dashboard {
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            height: calc(100vh - 80px);
-            gap: 6px;
-            padding: 6px;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px;
           }
-          .bento-quick { grid-area: 1 / 1 / 2 / 3; }
-          .bento-market { grid-area: 1 / 3 / 2 / 5; }
-          .bento-trending { grid-area: 2 / 1 / 3 / 3; }
-          .bento-news { grid-area: 2 / 3 / 3 / 5; }
-          .bento-table { grid-area: 3 / 1 / 4 / 3; }
-          .bento-chart { grid-area: 3 / 3 / 5 / 5; }
+          .bento-quick, .bento-market, .bento-trending, .bento-news { min-height: 180px; }
+          .bento-table { min-height: 300px; }
+          .bento-chart { min-height: 350px; }
         }
       `}</style>
       <div className="bento-dashboard">
       
       <BentoTile className="bento-quick">
         <TileLabel>Quick Actions</TileLabel>
-        <div style={{ height: 'calc(100% - 24px)' }}>
+        <div style={{ flex: 1, minHeight: 160 }}>
           <FlipCarousel
             items={quickActions}
             renderItem={(action) => (
@@ -464,7 +461,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
 
       <BentoTile className="bento-market">
         <TileLabel>Market Overview</TileLabel>
-        <div style={{ height: 'calc(100% - 24px)' }}>
+        <div style={{ flex: 1, minHeight: 160 }}>
           <FlipCarousel
             items={marketOverviewItems}
             renderItem={(item) => (
@@ -481,7 +478,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
 
       <BentoTile className="bento-trending">
         <TileLabel>Trending</TileLabel>
-        <div style={{ height: 'calc(100% - 24px)' }}>
+        <div style={{ flex: 1, minHeight: 160 }}>
           {coinsLoading ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666' }}>
               Loading...
@@ -504,7 +501,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
 
       <BentoTile className="bento-news">
         <TileLabel>News</TileLabel>
-        <div style={{ height: 'calc(100% - 24px)' }}>
+        <div style={{ flex: 1, minHeight: 160 }}>
           <FlipCarousel
             items={news}
             renderItem={(item) => <NewsContent news={item} />}
@@ -521,7 +518,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
 
       <BentoTile className="bento-chart" style={{ padding: 8 }}>
         <TileLabel>Bitcoin Chart</TileLabel>
-        <div style={{ height: 'calc(100% - 28px)' }}>
+        <div style={{ flex: 1, minHeight: 280 }}>
           <BitcoinChart compact={true} />
         </div>
       </BentoTile>
