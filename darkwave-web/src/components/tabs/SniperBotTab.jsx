@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import BentoGrid, { BentoItem } from '../ui/BentoGrid'
+import { useWalletState, WalletMultiButton } from '../../context/WalletContext'
 import './SniperBotTab.css'
 
 const API_BASE = ''
@@ -245,7 +246,7 @@ function ActivePositionCard({ position, onClose }) {
   )
 }
 
-function DiscoveredTokenCard({ token, onSnipe, onWatch }) {
+function DiscoveredTokenCard({ token, onSnipe, onWatch, disabled }) {
   const scoreColor = token.aiScore >= 70 ? '#39FF14' : token.aiScore >= 50 ? '#FFD700' : '#FF4444'
   const dexColor = token.dex === 'pumpfun' ? '#FF69B4' : '#9D4EDD'
 
@@ -284,24 +285,33 @@ function DiscoveredTokenCard({ token, onSnipe, onWatch }) {
         </div>
       </div>
       <div className="sniper-token-actions">
-        <button className="sniper-btn-snipe" onClick={() => onSnipe(token)}>Snipe</button>
+        <button 
+          className="sniper-btn-snipe" 
+          onClick={() => onSnipe(token)}
+          disabled={disabled}
+        >
+          {disabled ? 'Connect Wallet' : 'Snipe'}
+        </button>
         <button className="sniper-btn-watch" onClick={() => onWatch(token)}>Watch</button>
       </div>
     </div>
   )
 }
 
-function SmartAutoModePanel({ isActive, onToggle, config }) {
+function SmartAutoModePanel({ isActive, onToggle, config, disabled }) {
   return (
-    <div className="section-box sniper-automode-panel">
+    <div className={`section-box sniper-automode-panel ${disabled ? 'disabled' : ''}`}>
       <div className="sniper-automode-header">
         <div>
           <h4 className="sniper-automode-title">Smart Auto Mode</h4>
-          <p className="sniper-automode-desc">AI-powered autonomous trading</p>
+          <p className="sniper-automode-desc">
+            {disabled ? 'Connect wallet to enable' : 'AI-powered autonomous trading'}
+          </p>
         </div>
         <button 
           className={`sniper-automode-btn ${isActive ? 'active' : ''}`}
           onClick={onToggle}
+          disabled={disabled}
         >
           {isActive ? 'STOP' : 'START'}
         </button>
@@ -546,6 +556,7 @@ function RPCSettingsPanel({ rpcStatus, customRPC, setCustomRPC, onSaveCustomRPC,
 }
 
 export default function SniperBotTab() {
+  const wallet = useWalletState()
   const [mode, setMode] = useState('simple')
   const [config, setConfig] = useState(DEFAULT_CONFIG)
   const [discoveredTokens, setDiscoveredTokens] = useState([])
@@ -571,6 +582,12 @@ export default function SniperBotTab() {
       clearInterval(rpcInterval)
     }
   }, [])
+
+  useEffect(() => {
+    if (!wallet.connected && autoModeActive) {
+      setAutoModeActive(false)
+    }
+  }, [wallet.connected])
 
   useEffect(() => {
     if (autoModeActive && !scanInterval) {
@@ -642,7 +659,11 @@ export default function SniperBotTab() {
   }
 
   const handleSnipe = async (token) => {
-    console.log('Sniping token:', token)
+    if (!wallet.connected) {
+      alert('Please connect your wallet first')
+      return
+    }
+    console.log('Sniping token:', token, 'from wallet:', wallet.address)
   }
 
   const handleWatch = async (token) => {
@@ -671,6 +692,17 @@ export default function SniperBotTab() {
             <span className="sniper-sol-label">SOL</span>
             <span className="sniper-sol-value">${solPrice.toFixed(2)}</span>
           </div>
+          {wallet.connected && (
+            <div className="sniper-wallet-balance">
+              <span className="sniper-wallet-label">Balance</span>
+              <span className="sniper-wallet-value">
+                {wallet.balanceLoading ? '...' : `${(wallet.balance || 0).toFixed(4)} SOL`}
+              </span>
+            </div>
+          )}
+          <div className="sniper-wallet-connect">
+            <WalletMultiButton />
+          </div>
           <div className="sniper-mode-toggle">
             <button
               className={`sniper-mode-btn ${mode === 'simple' ? 'active' : ''}`}
@@ -688,6 +720,16 @@ export default function SniperBotTab() {
         </div>
       </div>
 
+      {!wallet.connected && (
+        <div className="sniper-wallet-warning section-box">
+          <div className="sniper-warning-icon">⚠️</div>
+          <div className="sniper-warning-text">
+            <strong>Wallet Required</strong>
+            <p>Connect your Solana wallet (Phantom or Solflare) to start sniping tokens</p>
+          </div>
+        </div>
+      )}
+
       <BentoGrid columns={2} gap="md">
         <BentoItem span={2}>
           <SessionStatsCard stats={stats} isActive={autoModeActive} />
@@ -696,8 +738,15 @@ export default function SniperBotTab() {
         <BentoItem span={2}>
           <SmartAutoModePanel 
             isActive={autoModeActive} 
-            onToggle={() => setAutoModeActive(!autoModeActive)}
+            onToggle={() => {
+              if (!wallet.connected) {
+                alert('Please connect your wallet first')
+                return
+              }
+              setAutoModeActive(!autoModeActive)
+            }}
             config={config}
+            disabled={!wallet.connected}
           />
         </BentoItem>
 
@@ -747,6 +796,7 @@ export default function SniperBotTab() {
                       token={token}
                       onSnipe={handleSnipe}
                       onWatch={handleWatch}
+                      disabled={!wallet.connected}
                     />
                   ))}
                 </div>
