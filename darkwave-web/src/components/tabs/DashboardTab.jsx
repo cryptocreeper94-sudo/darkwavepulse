@@ -192,7 +192,7 @@ function BentoCard({ children, onClick, style = {} }) {
 
 function QuickActionCard({ icon, title, subtitle, onClick, accentColor = '#00D4FF' }) {
   return (
-    <BentoCard onClick={onClick} style={{ minWidth: 120 }}>
+    <BentoCard onClick={onClick} style={{ flex: '1 0 18%', minWidth: 100, scrollSnapAlign: 'start' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ 
           fontSize: 16, 
@@ -203,12 +203,13 @@ function QuickActionCard({ icon, title, subtitle, onClick, accentColor = '#00D4F
           justifyContent: 'center',
           background: `${accentColor}15`,
           borderRadius: 6,
+          flexShrink: 0,
         }}>
           {icon}
         </div>
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>{title}</div>
-          <div style={{ fontSize: 9, color: '#666' }}>{subtitle}</div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+          <div style={{ fontSize: 9, color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
         </div>
       </div>
     </BentoCard>
@@ -218,7 +219,7 @@ function QuickActionCard({ icon, title, subtitle, onClick, accentColor = '#00D4F
 function MetricCard({ title, value, change, inflow }) {
   const isPositive = change >= 0
   return (
-    <BentoCard style={{ minWidth: 140 }}>
+    <BentoCard style={{ flex: '1 0 22%', minWidth: 100, scrollSnapAlign: 'start' }}>
       <div style={{ fontSize: 9, color: '#666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
         {title}
       </div>
@@ -241,11 +242,11 @@ function MetricCard({ title, value, change, inflow }) {
 
 function GaugeCard({ title, value, type, accentColor }) {
   return (
-    <BentoCard style={{ minWidth: 130, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <BentoCard style={{ flex: '1 0 22%', minWidth: 100, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ color: accentColor, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
         {title}
       </div>
-      <div style={{ width: 100 }}>
+      <div style={{ width: '80%', maxWidth: 100 }}>
         <Gauge value={value} type={type} size={100} showLabels={false} />
       </div>
     </BentoCard>
@@ -487,28 +488,28 @@ function TrendingCoinCard({ coin, onClick, isFavorite }) {
   }
   
   return (
-    <BentoCard onClick={onClick} style={{ minWidth: 120, scrollSnapAlign: 'start' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+    <BentoCard onClick={onClick} style={{ flex: '1 0 8%', minWidth: 90, scrollSnapAlign: 'start' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
         {coin.image && (
           <img 
             src={coin.image} 
             alt="" 
-            style={{ width: 24, height: 24, borderRadius: '50%' }}
+            style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0 }}
             onError={(e) => e.target.style.display = 'none'}
           />
         )}
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {coin.symbol?.toUpperCase()}
-            {isFavorite && <span style={{ color: '#FFD700', marginLeft: 4 }}>★</span>}
+            {isFavorite && <span style={{ color: '#FFD700', marginLeft: 3 }}>★</span>}
           </div>
-          <div style={{ fontSize: 9, color: '#666', maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{coin.name}</div>
+          <div style={{ fontSize: 8, color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{coin.name}</div>
         </div>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 3 }}>
         {formatPrice(coin.current_price || coin.price)}
       </div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: isPositive ? '#39FF14' : '#ff4444' }}>
+      <div style={{ fontSize: 9, fontWeight: 600, color: isPositive ? '#39FF14' : '#ff4444' }}>
         {isPositive ? '▲' : '▼'} {Math.abs(change).toFixed(1)}%
       </div>
     </BentoCard>
@@ -519,7 +520,7 @@ function NewsCard({ news }) {
   return (
     <BentoCard 
       onClick={() => news.url && window.open(news.url, '_blank')}
-      style={{ minWidth: 200, maxWidth: 200, scrollSnapAlign: 'start' }}
+      style={{ flex: '1 0 22%', minWidth: 160, scrollSnapAlign: 'start' }}
     >
       <div style={{ fontSize: 9, color: '#00D4FF', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase' }}>
         {news.source}
