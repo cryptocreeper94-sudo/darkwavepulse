@@ -1,6 +1,7 @@
 import { sniperBotService, DEFAULT_PRESET, SnipePresetConfig } from '../../services/sniperBotService';
 import { tokenScannerService } from '../../services/tokenScannerService';
 import { tradeExecutorService } from '../../services/tradeExecutorService';
+import { rpcService } from '../../services/rpcService';
 
 export const sniperBotRoutes = [
   // ============================================
@@ -459,6 +460,143 @@ export const sniperBotRoutes = [
         return c.json({ price });
       } catch (error: any) {
         return c.json({ error: 'Failed to get SOL price' }, 500);
+      }
+    }
+  },
+
+  // ============================================
+  // RPC CONFIGURATION
+  // ============================================
+  {
+    path: "/api/sniper/rpc/status",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const health = await rpcService.healthCheck();
+        const info = rpcService.getRPCInfo();
+        
+        return c.json({
+          ...health,
+          ...info,
+          message: health.status === 'healthy' 
+            ? `${info.active} RPC operational (${health.latencyMs}ms)` 
+            : `RPC degraded - ${health.latencyMs}ms latency`,
+        });
+      } catch (error: any) {
+        logger?.error('❌ [RPC] Health check failed', { error: error.message });
+        return c.json({ 
+          status: 'unhealthy', 
+          error: error.message,
+          active: 'Unknown',
+          type: 'unknown',
+        }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/rpc/info",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      try {
+        const info = rpcService.getRPCInfo();
+        return c.json(info);
+      } catch (error: any) {
+        return c.json({ error: 'Failed to get RPC info' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/rpc/custom",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { endpoint } = await c.req.json();
+        
+        if (endpoint) {
+          // Validate the endpoint by testing connection
+          try {
+            const testResponse = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 1,
+                method: 'getSlot',
+              }),
+            });
+            
+            if (!testResponse.ok) {
+              return c.json({ success: false, error: 'RPC endpoint unreachable' }, 400);
+            }
+          } catch (e) {
+            return c.json({ success: false, error: 'Invalid RPC endpoint' }, 400);
+          }
+          
+          rpcService.setCustomRPC(endpoint);
+          logger?.info('✅ [RPC] Custom RPC set', { endpoint: endpoint.substring(0, 50) });
+        } else {
+          rpcService.setCustomRPC(null);
+          logger?.info('✅ [RPC] Reverted to Helius RPC');
+        }
+        
+        const info = rpcService.getRPCInfo();
+        return c.json({ success: true, ...info });
+      } catch (error: any) {
+        logger?.error('❌ [RPC] Error setting custom RPC', { error: error.message });
+        return c.json({ error: 'Failed to set custom RPC' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/rpc/priority-fee",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { accountKeys, tokenMint } = await c.req.json();
+        
+        const keys = accountKeys || (tokenMint ? [tokenMint] : undefined);
+        const estimate = await rpcService.getPriorityFeeEstimate(keys);
+        
+        return c.json({
+          ...estimate,
+          feeLevelsSol: {
+            min: (estimate.priorityFeeLevels.min * 200000 / 1_000_000 / 1e9).toFixed(9),
+            low: (estimate.priorityFeeLevels.low * 200000 / 1_000_000 / 1e9).toFixed(9),
+            medium: (estimate.priorityFeeLevels.medium * 200000 / 1_000_000 / 1e9).toFixed(9),
+            high: (estimate.priorityFeeLevels.high * 200000 / 1_000_000 / 1e9).toFixed(9),
+            veryHigh: (estimate.priorityFeeLevels.veryHigh * 200000 / 1_000_000 / 1e9).toFixed(9),
+          },
+        });
+      } catch (error: any) {
+        logger?.error('❌ [RPC] Priority fee error', { error: error.message });
+        return c.json({ error: 'Failed to estimate priority fees' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/fee-estimate",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { tokenMint, priorityLevel } = await c.req.json();
+        
+        if (!tokenMint) {
+          return c.json({ error: 'tokenMint is required' }, 400);
+        }
+        
+        const estimate = await tradeExecutorService.getTransactionFeeEstimate(
+          tokenMint,
+          priorityLevel || 'auto'
+        );
+        
+        return c.json(estimate);
+      } catch (error: any) {
+        logger?.error('❌ [TradeExecutor] Fee estimate error', { error: error.message });
+        return c.json({ error: 'Failed to estimate fees' }, 500);
       }
     }
   },
