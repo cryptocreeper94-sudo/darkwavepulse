@@ -4,8 +4,10 @@ import HamburgerMenu from './HamburgerMenu'
 import BugReportModal from '../modals/BugReportModal'
 import DisclaimerModal from '../modals/DisclaimerModal'
 import AvatarCreator from '../ui/AvatarCreator'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function Layout({ children, activeTab, onTabChange }) {
+  const { isDarkMode, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isBugModalOpen, setIsBugModalOpen] = useState(false)
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false)
@@ -26,7 +28,7 @@ export default function Layout({ children, activeTab, onTabChange }) {
         alert('Agent Builder coming soon!')
         break
       case 'theme':
-        alert('Theme customization coming soon! The platform currently uses the signature dark theme.')
+        toggleTheme()
         break
       case 'bug':
         setIsBugModalOpen(true)
@@ -62,6 +64,7 @@ export default function Layout({ children, activeTab, onTabChange }) {
         onTabChange={onTabChange}
         onClose={handleClose}
         onAction={handleAction}
+        isDarkMode={isDarkMode}
       />
       
       <main className="app-content">
