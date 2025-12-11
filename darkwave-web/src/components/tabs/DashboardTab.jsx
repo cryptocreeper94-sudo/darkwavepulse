@@ -609,46 +609,48 @@ function ChartMetricsPanel({ coin }) {
       
       <div style={{ 
         marginTop: 'auto',
-        padding: '12px',
-        background: 'linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(255, 136, 0, 0.1) 100%)',
-        borderRadius: 10,
-        border: '1px solid rgba(255, 68, 68, 0.3)',
+        padding: '16px',
+        background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.12) 0%, rgba(57, 255, 20, 0.08) 100%)',
+        borderRadius: 12,
+        border: '1px solid rgba(0, 212, 255, 0.3)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{ 
-            width: 28, 
-            height: 28, 
-            background: 'linear-gradient(135deg, #ff4444, #ff8800)',
+            width: 42, 
+            height: 42, 
+            background: 'linear-gradient(135deg, #00D4FF, #39FF14)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 14,
+            fontSize: 20,
+            boxShadow: '0 0 20px rgba(0, 212, 255, 0.4)',
           }}>
             🎯
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>StrikeAgent</div>
-            <div style={{ fontSize: 9, color: '#888' }}>AI Predictive Trading</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>StrikeAgent</div>
+            <div style={{ fontSize: 11, color: '#00D4FF' }}>AI Predictive Trading</div>
           </div>
         </div>
-        <div style={{ fontSize: 9, color: '#aaa', lineHeight: 1.4, marginBottom: 8 }}>
-          Anti-MEV protection, safety checks, and AI-powered entry signals for new token launches.
+        <div style={{ fontSize: 11, color: '#aaa', lineHeight: 1.5, marginBottom: 12 }}>
+          Anti-MEV protection, real-time safety checks, and AI-powered entry signals for new token launches.
         </div>
         <button style={{
           width: '100%',
-          padding: '6px 12px',
-          fontSize: 10,
-          fontWeight: 600,
-          background: 'linear-gradient(135deg, #ff4444, #ff8800)',
+          padding: '10px 16px',
+          fontSize: 12,
+          fontWeight: 700,
+          background: 'linear-gradient(135deg, #00D4FF, #39FF14)',
           border: 'none',
-          borderRadius: 6,
-          color: '#fff',
+          borderRadius: 8,
+          color: '#000',
           cursor: 'pointer',
-          transition: 'opacity 0.2s',
+          transition: 'all 0.2s',
+          boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
         }}
-        onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-        onMouseLeave={(e) => e.target.style.opacity = '1'}
+        onMouseEnter={(e) => { e.target.style.transform = 'scale(1.02)'; e.target.style.boxShadow = '0 0 25px rgba(0, 212, 255, 0.5)' }}
+        onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.3)' }}
         >
           Learn More
         </button>
