@@ -26,8 +26,7 @@ export default function Layout({ children, activeTab, onTabChange }) {
         alert('Agent Builder coming soon!')
         break
       case 'theme':
-        console.log('Opening Theme Selector')
-        document.body.classList.toggle('theme-light')
+        alert('Theme customization coming soon! The platform currently uses the signature dark theme.')
         break
       case 'bug':
         setIsBugModalOpen(true)
