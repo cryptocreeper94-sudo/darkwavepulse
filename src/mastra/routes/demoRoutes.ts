@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_LI
 const PRICE_IDS = {
   base: process.env.BASE_PRICE_ID || process.env.STRIPE_BASE_MONTHLY_PRICE,
   annual: process.env.ANNUAL_SUBSCRIPTION_PRICE_ID || process.env.STRIPE_ANNUAL_PRICE,
+  legacyFounder: process.env.LEGACY_FOUNDER_6MONTH_PRICE_ID || process.env.STRIPE_LEGACY_FOUNDER_PRICE,
 };
 
 const demoSessions = new Map<string, DemoPortfolio>();
@@ -380,12 +381,18 @@ export const demoRoutes = [
         let priceId: string | undefined;
         let planType: string;
         
+        let isOneTime = false;
+        
         if (planId === 'rm_monthly') {
           priceId = PRICE_IDS.base;
           planType = 'base';
         } else if (planId === 'rm_annual') {
           priceId = PRICE_IDS.annual;
           planType = 'annual';
+        } else if (planId === 'legacy_founder') {
+          priceId = PRICE_IDS.legacyFounder;
+          planType = 'legacy_founder';
+          isOneTime = true;
         } else {
           return c.json({ success: false, error: 'Invalid plan' }, 400);
         }
@@ -401,14 +408,11 @@ export const demoRoutes = [
         
         const sessionConfig: Stripe.Checkout.SessionCreateParams = {
           payment_method_types: ['card'],
-          mode: 'subscription',
+          mode: isOneTime ? 'payment' : 'subscription',
           line_items: [{
             price: priceId,
             quantity: 1
           }],
-          subscription_data: {
-            trial_period_days: 3
-          },
           success_url: `${baseUrl}/app?tab=settings&payment=success&plan=${planType}&source=demo`,
           cancel_url: `${baseUrl}/demo?payment=cancelled`,
           metadata: {
@@ -417,6 +421,12 @@ export const demoRoutes = [
             source: 'strikeagent_demo'
           }
         };
+        
+        if (!isOneTime) {
+          sessionConfig.subscription_data = {
+            trial_period_days: 3
+          };
+        }
         
         if (email) {
           sessionConfig.customer_email = email;
