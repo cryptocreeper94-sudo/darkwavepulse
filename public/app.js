@@ -176,12 +176,35 @@ function showTruthSection(section) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 DarkWave Pulse initializing...');
   
+  // Check if this is StrikeAgent demo mode (bypass login for strikeagent.io or /demo path)
+  const isStrikeAgentDomain = window.location.hostname.includes('strikeagent');
+  const isDemoPath = window.location.pathname.startsWith('/demo');
+  const isDemoMode = isStrikeAgentDomain || isDemoPath;
+  
+  // Clear any stale demo session when NOT in demo mode (prevent demo session from persisting)
+  if (!isDemoMode) {
+    const existingUser = JSON.parse(localStorage.getItem('dwp_user') || '{}');
+    if (existingUser.isDemoMode || existingUser.accessLevel === 'demo') {
+      console.log('🧹 Clearing stale demo session');
+      localStorage.removeItem('dwp_user');
+      localStorage.removeItem('dwp_demo_mode');
+    }
+  }
+  
   // Check for valid session - redirect to lockscreen if not logged in
   const dwpUser = JSON.parse(localStorage.getItem('dwp_user') || '{}');
-  const hasValidSession = dwpUser.accessLevel || dwpUser.subscriptionTier || dwpUser.isWhitelisted;
+  const hasValidSession = dwpUser.accessLevel && dwpUser.accessLevel !== 'demo' || dwpUser.subscriptionTier || dwpUser.isWhitelisted;
   
-  // If no session at all, redirect to lockscreen (but not in development with localhost)
-  if (!hasValidSession && !window.location.hostname.includes('localhost')) {
+  // If demo mode, use session storage (not localStorage) for demo session - doesn't persist across tabs/sessions
+  if (isDemoMode) {
+    console.log('🎯 StrikeAgent Demo Mode - bypassing login');
+    // Store demo state in sessionStorage (clears when browser closes)
+    sessionStorage.setItem('dwp_demo_mode', 'true');
+    sessionStorage.setItem('dwp_demo_balance', '10000');
+  }
+  
+  // If no session at all, redirect to lockscreen (but not in development with localhost or demo mode)
+  if (!hasValidSession && !window.location.hostname.includes('localhost') && !isDemoMode) {
     console.log('🔒 No valid session found, redirecting to login...');
     window.location.href = '/lockscreen.html';
     return;
@@ -193,7 +216,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check for tab query parameter (admin/owner redirect to dev dashboard)
   const urlParams = new URLSearchParams(window.location.search);
   const requestedTab = urlParams.get('tab');
-  if (requestedTab) {
+  
+  // In demo mode, auto-switch to StrikeAgent tab
+  if (isDemoMode) {
+    console.log('🎯 Demo mode: Auto-switching to StrikeAgent tab');
+    setTimeout(() => {
+      if (typeof switchTab === 'function') {
+        switchTab('sniper');
+      }
+    }, 500);
+  } else if (requestedTab) {
     console.log('📍 Tab requested via URL:', requestedTab);
     // Wait for tabs to be initialized, then switch
     setTimeout(() => {

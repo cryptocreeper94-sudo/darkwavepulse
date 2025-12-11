@@ -27,12 +27,38 @@ import './styles/components.css'
 
 function App() {
   const isStrikeAgentDomain = window.location.hostname.includes('strikeagent')
-  const [activeTab, setActiveTab] = useState(isStrikeAgentDomain ? 'sniper' : 'dashboard')
-  const [userId, setUserId] = useState(null)
-  const [userConfig, setUserConfig] = useState(null)
+  const isDemoPath = window.location.pathname.startsWith('/demo')
+  const isDemoMode = isStrikeAgentDomain || isDemoPath
+  
+  const [activeTab, setActiveTab] = useState(isDemoMode ? 'sniper' : 'dashboard')
+  const [userId, setUserId] = useState(isDemoMode ? 'demo-user' : null)
+  const [userConfig, setUserConfig] = useState(isDemoMode ? { isDemoMode: true, demoBalance: 10000 } : null)
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
   
   useEffect(() => {
+    // Clear stale demo sessions when NOT in demo mode
+    if (!isDemoMode) {
+      const existingUser = localStorage.getItem('dwp_user')
+      if (existingUser) {
+        try {
+          const parsed = JSON.parse(existingUser)
+          if (parsed.isDemoMode || parsed.accessLevel === 'demo') {
+            console.log('🧹 Clearing stale demo session')
+            localStorage.removeItem('dwp_user')
+            localStorage.removeItem('dwp_demo_mode')
+          }
+        } catch (e) {}
+      }
+    }
+    
+    // Skip session fetch for demo mode - use sessionStorage (doesn't persist)
+    if (isDemoMode) {
+      console.log('🎯 StrikeAgent Demo Mode - bypassing login')
+      sessionStorage.setItem('dwp_demo_mode', 'true')
+      sessionStorage.setItem('dwp_demo_balance', '10000')
+      return
+    }
+    
     const fetchUserSession = async () => {
       try {
         const response = await fetch('/api/session')
@@ -55,7 +81,7 @@ function App() {
       }
     }
     fetchUserSession()
-  }, [])
+  }, [isDemoMode])
   
   const handleAnalyzeCoin = (coin) => {
     setSelectedCoinForAnalysis(coin)
