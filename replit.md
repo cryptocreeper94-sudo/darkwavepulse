@@ -144,19 +144,19 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 - `src/services/tradeLedgerService.ts` - Trade tracking and AI integration
 - `src/services/predictionLearningService.ts` - ML learning with drift detection
 
-### PHASE 5: STRIKEAGENT.IO DEMO EXPERIENCE (Current Focus)
+### PHASE 5: STRIKEAGENT.IO DEMO EXPERIENCE ✅ COMPLETE (Dec 11, 2024)
 **"Try before you buy - the conversion engine"**
 
 | Wave | Feature | Status |
 |------|---------|--------|
 | 5.1 | Standalone landing page (bypass Pulse login) | DONE ✅ |
 | 5.2 | Live market data feed with real prices | DONE ✅ |
-| 5.3 | AI coin discovery using safety engine | PENDING |
+| 5.3 | AI coin discovery using safety engine | DONE ✅ |
 | 5.4 | Paper trading with $10K demo balance | DONE ✅ |
-| 5.5 | Simulated buy/sell with live price tracking | PENDING |
-| 5.6 | Demo trade history + P&L dashboard | PENDING |
-| 5.7 | Email/Telegram capture for leads | PENDING |
-| 5.8 | Conversion CTA → Pulse subscription | PENDING |
+| 5.5 | Simulated buy/sell with live price tracking | DONE ✅ |
+| 5.6 | Demo trade history + P&L dashboard | DONE ✅ |
+| 5.7 | Email/Telegram capture for leads | DONE ✅ |
+| 5.8 | Conversion CTA → Pulse subscription | DONE ✅ |
 
 **Demo Mode Implementation (Dec 11, 2024):**
 - Demo accessed via `/demo` path or `strikeagent.io` domain
@@ -165,12 +165,20 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 - Shows $10,000 virtual balance with Demo Mode Active banner
 - Includes error boundary for graceful error handling
 - Multi-chain selector available (Solana, Ethereum, Base, Polygon, Arbitrum, BSC)
+- AI Token Discovery with safety scoring (A/B/C grades)
+- Live price polling every 10 seconds for open positions
+- Trade history with win rate, total P&L, best/worst trades
+- Lead capture form (email/Telegram) for early access signups
+- Upgrade CTA component for RM+ conversion
 
 **Key Files:**
 - `public/app.js` - Demo mode bypass logic (vanilla JS)
 - `darkwave-web/src/App.jsx` - Demo mode bypass logic (React) + SniperBotErrorBoundary
 - `src/services/demoTradeService.ts` - Paper trading logic
-- `src/mastra/routes/demoRoutes.ts` - Demo API endpoints
+- `src/mastra/routes/demoRoutes.ts` - Demo API endpoints (discover, buy, sell, portfolio, trades, capture-lead)
+- `darkwave-web/src/components/tabs/DemoTradeHistory.jsx` - Trade history UI
+- `darkwave-web/src/components/tabs/DemoLeadCapture.jsx` - Lead capture form
+- `darkwave-web/src/components/tabs/DemoUpgradeCTA.jsx` - Upgrade CTA component
 
 ---
 
