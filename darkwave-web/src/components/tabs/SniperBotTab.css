@@ -692,6 +692,23 @@
   color: #FFD700;
 }
 
+.sniper-btn-safety {
+  padding: 8px 12px;
+  font-size: 14px;
+  background: transparent;
+  color: #00D4FF;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sniper-btn-safety:hover {
+  border-color: #00D4FF;
+  background: rgba(0, 212, 255, 0.1);
+  transform: scale(1.05);
+}
+
 /* ============================================ */
 /* ACCORDION SETTINGS PANELS                    */
 /* ============================================ */

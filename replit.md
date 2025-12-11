@@ -69,3 +69,60 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 
 ### Supporting Libraries
 - `axios`, `zod`, React 19, Vite 7
+
+---
+
+## STRIKEAGENT ROADMAP (Dec 2024 → Feb 2026)
+
+### PHASE 1: SAFETY ENGINE MVP (Dec 10-20) ✅ COMPLETE
+"The product that makes us different"
+
+| Feature | Status |
+|---------|--------|
+| Anti-MEV (Jito Bundles) | DONE ✅ |
+| Mint Authority Check | DONE ✅ |
+| Freeze Authority Check | DONE ✅ |
+| Liquidity Lock/Burn Verify | DONE ✅ |
+| Honeypot Simulation | DONE ✅ |
+| Creator Wallet Scoring | DONE ✅ |
+| Token Age Filter | DONE ✅ |
+| Safety Report UI | DONE ✅ |
+| Safety Engine API Routes | DONE ✅ |
+
+**Key Files:**
+- `src/services/safetyEngineService.ts` - Full safety check engine
+- `src/services/jitoBundleService.ts` - Jito anti-MEV integration
+- `darkwave-web/src/components/trading/SafetyReport.jsx` - Safety report UI
+- `src/mastra/routes/sniperBotRoutes.ts` - API endpoints
+
+### PHASE 2: MULTI-CHAIN ARCHITECTURE (Jan → March)
+| Chain | Status |
+|-------|--------|
+| Solana | IN PROGRESS |
+| Ethereum | PENDING |
+| Base | PENDING |
+| Polygon | PENDING |
+| Arbitrum | PENDING |
+| BSC | PENDING |
+
+### PHASE 3: MULTI-CHAIN WALLET (Feb → April)
+| Feature | Status |
+|---------|--------|
+| Multi-chain support | IN PROGRESS |
+| One seed phrase | DONE ✅ |
+| In-app signing | DONE ✅ |
+| Portfolio dashboard | PENDING |
+
+### PHASE 4: ADAPTIVE AI (Parallel R&D)
+- Trade ledger, supervised learning, drift detection
+- Goal: AI that learns from every trade
+
+---
+
+## TIMELINE TO LAUNCH
+- Dec 10-20: Safety Engine ✅
+- Dec 20-Jan 10: StrikeAgent landing page + pricing
+- Jan 10-25: Stripe setup, trial system
+- Jan 25-Feb 1: Testing, whitelist validation
+- Feb 1-14: MARKETING PUSH
+- FEB 14: DWAV LAUNCH + STRIKEAGENT LIVE
