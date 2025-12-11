@@ -6,7 +6,7 @@ import DisclaimerModal from '../modals/DisclaimerModal'
 import AvatarCreator from '../ui/AvatarCreator'
 import { useTheme } from '../../context/ThemeContext'
 
-export default function Layout({ children, activeTab, onTabChange }) {
+export default function Layout({ children, activeTab, onTabChange, userTier }) {
   const { isDarkMode, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isBugModalOpen, setIsBugModalOpen] = useState(false)
@@ -65,6 +65,7 @@ export default function Layout({ children, activeTab, onTabChange }) {
         onClose={handleClose}
         onAction={handleAction}
         isDarkMode={isDarkMode}
+        userTier={userTier}
       />
       
       <main className="app-content">

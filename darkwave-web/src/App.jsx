@@ -20,6 +20,7 @@ import { AvatarProvider } from './context/AvatarContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { SkinsProvider } from './context/SkinsContext'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
 
@@ -93,21 +94,23 @@ function App() {
   
   return (
     <ThemeProvider>
-      <AvatarProvider>
-        <BuiltInWalletProvider>
-          <FavoritesProvider userId={userId}>
-            <GlossaryProvider>
-              <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-                <div style={{ padding: '0 12px' }}>
-                  {renderTab()}
-                </div>
-              </Layout>
-              <GlossaryPopup />
-              <CryptoCatPopup enabled={true} interval={90000} />
-            </GlossaryProvider>
-          </FavoritesProvider>
-        </BuiltInWalletProvider>
-      </AvatarProvider>
+      <SkinsProvider>
+        <AvatarProvider>
+          <BuiltInWalletProvider>
+            <FavoritesProvider userId={userId}>
+              <GlossaryProvider>
+                <Layout activeTab={activeTab} onTabChange={setActiveTab} userTier={userConfig?.subscriptionTier}>
+                  <div style={{ padding: '0 12px' }}>
+                    {renderTab()}
+                  </div>
+                </Layout>
+                <GlossaryPopup />
+                <CryptoCatPopup enabled={true} interval={90000} />
+              </GlossaryProvider>
+            </FavoritesProvider>
+          </BuiltInWalletProvider>
+        </AvatarProvider>
+      </SkinsProvider>
     </ThemeProvider>
   )
 }

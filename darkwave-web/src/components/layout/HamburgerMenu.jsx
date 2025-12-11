@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import SkinsSelector from './SkinsSelector';
+
 const menuItems = [
   { id: 'dashboard', icon: '🏠', label: 'My Dashboard' },
   { id: 'markets', icon: '📊', label: 'Markets' },
@@ -20,8 +23,10 @@ const getQuickActions = (isDarkMode) => [
   { id: 'logout', icon: '🚪', label: 'Logout', danger: true },
 ]
 
-export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose, onAction, isDarkMode = true }) {
+export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose, onAction, isDarkMode = true, userTier }) {
   const quickActions = getQuickActions(isDarkMode)
+  const [showSkins, setShowSkins] = useState(false)
+  
   return (
     <>
       <div 
@@ -59,6 +64,23 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
             ))}
           </div>
           
+          <div className="menu-section">
+            <div className="menu-section-title">Appearance</div>
+            <button
+              className="menu-item"
+              onClick={() => setShowSkins(!showSkins)}
+            >
+              <span className="menu-icon">🎨</span>
+              Skins
+              <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)' }}>
+                {showSkins ? '▲' : '▼'}
+              </span>
+            </button>
+            {showSkins && (
+              <SkinsSelector userTier={userTier} onClose={onClose} />
+            )}
+          </div>
+
           <div className="menu-section">
             <div className="menu-section-title">Quick Actions</div>
             {quickActions.map(item => (
