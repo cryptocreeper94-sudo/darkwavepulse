@@ -73,11 +73,14 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 
 ---
 
-## STRIKEAGENT ROADMAP (Dec 2024 → Feb 2026)
+## 🚀 MASTER ROADMAP (Dec 2024 → Feb 2026)
+**Target: DWAV Token Launch - February 14, 2026**
 
-### PHASE 1: SAFETY ENGINE MVP (Dec 10-20) ✅ COMPLETE
-"The product that makes us different"
+---
 
+## TRACK A: STRIKEAGENT CORE
+
+### PHASE 1: SAFETY ENGINE MVP ✅ COMPLETE (Dec 10-20)
 | Feature | Status |
 |---------|--------|
 | Anti-MEV (Jito Bundles) | DONE ✅ |
@@ -96,7 +99,7 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 - `darkwave-web/src/components/trading/SafetyReport.jsx` - Safety report UI
 - `src/mastra/routes/sniperBotRoutes.ts` - API endpoints
 
-### PHASE 2: MULTI-CHAIN ARCHITECTURE (Jan → March) ✅ COMPLETE
+### PHASE 2: MULTI-CHAIN ARCHITECTURE ✅ COMPLETE (Jan-March)
 | Chain | Status |
 |-------|--------|
 | Solana | DONE ✅ |
@@ -106,20 +109,19 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 | Arbitrum | PROVIDER READY ✅ |
 | BSC | PROVIDER READY ✅ |
 
-**Key Files (Phase 2):**
-- `src/services/multiChainProvider.ts` - Multi-chain provider abstraction (all 6 chains)
-- `src/services/evmSafetyEngine.ts` - EVM safety checks (ownership, honeypot, liquidity, contract verification)
+**Key Files:**
+- `src/services/multiChainProvider.ts` - Multi-chain provider abstraction
+- `src/services/evmSafetyEngine.ts` - EVM safety checks
 - `darkwave-web/src/components/tabs/SniperBotTab.jsx` - Chain selector UI
 
-### PHASE 3: MULTI-CHAIN WALLET (Feb → April)
+### PHASE 3: MULTI-CHAIN WALLET (In Progress)
 | Feature | Status |
 |---------|--------|
-| Multi-chain support | IN PROGRESS |
-| One seed phrase | DONE ✅ |
+| One seed phrase for all chains | DONE ✅ |
 | In-app signing | DONE ✅ |
 | Portfolio dashboard | PENDING |
 
-### PHASE 4: ADAPTIVE AI (Parallel R&D) ✅ COMPLETE
+### PHASE 4: ADAPTIVE AI ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
 | Trade Ledger | DONE ✅ |
@@ -129,37 +131,43 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 | Drift Detection | DONE ✅ |
 | Auto-Retraining | DONE ✅ |
 
-**Key Files (Phase 4):**
+**Key Files:**
 - `src/services/tradeLedgerService.ts` - Trade tracking and AI integration
 - `src/services/predictionLearningService.ts` - ML learning with drift detection
-- API routes: `/api/sniper/trades`, `/api/sniper/ai/retrain`, `/api/sniper/ai/drift`
+
+### PHASE 5: STRIKEAGENT.IO DEMO EXPERIENCE (Current Focus)
+**"Try before you buy - the conversion engine"**
+
+| Wave | Feature | Status |
+|------|---------|--------|
+| 5.1 | Standalone landing page (bypass Pulse login) | PENDING |
+| 5.2 | Live market data feed with real prices | PENDING |
+| 5.3 | AI coin discovery using safety engine | PENDING |
+| 5.4 | Paper trading with $10K demo balance | PENDING |
+| 5.5 | Simulated buy/sell with live price tracking | PENDING |
+| 5.6 | Demo trade history + P&L dashboard | PENDING |
+| 5.7 | Email/Telegram capture for leads | PENDING |
+| 5.8 | Conversion CTA → Pulse subscription | PENDING |
+
+**Key Files (to be created):**
+- `darkwave-web/src/pages/StrikeAgentDemo.jsx` - Demo landing page
+- `src/services/demoTradeService.ts` - Paper trading logic
+- `src/mastra/routes/demoRoutes.ts` - Demo API endpoints
 
 ---
 
-## TIMELINE TO LAUNCH
-- Dec 10-20: Safety Engine ✅
-- Dec 20-Jan 10: StrikeAgent landing page + pricing
-- Jan 10-25: Stripe setup, trial system
-- Jan 25-Feb 1: Testing, whitelist validation
-- Feb 1-14: MARKETING PUSH
-- FEB 14: DWAV LAUNCH + STRIKEAGENT LIVE
+## TRACK B: AI AGENT SYSTEM
 
----
+### WAVE 1: AGENT FOUNDATION ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Frameless 3D floating agent button | DONE ✅ |
+| Cyan glow effect at feet | DONE ✅ |
+| Gentle floating animation | DONE ✅ |
+| Agent appears on all pages | DONE ✅ |
 
-## AI AGENT SYSTEM ROADMAP (Dec 2024)
-
-### WAVE 1: AGENT FOUNDATION
-**"Make the floating button show YOUR agent"**
-- Floating AI Chat button displays user's selected agent (full-body Pixar-style)
-- rembg treatment for transparent backgrounds
-- Glow effect around the agent
-- Agent pop-up system with sweep-in animations from any direction
-- Comic-style speech bubbles for dialogue
-- 100+ random tips/quotes database
-- Appears ~2 times per page randomly
-
-### WAVE 2: AGENT DIVERSITY SYSTEM
-**"50+ diverse Pixar-style agents to choose from"**
+### WAVE 2: AGENT DIVERSITY SYSTEM (Pending)
+**"50+ diverse Pixar-style agents"**
 
 | Category | Options |
 |----------|---------|
@@ -168,33 +176,93 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 | Age | Young (20s), Middle (30-40s), Senior (50+) |
 | Hair | Black, Brown, Blonde, Red, Gray, White, Bald |
 | Facial Hair | Clean-shaven, Beard, Mustache, Goatee |
-| Style | All in sharp "Men in Black" suits - professional but fun |
+| Style | All in sharp "Men in Black" suits |
 
-- Full-body poses (standing, hands on hips, pointing, etc.)
-- Filter/search by category
-- Custom avatar upload option (uses rembg to remove background)
+| Feature | Status |
+|---------|--------|
+| Full-body MIB suit poses | PENDING |
+| Filter/search by category | PENDING |
+| Custom avatar upload (rembg treated) | PENDING |
 
-### WAVE 3: VOICE AI CONTROL FOR STRIKEAGENT
-**"Talk to your StrikeAgent - the killer differentiator"**
+### WAVE 3: VOICE AI CONTROL (Pending)
+**"Talk to your StrikeAgent"**
 
-1. User speaks command: "Buy ETH at $3,050, sell at $3,150"
-2. AI processes: Speech-to-text → Validates command → Checks market
-3. AI responds (voice): Confirms order with market context
-4. DOUBLE CONFIRMATION required before execution
-5. Voice matches agent gender (male/female based on avatar)
-6. Audit logging for all voice commands
-7. Worth +$5/month subscription increase
+| Feature | Status |
+|---------|--------|
+| Speech-to-text command input | PENDING |
+| AI validates command + checks market | PENDING |
+| Voice response (gender-matched) | PENDING |
+| Double confirmation before execution | PENDING |
+| Audit logging for voice commands | PENDING |
 
-### SUBSCRIPTION MODEL
-| Tier | Access | Trial? |
-|------|--------|--------|
-| Free | Dashboard, Markets, Basic Analysis | - |
-| 3-Day Trial | All predictive analysis tools | Auto-expires |
-| RM+ | Everything + StrikeAgent + Voice AI | - |
-| DWAV Holder | Staking features (when live) | - |
+---
 
-**Key Design Rules:**
+## TRACK C: MOBILE & UI
+
+### WAVE M1: MOBILE DASHBOARD REDESIGN ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| 2x3 filter button grid with blue gradient | DONE ✅ |
+| 3-card carousel (StrikeAgent, Market, Trending) | DONE ✅ |
+| News section at bottom with flashy gradient | DONE ✅ |
+| Proper CSS scoping for mobile-only styles | DONE ✅ |
+
+### WAVE M2: LIGHT MODE THEME ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Softer blue-tinted grays | DONE ✅ |
+| Enhanced contrast for readability | DONE ✅ |
+
+---
+
+## TRACK D: MONETIZATION & LAUNCH
+
+### PHASE M1: STRIPE INTEGRATION (Dec 20 - Jan 10)
+| Feature | Status |
+|---------|--------|
+| StrikeAgent pricing page | PENDING |
+| Stripe checkout integration | PENDING |
+| Subscription tiers setup | PENDING |
+| Trial system (3-day) | PENDING |
+
+### PHASE M2: MARKETING PREP (Jan 25 - Feb 14)
+| Feature | Status |
+|---------|--------|
+| StrikeAgent.io live with demo | PENDING |
+| Email capture funnel | PENDING |
+| Telegram community integration | PENDING |
+
+---
+
+## 📅 MASTER TIMELINE
+
+| Date Range | Focus |
+|------------|-------|
+| Dec 11-20 | StrikeAgent.io Demo MVP (Phase 5.1-5.5) |
+| Dec 20-Jan 10 | Stripe + Pricing + Landing Page |
+| Jan 10-25 | Agent Diversity (Wave 2) + Demo Polish |
+| Jan 25-Feb 1 | Testing + Whitelist Validation |
+| Feb 1-14 | MARKETING PUSH |
+| **Feb 14** | **🚀 DWAV LAUNCH + STRIKEAGENT LIVE** |
+
+---
+
+## SUBSCRIPTION MODEL
+
+| Tier | Access | Price |
+|------|--------|-------|
+| Free | Dashboard, Markets, Basic Analysis | $0 |
+| Demo | StrikeAgent paper trading (strikeagent.io) | $0 |
+| RM+ Monthly | Full Pulse + StrikeAgent Live | TBD |
+| RM+ Annual | Full access + discount | TBD |
+| DWAV Holder | Staking features (post-launch) | Token-gated |
+
+---
+
+## KEY DESIGN RULES
 - NO frames or boxes around agents
 - Agents appear like walking in front of a movie screen
 - Full-body, rembg-treated, Pixar/MIB style
 - Sweep-in animations from any angle/corner
+- NO orange, yellow, or brown colors anywhere
+- Solid black/dark gray backgrounds with glow effects
