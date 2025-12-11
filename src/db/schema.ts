@@ -803,3 +803,47 @@ export const limitOrders = pgTable('limit_orders', {
   filledEntryAt: timestamp('filled_entry_at'),
   filledExitAt: timestamp('filled_exit_at'),
 });
+
+// ============================================
+// MULTI-CHAIN STRIKEAGENT TRADES
+// Trade ledger for Adaptive AI learning across all chains
+// ============================================
+
+export const strikeAgentTrades = pgTable('strike_agent_trades', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  chain: varchar('chain', { length: 50 }).notNull(), // solana, ethereum, base, polygon, arbitrum, bsc
+  tokenAddress: varchar('token_address', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }).notNull(),
+  tokenName: varchar('token_name', { length: 255 }),
+  
+  tradeType: varchar('trade_type', { length: 20 }).notNull(), // buy, sell
+  source: varchar('source', { length: 50 }).notNull(), // strikeagent_auto, strikeagent_manual, limit_order, watchlist
+  
+  entryPrice: varchar('entry_price', { length: 50 }).notNull(),
+  exitPrice: varchar('exit_price', { length: 50 }),
+  amount: varchar('amount', { length: 50 }).notNull(),
+  amountUsd: varchar('amount_usd', { length: 50 }).notNull(),
+  
+  safetyScore: integer('safety_score'),
+  safetyGrade: varchar('safety_grade', { length: 5 }),
+  
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // pending, executed, partial, cancelled, failed
+  txHash: varchar('tx_hash', { length: 255 }),
+  gasFeeUsd: varchar('gas_fee_usd', { length: 50 }),
+  
+  entryTimestamp: timestamp('entry_timestamp').notNull(),
+  exitTimestamp: timestamp('exit_timestamp'),
+  
+  profitLoss: varchar('profit_loss', { length: 50 }),
+  profitLossPercent: varchar('profit_loss_percent', { length: 50 }),
+  isWin: boolean('is_win'),
+  
+  aiPrediction: text('ai_prediction'), // JSON: { signal, confidence, probability }
+  indicators: text('indicators'), // JSON: technical indicators at entry
+  notes: text('notes'),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
