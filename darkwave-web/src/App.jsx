@@ -11,7 +11,8 @@ import {
   DashboardTab,
   SniperBotTab,
   WalletTab,
-  PricingTab
+  PricingTab,
+  AnalysisTab
 } from './components/tabs'
 import { GlossaryPopup } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
@@ -26,6 +27,7 @@ function App() {
   const [activeTab, setActiveTab] = useState(isStrikeAgentDomain ? 'sniper' : 'dashboard')
   const [userId, setUserId] = useState(null)
   const [userConfig, setUserConfig] = useState(null)
+  const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
   
   useEffect(() => {
     const fetchUserSession = async () => {
@@ -52,10 +54,15 @@ function App() {
     fetchUserSession()
   }, [])
   
+  const handleAnalyzeCoin = (coin) => {
+    setSelectedCoinForAnalysis(coin)
+    setActiveTab('analysis')
+  }
+  
   const renderTab = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
       case 'markets':
         return <MarketsTab />
       case 'projects':
@@ -76,8 +83,10 @@ function App() {
         return <V2DetailsTab />
       case 'pricing':
         return <PricingTab userId={userId} currentTier={userConfig?.subscriptionTier} />
+      case 'analysis':
+        return <AnalysisTab coin={selectedCoinForAnalysis} onBack={() => setActiveTab('dashboard')} />
       default:
-        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
     }
   }
   

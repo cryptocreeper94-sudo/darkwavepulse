@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createChart, CandlestickSeries, AreaSeries, LineSeries } from 'lightweight-charts'
 import { createPortal } from 'react-dom'
 
 const TIMEFRAMES = [
+  { id: '1S', label: '1S', days: 0, isLive: true },
   { id: '1D', label: '1D', days: 1 },
   { id: '7D', label: '7D', days: 7 },
   { id: '30D', label: '30D', days: 30 },
@@ -100,11 +101,13 @@ function FullscreenPortal({ children, isOpen, onClose }) {
   )
 }
 
-export default function AnalysisChart({ coin, activeIndicators = {} }) {
+export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth = false }) {
   const chartContainerRef = useRef(null)
   const fullscreenChartRef = useRef(null)
   const chartRef = useRef(null)
+  const seriesRef = useRef(null)
   const fullscreenChartInstance = useRef(null)
+  const basePriceRef = useRef(null)
   
   const [chartType, setChartType] = useState('candlestick')
   const [timeframe, setTimeframe] = useState('7D')
@@ -118,11 +121,75 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
   const showSma = !!activeIndicators.sma
   const showEma = !!activeIndicators.ema
 
+  const fetchLivePrice = useCallback(async () => {
+    const symbol = coinSymbol?.toUpperCase() || 'BTC'
+    try {
+      const endpoint = symbol === 'BTC' ? '/api/crypto/btc-price' : `/api/crypto/coin-price?symbol=${symbol}`
+      const response = await fetch(endpoint)
+      if (response.ok) {
+        const priceData = await response.json()
+        const price = priceData?.price || priceData?.current_price
+        if (price) {
+          const now = Math.floor(Date.now() / 1000)
+          
+          setData(prev => {
+            const newPoint = {
+              time: now,
+              open: price,
+              high: price,
+              low: price,
+              close: price,
+            }
+            
+            if (prev.length === 0) {
+              basePriceRef.current = price
+              return [newPoint]
+            }
+            
+            const updated = [...prev]
+            const lastPoint = updated[updated.length - 1]
+            
+            if (now - lastPoint.time < 1) {
+              lastPoint.close = price
+              lastPoint.high = Math.max(lastPoint.high, price)
+              lastPoint.low = Math.min(lastPoint.low, price)
+            } else {
+              updated.push(newPoint)
+              if (updated.length > 120) updated.shift()
+            }
+            
+            return updated
+          })
+          
+          setPriceInfo(prev => {
+            const change = basePriceRef.current 
+              ? ((price - basePriceRef.current) / basePriceRef.current) * 100
+              : 0
+            return {
+              lastPrice: price,
+              priceChange: change.toFixed(2),
+            }
+          })
+        }
+      }
+    } catch (err) {
+      console.log('Live price fetch error')
+    }
+  }, [coinSymbol])
+
   useEffect(() => {
     let cancelled = false
+    const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+    
+    basePriceRef.current = null
+    
+    if (selectedTimeframe?.isLive) {
+      setData([])
+      setIsLoading(false)
+      return
+    }
     
     async function fetchData() {
-      const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
       const days = selectedTimeframe?.days === 'max' ? 1825 : (selectedTimeframe?.days || 7)
       const symbol = coinSymbol?.toUpperCase() || 'BTC'
       
@@ -134,6 +201,7 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
           const apiData = await response.json()
           if (apiData && apiData.length > 0) {
             setData(apiData)
+            if (apiData[0]) basePriceRef.current = apiData[0].open
             setIsLoading(false)
             return
           }
@@ -144,7 +212,9 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
       
       if (!cancelled) {
         const basePrice = parseFloat(coinPrice?.replace(/[$,]/g, '') || 100)
-        setData(generateSampleOHLC(days, basePrice))
+        const sampleData = generateSampleOHLC(days, basePrice)
+        setData(sampleData)
+        if (sampleData[0]) basePriceRef.current = sampleData[0].open
         setIsLoading(false)
       }
     }
@@ -153,6 +223,16 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
     
     return () => { cancelled = true }
   }, [timeframe, coinSymbol, coinPrice])
+
+  useEffect(() => {
+    const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+    
+    if (selectedTimeframe?.isLive) {
+      fetchLivePrice()
+      const liveInterval = setInterval(fetchLivePrice, 1000)
+      return () => clearInterval(liveInterval)
+    }
+  }, [timeframe, fetchLivePrice])
 
   useEffect(() => {
     if (data.length > 0) {
@@ -167,99 +247,141 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
   }, [data])
 
   useEffect(() => {
-    if (!chartContainerRef.current || data.length === 0) return
+    if (!chartContainerRef.current) return
 
-    if (chartRef.current) {
-      try { chartRef.current.remove() } catch (e) {}
-      chartRef.current = null
-    }
+    let chart = null
+    let isActive = true
 
-    const chart = createChart(chartContainerRef.current, {
-      layout: {
-        background: { type: 'solid', color: 'transparent' },
-        textColor: 'rgba(255, 255, 255, 0.7)',
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.06)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.06)' },
-      },
-      crosshair: {
-        mode: 1,
-        vertLine: { color: DEFAULT_COLORS.lineColor, width: 1, style: 2, labelBackgroundColor: DEFAULT_COLORS.lineColor },
-        horzLine: { color: DEFAULT_COLORS.lineColor, width: 1, style: 2, labelBackgroundColor: DEFAULT_COLORS.lineColor },
-      },
-      rightPriceScale: { borderColor: 'rgba(255, 255, 255, 0.1)', scaleMargins: { top: 0.1, bottom: 0.1 } },
-      timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true, secondsVisible: false },
-      handleScale: { mouseWheel: true, pinch: true },
-      handleScroll: { mouseWheel: true, pressedMouseMove: true, touch: true },
-    })
-
-    chartRef.current = chart
-
-    if (chartType === 'candlestick') {
-      const series = chart.addSeries(CandlestickSeries, {
-        upColor: DEFAULT_COLORS.upColor,
-        downColor: DEFAULT_COLORS.downColor,
-        borderUpColor: DEFAULT_COLORS.upColor,
-        borderDownColor: DEFAULT_COLORS.downColor,
-        wickUpColor: DEFAULT_COLORS.upColor,
-        wickDownColor: DEFAULT_COLORS.downColor,
-      })
-      series.setData(data)
-    } else {
-      const series = chart.addSeries(AreaSeries, {
-        lineColor: DEFAULT_COLORS.lineColor,
-        topColor: DEFAULT_COLORS.areaTopColor,
-        bottomColor: DEFAULT_COLORS.areaBottomColor,
-        lineWidth: 2,
-      })
-      series.setData(data.map(d => ({ time: d.time, value: d.close })))
-    }
-
-    if (showSma && data.length >= 20) {
-      const smaData = calculateSMA(data, 20)
-      const smaSeries = chart.addSeries(LineSeries, {
-        color: INDICATOR_COLORS.sma,
-        lineWidth: 1,
-        lineStyle: 0,
-        priceLineVisible: false,
-      })
-      smaSeries.setData(smaData)
-    }
-
-    if (showEma && data.length >= 12) {
-      const emaData = calculateEMA(data, 12)
-      const emaSeries = chart.addSeries(LineSeries, {
-        color: INDICATOR_COLORS.ema,
-        lineWidth: 1,
-        lineStyle: 0,
-        priceLineVisible: false,
-      })
-      emaSeries.setData(emaData)
-    }
-
-    chart.timeScale().fitContent()
-
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
-        try {
-          chart.applyOptions({
-            width: chartContainerRef.current.clientWidth,
-            height: chartContainerRef.current.clientHeight,
-          })
-        } catch (e) {}
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
+    try {
       if (chartRef.current) {
         try { chartRef.current.remove() } catch (e) {}
         chartRef.current = null
+        seriesRef.current = null
       }
+
+      chart = createChart(chartContainerRef.current, {
+        layout: {
+          background: { type: 'solid', color: 'transparent' },
+          textColor: 'rgba(255, 255, 255, 0.7)',
+        },
+        grid: {
+          vertLines: { color: 'rgba(255, 255, 255, 0.06)' },
+          horzLines: { color: 'rgba(255, 255, 255, 0.06)' },
+        },
+        crosshair: {
+          mode: 1,
+          vertLine: { color: DEFAULT_COLORS.lineColor, width: 1, style: 2, labelBackgroundColor: DEFAULT_COLORS.lineColor },
+          horzLine: { color: DEFAULT_COLORS.lineColor, width: 1, style: 2, labelBackgroundColor: DEFAULT_COLORS.lineColor },
+        },
+        rightPriceScale: { borderColor: 'rgba(255, 255, 255, 0.1)', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true, secondsVisible: true },
+        handleScale: { mouseWheel: true, pinch: true },
+        handleScroll: { mouseWheel: true, pressedMouseMove: true, touch: true },
+      })
+
+      if (!isActive) {
+        chart.remove()
+        return
+      }
+
+      chartRef.current = chart
+
+      let series
+      if (chartType === 'candlestick') {
+        series = chart.addSeries(CandlestickSeries, {
+          upColor: DEFAULT_COLORS.upColor,
+          downColor: DEFAULT_COLORS.downColor,
+          borderUpColor: DEFAULT_COLORS.upColor,
+          borderDownColor: DEFAULT_COLORS.downColor,
+          wickUpColor: DEFAULT_COLORS.upColor,
+          wickDownColor: DEFAULT_COLORS.downColor,
+        })
+      } else {
+        series = chart.addSeries(AreaSeries, {
+          lineColor: DEFAULT_COLORS.lineColor,
+          topColor: DEFAULT_COLORS.areaTopColor,
+          bottomColor: DEFAULT_COLORS.areaBottomColor,
+          lineWidth: 2,
+        })
+      }
+
+      seriesRef.current = series
+
+      const handleResize = () => {
+        if (chartContainerRef.current && chartRef.current) {
+          try {
+            chart.applyOptions({
+              width: chartContainerRef.current.clientWidth,
+              height: chartContainerRef.current.clientHeight,
+            })
+          } catch (e) {}
+        }
+      }
+
+      window.addEventListener('resize', handleResize)
+      handleResize()
+
+      const delayedResize = setTimeout(() => {
+        handleResize()
+        if (chartRef.current) {
+          chartRef.current.timeScale().fitContent()
+        }
+      }, 100)
+
+      return () => {
+        clearTimeout(delayedResize)
+        isActive = false
+        window.removeEventListener('resize', handleResize)
+        if (chart) {
+          try { chart.remove() } catch (e) {}
+        }
+        chartRef.current = null
+        seriesRef.current = null
+      }
+    } catch (err) {
+      console.log('Chart initialization error:', err)
+    }
+  }, [chartType])
+
+  useEffect(() => {
+    if (!seriesRef.current || !chartRef.current) return
+
+    try {
+      if (data.length > 0) {
+        if (chartType === 'candlestick') {
+          seriesRef.current.setData(data)
+        } else {
+          seriesRef.current.setData(data.map(d => ({ time: d.time, value: d.close })))
+        }
+      }
+
+      if (showSma && data.length >= 20 && chartRef.current) {
+        const smaData = calculateSMA(data, 20)
+        const smaSeries = chartRef.current.addSeries(LineSeries, {
+          color: INDICATOR_COLORS.sma,
+          lineWidth: 1,
+          lineStyle: 0,
+          priceLineVisible: false,
+        })
+        smaSeries.setData(smaData)
+      }
+
+      if (showEma && data.length >= 12 && chartRef.current) {
+        const emaData = calculateEMA(data, 12)
+        const emaSeries = chartRef.current.addSeries(LineSeries, {
+          color: INDICATOR_COLORS.ema,
+          lineWidth: 1,
+          lineStyle: 0,
+          priceLineVisible: false,
+        })
+        emaSeries.setData(emaData)
+      }
+
+      if (chartRef.current) {
+        chartRef.current.timeScale().fitContent()
+      }
+    } catch (err) {
+      console.log('Chart data update error:', err)
     }
   }, [data, chartType, showSma, showEma])
 
@@ -286,7 +408,7 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
           horzLine: { color: DEFAULT_COLORS.lineColor, width: 1, style: 2, labelBackgroundColor: DEFAULT_COLORS.lineColor },
         },
         rightPriceScale: { borderColor: 'rgba(255, 255, 255, 0.1)', scaleMargins: { top: 0.1, bottom: 0.1 } },
-        timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true, secondsVisible: false },
+        timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true, secondsVisible: true },
         handleScale: { mouseWheel: true, pinch: true },
         handleScroll: { mouseWheel: true, pressedMouseMove: true, touch: true },
       })
@@ -354,6 +476,8 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
 
   const symbol = coinSymbol?.toUpperCase() || 'BTC'
   const { lastPrice, priceChange } = priceInfo
+  const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+  const isLive = selectedTimeframe?.isLive
 
   const renderIndicatorLegend = () => {
     const active = []
@@ -374,12 +498,20 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
     )
   }
 
+  const chartHeight = fullWidth ? '320px' : '220px'
+
   return (
     <>
       <div style={styles.container}>
         <div style={styles.chartHeader}>
           <div style={styles.chartTitle}>
             <span style={styles.symbol}>{symbol}/USD</span>
+            {isLive && (
+              <span style={styles.liveBadge}>
+                <span style={styles.liveDot} />
+                LIVE
+              </span>
+            )}
             {lastPrice && (
               <span style={styles.priceInfo}>
                 <span style={styles.currentPrice}>${lastPrice.toLocaleString()}</span>
@@ -402,7 +534,17 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
             </div>
             <div style={styles.timeframeButtons}>
               {TIMEFRAMES.map(tf => (
-                <button key={tf.id} style={{ ...styles.tfBtn, ...(timeframe === tf.id ? styles.tfBtnActive : {}) }} onClick={() => setTimeframe(tf.id)}>{tf.label}</button>
+                <button 
+                  key={tf.id} 
+                  style={{ 
+                    ...styles.tfBtn, 
+                    ...(timeframe === tf.id ? styles.tfBtnActive : {}),
+                    ...(tf.isLive ? styles.tfBtnLive : {}),
+                  }} 
+                  onClick={() => setTimeframe(tf.id)}
+                >
+                  {tf.label}
+                </button>
               ))}
             </div>
             <button style={styles.actionBtn} onClick={() => setIsFullscreen(true)} title="Fullscreen">⛶</button>
@@ -411,11 +553,17 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
 
         {renderIndicatorLegend()}
 
-        <div style={styles.chartWrapper} ref={chartContainerRef}>
-          {isLoading && (
+        <div style={{ ...styles.chartWrapper, height: chartHeight }} ref={chartContainerRef}>
+          {isLoading && !isLive && (
             <div style={styles.loading}>
               <div style={styles.spinner} />
               <span>Loading chart...</span>
+            </div>
+          )}
+          {isLive && data.length === 0 && (
+            <div style={styles.loading}>
+              <div style={styles.spinner} />
+              <span>Connecting to live feed...</span>
             </div>
           )}
         </div>
@@ -425,6 +573,12 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
         <div style={styles.fullscreenHeader}>
           <div style={styles.chartTitle}>
             <span style={styles.symbol}>{symbol}/USD</span>
+            {isLive && (
+              <span style={styles.liveBadge}>
+                <span style={styles.liveDot} />
+                LIVE
+              </span>
+            )}
             {lastPrice && (
               <span style={styles.priceInfo}>
                 <span style={styles.currentPrice}>${lastPrice.toLocaleString()}</span>
@@ -438,7 +592,17 @@ export default function AnalysisChart({ coin, activeIndicators = {} }) {
             </div>
             <div style={styles.timeframeButtons}>
               {TIMEFRAMES.map(tf => (
-                <button key={tf.id} style={{ ...styles.tfBtn, ...(timeframe === tf.id ? styles.tfBtnActive : {}) }} onClick={() => setTimeframe(tf.id)}>{tf.label}</button>
+                <button 
+                  key={tf.id} 
+                  style={{ 
+                    ...styles.tfBtn, 
+                    ...(timeframe === tf.id ? styles.tfBtnActive : {}),
+                    ...(tf.isLive ? styles.tfBtnLive : {}),
+                  }} 
+                  onClick={() => setTimeframe(tf.id)}
+                >
+                  {tf.label}
+                </button>
               ))}
             </div>
           </div>
@@ -476,6 +640,26 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
     color: '#fff',
+  },
+  liveBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    background: 'rgba(57, 255, 20, 0.15)',
+    color: '#39FF14',
+    fontSize: '10px',
+    fontWeight: '700',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  },
+  liveDot: {
+    width: '6px',
+    height: '6px',
+    background: '#39FF14',
+    borderRadius: '50%',
+    animation: 'pulse 1.5s infinite',
   },
   priceInfo: {
     display: 'flex',
@@ -540,6 +724,9 @@ const styles = {
     background: 'rgba(0, 212, 255, 0.2)',
     color: '#00D4FF',
     boxShadow: '0 0 8px rgba(0, 212, 255, 0.3)',
+  },
+  tfBtnLive: {
+    color: 'rgba(57, 255, 20, 0.8)',
   },
   actionBtn: {
     width: '32px',
@@ -653,7 +840,10 @@ const styles = {
 }
 
 const styleSheet = document.createElement('style')
-styleSheet.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`
+styleSheet.textContent = `
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+`
 if (!document.querySelector('[data-analysis-chart-styles]')) {
   styleSheet.setAttribute('data-analysis-chart-styles', 'true')
   document.head.appendChild(styleSheet)
