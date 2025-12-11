@@ -3,6 +3,9 @@ import { tokenScannerService } from '../../services/tokenScannerService';
 import { tradeExecutorService } from '../../services/tradeExecutorService';
 import { rpcService } from '../../services/rpcService';
 import { safetyEngineService, DEFAULT_SAFETY_CONFIG } from '../../services/safetyEngineService';
+import { multiChainProvider, CHAIN_CONFIGS, ChainId } from '../../services/multiChainProvider';
+import { evmSafetyEngine, DEFAULT_EVM_SAFETY_CONFIG } from '../../services/evmSafetyEngine';
+import { tradeLedgerService } from '../../services/tradeLedgerService';
 
 export const sniperBotRoutes = [
   // ============================================
@@ -755,6 +758,242 @@ export const sniperBotRoutes = [
     method: "GET",
     createHandler: async () => async (c: any) => {
       return c.json({ defaultConfig: DEFAULT_SAFETY_CONFIG });
+    }
+  },
+
+  // ============================================
+  // MULTI-CHAIN SUPPORT
+  // ============================================
+  {
+    path: "/api/sniper/chains",
+    method: "GET",
+    createHandler: async () => async (c: any) => {
+      const chains = Object.entries(CHAIN_CONFIGS).map(([id, config]) => ({
+        id,
+        name: config.name,
+        symbol: config.symbol,
+        isEvm: config.isEvm,
+        explorerUrl: config.explorerUrl,
+      }));
+      return c.json({ chains });
+    }
+  },
+  {
+    path: "/api/sniper/multichain/token",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const chain = c.req.query('chain') as ChainId;
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!chain || !tokenAddress) {
+          return c.json({ error: 'chain and tokenAddress are required' }, 400);
+        }
+        
+        const tokenInfo = await multiChainProvider.getTokenInfo(chain, tokenAddress);
+        return c.json({ token: tokenInfo });
+      } catch (error: any) {
+        logger?.error('❌ [MultiChain] Token info error', { error: error.message });
+        return c.json({ error: 'Failed to get token info' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/multichain/discover",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const chain = c.req.query('chain') as ChainId || 'solana';
+        const maxAge = parseInt(c.req.query('maxAge') || '60');
+        
+        const tokens = await multiChainProvider.discoverNewTokens(chain, maxAge);
+        return c.json({ chain, tokens });
+      } catch (error: any) {
+        logger?.error('❌ [MultiChain] Discovery error', { error: error.message });
+        return c.json({ error: 'Failed to discover tokens' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/multichain/safety",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const chain = c.req.query('chain') as ChainId;
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!chain || !tokenAddress) {
+          return c.json({ error: 'chain and tokenAddress are required' }, 400);
+        }
+        
+        const chainConfig = CHAIN_CONFIGS[chain];
+        
+        if (chainConfig.isEvm) {
+          const report = await evmSafetyEngine.runFullSafetyCheck(chain, tokenAddress);
+          return c.json({ chain, report });
+        } else {
+          const report = await safetyEngineService.runFullSafetyCheck(tokenAddress);
+          return c.json({ chain, report });
+        }
+      } catch (error: any) {
+        logger?.error('❌ [MultiChain] Safety check error', { error: error.message });
+        return c.json({ error: 'Failed to run safety check' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/multichain/quick-safety",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const chain = c.req.query('chain') as ChainId;
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!chain || !tokenAddress) {
+          return c.json({ error: 'chain and tokenAddress are required' }, 400);
+        }
+        
+        const chainConfig = CHAIN_CONFIGS[chain];
+        
+        if (chainConfig.isEvm) {
+          const result = await evmSafetyEngine.quickSafetyCheck(chain, tokenAddress);
+          return c.json({ chain, tokenAddress, ...result });
+        } else {
+          const report = await safetyEngineService.runFullSafetyCheck(tokenAddress);
+          return c.json({ 
+            chain, 
+            tokenAddress, 
+            safe: report.passesAllChecks,
+            score: report.safetyScore,
+            criticalIssues: report.risks
+          });
+        }
+      } catch (error: any) {
+        logger?.error('❌ [MultiChain] Quick safety check error', { error: error.message });
+        return c.json({ error: 'Failed to run quick safety check' }, 500);
+      }
+    }
+  },
+
+  // ============================================
+  // TRADE LEDGER & ANALYTICS
+  // ============================================
+  {
+    path: "/api/sniper/trades",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const userId = c.req.query('userId');
+        const limit = parseInt(c.req.query('limit') || '50');
+        
+        if (!userId) {
+          return c.json({ error: 'userId is required' }, 400);
+        }
+        
+        const trades = await tradeLedgerService.getUserTrades(userId, limit);
+        return c.json({ trades });
+      } catch (error: any) {
+        logger?.error('❌ [TradeLedger] Error fetching trades', { error: error.message });
+        return c.json({ error: 'Failed to fetch trades' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/trades/stats",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const userId = c.req.query('userId');
+        const days = parseInt(c.req.query('days') || '30');
+        
+        if (!userId) {
+          return c.json({ error: 'userId is required' }, 400);
+        }
+        
+        const stats = await tradeLedgerService.getTradeStats(userId, days);
+        return c.json({ stats });
+      } catch (error: any) {
+        logger?.error('❌ [TradeLedger] Error fetching stats', { error: error.message });
+        return c.json({ error: 'Failed to fetch stats' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/trades",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const trade = await c.req.json();
+        
+        if (!trade.userId || !trade.chain || !trade.tokenAddress) {
+          return c.json({ error: 'userId, chain, and tokenAddress are required' }, 400);
+        }
+        
+        const tradeId = await tradeLedgerService.recordTrade({
+          ...trade,
+          entryTimestamp: new Date(),
+          status: 'pending',
+        });
+        
+        logger?.info('✅ [TradeLedger] Trade recorded', { tradeId });
+        return c.json({ success: true, tradeId });
+      } catch (error: any) {
+        logger?.error('❌ [TradeLedger] Error recording trade', { error: error.message });
+        return c.json({ error: 'Failed to record trade' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/trades/outcome",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const outcome = await c.req.json();
+        
+        if (!outcome.tradeId || outcome.exitPrice === undefined) {
+          return c.json({ error: 'tradeId and exitPrice are required' }, 400);
+        }
+        
+        await tradeLedgerService.recordTradeOutcome({
+          ...outcome,
+          exitTimestamp: new Date(),
+        });
+        
+        logger?.info('✅ [TradeLedger] Trade outcome recorded', { tradeId: outcome.tradeId });
+        return c.json({ success: true });
+      } catch (error: any) {
+        logger?.error('❌ [TradeLedger] Error recording outcome', { error: error.message });
+        return c.json({ error: 'Failed to record outcome' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/ai/retrain",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const result = await tradeLedgerService.triggerModelRetraining();
+        
+        if (result.success) {
+          logger?.info('✅ [AdaptiveAI] Model retraining completed', result.results);
+        } else {
+          logger?.warn('⚠️ [AdaptiveAI] Model retraining failed', { message: result.message });
+        }
+        
+        return c.json(result);
+      } catch (error: any) {
+        logger?.error('❌ [AdaptiveAI] Retraining error', { error: error.message });
+        return c.json({ error: 'Failed to retrain model' }, 500);
+      }
     }
   },
 ];
