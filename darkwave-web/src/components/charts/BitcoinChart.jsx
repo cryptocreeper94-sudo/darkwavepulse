@@ -74,6 +74,8 @@ export default function BitcoinChart() {
   const [priceChange, setPriceChange] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState([])
+  const [viewMode, setViewMode] = useState('price') // 'price' or 'volume'
+  const [dataScope, setDataScope] = useState('bitcoin') // 'bitcoin' or 'macro'
 
   const fetchLivePrice = useCallback(async () => {
     try {
@@ -363,18 +365,52 @@ export default function BitcoinChart() {
         <div className="chart-controls">
           <div className="chart-type-toggle">
             <button
+              className={`toggle-btn ${viewMode === 'price' ? 'active' : ''}`}
+              onClick={() => setViewMode('price')}
+              title="Price"
+            >
+              💲
+            </button>
+            <button
+              className={`toggle-btn ${viewMode === 'volume' ? 'active' : ''}`}
+              onClick={() => setViewMode('volume')}
+              title="Volume"
+            >
+              📊
+            </button>
+          </div>
+
+          <div className="chart-type-toggle">
+            <button
+              className={`toggle-btn ${dataScope === 'bitcoin' ? 'active' : ''}`}
+              onClick={() => setDataScope('bitcoin')}
+              title="Bitcoin"
+            >
+              ₿
+            </button>
+            <button
+              className={`toggle-btn ${dataScope === 'macro' ? 'active' : ''}`}
+              onClick={() => setDataScope('macro')}
+              title="Macro Market"
+            >
+              🌐
+            </button>
+          </div>
+
+          <div className="chart-type-toggle">
+            <button
               className={`toggle-btn ${chartType === 'candlestick' ? 'active' : ''}`}
               onClick={() => setChartType('candlestick')}
               title="Candlestick"
             >
-              📊
+              📈
             </button>
             <button
               className={`toggle-btn ${chartType === 'area' ? 'active' : ''}`}
               onClick={() => setChartType('area')}
               title="Area/Sparkline"
             >
-              📈
+              〰️
             </button>
           </div>
 
