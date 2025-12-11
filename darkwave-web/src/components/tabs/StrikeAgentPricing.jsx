@@ -54,6 +54,25 @@ const PLANS = [
     cta: 'Start Free Trial',
     popular: false,
     action: 'subscribe_annual'
+  },
+  {
+    id: 'legacy_founder',
+    name: 'Legacy Founder',
+    badge: 'LIMITED TIME',
+    price: '$24',
+    period: 'one-time',
+    savings: '6 months + 35K DWAV tokens',
+    description: 'Early supporter exclusive offer',
+    features: [
+      '6 months full access',
+      '35,000 DWAV tokens',
+      'Founder badge',
+      'No recurring billing',
+      'Launch celebration access'
+    ],
+    cta: 'Claim Founder Access',
+    popular: false,
+    action: 'subscribe_founder'
   }
 ]
 
