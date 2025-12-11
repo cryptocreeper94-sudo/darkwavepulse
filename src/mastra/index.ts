@@ -643,6 +643,19 @@ export const mastra = new Mastra({
           return c.json({ valid: false, message: 'No server session' });
         }
       },
+      // Session check endpoint (called by frontend App.jsx)
+      {
+        path: "/api/session",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          logger?.info('🔍 [Session] Session check request');
+          
+          // Return empty session - frontend uses localStorage for auth
+          // This endpoint exists to prevent 404 errors
+          return c.json({ user: null, message: 'No active session' });
+        }
+      },
       // Serve frontend HTML at root
       {
         path: "/",
