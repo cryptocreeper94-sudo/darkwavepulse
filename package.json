@@ -37,6 +37,7 @@
     "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
     "@trustwallet/wallet-core": "^4.4.4",
+    "@types/jest": "^30.0.0",
     "@types/pg": "^8.15.5",
     "ai": "^4.3.16",
     "axios": "^1.13.2",
@@ -51,6 +52,7 @@
     "helius-sdk": "^2.0.2",
     "inngest": "^3.40.2",
     "inngest-cli": "^1.11.5",
+    "jest": "^30.2.0",
     "jito-ts": "^4.2.1",
     "lightweight-charts": "^5.0.9",
     "openai": "^6.8.1",
@@ -58,6 +60,7 @@
     "pino": "^9.9.4",
     "stripe": "^19.3.0",
     "technicalindicators": "^3.1.0",
+    "ts-jest": "^29.4.6",
     "tsx": "^4.20.3",
     "zod": "^3.25.76"
   },

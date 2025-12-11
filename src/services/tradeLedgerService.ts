@@ -252,7 +252,35 @@ class TradeLedgerService {
         ORDER BY entry_timestamp DESC
         LIMIT ${limit}
       `);
-      return (result.rows || []) as unknown as Trade[];
+      return (result.rows || []).map((row: any) => ({
+        id: row.id,
+        userId: row.user_id,
+        chain: row.chain,
+        tokenAddress: row.token_address,
+        tokenSymbol: row.token_symbol,
+        tokenName: row.token_name,
+        tradeType: row.trade_type,
+        source: row.source,
+        entryPrice: row.entry_price ? parseFloat(row.entry_price) : 0,
+        exitPrice: row.exit_price ? parseFloat(row.exit_price) : undefined,
+        amount: row.amount ? parseFloat(row.amount) : 0,
+        amountUsd: row.amount_usd ? parseFloat(row.amount_usd) : 0,
+        safetyScore: row.safety_score,
+        safetyGrade: row.safety_grade,
+        status: row.status,
+        txHash: row.tx_hash,
+        gasFeeUsd: row.gas_fee_usd ? parseFloat(row.gas_fee_usd) : undefined,
+        entryTimestamp: new Date(row.entry_timestamp),
+        exitTimestamp: row.exit_timestamp ? new Date(row.exit_timestamp) : undefined,
+        profitLoss: row.profit_loss ? parseFloat(row.profit_loss) : undefined,
+        profitLossPercent: row.profit_loss_percent ? parseFloat(row.profit_loss_percent) : undefined,
+        isWin: row.is_win,
+        predictionId: row.prediction_id,
+        horizon: row.horizon,
+        aiPrediction: row.ai_prediction ? JSON.parse(row.ai_prediction) : undefined,
+        indicators: row.indicators ? JSON.parse(row.indicators) : undefined,
+        notes: row.notes,
+      })) as Trade[];
     } catch (error) {
       return Array.from(this.trades.values())
         .filter(t => t.userId === userId)
