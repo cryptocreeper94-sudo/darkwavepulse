@@ -140,7 +140,7 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 
 | Wave | Feature | Status |
 |------|---------|--------|
-| 5.1 | Standalone landing page (bypass Pulse login) | PENDING |
+| 5.1 | Standalone landing page (bypass Pulse login) | DONE ✅ |
 | 5.2 | Live market data feed with real prices | PENDING |
 | 5.3 | AI coin discovery using safety engine | PENDING |
 | 5.4 | Paper trading with $10K demo balance | PENDING |
@@ -149,10 +149,11 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 | 5.7 | Email/Telegram capture for leads | PENDING |
 | 5.8 | Conversion CTA → Pulse subscription | PENDING |
 
-**Key Files (to be created):**
-- `darkwave-web/src/pages/StrikeAgentDemo.jsx` - Demo landing page
-- `src/services/demoTradeService.ts` - Paper trading logic
-- `src/mastra/routes/demoRoutes.ts` - Demo API endpoints
+**Key Files:**
+- `public/app.js` - Demo mode bypass logic (vanilla JS)
+- `darkwave-web/src/App.jsx` - Demo mode bypass logic (React)
+- `src/services/demoTradeService.ts` - Paper trading logic (to be created)
+- `src/mastra/routes/demoRoutes.ts` - Demo API endpoints (to be created)
 
 ---
 
