@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo } from 'react'
-import { AvatarPreview, defaultAvatar, avatarOptions } from '../components/ui/AvatarCreator'
+import { AvatarPreview, defaultAvatar, avatarOptions, buildDicebearUrl } from '../components/ui/AvatarCreator'
 
 const STORAGE_KEY = 'pulse-user-avatar'
 const MODE_KEY = 'pulse-avatar-mode'
@@ -10,7 +10,11 @@ export function AvatarProvider({ children }) {
   const [avatar, setAvatar] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      return saved ? JSON.parse(saved) : defaultAvatar
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return { ...defaultAvatar, ...parsed }
+      }
+      return defaultAvatar
     } catch {
       return defaultAvatar
     }
@@ -71,42 +75,39 @@ export function AvatarProvider({ children }) {
   
   const getAvatarPreview = useCallback((size = 200) => {
     return (
-      <div style={{ width: size, height: size * 1.3 }}>
-        <AvatarPreview avatar={avatar} />
+      <div style={{ width: size, height: size }}>
+        <AvatarPreview avatar={avatar} size={size} />
       </div>
     )
   }, [avatar])
   
   const AvatarComponent = useMemo(() => {
     return function Avatar({ size = 40, showName = false }) {
-      const skin = avatarOptions.skinTone.find(s => s.id === avatar.skinTone) || avatarOptions.skinTone[3]
-      const hair = avatarOptions.hairColor.find(h => h.id === avatar.hairColor) || avatarOptions.hairColor[0]
-      const bg = avatarOptions.background.find(b => b.id === avatar.background) || avatarOptions.background[0]
-      const eyeColorOpt = avatarOptions.eyeColor.find(e => e.id === avatar.eyeColor) || avatarOptions.eyeColor[0]
+      const bgOpt = avatarOptions.background.find(b => b.id === avatar.background) || avatarOptions.background[0]
+      const avatarUrl = buildDicebearUrl(avatar, size)
       
       return (
         <div style={{
           width: size,
           height: size,
           borderRadius: '50%',
-          background: bg.color,
+          background: bgOpt.color,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          position: 'relative'
         }}>
-          <svg viewBox="20 15 60 60" style={{ width: '90%', height: '90%' }}>
-            <ellipse cx="50" cy="45" rx="22" ry="24" fill={skin.color} />
-            <ellipse cx="42" cy="42" rx="3" ry="2.5" fill={eyeColorOpt.color} />
-            <ellipse cx="58" cy="42" rx="3" ry="2.5" fill={eyeColorOpt.color} />
-            <ellipse cx="42" cy="42" rx="1.5" ry="1.5" fill="#1a1a1a" />
-            <ellipse cx="58" cy="42" rx="1.5" ry="1.5" fill="#1a1a1a" />
-            <path d="M45 55 Q50 58 55 55" stroke="#c0392b" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            {avatar.hairStyle !== 'bald' && avatar.hairStyle !== 'buzzcut' && (
-              <path d="M28 35 Q50 15 72 35 Q70 25 50 22 Q30 25 28 35" fill={hair.color} />
-            )}
-          </svg>
+          <img 
+            src={avatarUrl}
+            alt={avatar.name || 'Avatar'}
+            style={{
+              width: '90%',
+              height: '90%',
+              objectFit: 'contain'
+            }}
+          />
           {showName && (
             <div style={{
               position: 'absolute',
@@ -147,7 +148,8 @@ export function AvatarProvider({ children }) {
     AvatarComponent,
     resetAvatar,
     avatarOptions,
-    defaultAvatar
+    defaultAvatar,
+    buildDicebearUrl
   }), [avatar, mode, updateAvatar, updateAvatarField, toggleMode, setAvatarMode, getAvatarPreview, AvatarComponent, resetAvatar])
   
   return (

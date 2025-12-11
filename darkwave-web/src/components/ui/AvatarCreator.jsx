@@ -112,15 +112,23 @@ const avatarOptions = {
     { id: 'rings', label: 'Rings', icon: '💍' },
   ],
   background: [
-    { id: 'dark', label: 'Dark', color: 'linear-gradient(135deg, #0f0f0f, #1a1a1a)' },
-    { id: 'space', label: 'Space', color: 'linear-gradient(135deg, #0B0C10, #1a1a3a)' },
-    { id: 'ocean', label: 'Ocean', color: 'linear-gradient(180deg, #0d1b2a, #0a3d5c)' },
-    { id: 'forest', label: 'Forest', color: 'linear-gradient(135deg, #0f1419, #1a4d2e)' },
-    { id: 'sunset', label: 'Sunset', color: 'linear-gradient(180deg, #6BA3FF, #2A2416)' },
-    { id: 'neon', label: 'Neon', color: 'linear-gradient(135deg, #9D4EDD, #00D4FF)' },
-    { id: 'crypto', label: 'Crypto', color: 'linear-gradient(135deg, #f39c12, #9b59b6)' },
+    { id: 'dark', label: 'Dark', color: '#0f0f0f' },
+    { id: 'space', label: 'Space', color: '#0B0C10' },
+    { id: 'ocean', label: 'Ocean', color: '#0d1b2a' },
+    { id: 'forest', label: 'Forest', color: '#0f1419' },
+    { id: 'sunset', label: 'Sunset', color: '#2A2416' },
+    { id: 'neon', label: 'Neon', color: '#1a1a2e' },
+    { id: 'crypto', label: 'Crypto', color: '#1a1a1a' },
   ]
 }
+
+const dicebearStyles = [
+  { id: 'personas', label: 'Personas' },
+  { id: 'notionists', label: 'Notionists' },
+  { id: 'avataaars', label: 'Avataaars' },
+  { id: 'lorelei', label: 'Lorelei' },
+  { id: 'micah', label: 'Micah' },
+]
 
 const defaultAvatar = {
   skinTone: 'medium',
@@ -134,294 +142,63 @@ const defaultAvatar = {
   clothing: 'casual',
   accessories: 'none',
   background: 'dark',
-  name: 'My Avatar'
+  name: 'My Avatar',
+  dicebearStyle: 'personas'
 }
 
-function AvatarPreview({ avatar }) {
-  const skin = avatarOptions.skinTone.find(s => s.id === avatar.skinTone) || avatarOptions.skinTone[3]
-  const hair = avatarOptions.hairColor.find(h => h.id === avatar.hairColor) || avatarOptions.hairColor[0]
-  const bg = avatarOptions.background.find(b => b.id === avatar.background) || avatarOptions.background[0]
-  const clothing = avatarOptions.clothing.find(c => c.id === avatar.clothing) || avatarOptions.clothing[1]
-  const eyeColorOpt = avatarOptions.eyeColor.find(e => e.id === avatar.eyeColor) || avatarOptions.eyeColor[0]
-  const isBald = avatar.hairStyle === 'bald' || avatar.hairStyle === 'buzzcut'
+function buildDicebearUrl(avatar, size = 200) {
+  const style = avatar.dicebearStyle || 'personas'
+  const seed = avatar.name || 'default'
   
-  const getFaceShapeParams = () => {
-    switch (avatar.faceShape) {
-      case 'round':
-        return { rx: 30, ry: 30, cy: 47 }
-      case 'square':
-        return { rx: 26, ry: 30, cy: 45 }
-      case 'heart':
-        return { rx: 28, ry: 34, cy: 44 }
-      default:
-        return { rx: 28, ry: 32, cy: 45 }
-    }
+  const skinOpt = avatarOptions.skinTone.find(s => s.id === avatar.skinTone)
+  const hairOpt = avatarOptions.hairColor.find(h => h.id === avatar.hairColor)
+  const bgOpt = avatarOptions.background.find(b => b.id === avatar.background)
+  
+  const skinColor = skinOpt ? skinOpt.color.replace('#', '') : 'c68642'
+  const hairColor = hairOpt ? hairOpt.color.replace('#', '') : '1a1a1a'
+  const backgroundColor = bgOpt ? bgOpt.color.replace('#', '') : '0f0f0f'
+  
+  const params = new URLSearchParams({
+    seed: seed,
+    backgroundColor: backgroundColor,
+    size: size.toString()
+  })
+  
+  if (style === 'personas' || style === 'notionists') {
+    params.append('skinColor', skinColor)
   }
   
-  const faceParams = getFaceShapeParams()
-  
-  const getEyebrowPath = () => {
-    switch (avatar.eyebrowStyle) {
-      case 'thin':
-        return { strokeWidth: 1, d1: 'M30 38 Q38 36 46 38', d2: 'M54 38 Q62 36 70 38' }
-      case 'thick':
-        return { strokeWidth: 3, d1: 'M30 38 Q38 35 46 38', d2: 'M54 38 Q62 35 70 38' }
-      case 'arched':
-        return { strokeWidth: 2, d1: 'M30 40 Q38 32 46 38', d2: 'M54 38 Q62 32 70 40' }
-      default:
-        return { strokeWidth: 2, d1: 'M30 38 L46 38', d2: 'M54 38 L70 38' }
-    }
-  }
-  
-  const eyebrowParams = getEyebrowPath()
+  return `https://api.dicebear.com/9.x/${style}/svg?${params.toString()}`
+}
+
+function AvatarPreview({ avatar, size = 200 }) {
+  const bgOpt = avatarOptions.background.find(b => b.id === avatar.background)
+  const bgColor = bgOpt ? bgOpt.color : '#0f0f0f'
+  const avatarUrl = buildDicebearUrl(avatar, size)
   
   return (
     <div style={{
-      width: 200,
-      height: 260,
-      background: bg.color,
+      width: size,
+      height: size,
+      background: bgColor,
       borderRadius: 16,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'flex-end',
-      padding: 20,
+      justifyContent: 'center',
       position: 'relative',
       overflow: 'hidden',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(157, 78, 221, 0.2)'
+      boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(0, 212, 255, 0.15)'
     }}>
-      <svg viewBox="0 0 100 140" style={{ width: '100%', height: 'auto' }}>
-        <defs>
-          <clipPath id="headClip">
-            <ellipse cx="50" cy={faceParams.cy} rx={faceParams.rx} ry={faceParams.ry} />
-          </clipPath>
-        </defs>
-        
-        <ellipse cx="50" cy="120" rx="35" ry="25" fill={clothing.color} />
-        <rect x="15" y="95" width="70" height="45" rx="10" fill={clothing.color} />
-        
-        {(avatar.clothing === 'tank-top' || avatar.clothing === 'crop-top') && (
-          <>
-            <ellipse cx="35" cy="95" rx="8" ry="5" fill={skin.color} />
-            <ellipse cx="65" cy="95" rx="8" ry="5" fill={skin.color} />
-          </>
-        )}
-        
-        {avatar.clothing === 'vest' && (
-          <rect x="35" y="95" width="30" height="35" fill="#ecf0f1" />
-        )}
-        
-        {avatar.clothing === 'jacket' && (
-          <>
-            <rect x="15" y="95" width="15" height="45" rx="5" fill="#1a252f" />
-            <rect x="70" y="95" width="15" height="45" rx="5" fill="#1a252f" />
-          </>
-        )}
-        
-        {avatar.accessories === 'watch' && (
-          <rect x="8" y="115" width="8" height="10" rx="2" fill="#c0c0c0" stroke="#888" strokeWidth="1" />
-        )}
-        
-        {avatar.accessories === 'chain-necklace' && (
-          <path d="M30 92 Q50 100 70 92" stroke="#FFD700" strokeWidth="2" fill="none" />
-        )}
-        
-        <ellipse cx="50" cy={faceParams.cy} rx={faceParams.rx} ry={faceParams.ry} fill={skin.color} />
-        
-        {avatar.faceShape === 'heart' && (
-          <path d={`M50 ${faceParams.cy + faceParams.ry - 5} L42 ${faceParams.cy + faceParams.ry - 12} L58 ${faceParams.cy + faceParams.ry - 12} Z`} fill={skin.color} />
-        )}
-        
-        {!isBald && (
-          <g>
-            {avatar.hairStyle === 'short' && (
-              <path d="M22 35 Q50 5 78 35 Q78 20 50 15 Q22 20 22 35" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'medium' && (
-              <path d="M20 40 Q50 0 80 40 Q85 55 80 70 L75 50 Q50 5 25 50 L20 70 Q15 55 20 40" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'long' && (
-              <path d="M18 45 Q50 -5 82 45 Q90 80 85 110 L80 80 Q80 50 50 10 Q20 50 20 80 L15 110 Q10 80 18 45" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'curly' && (
-              <>
-                <circle cx="25" cy="30" r="12" fill={hair.color} />
-                <circle cx="40" cy="20" r="10" fill={hair.color} />
-                <circle cx="55" cy="18" r="11" fill={hair.color} />
-                <circle cx="70" cy="25" r="10" fill={hair.color} />
-                <circle cx="78" cy="38" r="8" fill={hair.color} />
-                <circle cx="22" cy="45" r="9" fill={hair.color} />
-              </>
-            )}
-            {avatar.hairStyle === 'afro' && (
-              <ellipse cx="50" cy="35" rx="40" ry="35" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'braids' && (
-              <>
-                <path d="M22 30 Q50 5 78 30" fill={hair.color} stroke={hair.color} strokeWidth="4" />
-                <path d="M18 45 L15 85 M20 45 L17 85" stroke={hair.color} strokeWidth="3" />
-                <path d="M82 45 L85 85 M80 45 L83 85" stroke={hair.color} strokeWidth="3" />
-              </>
-            )}
-            {avatar.hairStyle === 'wavy' && (
-              <path d="M20 35 Q35 10 50 15 Q65 10 80 35 Q85 50 80 65 Q70 45 50 20 Q30 45 20 65 Q15 50 20 35" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'ponytail' && (
-              <>
-                <path d="M22 35 Q50 5 78 35 Q78 20 50 15 Q22 20 22 35" fill={hair.color} />
-                <ellipse cx="50" cy="8" rx="8" ry="6" fill={hair.color} />
-                <path d="M50 14 L50 -5" stroke={hair.color} strokeWidth="6" />
-              </>
-            )}
-            {avatar.hairStyle === 'pigtails' && (
-              <>
-                <path d="M22 35 Q50 5 78 35 Q78 20 50 15 Q22 20 22 35" fill={hair.color} />
-                <circle cx="18" cy="45" r="8" fill={hair.color} />
-                <circle cx="82" cy="45" r="8" fill={hair.color} />
-                <path d="M18 53 L15 80" stroke={hair.color} strokeWidth="5" />
-                <path d="M82 53 L85 80" stroke={hair.color} strokeWidth="5" />
-              </>
-            )}
-            {avatar.hairStyle === 'mohawk' && (
-              <path d="M45 35 L50 0 L55 35 Q55 25 50 20 Q45 25 45 35" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'dreads' && (
-              <>
-                <path d="M22 30 Q50 5 78 30" fill={hair.color} />
-                {[20, 30, 40, 50, 60, 70, 80].map((x, i) => (
-                  <path key={i} d={`M${x} 30 L${x + (i % 2 === 0 ? 3 : -3)} 75`} stroke={hair.color} strokeWidth="4" />
-                ))}
-              </>
-            )}
-            {avatar.hairStyle === 'cornrows' && (
-              <>
-                <path d="M22 30 Q50 5 78 30" fill={hair.color} />
-                {[30, 40, 50, 60, 70].map((x, i) => (
-                  <path key={i} d={`M${x} 15 L${x} 35`} stroke={hair.color} strokeWidth="2" strokeDasharray="2,2" />
-                ))}
-              </>
-            )}
-            {avatar.hairStyle === 'man-bun' && (
-              <>
-                <path d="M22 35 Q50 10 78 35 Q78 25 50 20 Q22 25 22 35" fill={hair.color} />
-                <circle cx="50" cy="10" r="10" fill={hair.color} />
-              </>
-            )}
-            {avatar.hairStyle === 'pixie' && (
-              <path d="M22 38 Q40 15 60 20 Q75 25 78 40 Q70 30 50 25 Q30 30 22 38" fill={hair.color} />
-            )}
-            {avatar.hairStyle === 'bob' && (
-              <path d="M18 40 Q50 5 82 40 Q85 60 80 70 L75 55 Q50 10 25 55 L20 70 Q15 60 18 40" fill={hair.color} />
-            )}
-          </g>
-        )}
-        {avatar.hairStyle === 'buzzcut' && (
-          <ellipse cx="50" cy="30" rx="26" ry="18" fill={hair.color} opacity="0.5" />
-        )}
-        
-        <path d={eyebrowParams.d1} stroke={hair.color} strokeWidth={eyebrowParams.strokeWidth} fill="none" strokeLinecap="round" />
-        <path d={eyebrowParams.d2} stroke={hair.color} strokeWidth={eyebrowParams.strokeWidth} fill="none" strokeLinecap="round" />
-        
-        <ellipse cx="38" cy="45" rx="4" ry="3" fill={eyeColorOpt.color} />
-        <ellipse cx="62" cy="45" rx="4" ry="3" fill={eyeColorOpt.color} />
-        <ellipse cx="38" cy="45" rx="2" ry="2" fill="#1a1a1a" />
-        <ellipse cx="62" cy="45" rx="2" ry="2" fill="#1a1a1a" />
-        <ellipse cx="39" cy="44" rx="1" ry="1" fill="white" />
-        <ellipse cx="63" cy="44" rx="1" ry="1" fill="white" />
-        
-        <ellipse cx="50" cy="55" rx="3" ry="2" fill={`color-mix(in srgb, ${skin.color} 70%, #8b4513)`} />
-        
-        <path d="M43 65 Q50 70 57 65" stroke="#c0392b" strokeWidth="2" fill="none" strokeLinecap="round" />
-        
-        {avatar.facialHair !== 'none' && (
-          <g fill={hair.color} opacity="0.8">
-            {avatar.facialHair === 'stubble' && (
-              <ellipse cx="50" cy="68" rx="15" ry="8" opacity="0.3" />
-            )}
-            {avatar.facialHair === 'mustache' && (
-              <path d="M35 60 Q50 65 65 60 Q50 68 35 60" />
-            )}
-            {avatar.facialHair === 'goatee' && (
-              <>
-                <path d="M35 60 Q50 65 65 60 Q50 68 35 60" />
-                <ellipse cx="50" cy="75" rx="8" ry="6" />
-              </>
-            )}
-            {avatar.facialHair === 'full-beard' && (
-              <path d="M25 55 Q25 80 50 85 Q75 80 75 55 Q60 60 50 58 Q40 60 25 55" />
-            )}
-            {avatar.facialHair === 'soul-patch' && (
-              <ellipse cx="50" cy="72" rx="4" ry="4" />
-            )}
-          </g>
-        )}
-        
-        {avatar.accessories === 'glasses' && (
-          <g stroke="#333" strokeWidth="1.5" fill="none">
-            <circle cx="38" cy="45" r="8" fill="rgba(200,200,255,0.2)" />
-            <circle cx="62" cy="45" r="8" fill="rgba(200,200,255,0.2)" />
-            <path d="M46 45 L54 45" />
-            <path d="M30 45 L22 42" />
-            <path d="M70 45 L78 42" />
-          </g>
-        )}
-        {avatar.accessories === 'sunglasses' && (
-          <g>
-            <rect x="28" y="40" width="16" height="10" rx="2" fill="#1a1a1a" />
-            <rect x="56" y="40" width="16" height="10" rx="2" fill="#1a1a1a" />
-            <path d="M44 45 L56 45" stroke="#1a1a1a" strokeWidth="2" />
-            <path d="M28 45 L20 42" stroke="#1a1a1a" strokeWidth="2" />
-            <path d="M72 45 L80 42" stroke="#1a1a1a" strokeWidth="2" />
-          </g>
-        )}
-        {avatar.accessories === 'headphones' && (
-          <g stroke="#333" strokeWidth="3" fill="none">
-            <path d="M20 50 Q20 20 50 15 Q80 20 80 50" />
-            <rect x="14" y="45" width="10" height="15" rx="3" fill="#333" />
-            <rect x="76" y="45" width="10" height="15" rx="3" fill="#333" />
-          </g>
-        )}
-        {avatar.accessories === 'hat' && (
-          <g>
-            <ellipse cx="50" cy="18" rx="32" ry="8" fill="#2c3e50" />
-            <rect x="25" y="8" width="50" height="12" rx="4" fill="#2c3e50" />
-          </g>
-        )}
-        {avatar.accessories === 'bandana' && (
-          <g>
-            <path d="M20 30 Q50 20 80 30 L78 38 Q50 28 22 38 Z" fill="#e74c3c" />
-            <path d="M78 30 L85 40" stroke="#e74c3c" strokeWidth="3" />
-          </g>
-        )}
-        {avatar.accessories === 'beanie' && (
-          <g>
-            <path d="M18 40 Q50 10 82 40 L80 32 Q50 5 20 32 Z" fill="#34495e" />
-            <ellipse cx="50" cy="10" rx="5" ry="5" fill="#34495e" />
-          </g>
-        )}
-        {avatar.accessories === 'cap-backwards' && (
-          <g>
-            <path d="M22 35 Q50 15 78 35 L75 28 Q50 10 25 28 Z" fill="#2c3e50" />
-            <rect x="20" y="30" width="15" height="8" rx="2" fill="#2c3e50" />
-          </g>
-        )}
-        {avatar.accessories === 'earrings' && (
-          <g>
-            <circle cx="20" cy="55" r="3" fill="#f1c40f" />
-            <circle cx="80" cy="55" r="3" fill="#f1c40f" />
-          </g>
-        )}
-        {avatar.accessories === 'necklace' && (
-          <path d="M35 88 Q50 95 65 88" stroke="#f1c40f" strokeWidth="2" fill="none" />
-        )}
-        {avatar.accessories === 'rings' && (
-          <>
-            <circle cx="25" cy="125" r="2" fill="#f1c40f" stroke="#c0392b" strokeWidth="0.5" />
-            <circle cx="75" cy="125" r="2" fill="#c0c0c0" stroke="#3498db" strokeWidth="0.5" />
-          </>
-        )}
-      </svg>
-      
+      <img 
+        src={avatarUrl}
+        alt={avatar.name || 'Avatar'}
+        style={{
+          width: '85%',
+          height: '85%',
+          objectFit: 'contain'
+        }}
+      />
       <div style={{
         position: 'absolute',
         bottom: 8,
@@ -431,7 +208,7 @@ function AvatarPreview({ avatar }) {
         color: 'white',
         fontSize: 12,
         fontWeight: 600,
-        textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+        textShadow: '0 2px 4px rgba(0,0,0,0.8)'
       }}>
         {avatar.name}
       </div>
@@ -439,63 +216,154 @@ function AvatarPreview({ avatar }) {
   )
 }
 
-function OptionSection({ title, options, selected, onSelect, type = 'icon' }) {
+function Accordion({ title, icon, isOpen, onToggle, children }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ 
-        fontSize: 11, 
-        color: '#888', 
-        marginBottom: 8, 
-        textTransform: 'uppercase',
-        fontWeight: 600 
+    <div style={{
+      background: '#1a1a1a',
+      borderRadius: 10,
+      marginBottom: 8,
+      border: isOpen ? '1px solid rgba(0, 212, 255, 0.3)' : '1px solid rgba(255,255,255,0.1)',
+      overflow: 'hidden',
+      transition: 'border-color 0.2s ease'
+    }}>
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 14px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          color: isOpen ? '#00D4FF' : '#ccc',
+          transition: 'color 0.2s ease'
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+          <span>{icon}</span>
+          {title}
+        </span>
+        <span style={{
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.2s ease',
+          fontSize: 12
+        }}>
+          ▼
+        </span>
+      </button>
+      <div style={{
+        maxHeight: isOpen ? 400 : 0,
+        overflow: 'hidden',
+        transition: 'max-height 0.3s ease'
       }}>
-        {title}
-      </div>
-      <div style={{ 
-        display: 'flex', 
-        flexWrap: 'wrap', 
-        gap: 6 
-      }}>
-        {options.map(opt => (
-          <button
-            key={opt.id}
-            onClick={() => onSelect(opt.id)}
-            style={{
-              width: type === 'color' ? 28 : 'auto',
-              height: type === 'color' ? 28 : 32,
-              minWidth: type === 'color' ? 28 : 50,
-              padding: type === 'color' ? 0 : '4px 10px',
-              borderRadius: type === 'color' ? '50%' : 6,
-              border: selected === opt.id 
-                ? '2px solid #00D4FF' 
-                : '1px solid rgba(255,255,255,0.2)',
-              background: type === 'color' ? opt.color : 'rgba(255,255,255,0.05)',
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: type === 'color' ? 12 : 11,
-              transition: 'all 0.2s',
-              boxShadow: selected === opt.id ? '0 0 10px rgba(0,212,255,0.5)' : 'none'
-            }}
-          >
-            {type !== 'color' && (opt.icon ? `${opt.icon}` : opt.label)}
-          </button>
-        ))}
+        <div style={{ padding: '0 14px 14px' }}>
+          {children}
+        </div>
       </div>
     </div>
   )
 }
 
-export { avatarOptions, defaultAvatar, AvatarPreview }
+function OptionGrid({ options, selected, onSelect, type = 'icon' }) {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      flexWrap: 'wrap', 
+      gap: 6 
+    }}>
+      {options.map(opt => (
+        <button
+          key={opt.id}
+          onClick={() => onSelect(opt.id)}
+          style={{
+            width: type === 'color' ? 32 : 'auto',
+            height: type === 'color' ? 32 : 34,
+            minWidth: type === 'color' ? 32 : 54,
+            padding: type === 'color' ? 0 : '6px 10px',
+            borderRadius: type === 'color' ? '50%' : 8,
+            border: selected === opt.id 
+              ? '2px solid #00D4FF' 
+              : '1px solid rgba(255,255,255,0.15)',
+            background: type === 'color' ? opt.color : 'rgba(255,255,255,0.05)',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: type === 'color' ? 12 : 11,
+            transition: 'all 0.2s',
+            boxShadow: selected === opt.id ? '0 0 12px rgba(0,212,255,0.5)' : 'none'
+          }}
+        >
+          {type !== 'color' && (opt.icon ? `${opt.icon}` : opt.label)}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function StyleSelector({ selected, onSelect }) {
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      {dicebearStyles.map(style => {
+        const previewUrl = `https://api.dicebear.com/9.x/${style.id}/svg?seed=preview&size=48&backgroundColor=1a1a1a`
+        return (
+          <button
+            key={style.id}
+            onClick={() => onSelect(style.id)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 4,
+              padding: 8,
+              background: selected === style.id ? 'rgba(0, 212, 255, 0.15)' : 'rgba(255,255,255,0.05)',
+              border: selected === style.id ? '2px solid #00D4FF' : '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 10,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: selected === style.id ? '0 0 15px rgba(0,212,255,0.3)' : 'none'
+            }}
+          >
+            <img 
+              src={previewUrl} 
+              alt={style.label}
+              style={{ 
+                width: 40, 
+                height: 40, 
+                borderRadius: 6,
+                background: '#1a1a1a'
+              }} 
+            />
+            <span style={{ 
+              fontSize: 10, 
+              color: selected === style.id ? '#00D4FF' : '#888',
+              fontWeight: 600
+            }}>
+              {style.label}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+export { avatarOptions, defaultAvatar, AvatarPreview, buildDicebearUrl }
 
 export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = false }) {
   const [avatar, setAvatar] = useState(() => {
     const saved = localStorage.getItem('pulse-user-avatar')
-    return saved ? JSON.parse(saved) : defaultAvatar
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      return { ...defaultAvatar, ...parsed }
+    }
+    return defaultAvatar
   })
-  const [activeTab, setActiveTab] = useState('appearance')
+  
+  const [openAccordion, setOpenAccordion] = useState('face')
   
   const updateAvatar = useCallback((key, value) => {
     setAvatar(prev => ({ ...prev, [key]: value }))
@@ -508,6 +376,7 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
   }, [avatar, onSave, onClose])
   
   const handleRandomize = useCallback(() => {
+    const randomSeed = Math.random().toString(36).substring(2, 10)
     const random = {
       skinTone: avatarOptions.skinTone[Math.floor(Math.random() * avatarOptions.skinTone.length)].id,
       faceShape: avatarOptions.faceShape[Math.floor(Math.random() * avatarOptions.faceShape.length)].id,
@@ -520,19 +389,17 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
       clothing: avatarOptions.clothing[Math.floor(Math.random() * avatarOptions.clothing.length)].id,
       accessories: avatarOptions.accessories[Math.floor(Math.random() * avatarOptions.accessories.length)].id,
       background: avatarOptions.background[Math.floor(Math.random() * avatarOptions.background.length)].id,
-      name: avatar.name
+      name: avatar.name || randomSeed,
+      dicebearStyle: avatar.dicebearStyle
     }
     setAvatar(random)
-  }, [avatar.name])
+  }, [avatar.name, avatar.dicebearStyle])
+  
+  const toggleAccordion = useCallback((id) => {
+    setOpenAccordion(prev => prev === id ? null : id)
+  }, [])
   
   if (!isOpen) return null
-  
-  const tabs = [
-    { id: 'appearance', label: 'Appearance' },
-    { id: 'features', label: 'Features' },
-    { id: 'style', label: 'Style' },
-    { id: 'extras', label: 'Extras' }
-  ]
   
   return (
     <div style={{
@@ -541,7 +408,7 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0,0,0,0.9)',
+      background: 'rgba(0,0,0,0.92)',
       zIndex: 10000,
       display: 'flex',
       alignItems: 'center',
@@ -549,39 +416,50 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
       padding: 16
     }} onClick={onClose}>
       <div style={{
-        background: '#141414',
+        background: '#0f0f0f',
         borderRadius: 16,
-        border: '1px solid rgba(157, 78, 221, 0.3)',
+        border: '1px solid rgba(0, 212, 255, 0.2)',
         width: '100%',
-        maxWidth: 600,
-        maxHeight: '90vh',
+        maxWidth: 720,
+        maxHeight: '92vh',
         overflow: 'hidden',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        boxShadow: '0 0 60px rgba(0, 212, 255, 0.1)'
       }} onClick={e => e.stopPropagation()}>
+        
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '16px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
+          padding: '14px 20px',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          background: '#141414'
         }}>
           <h2 style={{ 
             margin: 0, 
             color: '#00D4FF', 
             fontSize: 18,
-            fontFamily: 'Orbitron, sans-serif'
+            fontFamily: 'Orbitron, sans-serif',
+            textShadow: '0 0 20px rgba(0, 212, 255, 0.4)'
           }}>
             Avatar Creator
           </h2>
           <button
             onClick={onClose}
             style={{
-              background: 'none',
-              border: 'none',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 8,
               color: '#888',
-              fontSize: 24,
-              cursor: 'pointer'
+              fontSize: 18,
+              cursor: 'pointer',
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
             }}
           >
             ×
@@ -589,198 +467,206 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
         </div>
         
         <div style={{
-          display: 'flex',
           flex: 1,
-          overflow: 'hidden'
+          overflow: 'auto',
+          padding: 16
         }}>
           <div style={{
-            padding: 20,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            borderRight: '1px solid rgba(255,255,255,0.1)',
-            background: 'rgba(0,0,0,0.3)'
-          }}>
-            <AvatarPreview avatar={avatar} />
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateRows: 'auto auto',
+            gap: 12
+          }}
+          className="avatar-bento-grid"
+          >
+            <div style={{
+              gridRow: 'span 2',
+              background: '#141414',
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20,
+              minHeight: 280
+            }}>
+              <AvatarPreview avatar={avatar} size={220} />
+            </div>
             
-            <input
-              type="text"
-              value={avatar.name}
-              onChange={e => updateAvatar('name', e.target.value)}
-              placeholder="Avatar Name"
-              style={{
-                marginTop: 12,
-                width: '100%',
-                padding: '8px 12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 6,
-                color: 'white',
-                fontSize: 12,
-                textAlign: 'center'
-              }}
-            />
+            <div style={{
+              background: '#141414',
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.08)',
+              padding: 16
+            }}>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', fontWeight: 600, marginBottom: 6, display: 'block' }}>
+                  Avatar Name
+                </label>
+                <input
+                  type="text"
+                  value={avatar.name}
+                  onChange={e => updateAvatar('name', e.target.value)}
+                  placeholder="Enter name..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 8,
+                    color: 'white',
+                    fontSize: 13
+                  }}
+                />
+              </div>
+              
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8, display: 'block' }}>
+                  Avatar Style
+                </label>
+                <StyleSelector 
+                  selected={avatar.dicebearStyle || 'personas'} 
+                  onSelect={v => updateAvatar('dicebearStyle', v)} 
+                />
+              </div>
+              
+              <button
+                onClick={handleRandomize}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  background: 'linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(0, 212, 255, 0.2))',
+                  border: '1px solid rgba(157, 78, 221, 0.4)',
+                  borderRadius: 8,
+                  color: '#c084fc',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  transition: 'all 0.2s'
+                }}
+              >
+                🎲 Randomize
+              </button>
+            </div>
             
-            <button
-              onClick={handleRandomize}
-              style={{
-                marginTop: 12,
-                padding: '8px 16px',
-                background: 'rgba(157, 78, 221, 0.2)',
-                border: '1px solid rgba(157, 78, 221, 0.4)',
-                borderRadius: 6,
-                color: '#c084fc',
-                fontSize: 12,
-                cursor: 'pointer',
-                width: '100%'
-              }}
-            >
-              🎲 Randomize
-            </button>
+            <div style={{
+              background: '#141414',
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.08)',
+              padding: 12,
+              maxHeight: 320,
+              overflowY: 'auto'
+            }}>
+              <Accordion 
+                title="Face & Skin" 
+                icon="👤" 
+                isOpen={openAccordion === 'face'}
+                onToggle={() => toggleAccordion('face')}
+              >
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 10, color: '#666', marginBottom: 6, fontWeight: 600 }}>SKIN TONE</div>
+                  <OptionGrid 
+                    options={avatarOptions.skinTone} 
+                    selected={avatar.skinTone} 
+                    onSelect={v => updateAvatar('skinTone', v)} 
+                    type="color" 
+                  />
+                </div>
+              </Accordion>
+              
+              <Accordion 
+                title="Hair" 
+                icon="💇" 
+                isOpen={openAccordion === 'hair'}
+                onToggle={() => toggleAccordion('hair')}
+              >
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 10, color: '#666', marginBottom: 6, fontWeight: 600 }}>HAIR STYLE</div>
+                  <OptionGrid 
+                    options={avatarOptions.hairStyle} 
+                    selected={avatar.hairStyle} 
+                    onSelect={v => updateAvatar('hairStyle', v)} 
+                  />
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, color: '#666', marginBottom: 6, fontWeight: 600 }}>HAIR COLOR</div>
+                  <OptionGrid 
+                    options={avatarOptions.hairColor} 
+                    selected={avatar.hairColor} 
+                    onSelect={v => updateAvatar('hairColor', v)} 
+                    type="color" 
+                  />
+                </div>
+              </Accordion>
+              
+              <Accordion 
+                title="Clothing & Style" 
+                icon="👔" 
+                isOpen={openAccordion === 'clothing'}
+                onToggle={() => toggleAccordion('clothing')}
+              >
+                <OptionGrid 
+                  options={avatarOptions.clothing} 
+                  selected={avatar.clothing} 
+                  onSelect={v => updateAvatar('clothing', v)} 
+                />
+              </Accordion>
+              
+              <Accordion 
+                title="Accessories" 
+                icon="🕶️" 
+                isOpen={openAccordion === 'accessories'}
+                onToggle={() => toggleAccordion('accessories')}
+              >
+                <OptionGrid 
+                  options={avatarOptions.accessories} 
+                  selected={avatar.accessories} 
+                  onSelect={v => updateAvatar('accessories', v)} 
+                />
+              </Accordion>
+              
+              <Accordion 
+                title="Background" 
+                icon="🎨" 
+                isOpen={openAccordion === 'background'}
+                onToggle={() => toggleAccordion('background')}
+              >
+                <OptionGrid 
+                  options={avatarOptions.background} 
+                  selected={avatar.background} 
+                  onSelect={v => updateAvatar('background', v)} 
+                  type="color" 
+                />
+              </Accordion>
+            </div>
           </div>
           
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {!isPremium && (
             <div style={{
-              display: 'flex',
-              borderBottom: '1px solid rgba(255,255,255,0.1)'
+              marginTop: 12,
+              padding: 12,
+              background: 'rgba(249, 115, 22, 0.08)',
+              border: '1px solid rgba(249, 115, 22, 0.25)',
+              borderRadius: 10,
+              fontSize: 12,
+              color: '#f97316',
+              textAlign: 'center'
             }}>
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  style={{
-                    flex: 1,
-                    padding: '12px 16px',
-                    background: activeTab === tab.id ? 'rgba(0,212,255,0.1)' : 'transparent',
-                    border: 'none',
-                    borderBottom: activeTab === tab.id ? '2px solid #00D4FF' : '2px solid transparent',
-                    color: activeTab === tab.id ? '#00D4FF' : '#888',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              Upgrade to Premium to unlock all customization options!
             </div>
-            
-            <div style={{ 
-              flex: 1, 
-              overflow: 'auto', 
-              padding: 16 
-            }}>
-              {activeTab === 'appearance' && (
-                <>
-                  <OptionSection
-                    title="Skin Tone"
-                    options={avatarOptions.skinTone}
-                    selected={avatar.skinTone}
-                    onSelect={v => updateAvatar('skinTone', v)}
-                    type="color"
-                  />
-                  <OptionSection
-                    title="Face Shape"
-                    options={avatarOptions.faceShape}
-                    selected={avatar.faceShape}
-                    onSelect={v => updateAvatar('faceShape', v)}
-                  />
-                  <OptionSection
-                    title="Hair Style"
-                    options={avatarOptions.hairStyle}
-                    selected={avatar.hairStyle}
-                    onSelect={v => updateAvatar('hairStyle', v)}
-                  />
-                  <OptionSection
-                    title="Hair Color"
-                    options={avatarOptions.hairColor}
-                    selected={avatar.hairColor}
-                    onSelect={v => updateAvatar('hairColor', v)}
-                    type="color"
-                  />
-                </>
-              )}
-              
-              {activeTab === 'features' && (
-                <>
-                  <OptionSection
-                    title="Eye Color"
-                    options={avatarOptions.eyeColor}
-                    selected={avatar.eyeColor}
-                    onSelect={v => updateAvatar('eyeColor', v)}
-                    type="color"
-                  />
-                  <OptionSection
-                    title="Eyebrow Style"
-                    options={avatarOptions.eyebrowStyle}
-                    selected={avatar.eyebrowStyle}
-                    onSelect={v => updateAvatar('eyebrowStyle', v)}
-                  />
-                  <OptionSection
-                    title="Facial Hair"
-                    options={avatarOptions.facialHair}
-                    selected={avatar.facialHair}
-                    onSelect={v => updateAvatar('facialHair', v)}
-                  />
-                </>
-              )}
-              
-              {activeTab === 'style' && (
-                <>
-                  <OptionSection
-                    title="Body Type"
-                    options={avatarOptions.bodyType}
-                    selected={avatar.bodyType}
-                    onSelect={v => updateAvatar('bodyType', v)}
-                  />
-                  <OptionSection
-                    title="Clothing"
-                    options={avatarOptions.clothing}
-                    selected={avatar.clothing}
-                    onSelect={v => updateAvatar('clothing', v)}
-                  />
-                </>
-              )}
-              
-              {activeTab === 'extras' && (
-                <>
-                  <OptionSection
-                    title="Accessories"
-                    options={avatarOptions.accessories}
-                    selected={avatar.accessories}
-                    onSelect={v => updateAvatar('accessories', v)}
-                  />
-                  <OptionSection
-                    title="Background"
-                    options={avatarOptions.background}
-                    selected={avatar.background}
-                    onSelect={v => updateAvatar('background', v)}
-                  />
-                </>
-              )}
-              
-              {!isPremium && (
-                <div style={{
-                  marginTop: 16,
-                  padding: 12,
-                  background: 'rgba(249, 115, 22, 0.1)',
-                  border: '1px solid rgba(249, 115, 22, 0.3)',
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: '#f97316'
-                }}>
-                  Upgrade to Premium to unlock all customization options and save unlimited avatars!
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
         
         <div style={{
           display: 'flex',
           gap: 12,
           padding: 16,
-          borderTop: '1px solid rgba(255,255,255,0.1)'
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: '#141414'
         }}>
           <button
             onClick={onClose}
@@ -788,12 +674,13 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
               flex: 1,
               padding: '12px 20px',
               background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 10,
               color: '#888',
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s'
             }}
           >
             Cancel
@@ -805,17 +692,31 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
               padding: '12px 20px',
               background: 'linear-gradient(135deg, #00D4FF, #9D4EDD)',
               border: 'none',
-              borderRadius: 8,
+              borderRadius: 10,
               color: 'white',
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 0 20px rgba(0, 212, 255, 0.3)',
+              transition: 'all 0.2s'
             }}
           >
             Save Avatar
           </button>
         </div>
       </div>
+      
+      <style>{`
+        @media (max-width: 768px) {
+          .avatar-bento-grid {
+            grid-template-columns: 1fr !important;
+            grid-template-rows: auto !important;
+          }
+          .avatar-bento-grid > div:first-child {
+            grid-row: span 1 !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
