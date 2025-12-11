@@ -1,9 +1,9 @@
 {
-  "version": "1.20.1",
+  "version": "1.20.2",
   "major": 1,
   "minor": 20,
-  "patch": 1,
+  "patch": 2,
   "releaseGate": false,
-  "lastUpdated": "2025-12-10T21:07:11.641Z",
+  "lastUpdated": "2025-12-11T16:38:45.006Z",
   "notes": "Pre-token launch version. v2.0.0 reserved for DWAV token launch on Feb 14, 2026."
 }
