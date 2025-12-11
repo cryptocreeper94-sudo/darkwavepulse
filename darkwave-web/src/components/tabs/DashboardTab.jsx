@@ -271,6 +271,24 @@ function NewsContent({ news }) {
   )
 }
 
+function MobileNewsCard({ news }) {
+  return (
+    <div 
+      className="mobile-news-card"
+      onClick={() => news.url && window.open(news.url, '_blank')}
+    >
+      <div className="news-card-bg">
+        <div className="news-card-overlay"></div>
+        <div className="news-card-content">
+          <div className="news-source">{news.source}</div>
+          <div className="news-title">{news.title}</div>
+          <div className="news-time">{news.time}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const coinCategories = [
   { id: 'top', label: 'Top' },
   { id: 'gainers', label: 'Gainers' },
@@ -372,23 +390,13 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <TileLabel>{category === 'top' ? 'Top Coins' : category === 'gainers' ? 'Top Gainers' : category === 'losers' ? 'Top Losers' : category === 'meme' ? 'Meme Coins' : category === 'defi' ? 'DeFi' : 'DEX Tokens'}</TileLabel>
       </div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div className="coin-filter-section">
+        <div className="coin-filter-buttons">
           {coinCategories.map(cat => (
             <button
               key={cat.id}
               onClick={() => { setCategory(cat.id); setSearchQuery(''); setSearchResults(null); }}
-              style={{
-                padding: '4px 10px',
-                fontSize: 10,
-                fontWeight: 600,
-                border: 'none',
-                borderRadius: 12,
-                cursor: 'pointer',
-                background: category === cat.id ? '#00D4FF' : '#1a1a1a',
-                color: category === cat.id ? '#000' : '#888',
-                transition: 'all 0.2s',
-              }}
+              className={`coin-filter-btn ${category === cat.id ? 'active' : ''}`}
             >
               {cat.label}
             </button>
@@ -877,19 +885,148 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         }
         
         .mobile-category-card {
-          background: #0f0f0f;
-          border: 1px solid #222;
-          border-radius: 12px;
-          padding: 12px;
+          background: linear-gradient(135deg, rgba(0, 40, 60, 0.9) 0%, rgba(0, 20, 40, 0.95) 50%, rgba(0, 60, 80, 0.9) 100%);
+          border: 1px solid rgba(0, 212, 255, 0.3);
+          border-radius: 16px;
+          padding: 16px;
           min-height: 220px;
           display: flex;
           flex-direction: column;
+          box-shadow: 0 4px 30px rgba(0, 212, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          position: relative;
+          overflow: hidden;
+        }
+        .mobile-category-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
         }
         .mobile-category-card .market-item-wrapper {
           flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+        
+        .coin-filter-section {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .coin-filter-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .coin-filter-btn {
+          padding: 6px 14px;
+          font-size: 11px;
+          font-weight: 600;
+          border: 1px solid #333;
+          border-radius: 20px;
+          cursor: pointer;
+          background: #1a1a1a;
+          color: #888;
+          transition: all 0.2s ease;
+        }
+        .coin-filter-btn:hover {
+          border-color: rgba(0, 212, 255, 0.5);
+          color: #fff;
+        }
+        .coin-filter-btn.active {
+          background: linear-gradient(135deg, #00D4FF, #0099FF);
+          border-color: transparent;
+          color: #000;
+          box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        @media (max-width: 640px) {
+          .coin-filter-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+          }
+          .coin-filter-btn {
+            padding: 10px 8px;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 12px;
+          }
+          .coin-filter-section {
+            flex-direction: column;
+            gap: 12px;
+          }
+          .coin-filter-section > div:last-child {
+            width: 100%;
+          }
+          .coin-filter-section input {
+            width: 100% !important;
+          }
+          
+          .mobile-news-section {
+            margin-top: 20px;
+            margin-bottom: 80px;
+          }
+          .mobile-news-card {
+            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+          }
+          .mobile-news-card:active {
+            transform: scale(0.98);
+          }
+          .news-card-bg {
+            position: relative;
+            min-height: 180px;
+            background: linear-gradient(135deg, #001a2c 0%, #003355 50%, #001a2c 100%);
+            background-image: 
+              radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 50%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
+              linear-gradient(135deg, #001a2c 0%, #003355 50%, #001a2c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .news-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+          }
+          .news-card-content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            text-align: center;
+          }
+          .news-source {
+            font-size: 11px;
+            font-weight: 700;
+            color: #00D4FF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+          }
+          .news-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+            margin-bottom: 12px;
+          }
+          .news-time {
+            font-size: 11px;
+            color: #666;
+          }
         }
       `}</style>
       <div className="bento-dashboard">
@@ -898,7 +1035,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         <div className="mobile-categories-wrapper">
           <MobileCardCarousel>
             <div className="mobile-category-card">
-              <TileLabel>Quick Actions</TileLabel>
+              <TileLabel color="#00D4FF">StrikeAgent</TileLabel>
               <div style={{ flex: 1 }}>
                 <FlipCarousel
                   items={quickActions}
@@ -918,7 +1055,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             </div>
             
             <div className="mobile-category-card">
-              <TileLabel>Market Overview</TileLabel>
+              <TileLabel color="#00D4FF">Market Overview</TileLabel>
               <div style={{ flex: 1 }}>
                 <FlipCarousel
                   items={marketOverviewItems}
@@ -935,7 +1072,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             </div>
             
             <div className="mobile-category-card">
-              <TileLabel>Trending</TileLabel>
+              <TileLabel color="#00D4FF">Trending</TileLabel>
               <div style={{ flex: 1 }}>
                 {coinsLoading ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666' }}>
@@ -954,19 +1091,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                     interval={4000}
                   />
                 )}
-              </div>
-            </div>
-            
-            <div className="mobile-category-card">
-              <TileLabel>News</TileLabel>
-              <div style={{ flex: 1 }}>
-                <FlipCarousel
-                  items={news}
-                  renderItem={(item) => <NewsContent news={item} />}
-                  showDots={true}
-                  autoPlay={false}
-                  interval={7000}
-                />
               </div>
             </div>
           </MobileCardCarousel>
@@ -1063,6 +1187,21 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           <BitcoinChart compact={false} coinId={selectedCoin?.id} />
         </div>
       </div>
+
+      {isMobile && news.length > 0 && (
+        <div className="mobile-news-section">
+          <div style={{ marginBottom: 12, paddingLeft: 4 }}>
+            <TileLabel color="#00D4FF">Latest News</TileLabel>
+          </div>
+          <FlipCarousel
+            items={news}
+            renderItem={(item) => <MobileNewsCard news={item} />}
+            showDots={true}
+            autoPlay={true}
+            interval={8000}
+          />
+        </div>
+      )}
 
       <div style={{
         position: 'fixed',
