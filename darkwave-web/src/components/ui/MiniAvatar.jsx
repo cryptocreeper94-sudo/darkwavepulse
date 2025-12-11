@@ -1,14 +1,10 @@
 import { useAvatar } from '../../context/AvatarContext'
+import { buildDicebearUrl, avatarOptions } from './AvatarCreator'
 
 export default function MiniAvatar({ size = 32, onClick = null, showFallback = true }) {
-  const { avatar, isCustomMode, AvatarComponent, avatarOptions } = useAvatar()
+  const { avatar, isCustomMode } = useAvatar()
   
-  const skin = avatarOptions.skinTone.find(s => s.id === avatar.skinTone) || avatarOptions.skinTone[3]
-  const hair = avatarOptions.hairColor.find(h => h.id === avatar.hairColor) || avatarOptions.hairColor[0]
   const bg = avatarOptions.background.find(b => b.id === avatar.background) || avatarOptions.background[0]
-  const eyeColorOpt = avatarOptions.eyeColor.find(e => e.id === avatar.eyeColor) || avatarOptions.eyeColor[0]
-  
-  const hasCustomAvatar = avatar && avatar.name !== 'My Avatar'
   
   if (!isCustomMode && showFallback) {
     return (
@@ -32,6 +28,8 @@ export default function MiniAvatar({ size = 32, onClick = null, showFallback = t
     )
   }
   
+  const avatarUrl = buildDicebearUrl(avatar, size * 2)
+  
   return (
     <div 
       onClick={onClick}
@@ -49,17 +47,15 @@ export default function MiniAvatar({ size = 32, onClick = null, showFallback = t
         border: '2px solid rgba(255, 255, 255, 0.1)'
       }}
     >
-      <svg viewBox="20 15 60 60" style={{ width: '90%', height: '90%' }}>
-        <ellipse cx="50" cy="45" rx="22" ry="24" fill={skin.color} />
-        <ellipse cx="42" cy="42" rx="3" ry="2.5" fill={eyeColorOpt.color} />
-        <ellipse cx="58" cy="42" rx="3" ry="2.5" fill={eyeColorOpt.color} />
-        <ellipse cx="42" cy="42" rx="1.5" ry="1.5" fill="#1a1a1a" />
-        <ellipse cx="58" cy="42" rx="1.5" ry="1.5" fill="#1a1a1a" />
-        <path d="M45 55 Q50 58 55 55" stroke="#c0392b" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        {avatar.hairStyle !== 'bald' && avatar.hairStyle !== 'buzzcut' && (
-          <path d="M28 35 Q50 15 72 35 Q70 25 50 22 Q30 25 28 35" fill={hair.color} />
-        )}
-      </svg>
+      <img 
+        src={avatarUrl}
+        alt={avatar.name || 'Avatar'}
+        style={{
+          width: '90%',
+          height: '90%',
+          objectFit: 'contain'
+        }}
+      />
     </div>
   )
 }
