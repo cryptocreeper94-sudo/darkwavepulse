@@ -12,15 +12,16 @@ const menuItems = [
   { id: 'v2-details', icon: '📅', label: 'V2 Details', highlight: true },
 ]
 
-const quickActions = [
+const getQuickActions = (isDarkMode) => [
   { id: 'agent', icon: '👤', label: 'Agent Builder' },
-  { id: 'theme', icon: '🎨', label: 'Change Theme' },
+  { id: 'theme', icon: isDarkMode ? '☀️' : '🌙', label: isDarkMode ? 'Light Mode' : 'Dark Mode' },
   { id: 'bug', icon: '🐛', label: 'Report Bug' },
   { id: 'disclaimer', icon: '⚠️', label: 'Disclaimer' },
   { id: 'logout', icon: '🚪', label: 'Logout', danger: true },
 ]
 
-export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose, onAction }) {
+export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose, onAction, isDarkMode = true }) {
+  const quickActions = getQuickActions(isDarkMode)
   return (
     <>
       <div 
