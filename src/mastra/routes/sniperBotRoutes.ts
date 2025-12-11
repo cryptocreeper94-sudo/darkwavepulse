@@ -936,13 +936,32 @@ export const sniperBotRoutes = [
           return c.json({ error: 'userId, chain, and tokenAddress are required' }, 400);
         }
         
+        if (!trade.predictionId) {
+          logger?.warn('⚠️ [TradeLedger] Trade recorded without predictionId - Adaptive AI learning will be limited', {
+            tokenSymbol: trade.tokenSymbol,
+            chain: trade.chain,
+            source: trade.source,
+          });
+        }
+        
+        if (!trade.horizon && trade.predictionId) {
+          logger?.warn('⚠️ [TradeLedger] Trade has predictionId but missing horizon - defaulting to 1h', {
+            predictionId: trade.predictionId,
+          });
+          trade.horizon = '1h';
+        }
+        
         const tradeId = await tradeLedgerService.recordTrade({
           ...trade,
           entryTimestamp: new Date(),
           status: 'pending',
         });
         
-        logger?.info('✅ [TradeLedger] Trade recorded', { tradeId });
+        logger?.info('✅ [TradeLedger] Trade recorded', { 
+          tradeId, 
+          hasPrediction: !!trade.predictionId,
+          horizon: trade.horizon || 'none',
+        });
         return c.json({ success: true, tradeId });
       } catch (error: any) {
         logger?.error('❌ [TradeLedger] Error recording trade', { error: error.message });
