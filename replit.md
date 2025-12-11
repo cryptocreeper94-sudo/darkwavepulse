@@ -41,6 +41,7 @@ The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with 
 - 18 AI Agent personas with NFT Trading Cards.
 - Comprehensive Knowledge Base.
 - Custom Avatar Creator with DiceBear integration, bento grid layout, and accordion-based customization. Supports 5 professional avatar styles (personas, notionists, avataaars, lorelei, micah).
+- **Skins System**: 304 customizable themes across 14 categories (subscriber-exclusive feature). Categories include Classic (3), NFL (32), MLB (30), NBA (30), NHL (32), College Football (40), EPL (20), La Liga (20), Bundesliga (18), Serie A (20), Ligue 1 (18), MLS (29), Golf (2), Nature (9). Free users get 2 demo themes (classic-dark, light). RM+ subscribers unlock all 304 themes. Each team theme includes official logo watermarks.
 
 ## External Dependencies
 
