@@ -582,7 +582,7 @@ function ChartMetricsPanel({ coin }) {
         </div>
       </div>
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 10, color: '#666' }}>Market Cap</span>
           <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatMarketCap(coin.market_cap)}</span>
@@ -605,6 +605,53 @@ function ChartMetricsPanel({ coin }) {
             {athChange.toFixed(1)}%
           </span>
         </div>
+      </div>
+      
+      <div style={{ 
+        marginTop: 'auto',
+        padding: '12px',
+        background: 'linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(255, 136, 0, 0.1) 100%)',
+        borderRadius: 10,
+        border: '1px solid rgba(255, 68, 68, 0.3)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+          <div style={{ 
+            width: 28, 
+            height: 28, 
+            background: 'linear-gradient(135deg, #ff4444, #ff8800)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 14,
+          }}>
+            🎯
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>StrikeAgent</div>
+            <div style={{ fontSize: 9, color: '#888' }}>AI Predictive Trading</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 9, color: '#aaa', lineHeight: 1.4, marginBottom: 8 }}>
+          Anti-MEV protection, safety checks, and AI-powered entry signals for new token launches.
+        </div>
+        <button style={{
+          width: '100%',
+          padding: '6px 12px',
+          fontSize: 10,
+          fontWeight: 600,
+          background: 'linear-gradient(135deg, #ff4444, #ff8800)',
+          border: 'none',
+          borderRadius: 6,
+          color: '#fff',
+          cursor: 'pointer',
+          transition: 'opacity 0.2s',
+        }}
+        onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+        onMouseLeave={(e) => e.target.style.opacity = '1'}
+        >
+          Learn More
+        </button>
       </div>
     </div>
   )
