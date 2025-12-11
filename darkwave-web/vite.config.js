@@ -13,6 +13,7 @@ export default defineConfig({
         global: true,
         process: true,
       },
+      protocolImports: true,
     }),
   ],
   server: {
@@ -33,6 +34,9 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         telegram: resolve(__dirname, 'telegram.html'),
       },
+      external: [
+        'vite-plugin-node-polyfills/shims/global',
+      ],
     },
   },
   resolve: {
