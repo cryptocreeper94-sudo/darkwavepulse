@@ -649,7 +649,8 @@ export default function SniperBotTab() {
     { id: 'linea', name: 'Linea', symbol: 'ETH', isEvm: true },
     { id: 'scroll', name: 'Scroll', symbol: 'ETH', isEvm: true },
     { id: 'mantle', name: 'Mantle', symbol: 'MNT', isEvm: true },
-    { id: 'blast', name: 'Blast', symbol: 'ETH', isEvm: true },
+    { id: 'kava', name: 'Kava', symbol: 'KAVA', isEvm: true },
+    { id: 'evmos', name: 'Evmos', symbol: 'EVMOS', isEvm: true },
   ])
   
   const isDemoMode = sessionStorage.getItem('dwp_demo_mode') === 'true'
