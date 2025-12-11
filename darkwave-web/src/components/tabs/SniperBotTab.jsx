@@ -4,6 +4,7 @@ import BentoGrid, { BentoItem } from '../ui/BentoGrid'
 import { useWalletState } from '../../context/WalletContext'
 import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
 import ManualWatchlist from '../trading/ManualWatchlist'
+import SafetyReport from '../trading/SafetyReport'
 import './SniperBotTab.css'
 
 const API_BASE = ''
@@ -248,7 +249,7 @@ function ActivePositionCard({ position, onClose }) {
   )
 }
 
-function DiscoveredTokenCard({ token, onSnipe, onWatch, disabled }) {
+function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, disabled }) {
   const scoreColor = token.aiScore >= 70 ? '#39FF14' : token.aiScore >= 50 ? '#FFD700' : '#FF4444'
   const dexColor = token.dex === 'pumpfun' ? '#FF69B4' : '#9D4EDD'
 
@@ -295,6 +296,13 @@ function DiscoveredTokenCard({ token, onSnipe, onWatch, disabled }) {
           {disabled ? 'Connect Wallet' : 'Strike'}
         </button>
         <button className="sniper-btn-watch" onClick={() => onWatch(token)}>Watch</button>
+        <button 
+          className="sniper-btn-safety" 
+          onClick={() => onSafetyCheck && onSafetyCheck(token)}
+          title="Run Safety Check"
+        >
+          🛡️
+        </button>
       </div>
     </div>
   )
@@ -617,6 +625,7 @@ export default function SniperBotTab() {
   const [expandedRPC, setExpandedRPC] = useState(false)
   const [rpcStatus, setRpcStatus] = useState(null)
   const [customRPC, setCustomRPC] = useState('')
+  const [safetyCheckToken, setSafetyCheckToken] = useState(null)
   
   const wallet = walletSource === 'external' 
     ? { 
@@ -887,6 +896,7 @@ export default function SniperBotTab() {
                       token={token}
                       onSnipe={handleSnipe}
                       onWatch={handleWatch}
+                      onSafetyCheck={(t) => setSafetyCheckToken(t.address)}
                       disabled={!wallet.connected}
                     />
                   ))}
@@ -901,6 +911,15 @@ export default function SniperBotTab() {
             </div>
           </div>
         </BentoItem>
+
+        {safetyCheckToken && (
+          <BentoItem span={2} className="sniper-safety-section">
+            <SafetyReport 
+              tokenAddress={safetyCheckToken}
+              onClose={() => setSafetyCheckToken(null)}
+            />
+          </BentoItem>
+        )}
 
         {mode === 'advanced' && (
           <>

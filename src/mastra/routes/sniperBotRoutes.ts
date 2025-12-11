@@ -2,6 +2,7 @@ import { sniperBotService, DEFAULT_PRESET, SnipePresetConfig } from '../../servi
 import { tokenScannerService } from '../../services/tokenScannerService';
 import { tradeExecutorService } from '../../services/tradeExecutorService';
 import { rpcService } from '../../services/rpcService';
+import { safetyEngineService, DEFAULT_SAFETY_CONFIG } from '../../services/safetyEngineService';
 
 export const sniperBotRoutes = [
   // ============================================
@@ -598,6 +599,162 @@ export const sniperBotRoutes = [
         logger?.error('❌ [TradeExecutor] Fee estimate error', { error: error.message });
         return c.json({ error: 'Failed to estimate fees' }, 500);
       }
+    }
+  },
+
+  // ============================================
+  // SAFETY ENGINE - Token Safety Checks
+  // ============================================
+  {
+    path: "/api/sniper/safety/check",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { tokenAddress, config } = await c.req.json();
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        logger?.info('🔍 [SafetyEngine] Running full safety check', { tokenAddress });
+        
+        const safetyConfig = config || DEFAULT_SAFETY_CONFIG;
+        const report = await safetyEngineService.runFullSafetyCheck(tokenAddress, safetyConfig);
+        
+        logger?.info('✅ [SafetyEngine] Safety check complete', { 
+          tokenAddress, 
+          score: report.safetyScore,
+          grade: report.safetyGrade,
+          risks: report.risks.length 
+        });
+        
+        return c.json(report);
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Safety check error', { error: error.message });
+        return c.json({ error: 'Failed to run safety check', details: error.message }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/quick-check",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        // Run quick checks in parallel
+        const [authorityCheck, honeypotCheck] = await Promise.all([
+          safetyEngineService.quickAuthorityCheck(tokenAddress),
+          safetyEngineService.quickHoneypotCheck(tokenAddress),
+        ]);
+        
+        const quickSafe = authorityCheck.safe && honeypotCheck.safe;
+        
+        return c.json({
+          tokenAddress,
+          quickSafe,
+          authorities: authorityCheck,
+          honeypot: honeypotCheck,
+        });
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Quick check error', { error: error.message });
+        return c.json({ error: 'Failed to run quick check' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/authorities",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        const result = await safetyEngineService.checkTokenAuthorities(tokenAddress);
+        return c.json({ tokenAddress, ...result });
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Authority check error', { error: error.message });
+        return c.json({ error: 'Failed to check authorities' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/honeypot",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        logger?.info('🍯 [SafetyEngine] Running honeypot simulation', { tokenAddress });
+        const result = await safetyEngineService.simulateHoneypot(tokenAddress);
+        
+        return c.json({ tokenAddress, ...result });
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Honeypot check error', { error: error.message });
+        return c.json({ error: 'Failed to check honeypot' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/liquidity",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        const result = await safetyEngineService.checkLiquiditySafety(tokenAddress);
+        return c.json({ tokenAddress, ...result });
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Liquidity check error', { error: error.message });
+        return c.json({ error: 'Failed to check liquidity' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/holders",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const tokenAddress = c.req.query('tokenAddress');
+        
+        if (!tokenAddress) {
+          return c.json({ error: 'tokenAddress is required' }, 400);
+        }
+        
+        const result = await safetyEngineService.analyzeHolderDistribution(tokenAddress);
+        return c.json({ tokenAddress, ...result });
+      } catch (error: any) {
+        logger?.error('❌ [SafetyEngine] Holder analysis error', { error: error.message });
+        return c.json({ error: 'Failed to analyze holders' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/safety/config",
+    method: "GET",
+    createHandler: async () => async (c: any) => {
+      return c.json({ defaultConfig: DEFAULT_SAFETY_CONFIG });
     }
   },
 ];
