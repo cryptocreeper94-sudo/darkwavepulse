@@ -49,13 +49,14 @@ body {
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: #0a0a0a;
-  border-bottom: 1px solid #222;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
   z-index: 9999;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .hamburger-btn {
