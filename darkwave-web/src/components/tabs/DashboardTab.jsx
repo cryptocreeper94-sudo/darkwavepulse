@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useAvatar } from '../../context/AvatarContext'
 import BitcoinChart from '../charts/BitcoinChart'
-import CoinAnalysisModal from '../modals/CoinAnalysisModal'
 import Gauge from '../ui/Gauge'
 import FlipCarousel from '../ui/FlipCarousel'
 import MobileCardCarousel from '../ui/MobileCardCarousel'
@@ -363,11 +362,9 @@ function MiniCoinTable({ coins, onCoinClick, favorites }) {
   )
 }
 
-export default function DashboardTab({ userId, userConfig, onNavigate }) {
+export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyzeCoin }) {
   const { favorites } = useFavorites()
   const isMobile = useIsMobile()
-  const [selectedCoin, setSelectedCoin] = useState(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [coins, setCoins] = useState([])
   const [coinsLoading, setCoinsLoading] = useState(true)
   const [marketData, setMarketData] = useState({
@@ -441,8 +438,18 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
   }, [])
 
   const handleCoinClick = (coin) => {
-    setSelectedCoin(coin)
-    setIsModalOpen(true)
+    if (onAnalyzeCoin) {
+      onAnalyzeCoin({
+        id: coin.id,
+        symbol: coin.symbol?.toUpperCase(),
+        name: coin.name,
+        image: coin.image,
+        price: `$${coin.current_price?.toLocaleString() || '0'}`,
+        change: `${coin.price_change_percentage_24h >= 0 ? '+' : ''}${coin.price_change_percentage_24h?.toFixed(2) || '0'}%`,
+        marketCap: `$${(coin.market_cap / 1e9)?.toFixed(2) || '0'}B`,
+        volume: `$${(coin.total_volume / 1e9)?.toFixed(2) || '0'}B`,
+      })
+    }
   }
 
   const isFavorite = (symbol) => favorites?.some(f => f.symbol?.toUpperCase() === symbol?.toUpperCase())
@@ -709,15 +716,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate }) {
         Powered by DarkWave Studios, LLC © 2025 | v{versionData.version}
       </div>
       
-      <CoinAnalysisModal 
-        coin={selectedCoin}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedCoin(null)
-        }}
-      />
-    </div>
+          </div>
     </>
   )
 }
