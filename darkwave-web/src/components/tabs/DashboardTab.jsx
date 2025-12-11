@@ -422,7 +422,7 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
           )}
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         <div style={{ fontSize: 8, color: '#444', display: 'flex', padding: '4px 0', borderBottom: '1px solid #222', position: 'sticky', top: 0, background: '#0f0f0f', zIndex: 1 }}>
           <span style={{ flex: '0 0 20px', textAlign: 'center' }}>#</span>
           <span style={{ flex: '1 1 45px', minWidth: 40 }}>Coin</span>
@@ -435,6 +435,11 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
           <span style={{ flex: '0 0 40px', textAlign: 'center' }}>7d</span>
           <span style={{ flex: '0 0 38px', textAlign: 'right' }}>ATH</span>
         </div>
+        {displayCoins.length === 0 && (
+          <div style={{ padding: 20, textAlign: 'center', color: '#666', fontSize: 11 }}>
+            {coins.length === 0 ? 'Loading coins...' : 'No coins found for this category'}
+          </div>
+        )}
         {displayCoins.map((coin, i) => {
           const change24h = coin.price_change_percentage_24h || 0
           const change7d = coin.price_change_percentage_7d_in_currency || 0
