@@ -36,6 +36,15 @@ function formatPrice(price) {
   return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
+function formatSupply(value) {
+  if (!value) return '—'
+  if (value >= 1e12) return `${(value / 1e12).toFixed(2)}T`
+  if (value >= 1e9) return `${(value / 1e9).toFixed(2)}B`
+  if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`
+  if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`
+  return value.toFixed(0)
+}
+
 function BentoTile({ children, className = '', style = {}, onClick }) {
   return (
     <div
@@ -270,24 +279,84 @@ const memeCoins = ['doge', 'shib', 'pepe', 'floki', 'bonk', 'wif', 'meme', 'turb
 const defiCoins = ['uni', 'aave', 'mkr', 'ldo', 'crv', 'snx', 'comp', 'sushi', 'yfi', '1inch', 'pendle', 'ena', 'ethfi', 'eigen', 'ondo']
 const dexCoins = ['uni', 'cake', 'ray', 'jup', 'dydx', 'gmx', 'sushi', '1inch', 'crv', 'bal', 'joe', 'orca', 'velo', 'aero', 'osmo']
 
-function MiniCoinTable({ coins, onCoinClick, favorites }) {
+function isContractAddress(input) {
+  if (!input) return false
+  const trimmed = input.trim()
+  if (trimmed.startsWith('0x') && trimmed.length === 42) return 'evm'
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmed)) return 'solana'
+  return false
+}
+
+function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
   const [category, setCategory] = useState('top')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState(null)
+  const [isSearching, setIsSearching] = useState(false)
   const isFavorite = (symbol) => favorites?.some(f => f.symbol?.toUpperCase() === symbol?.toUpperCase())
   
   const getFilteredCoins = () => {
+    let filtered = coins
     switch(category) {
       case 'gainers':
-        return [...coins].sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0)).slice(0, 10)
+        filtered = [...coins].sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0)).slice(0, 10)
+        break
       case 'losers':
-        return [...coins].sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0)).slice(0, 10)
+        filtered = [...coins].sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0)).slice(0, 10)
+        break
       case 'meme':
-        return coins.filter(c => memeCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        filtered = coins.filter(c => memeCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        break
       case 'defi':
-        return coins.filter(c => defiCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        filtered = coins.filter(c => defiCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        break
       case 'dex':
-        return coins.filter(c => dexCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        filtered = coins.filter(c => dexCoins.includes(c.symbol?.toLowerCase())).slice(0, 10)
+        break
       default:
-        return coins.slice(0, 10)
+        filtered = coins.slice(0, 10)
+    }
+    
+    if (searchQuery && !searchResults) {
+      const query = searchQuery.toLowerCase()
+      filtered = coins.filter(c => 
+        c.name?.toLowerCase().includes(query) || 
+        c.symbol?.toLowerCase().includes(query)
+      ).slice(0, 10)
+    }
+    
+    return searchResults ? [searchResults] : filtered
+  }
+  
+  const handleSearchChange = async (e) => {
+    const value = e.target.value
+    setSearchQuery(value)
+    setSearchResults(null)
+    
+    const caType = isContractAddress(value)
+    if (caType) {
+      setIsSearching(true)
+      try {
+        const response = await fetch(`/api/crypto/token-lookup?address=${encodeURIComponent(value.trim())}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data && data.id) {
+            setSearchResults(data)
+          }
+        }
+      } catch (err) {
+        console.log('Token lookup failed:', err)
+      } finally {
+        setIsSearching(false)
+      }
+    }
+  }
+  
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      const displayCoins = getFilteredCoins()
+      if (displayCoins.length > 0) {
+        onCoinClick(displayCoins[0])
+      }
     }
   }
   
@@ -295,29 +364,58 @@ function MiniCoinTable({ coins, onCoinClick, favorites }) {
   
   return (
     <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <TileLabel>{category === 'top' ? 'Top Coins' : category === 'gainers' ? 'Top Gainers' : category === 'losers' ? 'Top Losers' : category === 'meme' ? 'Meme Coins' : category === 'defi' ? 'DeFi' : 'DEX Tokens'}</TileLabel>
       </div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-        {coinCategories.map(cat => (
-          <button
-            key={cat.id}
-            onClick={() => setCategory(cat.id)}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {coinCategories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => { setCategory(cat.id); setSearchQuery(''); setSearchResults(null); }}
+              style={{
+                padding: '4px 10px',
+                fontSize: 10,
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: 12,
+                cursor: 'pointer',
+                background: category === cat.id ? '#00D4FF' : '#1a1a1a',
+                color: category === cat.id ? '#000' : '#888',
+                transition: 'all 0.2s',
+              }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            placeholder="Search coin or paste contract address..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
             style={{
-              padding: '4px 10px',
+              width: 200,
+              padding: '6px 10px',
               fontSize: 10,
-              fontWeight: 600,
-              border: 'none',
-              borderRadius: 12,
-              cursor: 'pointer',
-              background: category === cat.id ? '#00D4FF' : '#1a1a1a',
-              color: category === cat.id ? '#000' : '#888',
-              transition: 'all 0.2s',
+              background: '#1a1a1a',
+              border: '1px solid #333',
+              borderRadius: 8,
+              color: '#fff',
+              outline: 'none',
+              transition: 'border-color 0.2s',
             }}
-          >
-            {cat.label}
-          </button>
-        ))}
+            onFocus={(e) => e.target.style.borderColor = '#00D4FF'}
+            onBlur={(e) => e.target.style.borderColor = '#333'}
+          />
+          {isSearching && (
+            <div style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: '#00D4FF', fontSize: 10 }}>
+              ...
+            </div>
+          )}
+        </div>
       </div>
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ fontSize: 8, color: '#444', display: 'flex', padding: '4px 0', borderBottom: '1px solid #222', position: 'sticky', top: 0, background: '#0f0f0f', zIndex: 1 }}>
@@ -342,6 +440,7 @@ function MiniCoinTable({ coins, onCoinClick, favorites }) {
           const supply = coin.circulating_supply ? (coin.circulating_supply >= 1e9 ? `${(coin.circulating_supply / 1e9).toFixed(1)}B` : coin.circulating_supply >= 1e6 ? `${(coin.circulating_supply / 1e6).toFixed(0)}M` : `${(coin.circulating_supply / 1e3).toFixed(0)}K`) : '-'
           const athChange = coin.ath_change_percentage || 0
           const sparkline = coin.sparkline_in_7d?.price || []
+          const isSelected = coin.id === selectedCoinId
           return (
             <div 
               key={coin.id || i}
@@ -353,9 +452,11 @@ function MiniCoinTable({ coins, onCoinClick, favorites }) {
                 borderBottom: '1px solid #1a1a1a',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
+                background: isSelected ? 'rgba(0, 212, 255, 0.1)' : 'transparent',
+                borderLeft: isSelected ? '2px solid #00D4FF' : '2px solid transparent',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#1a1a1a' }}
+              onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
             >
               <div style={{ flex: '0 0 20px', textAlign: 'center', fontSize: 9, color: '#666' }}>
                 {coin.market_cap_rank || i + 1}
@@ -417,11 +518,93 @@ function MiniCoinTable({ coins, onCoinClick, favorites }) {
   )
 }
 
+function ChartMetricsPanel({ coin }) {
+  if (!coin) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100%',
+        color: '#666',
+        fontSize: 12,
+      }}>
+        Select a coin to view metrics
+      </div>
+    )
+  }
+  
+  const change24h = coin.price_change_percentage_24h || 0
+  const change7d = coin.price_change_percentage_7d_in_currency || 0
+  const athChange = coin.ath_change_percentage || 0
+  const isPositive24h = change24h >= 0
+  const isPositive7d = change7d >= 0
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 12, borderBottom: '1px solid #222' }}>
+        {coin.image && (
+          <img src={coin.image} alt="" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+        )}
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{coin.name}</div>
+          <div style={{ fontSize: 11, color: '#666' }}>{coin.symbol?.toUpperCase()}</div>
+        </div>
+      </div>
+      
+      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff' }}>
+        {formatPrice(coin.current_price)}
+      </div>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', marginBottom: 2 }}>24h Change</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: isPositive24h ? '#39FF14' : '#ff4444' }}>
+            {isPositive24h ? '+' : ''}{change24h.toFixed(2)}%
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', marginBottom: 2 }}>7d Change</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: isPositive7d ? '#39FF14' : '#ff4444' }}>
+            {isPositive7d ? '+' : ''}{change7d.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, color: '#666' }}>Market Cap</span>
+          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatMarketCap(coin.market_cap)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, color: '#666' }}>24h Volume</span>
+          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatMarketCap(coin.total_volume)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, color: '#666' }}>Circulating Supply</span>
+          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatSupply(coin.circulating_supply)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, color: '#666' }}>ATH</span>
+          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatPrice(coin.ath)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, color: '#666' }}>From ATH</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: athChange >= -10 ? '#39FF14' : athChange >= -50 ? '#FFD700' : '#ff4444' }}>
+            {athChange.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyzeCoin }) {
   const { favorites } = useFavorites()
   const isMobile = useIsMobile()
   const [coins, setCoins] = useState([])
   const [coinsLoading, setCoinsLoading] = useState(true)
+  const [selectedCoin, setSelectedCoin] = useState(null)
   const [marketData, setMarketData] = useState({
     fearGreed: 65,
     altcoinSeason: 75,
@@ -454,7 +637,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         const response = await fetch('/api/market-overview?category=top')
         if (response.ok) {
           const data = await response.json()
-          setCoins(Array.isArray(data) ? data : (data.coins || []))
+          const coinList = Array.isArray(data) ? data : (data.coins || [])
+          setCoins(coinList)
+          if (!selectedCoin && coinList.length > 0) {
+            setSelectedCoin(coinList[0])
+          }
         }
       } catch (err) {
         console.log('Failed to fetch coins')
@@ -493,6 +680,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   }, [])
 
   const handleCoinClick = (coin) => {
+    setSelectedCoin(coin)
     if (onAnalyzeCoin) {
       onAnalyzeCoin({
         id: coin.id,
@@ -531,15 +719,33 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           padding: 12px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: minmax(220px, auto) minmax(220px, auto) minmax(300px, auto) minmax(300px, auto);
+          grid-template-rows: minmax(220px, auto) minmax(220px, auto) minmax(280px, auto) minmax(350px, auto);
           gap: 10px;
         }
         .bento-quick { grid-area: 1 / 1 / 3 / 4; }
         .bento-market { grid-area: 1 / 4 / 3 / 7; }
         .bento-trending { grid-area: 1 / 7 / 3 / 10; }
         .bento-news { grid-area: 1 / 10 / 3 / 13; }
-        .bento-table { grid-area: 3 / 1 / 5 / 5; }
-        .bento-chart { grid-area: 3 / 5 / 5 / 13; }
+        .bento-table { grid-area: 3 / 1 / 4 / 13; }
+        .bento-chart-section { 
+          grid-area: 4 / 1 / 5 / 13;
+          display: grid;
+          grid-template-columns: 1fr 3fr;
+          gap: 12px;
+        }
+        .chart-metrics {
+          background: #0f0f0f;
+          border: 1px solid #222;
+          border-radius: 12px;
+          padding: 16px;
+        }
+        .chart-container {
+          background: #0f0f0f;
+          border: 1px solid #222;
+          border-radius: 12px;
+          padding: 8px;
+          min-height: 300px;
+        }
         
         @media (max-width: 1024px) {
           .bento-dashboard {
@@ -549,7 +755,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             padding: 10px;
           }
           .bento-quick, .bento-market, .bento-trending, .bento-news,
-          .bento-table, .bento-chart {
+          .bento-table, .bento-chart-section {
             grid-area: auto;
           }
           .bento-quick { min-height: 200px; }
@@ -557,7 +763,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           .bento-trending { min-height: 200px; }
           .bento-news { min-height: 200px; }
           .bento-table { min-height: 350px; grid-column: 1 / -1; }
-          .bento-chart { min-height: 400px; grid-column: 1 / -1; }
+          .bento-chart-section { 
+            min-height: 400px; 
+            grid-column: 1 / -1;
+            grid-template-columns: 1fr 2fr;
+          }
         }
         
         @media (max-width: 640px) {
@@ -571,7 +781,17 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             display: none;
           }
           .bento-table { min-height: 300px; }
-          .bento-chart { min-height: 350px; }
+          .bento-chart-section { 
+            min-height: 500px;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+          }
+          .chart-metrics {
+            padding: 12px;
+          }
+          .chart-container {
+            min-height: 280px;
+          }
           .mobile-categories-wrapper {
             display: block;
           }
@@ -746,15 +966,22 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
       </BentoTile>
 
       <BentoTile className="bento-table">
-        <MiniCoinTable coins={coins} onCoinClick={handleCoinClick} favorites={favorites} />
+        <MiniCoinTable 
+          coins={coins} 
+          onCoinClick={handleCoinClick} 
+          favorites={favorites} 
+          selectedCoinId={selectedCoin?.id}
+        />
       </BentoTile>
 
-      <BentoTile className="bento-chart" style={{ padding: 8 }}>
-        <TileLabel>Bitcoin Chart</TileLabel>
-        <div style={{ flex: 1, minHeight: 280 }}>
-          <BitcoinChart compact={true} />
+      <div className="bento-chart-section">
+        <div className="chart-metrics">
+          <ChartMetricsPanel coin={selectedCoin} />
         </div>
-      </BentoTile>
+        <div className="chart-container">
+          <BitcoinChart compact={false} coinId={selectedCoin?.id} />
+        </div>
+      </div>
 
       <div style={{
         position: 'fixed',
