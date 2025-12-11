@@ -26,7 +26,8 @@ const SUPPORTED_CHAINS = {
   linea: { name: 'Linea', symbol: 'ETH', isEvm: true },
   scroll: { name: 'Scroll', symbol: 'ETH', isEvm: true },
   mantle: { name: 'Mantle', symbol: 'MNT', isEvm: true },
-  blast: { name: 'Blast', symbol: 'ETH', isEvm: true },
+  kava: { name: 'Kava', symbol: 'KAVA', isEvm: true },
+  evmos: { name: 'Evmos', symbol: 'EVMOS', isEvm: true },
 }
 
 async function deriveKey(password, salt) {
