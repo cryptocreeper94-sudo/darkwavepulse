@@ -1,6 +1,7 @@
 import { inngest } from "./client";
 import { predictionTrackingService } from "../../services/predictionTrackingService.js";
 import { predictionLearningService } from "../../services/predictionLearningService.js";
+import { strikeAgentTrackingService } from "../../services/strikeAgentTrackingService.js";
 import axios from "axios";
 
 /**
@@ -263,8 +264,67 @@ export const modelTrainingWorker = inngest.createFunction(
   }
 );
 
+/**
+ * StrikeAgent Outcome Worker
+ * Runs periodically to check outcomes of StrikeAgent token discoveries
+ * Tracks if tokens pumped or rugged at 1h, 4h, 24h, 7d horizons
+ */
+export const strikeAgentOutcomeWorker = inngest.createFunction(
+  {
+    id: "strikeagent-outcome-worker",
+    name: "Check StrikeAgent Outcomes",
+  },
+  [
+    { cron: "30 * * * *" }, // Run every hour at minute 30
+    { event: "strikeagent/check-outcomes" }, // Can be triggered manually
+  ],
+  async ({ event, step }) => {
+    console.log("🎯 [StrikeAgentWorker] Starting outcome check run...");
+    
+    let processedCount = 0;
+    let errorCount = 0;
+
+    for (const horizon of HORIZONS) {
+      const pendingPredictions = await step.run(
+        `get-pending-sa-${horizon}`,
+        async () => {
+          return await strikeAgentTrackingService.getPendingOutcomeChecks(horizon);
+        }
+      );
+
+      console.log(`📊 [StrikeAgentWorker] Found ${pendingPredictions.length} pending StrikeAgent predictions for ${horizon} horizon`);
+
+      for (const prediction of pendingPredictions) {
+        try {
+          await step.run(
+            `check-sa-outcome-${prediction.id}-${horizon}`,
+            async () => {
+              return await strikeAgentTrackingService.checkOutcomeForPrediction(prediction.id, horizon);
+            }
+          );
+
+          processedCount++;
+        } catch (error: any) {
+          console.error(`❌ [StrikeAgentWorker] Error processing ${prediction.id}:`, error.message);
+          errorCount++;
+        }
+      }
+    }
+
+    const summary = {
+      processedCount,
+      errorCount,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log(`✅ [StrikeAgentWorker] Completed: ${processedCount} outcomes recorded, ${errorCount} errors`);
+    return summary;
+  }
+);
+
 export const predictionWorkerFunctions = [
   predictionOutcomeWorker,
   predictionCreatedHandler,
   modelTrainingWorker,
+  strikeAgentOutcomeWorker,
 ];
