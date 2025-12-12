@@ -141,20 +141,112 @@ const ApiUsageCard = ({ name, icon, data }) => {
   )
 }
 
+const WinRateCard = ({ title, icon, data, color = '#00D4FF' }) => {
+  const winRate = data?.currentWinRate
+  const delta = parseFloat(data?.delta || 0)
+  const trend = data?.trend || 'neutral'
+  const samples = data?.currentSamples || 0
+  
+  const getTrendIcon = () => {
+    if (trend === 'improving') return '↑'
+    if (trend === 'declining') return '↓'
+    if (trend === 'new') return '★'
+    return '→'
+  }
+  
+  const getTrendColor = () => {
+    if (trend === 'improving') return '#00ff88'
+    if (trend === 'declining') return '#ff4466'
+    if (trend === 'new') return '#00D4FF'
+    return '#888'
+  }
+  
+  return (
+    <div style={{
+      background: '#1a1a1a',
+      borderRadius: '16px',
+      padding: '24px',
+      textAlign: 'center',
+      flex: 1,
+      minWidth: '200px',
+      border: `1px solid ${color}33`
+    }}>
+      <div style={{ fontSize: '24px', marginBottom: '8px' }}>{icon}</div>
+      <div style={{ color: '#888', fontSize: '12px', marginBottom: '12px' }}>{title}</div>
+      
+      {winRate !== null ? (
+        <>
+          <div style={{ 
+            fontSize: '48px', 
+            fontWeight: 700, 
+            color: parseFloat(winRate) >= 60 ? '#00ff88' : parseFloat(winRate) >= 50 ? '#ffaa00' : '#ff4466',
+            lineHeight: 1
+          }}>
+            {winRate}%
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: '6px',
+            marginTop: '12px'
+          }}>
+            {data?.delta !== null && (
+              <span style={{ 
+                padding: '4px 10px',
+                background: getTrendColor() + '22',
+                color: getTrendColor(),
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: 600
+              }}>
+                {getTrendIcon()} {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs last week
+              </span>
+            )}
+            {trend === 'new' && (
+              <span style={{ 
+                padding: '4px 10px',
+                background: '#00D4FF22',
+                color: '#00D4FF',
+                borderRadius: '12px',
+                fontSize: '12px'
+              }}>
+                New data
+              </span>
+            )}
+          </div>
+          <div style={{ color: '#666', fontSize: '11px', marginTop: '8px' }}>
+            Based on {samples} predictions this week
+          </div>
+        </>
+      ) : (
+        <div style={{ color: '#666', fontSize: '14px' }}>
+          Collecting data...
+          <div style={{ fontSize: '11px', marginTop: '4px' }}>
+            Need more predictions to calculate
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function MLDashboardTab() {
   const [stats, setStats] = useState(null)
   const [strikeAgentStats, setStrikeAgentStats] = useState(null)
   const [apiUsage, setApiUsage] = useState(null)
+  const [accuracyTrends, setAccuracyTrends] = useState(null)
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState(null)
   const [apiAccordionOpen, setApiAccordionOpen] = useState(false)
 
   const fetchStats = useCallback(async () => {
     try {
-      const [predRes, saRes, apiRes] = await Promise.all([
+      const [predRes, saRes, apiRes, trendsRes] = await Promise.all([
         fetch('/api/ml/stats'),
         fetch('/api/sniper/ml/stats'),
-        fetch('/api/ml/api-usage')
+        fetch('/api/ml/api-usage'),
+        fetch('/api/ml/accuracy-trends')
       ])
       
       if (predRes.ok) {
@@ -170,6 +262,11 @@ export default function MLDashboardTab() {
       if (apiRes.ok) {
         const data = await apiRes.json()
         setApiUsage(data)
+      }
+      
+      if (trendsRes.ok) {
+        const data = await trendsRes.json()
+        setAccuracyTrends(data)
       }
       
       setLastRefresh(new Date())
@@ -236,6 +333,102 @@ export default function MLDashboardTab() {
             ↻ Refresh
           </button>
         </div>
+      </div>
+
+      {/* AI Performance Overview - Win Rates with Deltas */}
+      <div style={{ 
+        background: 'linear-gradient(135deg, #0f1a0f, #1a2a1a)',
+        borderRadius: '16px',
+        padding: '24px',
+        marginBottom: '24px',
+        border: '1px solid #00ff8833'
+      }}>
+        <h2 style={{ color: '#fff', fontSize: '18px', margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span>📈</span> AI Performance Overview
+          {accuracyTrends?.technicalAnalysis?.overall?.trend === 'improving' && (
+            <span style={{ 
+              padding: '4px 12px',
+              background: '#00ff8822',
+              color: '#00ff88',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: 600
+            }}>
+              ↑ Improving
+            </span>
+          )}
+        </h2>
+        
+        <div style={{ 
+          display: 'flex', 
+          gap: '20px', 
+          flexWrap: 'wrap',
+          marginBottom: '20px'
+        }}>
+          <WinRateCard 
+            title="Technical Analysis Win Rate"
+            icon="📊"
+            data={accuracyTrends?.technicalAnalysis?.overall}
+            color="#00D4FF"
+          />
+          <WinRateCard 
+            title="StrikeAgent Win Rate"
+            icon="🎯"
+            data={accuracyTrends?.strikeAgent}
+            color="#ff6b00"
+          />
+        </div>
+        
+        {/* Horizon breakdown */}
+        {accuracyTrends?.technicalAnalysis?.byHorizon && Object.keys(accuracyTrends.technicalAnalysis.byHorizon).some(
+          h => accuracyTrends.technicalAnalysis.byHorizon[h]?.currentWinRate !== null
+        ) && (
+          <div style={{ 
+            background: '#1a1a1a', 
+            borderRadius: '12px', 
+            padding: '16px' 
+          }}>
+            <div style={{ color: '#888', fontSize: '12px', marginBottom: '12px' }}>
+              Win Rate by Time Horizon (This Week vs Last Week)
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+              {['1h', '4h', '24h', '7d'].map(h => {
+                const hData = accuracyTrends?.technicalAnalysis?.byHorizon?.[h]
+                const winRate = hData?.currentWinRate
+                const delta = parseFloat(hData?.delta || 0)
+                const trend = hData?.trend
+                
+                return (
+                  <div key={h} style={{ textAlign: 'center', padding: '12px', background: '#141414', borderRadius: '8px' }}>
+                    <div style={{ color: '#666', fontSize: '11px', marginBottom: '4px' }}>{h} Horizon</div>
+                    {winRate !== null ? (
+                      <>
+                        <div style={{ 
+                          fontSize: '24px', 
+                          fontWeight: 700, 
+                          color: parseFloat(winRate) >= 60 ? '#00ff88' : parseFloat(winRate) >= 50 ? '#ffaa00' : '#ff4466'
+                        }}>
+                          {winRate}%
+                        </div>
+                        {hData?.delta !== null && (
+                          <div style={{ 
+                            fontSize: '11px', 
+                            color: trend === 'improving' ? '#00ff88' : trend === 'declining' ? '#ff4466' : '#888',
+                            marginTop: '4px'
+                          }}>
+                            {trend === 'improving' ? '↑' : trend === 'declining' ? '↓' : '→'} {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ color: '#444', fontSize: '12px' }}>--</div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* API Cost Monitor Accordion */}

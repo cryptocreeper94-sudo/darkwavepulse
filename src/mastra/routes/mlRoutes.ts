@@ -1,6 +1,6 @@
 import { db } from '../../db/client.js';
-import { predictionEvents, predictionOutcomes, predictionModelVersions, strikeagentPredictions } from '../../db/schema';
-import { desc, gte, sql } from 'drizzle-orm';
+import { predictionEvents, predictionOutcomes, predictionModelVersions, strikeagentPredictions, strikeagentOutcomes } from '../../db/schema';
+import { desc, gte, lte, sql, and } from 'drizzle-orm';
 
 export const mlRoutes = [
   {
@@ -196,6 +196,137 @@ export const mlRoutes = [
           helius: { callsToday: 0, callsThisMonth: 0, monthlyLimit: 100000, percentUsed: '0', estimatedMonthlyCost: '$0', status: 'unknown' },
           breakdown: { predictions: 0, tokenScans: 0, outcomeChecks: 0 },
           summary: { totalApiCalls: 0, estimatedTotalCost: '$0/month' }
+        });
+      }
+    }
+  },
+  {
+    path: "/api/ml/accuracy-trends",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        
+        const allOutcomes = await db.select().from(predictionOutcomes);
+        
+        const currentWeekOutcomes = allOutcomes.filter((o: any) => 
+          new Date(o.checkedAt) >= oneWeekAgo
+        );
+        const previousWeekOutcomes = allOutcomes.filter((o: any) => 
+          new Date(o.checkedAt) >= twoWeeksAgo && new Date(o.checkedAt) < oneWeekAgo
+        );
+        
+        const calculateWinRate = (outcomes: any[]) => {
+          if (outcomes.length === 0) return null;
+          const correct = outcomes.filter((o: any) => o.isCorrect).length;
+          return (correct / outcomes.length) * 100;
+        };
+        
+        const horizons = ['1h', '4h', '24h', '7d'];
+        const trendsByHorizon: Record<string, any> = {};
+        
+        for (const h of horizons) {
+          const currentH = currentWeekOutcomes.filter((o: any) => o.horizon === h);
+          const previousH = previousWeekOutcomes.filter((o: any) => o.horizon === h);
+          
+          const currentRate = calculateWinRate(currentH);
+          const previousRate = calculateWinRate(previousH);
+          
+          let delta = null;
+          let trend = 'neutral';
+          if (currentRate !== null && previousRate !== null) {
+            delta = currentRate - previousRate;
+            trend = delta > 0 ? 'improving' : delta < 0 ? 'declining' : 'stable';
+          } else if (currentRate !== null && previousRate === null) {
+            trend = 'new';
+          }
+          
+          trendsByHorizon[h] = {
+            currentWinRate: currentRate !== null ? currentRate.toFixed(1) : null,
+            previousWinRate: previousRate !== null ? previousRate.toFixed(1) : null,
+            delta: delta !== null ? delta.toFixed(1) : null,
+            trend,
+            currentSamples: currentH.length,
+            previousSamples: previousH.length
+          };
+        }
+        
+        const overallCurrentRate = calculateWinRate(currentWeekOutcomes);
+        const overallPreviousRate = calculateWinRate(previousWeekOutcomes);
+        let overallDelta = null;
+        let overallTrend = 'neutral';
+        if (overallCurrentRate !== null && overallPreviousRate !== null) {
+          overallDelta = overallCurrentRate - overallPreviousRate;
+          overallTrend = overallDelta > 0 ? 'improving' : overallDelta < 0 ? 'declining' : 'stable';
+        } else if (overallCurrentRate !== null) {
+          overallTrend = 'new';
+        }
+
+        let saCurrentRate = null;
+        let saPreviousRate = null;
+        let saDelta = null;
+        let saTrend = 'neutral';
+        let saCurrentSamples = 0;
+        let saPreviousSamples = 0;
+        
+        try {
+          const saOutcomes = await db.select().from(strikeagentOutcomes);
+          const saCurrentWeek = saOutcomes.filter((o: any) => 
+            new Date(o.checkedAt) >= oneWeekAgo
+          );
+          const saPreviousWeek = saOutcomes.filter((o: any) => 
+            new Date(o.checkedAt) >= twoWeeksAgo && new Date(o.checkedAt) < oneWeekAgo
+          );
+          
+          saCurrentRate = calculateWinRate(saCurrentWeek);
+          saPreviousRate = calculateWinRate(saPreviousWeek);
+          saCurrentSamples = saCurrentWeek.length;
+          saPreviousSamples = saPreviousWeek.length;
+          
+          if (saCurrentRate !== null && saPreviousRate !== null) {
+            saDelta = saCurrentRate - saPreviousRate;
+            saTrend = saDelta > 0 ? 'improving' : saDelta < 0 ? 'declining' : 'stable';
+          } else if (saCurrentRate !== null) {
+            saTrend = 'new';
+          }
+        } catch (e) {
+        }
+        
+        return c.json({
+          technicalAnalysis: {
+            overall: {
+              currentWinRate: overallCurrentRate !== null ? overallCurrentRate.toFixed(1) : null,
+              previousWinRate: overallPreviousRate !== null ? overallPreviousRate.toFixed(1) : null,
+              delta: overallDelta !== null ? overallDelta.toFixed(1) : null,
+              trend: overallTrend,
+              currentSamples: currentWeekOutcomes.length,
+              previousSamples: previousWeekOutcomes.length
+            },
+            byHorizon: trendsByHorizon
+          },
+          strikeAgent: {
+            currentWinRate: saCurrentRate !== null ? saCurrentRate.toFixed(1) : null,
+            previousWinRate: saPreviousRate !== null ? saPreviousRate.toFixed(1) : null,
+            delta: saDelta !== null ? saDelta.toFixed(1) : null,
+            trend: saTrend,
+            currentSamples: saCurrentSamples,
+            previousSamples: saPreviousSamples
+          },
+          period: {
+            currentWeekStart: oneWeekAgo.toISOString(),
+            previousWeekStart: twoWeeksAgo.toISOString(),
+            now: now.toISOString()
+          }
+        });
+      } catch (error: any) {
+        logger?.error('❌ [MLStats] Error fetching accuracy trends', { error: error.message });
+        return c.json({
+          technicalAnalysis: { overall: { currentWinRate: null, trend: 'unknown' }, byHorizon: {} },
+          strikeAgent: { currentWinRate: null, trend: 'unknown' },
+          period: {}
         });
       }
     }
