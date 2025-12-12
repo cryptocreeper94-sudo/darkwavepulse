@@ -16,24 +16,24 @@ export const COINS: Coin[] = [
   // Featured
   {
     id: 1,
-    ticker: 'SolDump',
-    name: 'SolDump',
-    ca: 'SolDumpSolDumpSolDumpSolDumpSolDumpSolDump',
+    ticker: '$CCAT',
+    name: 'CryptoCat',
+    ca: 'CyokFVBYyvdDzvScSSpHeJ3gR2oGPU5o9CjBHXwkpump',
     category: 'featured',
-    imagePath: 'soldump',
-    description: 'Current featured coin',
+    imagePath: 'ccat-cryptocat',
+    description: 'The original Crypto Cat',
     isFeatured: true
   },
   
-  // Spiritual & Unity (5)
+  // Spiritual & Unity (4)
   {
     id: 2,
-    ticker: '$LOVE',
-    name: 'United',
-    ca: 'Gvt8zjmMrUXKgvckQzJMobsegF373M6ALYtmCq6qpump',
+    ticker: '$JH-25',
+    name: 'Justice for Humanity',
+    ca: '22PXfkPGkhVUwMqQaeFzjtdzyFNU8ZQRk2shifwAuSkx',
     category: 'spiritual',
-    imagePath: 'love-united',
-    description: 'Unity and love on chain'
+    imagePath: 'justice-for-humanity',
+    description: 'Fighting for justice'
   },
   {
     id: 3,
@@ -63,16 +63,7 @@ export const COINS: Coin[] = [
     description: 'Rare earth token'
   },
   
-  // Justice & Conspiracy (3)
-  {
-    id: 6,
-    ticker: '$JH-25',
-    name: 'Justice for Humanity',
-    ca: '22PXfkPGkhVUwMqQaeFzjtdzyFNU8ZQRk2shifwAuSkx',
-    category: 'conspiracy',
-    imagePath: 'jh25-justice',
-    description: 'Fighting for justice'
-  },
+  // Justice & Conspiracy (2)
   {
     id: 7,
     ticker: '$OBEY',
@@ -131,12 +122,12 @@ export const COINS: Coin[] = [
   },
   {
     id: 13,
-    ticker: '$GRIMCAT',
-    name: 'Crypto Cat Halloween 2025',
-    ca: 'HssQ9yerrCxVW32eYvL5XnJPC7zfRT9E6SpEkKyLpump',
+    ticker: '$INSANE',
+    name: 'Overstimulated',
+    ca: 'OVERstimulatedOVERstimulatedOVERstimulated',
     category: 'meme',
-    imagePath: 'grimcat-halloween',
-    description: 'Spooky season trading'
+    imagePath: 'overstimulated',
+    description: 'Overstimulated vibes'
   },
   {
     id: 14,
