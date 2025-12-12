@@ -1,7 +1,18 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import InfoTooltip from '../ui/InfoTooltip'
 import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
 import DustBuster from './DustBuster'
+import FlipCarousel from '../ui/FlipCarousel'
+
+const WALLET_TIPS = [
+  "Your portfolio is looking great!",
+  "Ready to make moves?",
+  "Stay vigilant, stay profitable!",
+  "DeFi awaits your next play.",
+  "Diversification is key!",
+  "HODL strong, trade smart.",
+  "The market never sleeps!",
+]
 
 const WALLET_DEFINITIONS = {
   mnemonic: {
@@ -553,6 +564,79 @@ export default function WalletManager({ userId }) {
   
   const activeWallet = builtInWallet.wallets.find(w => w.id === builtInWallet.activeWalletId)
   
+  const currentTip = useMemo(() => WALLET_TIPS[Math.floor(Math.random() * WALLET_TIPS.length)], [])
+  
+  const chainSlides = useMemo(() => {
+    if (!builtInWallet.addresses) return []
+    const entries = Object.entries(builtInWallet.addresses).filter(([k]) => CHAIN_INFO[k])
+    const slides = []
+    for (let i = 0; i < entries.length; i += 2) {
+      slides.push(entries.slice(i, i + 2))
+    }
+    return slides
+  }, [builtInWallet.addresses])
+  
+  const renderChainCard = (chainKey, address) => {
+    const chain = CHAIN_INFO[chainKey]
+    if (!chain) return null
+    const balance = builtInWallet.balances[chainKey]
+    const isExpanded = activeChain === chainKey
+    
+    return (
+      <div 
+        key={chainKey}
+        className={`chain-card-premium ${isExpanded ? 'expanded' : ''}`}
+        style={{ '--chain-color': chain.color, '--chain-gradient': chain.gradient }}
+        onClick={() => setActiveChain(isExpanded ? null : chainKey)}
+      >
+        <div className="chain-card-shimmer"></div>
+        <div className="chain-card-content">
+          <div className="chain-card-icon">{chain.icon}</div>
+          <div className="chain-card-info">
+            <span className="chain-card-name">{chain.name}</span>
+            <span className="chain-card-symbol">{chain.symbol}</span>
+          </div>
+          <div className="chain-card-balance">
+            <span className="chain-balance-crypto">{balance ? balance.balance : '...'}</span>
+            <span className="chain-balance-usd">${balance ? balance.usd.toFixed(2) : '0.00'}</span>
+          </div>
+        </div>
+        
+        {isExpanded && (
+          <div className="accordion-chain-details">
+            <div className="accordion-address" onClick={(e) => { e.stopPropagation(); copyAddress(address); }}>
+              <span className="address-text">{address}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+            </div>
+            <div className="accordion-actions">
+              <button className="accordion-action send" onClick={(e) => { e.stopPropagation(); openSendPanel(chainKey); }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/>
+                  <polygon points="22,2 15,22 11,13 2,9"/>
+                </svg>
+                Send
+              </button>
+              <button className="accordion-action receive" onClick={(e) => { e.stopPropagation(); copyAddress(address); }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Receive
+              </button>
+            </div>
+            <div className="accordion-transactions">
+              <span className="transactions-placeholder">Recent transactions coming soon...</span>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+  
   const renderMain = () => (
     <div className="wallet-main-v2">
       <div className="wallet-selector-bar">
@@ -643,25 +727,34 @@ export default function WalletManager({ userId }) {
         </div>
       )}
       
-      <div className="wallet-main-header">
-        <div className="wallet-total-card">
-          <span className="total-label">Total Balance</span>
-          <span className="total-value">${builtInWallet.totalUsd.toFixed(2)}</span>
-          <div className="total-actions">
-            <button className="action-btn" onClick={builtInWallet.refreshBalances}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 4v6h-6M1 20v-6h6"/>
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-              </svg>
-              Refresh
-            </button>
-            <button className="action-btn lock" onClick={handleLockWallet}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="2"/>
-                <path d="M7 11V7a5 5 0 0110 0v4"/>
-              </svg>
-              Lock
-            </button>
+      {/* PREMIUM HERO SECTION */}
+      <div className="wallet-hero-premium">
+        <div className="wallet-hero-glow"></div>
+        <div className="wallet-hero-content">
+          <div className="wallet-hero-balance">
+            <span className="hero-balance-label">Total Balance</span>
+            <span className="hero-balance-value">${builtInWallet.totalUsd.toFixed(2)}</span>
+            <div className="hero-actions">
+              <button className="hero-action-btn" onClick={builtInWallet.refreshBalances}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M23 4v6h-6M1 20v-6h6"/>
+                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                </svg>
+              </button>
+              <button className="hero-action-btn lock" onClick={handleLockWallet}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div className="wallet-hero-agent">
+            <div className="speech-bubble">
+              <span>{currentTip}</span>
+              <div className="speech-bubble-tail"></div>
+            </div>
+            <img src="/agents/pixar/marcus.png" alt="Marcus" className="agent-image" />
           </div>
         </div>
       </div>
@@ -669,84 +762,64 @@ export default function WalletManager({ userId }) {
       {success && <div className="form-success">{success}</div>}
       {error && <div className="form-error">{error}</div>}
       
-      <div className="wallet-chains-grid">
-        {builtInWallet.addresses && Object.entries(builtInWallet.addresses).map(([chainKey, address]) => {
-          const chain = CHAIN_INFO[chainKey]
-          if (!chain) return null
-          const balance = builtInWallet.balances[chainKey]
-          const isActive = activeChain === chainKey
-          
-          return (
-            <div 
-              key={chainKey} 
-              className={`wallet-chain-v2 ${isActive ? 'active' : ''}`}
-              style={{ '--chain-color': chain.color, '--chain-gradient': chain.gradient }}
-              onClick={() => setActiveChain(isActive ? null : chainKey)}
-            >
-              <div className="chain-header">
-                <div className="chain-identity">
-                  <span className="chain-icon-lg">{chain.icon}</span>
-                  <div className="chain-info">
-                    <span className="chain-name">{chain.name}</span>
-                    <span className="chain-symbol">{chain.symbol}</span>
-                  </div>
-                </div>
-                <div className="chain-balance">
-                  <span className="balance-crypto">{balance ? balance.balance : '...'}</span>
-                  <span className="balance-usd">${balance ? balance.usd.toFixed(2) : '0.00'}</span>
-                </div>
+      {/* CHAIN CAROUSEL */}
+      <div className="chain-carousel-container">
+        <h3 className="section-title">Your Assets</h3>
+        {chainSlides.length > 0 ? (
+          <FlipCarousel
+            items={chainSlides}
+            showArrows={true}
+            showDots={true}
+            autoPlay={false}
+            className="chain-carousel"
+            style={{ height: activeChain ? 280 : 160 }}
+            renderItem={(slide, idx) => (
+              <div className="chain-slide" key={idx}>
+                {slide.map(([chainKey, address]) => renderChainCard(chainKey, address))}
               </div>
-              
-              <div className="chain-address" onClick={(e) => { e.stopPropagation(); copyAddress(address); }}>
-                <span>{address.slice(0, 10)}...{address.slice(-8)}</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            )}
+          />
+        ) : (
+          <div className="no-chains">Loading chains...</div>
+        )}
+      </div>
+      
+      {/* QUICK ACTIONS HUB */}
+      <div className="quick-actions-hub">
+        <h3 className="section-title">Quick Actions</h3>
+        <div className="quick-actions-grid">
+          <button className="quick-action-card" onClick={() => { setSendChain('solana'); setShowSendPanel(true); }}>
+            <div className="quick-action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22,2 15,22 11,13 2,9"/>
+              </svg>
+            </div>
+            <span className="quick-action-label">Send</span>
+          </button>
+          <button className="quick-action-card" onClick={() => builtInWallet.addresses?.solana && copyAddress(builtInWallet.addresses.solana)}>
+            <div className="quick-action-icon receive">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+            <span className="quick-action-label">Receive</span>
+          </button>
+          {builtInWallet.addresses?.solana && (
+            <button className="quick-action-card dust" onClick={() => setShowDustBuster(true)}>
+              <div className="quick-action-icon dust">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 6h18M3 6l2 14h14l2-14M3 6l4-4h10l4 4"/>
+                  <path d="M9 10v6M12 10v6M15 10v6"/>
                 </svg>
               </div>
-              
-              {isActive && (
-                <div className="chain-actions">
-                  <button className="chain-action-btn send" onClick={(e) => { e.stopPropagation(); openSendPanel(chainKey); }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="22" y1="2" x2="11" y2="13"/>
-                      <polygon points="22,2 15,22 11,13 2,9"/>
-                    </svg>
-                    Send
-                  </button>
-                  <button className="chain-action-btn receive" onClick={(e) => { e.stopPropagation(); copyAddress(address); }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                      <polyline points="7,10 12,15 17,10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Receive
-                  </button>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Dust Buster Card - Solana Only */}
-      {builtInWallet.addresses?.solana && (
-        <div className="dust-buster-card" onClick={() => setShowDustBuster(true)}>
-          <div className="dust-buster-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" strokeWidth="2">
-              <path d="M3 6h18M3 6l2 14h14l2-14M3 6l4-4h10l4 4"/>
-              <path d="M9 10v6M12 10v6M15 10v6"/>
-            </svg>
-          </div>
-          <div className="dust-buster-info">
-            <span className="dust-buster-title">Dust Buster</span>
-            <span className="dust-buster-subtitle">Clean up & recover locked SOL</span>
-          </div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2">
-            <polyline points="9,18 15,12 9,6"/>
-          </svg>
+              <span className="quick-action-label">Dust Buster</span>
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {showDustBuster && (
         <div className="dust-buster-overlay" onClick={() => setShowDustBuster(false)}>
@@ -1813,6 +1886,477 @@ export default function WalletManager({ userId }) {
           font-size: 20px;
         }
 
+        /* ========== PREMIUM WALLET STYLES ========== */
+        
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        
+        @keyframes balanceGlow {
+          0%, 100% { text-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3); }
+          50% { text-shadow: 0 0 30px rgba(0, 212, 255, 0.7), 0 0 60px rgba(0, 212, 255, 0.4); }
+        }
+        
+        @keyframes floatAgent {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        
+        /* Premium Hero Section */
+        .wallet-hero-premium {
+          position: relative;
+          background: linear-gradient(135deg, #0f0f0f 0%, #141414 50%, #1a1a1a 100%);
+          border: 1px solid #333;
+          border-radius: 20px;
+          padding: 24px;
+          margin-bottom: 24px;
+          overflow: hidden;
+        }
+        
+        .wallet-hero-glow {
+          position: absolute;
+          top: 50%;
+          left: 30%;
+          transform: translate(-50%, -50%);
+          width: 200px;
+          height: 200px;
+          background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        
+        .wallet-hero-content {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        
+        .wallet-hero-balance {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        .hero-balance-label {
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        
+        .hero-balance-value {
+          font-size: 42px;
+          font-weight: 700;
+          color: #fff;
+          animation: balanceGlow 3s ease-in-out infinite;
+          line-height: 1.1;
+        }
+        
+        .hero-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 8px;
+        }
+        
+        .hero-action-btn {
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          background: #252525;
+          border: 1px solid #333;
+          color: #888;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+        
+        .hero-action-btn:hover {
+          border-color: #00D4FF;
+          color: #00D4FF;
+          box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+        
+        .hero-action-btn.lock:hover {
+          border-color: #FF6B6B;
+          color: #FF6B6B;
+          box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .wallet-hero-agent {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .agent-image {
+          width: 100px;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 2px solid #00D4FF;
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+          animation: floatAgent 4s ease-in-out infinite;
+        }
+        
+        .speech-bubble {
+          position: absolute;
+          bottom: 100%;
+          right: 0;
+          background: #1a1a1a;
+          border: 1px solid #333;
+          border-radius: 12px;
+          padding: 10px 14px;
+          max-width: 140px;
+          font-size: 12px;
+          color: #ccc;
+          margin-bottom: 10px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .speech-bubble-tail {
+          position: absolute;
+          bottom: -8px;
+          right: 30px;
+          width: 0;
+          height: 0;
+          border-left: 8px solid transparent;
+          border-right: 8px solid transparent;
+          border-top: 8px solid #333;
+        }
+        
+        .speech-bubble-tail::after {
+          content: '';
+          position: absolute;
+          top: -9px;
+          left: -7px;
+          width: 0;
+          height: 0;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-top: 7px solid #1a1a1a;
+        }
+        
+        /* Section Titles */
+        .section-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #fff;
+          margin: 0 0 16px 0;
+        }
+        
+        /* Chain Carousel */
+        .chain-carousel-container {
+          margin-bottom: 24px;
+        }
+        
+        .chain-carousel {
+          border-radius: 16px;
+          overflow: visible;
+        }
+        
+        .chain-slide {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          height: 100%;
+          padding: 8px;
+        }
+        
+        .no-chains {
+          padding: 40px;
+          text-align: center;
+          color: #666;
+        }
+        
+        /* Premium Chain Card */
+        .chain-card-premium {
+          position: relative;
+          background: #141414;
+          border: 1px solid #333;
+          border-radius: 16px;
+          padding: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          overflow: hidden;
+        }
+        
+        .chain-card-premium::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          padding: 1px;
+          background: var(--chain-gradient);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .chain-card-premium:hover::before {
+          opacity: 1;
+        }
+        
+        .chain-card-premium:hover {
+          transform: perspective(1000px) rotateY(3deg) translateY(-4px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px color-mix(in srgb, var(--chain-color) 30%, transparent);
+        }
+        
+        .chain-card-premium.expanded {
+          background: #1a1a1a;
+        }
+        
+        .chain-card-shimmer {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+          background-size: 200% 100%;
+          animation: shimmer 4s infinite;
+          pointer-events: none;
+          border-radius: 16px;
+        }
+        
+        .chain-card-content {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        
+        .chain-card-icon {
+          font-size: 28px;
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #0f0f0f;
+          border-radius: 12px;
+          border: 1px solid #333;
+        }
+        
+        .chain-card-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        
+        .chain-card-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #fff;
+        }
+        
+        .chain-card-symbol {
+          font-size: 13px;
+          color: #666;
+        }
+        
+        .chain-card-balance {
+          text-align: right;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        
+        .chain-balance-crypto {
+          font-size: 16px;
+          font-weight: 600;
+          color: #fff;
+        }
+        
+        .chain-balance-usd {
+          font-size: 13px;
+          color: #888;
+        }
+        
+        /* Accordion Chain Details */
+        .accordion-chain-details {
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid #333;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .accordion-address {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 14px;
+          background: #0f0f0f;
+          border: 1px solid #333;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .accordion-address:hover {
+          border-color: #00D4FF;
+          color: #00D4FF;
+        }
+        
+        .address-text {
+          flex: 1;
+          font-family: monospace;
+          font-size: 11px;
+          color: #888;
+          word-break: break-all;
+        }
+        
+        .accordion-actions {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .accordion-action {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: none;
+        }
+        
+        .accordion-action.send {
+          background: linear-gradient(135deg, #00D4FF, #0099FF);
+          color: #000;
+        }
+        
+        .accordion-action.receive {
+          background: #252525;
+          color: #fff;
+          border: 1px solid #333;
+        }
+        
+        .accordion-action:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .accordion-transactions {
+          padding: 12px 14px;
+          background: #0f0f0f;
+          border-radius: 10px;
+          text-align: center;
+        }
+        
+        .transactions-placeholder {
+          font-size: 13px;
+          color: #555;
+        }
+        
+        /* Quick Actions Hub */
+        .quick-actions-hub {
+          margin-bottom: 24px;
+        }
+        
+        .quick-actions-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+        
+        .quick-action-card {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 20px 16px;
+          background: #141414;
+          border: 1px solid #333;
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          overflow: hidden;
+        }
+        
+        .quick-action-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          padding: 1px;
+          background: linear-gradient(135deg, #00D4FF, #0099FF);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .quick-action-card:hover::before {
+          opacity: 1;
+        }
+        
+        .quick-action-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        
+        .quick-action-card.dust::before {
+          background: linear-gradient(135deg, #9945FF, #14F195);
+        }
+        
+        .quick-action-card.dust:hover {
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(153, 69, 255, 0.2);
+        }
+        
+        .quick-action-icon {
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 212, 255, 0.1);
+          border-radius: 14px;
+          color: #00D4FF;
+          transition: all 0.3s ease;
+        }
+        
+        .quick-action-icon.receive {
+          background: rgba(57, 255, 20, 0.1);
+          color: #39FF14;
+        }
+        
+        .quick-action-icon.dust {
+          background: rgba(153, 69, 255, 0.1);
+          color: #9945FF;
+        }
+        
+        .quick-action-card:hover .quick-action-icon {
+          transform: scale(1.1);
+        }
+        
+        .quick-action-label {
+          font-size: 14px;
+          font-weight: 600;
+          color: #fff;
+        }
+
         @media (max-width: 480px) {
           .wallet-hero h1 {
             font-size: 26px;
@@ -1838,6 +2382,101 @@ export default function WalletManager({ userId }) {
 
           .dust-buster-overlay {
             padding: 20px 12px;
+          }
+          
+          /* Premium Responsive Styles */
+          .wallet-hero-premium {
+            padding: 20px 16px;
+          }
+          
+          .wallet-hero-content {
+            flex-direction: column;
+            text-align: center;
+          }
+          
+          .wallet-hero-balance {
+            align-items: center;
+          }
+          
+          .hero-balance-value {
+            font-size: 36px;
+          }
+          
+          .hero-actions {
+            justify-content: center;
+          }
+          
+          .wallet-hero-agent {
+            order: -1;
+            margin-bottom: 16px;
+          }
+          
+          .agent-image {
+            width: 80px;
+            height: 80px;
+          }
+          
+          .speech-bubble {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            margin-bottom: 10px;
+            max-width: 200px;
+          }
+          
+          .speech-bubble-tail {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+          }
+          
+          .quick-actions-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+          }
+          
+          .quick-action-card {
+            padding: 16px 10px;
+          }
+          
+          .quick-action-icon {
+            width: 40px;
+            height: 40px;
+          }
+          
+          .quick-action-icon svg {
+            width: 20px;
+            height: 20px;
+          }
+          
+          .quick-action-label {
+            font-size: 12px;
+          }
+          
+          .chain-card-premium {
+            padding: 14px;
+          }
+          
+          .chain-card-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+          }
+          
+          .chain-card-name {
+            font-size: 14px;
+          }
+          
+          .chain-balance-crypto {
+            font-size: 14px;
+          }
+          
+          .accordion-actions {
+            flex-direction: column;
+          }
+          
+          .address-text {
+            font-size: 10px;
           }
         }
       `}</style>
