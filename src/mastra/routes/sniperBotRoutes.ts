@@ -6,6 +6,7 @@ import { safetyEngineService, DEFAULT_SAFETY_CONFIG } from '../../services/safet
 import { multiChainProvider, CHAIN_CONFIGS, ChainId } from '../../services/multiChainProvider';
 import { evmSafetyEngine, DEFAULT_EVM_SAFETY_CONFIG } from '../../services/evmSafetyEngine';
 import { tradeLedgerService } from '../../services/tradeLedgerService';
+import { strikeAgentTrackingService } from '../../services/strikeAgentTrackingService';
 
 export const sniperBotRoutes = [
   // ============================================
@@ -150,11 +151,35 @@ export const sniperBotRoutes = [
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
       try {
-        const { config } = await c.req.json();
+        const { config, userId } = await c.req.json();
         const filterConfig: SnipePresetConfig = config || DEFAULT_PRESET;
         
         logger?.info('🔍 [SniperBot] Token discovery started');
         const tokens = await tokenScannerService.discoverTokens(filterConfig);
+        
+        // Log predictions for ML learning (async, don't wait)
+        for (const token of tokens) {
+          strikeAgentTrackingService.logPrediction({
+            tokenAddress: token.address,
+            tokenSymbol: token.symbol,
+            tokenName: token.name,
+            dex: token.dex,
+            chain: 'solana',
+            priceUsd: token.priceUsd,
+            priceSol: token.priceSol,
+            marketCapUsd: token.marketCapUsd,
+            liquidityUsd: token.liquidityUsd,
+            tokenAgeMinutes: token.ageMinutes,
+            aiRecommendation: token.aiRecommendation,
+            aiScore: token.aiScore,
+            aiReasoning: token.aiReasoning,
+            safetyMetrics: token.safetyMetrics,
+            movementMetrics: token.movementMetrics,
+            userId,
+          }).catch(err => {
+            logger?.warn('⚠️ [SniperBot] Failed to log prediction', { token: token.symbol, error: err.message });
+          });
+        }
         
         logger?.info('✅ [SniperBot] Token discovery complete', { count: tokens.length });
         return c.json({ tokens, count: tokens.length });
@@ -170,7 +195,7 @@ export const sniperBotRoutes = [
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
       try {
-        const { tokenAddress } = await c.req.json();
+        const { tokenAddress, userId } = await c.req.json();
         if (!tokenAddress) {
           return c.json({ error: 'tokenAddress is required' }, 400);
         }
@@ -191,6 +216,32 @@ export const sniperBotRoutes = [
         
         // AI scoring
         const aiAnalysis = tokenScannerService.calculateAIScore(safetyMetrics, movementMetrics);
+        
+        // Log prediction for ML learning (async, don't wait)
+        const ageMinutes = tokenDetails.pairCreatedAt 
+          ? (Date.now() - tokenDetails.pairCreatedAt) / (1000 * 60)
+          : undefined;
+          
+        strikeAgentTrackingService.logPrediction({
+          tokenAddress: tokenDetails.baseToken.address,
+          tokenSymbol: tokenDetails.baseToken.symbol,
+          tokenName: tokenDetails.baseToken.name,
+          dex: tokenDetails.dexId,
+          chain: 'solana',
+          priceUsd: parseFloat(tokenDetails.priceUsd || '0'),
+          priceSol: parseFloat(tokenDetails.priceNative || '0'),
+          marketCapUsd: tokenDetails.fdv,
+          liquidityUsd: tokenDetails.liquidity?.usd,
+          tokenAgeMinutes: ageMinutes,
+          aiRecommendation: aiAnalysis.recommendation,
+          aiScore: aiAnalysis.score,
+          aiReasoning: aiAnalysis.reasoning,
+          safetyMetrics,
+          movementMetrics,
+          userId,
+        }).catch(err => {
+          logger?.warn('⚠️ [SniperBot] Failed to log prediction', { token: tokenDetails.baseToken.symbol, error: err.message });
+        });
         
         return c.json({
           token: {
@@ -1035,6 +1086,25 @@ export const sniperBotRoutes = [
       } catch (error: any) {
         logger?.error('❌ [AdaptiveAI] Drift detection error', { error: error.message });
         return c.json({ error: 'Failed to detect drift' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/sniper/ml/stats",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const stats = await strikeAgentTrackingService.getStats();
+        
+        logger?.info('📊 [StrikeAgentML] Stats retrieved', { 
+          totalPredictions: stats.totalPredictions 
+        });
+        
+        return c.json(stats);
+      } catch (error: any) {
+        logger?.error('❌ [StrikeAgentML] Stats error', { error: error.message });
+        return c.json({ error: 'Failed to get ML stats' }, 500);
       }
     }
   },

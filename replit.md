@@ -213,10 +213,10 @@ interface AutoTradeConfig {
 - [ ] Alert on performance drop
 
 **Phase 3 Checklist:**
-- [ ] StrikeAgent prediction logging
-- [ ] Memecoin-specific feature extraction
-- [ ] Sniper model training
-- [ ] Token outcome tracking
+- [x] StrikeAgent prediction logging (integrated into /api/sniper/discover and /api/sniper/analyze-token)
+- [x] Memecoin-specific feature extraction (token age, holder %, bot %, liquidity, safety metrics)
+- [ ] Sniper model training (waiting for 50+ samples)
+- [x] Token outcome tracking (Inngest worker at 30min past each hour)
 
 **Phase 4 Checklist:**
 - [ ] Auto-trade config schema

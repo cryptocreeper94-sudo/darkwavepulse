@@ -865,3 +865,97 @@ export const referrals = pgTable('referrals', {
   rewardAmount: varchar('reward_amount', { length: 50 }).default('0'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// ============================================
+// STRIKEAGENT PREDICTION TRACKING
+// Logs memecoin/DEX token discoveries for ML learning
+// ============================================
+
+export const strikeagentPredictions = pgTable('strikeagent_predictions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }),
+  
+  // Token Information
+  tokenAddress: varchar('token_address', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }).notNull(),
+  tokenName: varchar('token_name', { length: 255 }),
+  dex: varchar('dex', { length: 50 }),
+  chain: varchar('chain', { length: 50 }).notNull().default('solana'),
+  
+  // Price at Discovery
+  priceUsd: varchar('price_usd', { length: 50 }).notNull(),
+  priceSol: varchar('price_sol', { length: 50 }),
+  marketCapUsd: varchar('market_cap_usd', { length: 50 }),
+  liquidityUsd: varchar('liquidity_usd', { length: 50 }),
+  tokenAgeMinutes: integer('token_age_minutes'),
+  
+  // AI Recommendation
+  aiRecommendation: varchar('ai_recommendation', { length: 20 }).notNull(), // 'snipe' | 'watch' | 'avoid'
+  aiScore: integer('ai_score').notNull(), // 0-100
+  aiReasoning: text('ai_reasoning'),
+  
+  // Safety Metrics (JSON)
+  safetyMetrics: text('safety_metrics'), // { botPercent, bundlePercent, top10HoldersPercent, liquidityUsd, holderCount, etc }
+  
+  // Movement Metrics (JSON)
+  movementMetrics: text('movement_metrics'), // { priceChangePercent, volumeMultiplier, tradesPerMinute, buySellRatio, holderGrowthPercent }
+  
+  // Additional Memecoin Features
+  holderCount: integer('holder_count'),
+  top10HoldersPercent: varchar('top10_holders_percent', { length: 20 }),
+  botPercent: varchar('bot_percent', { length: 20 }),
+  bundlePercent: varchar('bundle_percent', { length: 20 }),
+  mintAuthorityActive: boolean('mint_authority_active'),
+  freezeAuthorityActive: boolean('freeze_authority_active'),
+  isHoneypot: boolean('is_honeypot'),
+  liquidityLocked: boolean('liquidity_locked'),
+  isPumpFun: boolean('is_pump_fun'),
+  creatorWalletRisky: boolean('creator_wallet_risky'),
+  
+  // Blockchain Stamp
+  payloadHash: varchar('payload_hash', { length: 128 }),
+  onchainSignature: varchar('onchain_signature', { length: 128 }),
+  
+  // Status
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'stamped' | 'evaluated'
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  stampedAt: timestamp('stamped_at'),
+});
+
+// StrikeAgent Prediction Outcomes - Track what happened to discovered tokens
+export const strikeagentOutcomes = pgTable('strikeagent_outcomes', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  predictionId: varchar('prediction_id', { length: 255 }).notNull(),
+  
+  // Time Horizon
+  horizon: varchar('horizon', { length: 20 }).notNull(), // '1h' | '4h' | '24h' | '7d'
+  
+  // Actual Results
+  priceAtCheck: varchar('price_at_check', { length: 50 }).notNull(),
+  priceChangePercent: varchar('price_change_percent', { length: 20 }).notNull(),
+  
+  // Market Changes
+  marketCapAtCheck: varchar('market_cap_at_check', { length: 50 }),
+  liquidityAtCheck: varchar('liquidity_at_check', { length: 50 }),
+  holderCountAtCheck: integer('holder_count_at_check'),
+  volumeChange: varchar('volume_change', { length: 50 }),
+  
+  // Outcome Classification
+  outcome: varchar('outcome', { length: 20 }).notNull(), // 'PUMP' | 'RUG' | 'SIDEWAYS' | 'MOON'
+  isCorrect: boolean('is_correct').notNull(), // Did AI recommendation match actual outcome?
+  
+  // For snipe recommendations: Was the 2x target hit before any major dump?
+  hit2x: boolean('hit_2x'),
+  hit5x: boolean('hit_5x'),
+  hit10x: boolean('hit_10x'),
+  maxGainPercent: varchar('max_gain_percent', { length: 20 }),
+  maxDrawdownPercent: varchar('max_drawdown_percent', { length: 20 }),
+  
+  // Token Status
+  isRugged: boolean('is_rugged'),
+  liquidityRemaining: varchar('liquidity_remaining', { length: 50 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  evaluatedAt: timestamp('evaluated_at').defaultNow().notNull(),
+});
