@@ -1,31 +1,13 @@
-import { useEffect, useRef } from 'react'
 import { useGlossary } from '../../context/GlossaryContext'
+import { PIXAR_AGENT_PRIMARIES } from '../../data/agents'
 
 export default function GlossaryPopup() {
   const { activeTerm, position, sassMode, hideDefinition, toggleSassMode } = useGlossary()
-  const popupRef = useRef(null)
-  
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (popupRef.current && !popupRef.current.contains(e.target)) {
-        hideDefinition()
-      }
-    }
-    
-    if (activeTerm) {
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('touchstart', handleClickOutside)
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
-    }
-  }, [activeTerm, hideDefinition])
   
   if (!activeTerm) return null
   
   const definition = sassMode ? activeTerm.smartass : activeTerm.plain
+  const agent = PIXAR_AGENT_PRIMARIES.find(a => a.id === 2) || PIXAR_AGENT_PRIMARIES[1]
   
   const categoryColors = {
     'Crypto': '#00D4FF',
@@ -37,103 +19,197 @@ export default function GlossaryPopup() {
   }
   
   const categoryColor = categoryColors[activeTerm.category] || '#00D4FF'
-  
+
   return (
-    <div 
-      ref={popupRef}
-      style={{
-        position: 'fixed',
-        left: position.x,
-        top: position.y,
-        transform: 'translateX(-50%)',
-        zIndex: 9999,
-        width: 280,
-        maxWidth: 'calc(100vw - 40px)',
-        background: 'linear-gradient(135deg, #1a1a1a, #0f0f0f)',
-        border: `1px solid ${categoryColor}40`,
-        borderRadius: 12,
-        padding: 16,
-        boxShadow: `0 8px 32px rgba(0,0,0,0.6), 0 0 20px ${categoryColor}20`,
-        animation: 'fadeIn 0.2s ease-out'
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <div>
-          <div style={{ 
-            fontSize: 16, 
-            fontWeight: 700, 
-            color: '#fff',
-            marginBottom: 4
-          }}>
-            {activeTerm.term}
-          </div>
-          <div style={{ 
-            fontSize: 10, 
-            color: categoryColor,
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: 0.5
-          }}>
-            {activeTerm.category}
-          </div>
-        </div>
-        <button
-          onClick={hideDefinition}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#666',
-            fontSize: 18,
-            cursor: 'pointer',
-            padding: 4,
-            lineHeight: 1
-          }}
+    <>
+      <div 
+        className="glossary-popup-overlay"
+        onClick={(e) => { e.stopPropagation(); hideDefinition() }}
+      />
+      <div 
+        className="glossary-popup"
+        style={{
+          left: Math.min(position.x, window.innerWidth - 320),
+          top: position.y
+        }}
+      >
+        <button 
+          className="glossary-close-btn"
+          onClick={(e) => { e.stopPropagation(); hideDefinition() }}
         >
           ×
         </button>
-      </div>
-      
-      <div style={{ 
-        fontSize: 13, 
-        color: '#ccc',
-        lineHeight: 1.5,
-        marginBottom: 12
-      }}>
-        {definition}
-      </div>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button
-          onClick={toggleSassMode}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '4px 8px',
-            background: sassMode ? 'rgba(255, 0, 110, 0.2)' : 'rgba(0, 212, 255, 0.2)',
-            border: `1px solid ${sassMode ? 'rgba(255, 0, 110, 0.4)' : 'rgba(0, 212, 255, 0.4)'}`,
-            borderRadius: 12,
-            color: sassMode ? '#FF006E' : '#00D4FF',
-            fontSize: 10,
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-        >
-          <span>{sassMode ? '😾' : '📚'}</span>
-          <span>{sassMode ? 'Sass Mode' : 'Plain'}</span>
-        </button>
         
-        <div style={{ fontSize: 10, color: '#666' }}>
-          Tap to switch style
+        <div className="glossary-header">
+          <span className="glossary-term">{activeTerm.term}</span>
+          <span 
+            className="glossary-category"
+            style={{ color: categoryColor }}
+          >
+            {activeTerm.category}
+          </span>
+        </div>
+        
+        <div className="glossary-content">
+          <div className="glossary-agent-avatar">
+            <img 
+              src={agent.image} 
+              alt={agent.name}
+              onError={(e) => { e.target.src = '/agents/pixar/aria.png' }}
+            />
+          </div>
+          <div className="glossary-definition">
+            {definition}
+          </div>
+        </div>
+        
+        <div className="glossary-actions">
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleSassMode() }}
+            className="glossary-sass-btn"
+            style={{
+              background: sassMode ? 'rgba(255, 0, 110, 0.2)' : 'rgba(0, 212, 255, 0.2)',
+              borderColor: sassMode ? 'rgba(255, 0, 110, 0.4)' : 'rgba(0, 212, 255, 0.4)',
+              color: sassMode ? '#FF006E' : '#00D4FF'
+            }}
+          >
+            <span>{sassMode ? '😾' : '📚'}</span>
+            <span>{sassMode ? 'Sass Mode' : 'Plain'}</span>
+          </button>
+          <div className="glossary-hint">Tap to switch</div>
         </div>
       </div>
-      
+
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .glossary-popup-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 9998;
+          background: transparent;
+        }
+
+        .glossary-popup {
+          position: fixed;
+          z-index: 9999;
+          background: #1a1a1a;
+          border: 2px solid #00d4ff;
+          border-radius: 12px;
+          padding: 14px 16px;
+          max-width: 300px;
+          min-width: 240px;
+          box-shadow: 0 4px 24px rgba(0, 212, 255, 0.25);
+          animation: popupFadeIn 0.2s ease-out;
+        }
+
+        @keyframes popupFadeIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glossary-close-btn {
+          position: absolute;
+          top: 6px;
+          right: 8px;
+          background: none;
+          border: none;
+          color: #666;
+          font-size: 20px;
+          cursor: pointer;
+          padding: 4px 8px;
+          line-height: 1;
+          z-index: 10;
+          transition: color 0.2s;
+        }
+
+        .glossary-close-btn:hover {
+          color: #ff4466;
+        }
+
+        .glossary-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+          padding-right: 24px;
+        }
+
+        .glossary-term {
+          font-size: 15px;
+          font-weight: 700;
+          color: #00d4ff;
+        }
+
+        .glossary-category {
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .glossary-content {
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+        }
+
+        .glossary-agent-avatar {
+          flex-shrink: 0;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 2px solid #00d4ff;
+          background: #0a0a0a;
+        }
+
+        .glossary-agent-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .glossary-definition {
+          font-size: 13px;
+          color: #ccc;
+          line-height: 1.5;
+          flex: 1;
+        }
+
+        .glossary-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 12px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glossary-sass-btn {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 6px 12px;
+          border: 1px solid;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .glossary-hint {
+          font-size: 10px;
+          color: #666;
+        }
+
+        @media (max-width: 480px) {
+          .glossary-popup {
+            left: 10px !important;
+            right: 10px;
+            max-width: calc(100vw - 20px);
+          }
         }
       `}</style>
-    </div>
+    </>
   )
 }
