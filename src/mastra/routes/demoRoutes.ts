@@ -1,6 +1,7 @@
 import { demoTradeService, DemoPortfolio } from '../../services/demoTradeService';
 import { telegramNotificationService } from '../../services/telegramNotificationService';
 import { userAvatarService, AVATAR_STYLES } from '../../services/userAvatarService';
+import { referralService } from '../../services/referralService';
 import axios from 'axios';
 import Stripe from 'stripe';
 
@@ -598,6 +599,78 @@ export const demoRoutes = [
       } catch (error: any) {
         logger?.error('❌ [Avatar] Random error', { error: error.message });
         return c.json({ success: false, error: 'Failed to generate random avatar' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/user/referral-code",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const userId = c.req.query('userId');
+        
+        if (!userId) {
+          return c.json({ success: false, error: 'User ID required' }, 400);
+        }
+        
+        const code = await referralService.getUserReferralCode(userId);
+        
+        logger?.info('🎁 [Referral] Code retrieved', { userId });
+        return c.json({ success: true, referralCode: code });
+      } catch (error: any) {
+        logger?.error('❌ [Referral] Code error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to get referral code' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/user/referral/apply",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const body = await c.req.json();
+        const { referralCode, userId } = body;
+        
+        if (!referralCode || !userId) {
+          return c.json({ success: false, error: 'Referral code and user ID required' }, 400);
+        }
+        
+        const result = await referralService.trackReferral(referralCode, userId);
+        
+        if (!result.success) {
+          logger?.warn('⚠️ [Referral] Apply failed', { referralCode, error: result.error });
+          return c.json({ success: false, error: result.error }, 400);
+        }
+        
+        logger?.info('🎁 [Referral] Code applied', { referralCode, userId });
+        return c.json({ success: true, message: 'Referral code applied successfully' });
+      } catch (error: any) {
+        logger?.error('❌ [Referral] Apply error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to apply referral code' }, 500);
+      }
+    }
+  },
+  {
+    path: "/api/user/referral/stats",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const userId = c.req.query('userId');
+        
+        if (!userId) {
+          return c.json({ success: false, error: 'User ID required' }, 400);
+        }
+        
+        const stats = await referralService.getReferralStats(userId);
+        
+        logger?.info('🎁 [Referral] Stats retrieved', { userId, stats: stats.completedReferrals });
+        return c.json({ success: true, stats });
+      } catch (error: any) {
+        logger?.error('❌ [Referral] Stats error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to get referral stats' }, 500);
       }
     }
   },

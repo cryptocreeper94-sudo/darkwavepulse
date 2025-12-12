@@ -850,3 +850,18 @@ export const strikeAgentTrades = pgTable('strike_agent_trades', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// ============================================
+// REFERRAL SYSTEM
+// Tracks user referrals and rewards
+// ============================================
+
+export const referrals = pgTable('referrals', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  referrerUserId: varchar('referrer_user_id', { length: 255 }).notNull(),
+  referredUserId: varchar('referred_user_id', { length: 255 }),
+  referralCode: varchar('referral_code', { length: 50 }).notNull().unique(),
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'completed' | 'rewarded'
+  rewardAmount: varchar('reward_amount', { length: 50 }).default('0'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
