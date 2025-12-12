@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import InfoTooltip from '../ui/InfoTooltip'
 import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
+import DustBuster from './DustBuster'
 
 const WALLET_DEFINITIONS = {
   mnemonic: {
@@ -69,6 +70,7 @@ export default function WalletManager({ userId }) {
   const [gasEstimate, setGasEstimate] = useState(null)
   const [showSendPanel, setShowSendPanel] = useState(false)
   const [activeChain, setActiveChain] = useState(null)
+  const [showDustBuster, setShowDustBuster] = useState(false)
   
   useEffect(() => {
     if (builtInWallet.hasWallet) {
@@ -726,6 +728,40 @@ export default function WalletManager({ userId }) {
           )
         })}
       </div>
+
+      {/* Dust Buster Card - Solana Only */}
+      {builtInWallet.addresses?.solana && (
+        <div className="dust-buster-card" onClick={() => setShowDustBuster(true)}>
+          <div className="dust-buster-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" strokeWidth="2">
+              <path d="M3 6h18M3 6l2 14h14l2-14M3 6l4-4h10l4 4"/>
+              <path d="M9 10v6M12 10v6M15 10v6"/>
+            </svg>
+          </div>
+          <div className="dust-buster-info">
+            <span className="dust-buster-title">Dust Buster</span>
+            <span className="dust-buster-subtitle">Clean up & recover locked SOL</span>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2">
+            <polyline points="9,18 15,12 9,6"/>
+          </svg>
+        </div>
+      )}
+
+      {showDustBuster && (
+        <div className="dust-buster-overlay" onClick={() => setShowDustBuster(false)}>
+          <div className="dust-buster-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="dust-buster-header">
+              <h3>Dust Buster</h3>
+              <button className="close-btn" onClick={() => setShowDustBuster(false)}>×</button>
+            </div>
+            <DustBuster 
+              walletAddress={builtInWallet.addresses?.solana}
+              onClose={() => setShowDustBuster(false)}
+            />
+          </div>
+        </div>
+      )}
 
       {showSendPanel && (
         <div className="send-overlay" onClick={() => setShowSendPanel(false)}>
@@ -1685,6 +1721,98 @@ export default function WalletManager({ userId }) {
           flex: 1;
         }
 
+        /* Dust Buster Card */
+        .dust-buster-card {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 16px 20px;
+          background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+          border: 1px solid #333;
+          border-radius: 12px;
+          margin-top: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .dust-buster-card:hover {
+          border-color: #00D4FF;
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
+        .dust-buster-icon {
+          width: 48px;
+          height: 48px;
+          background: rgba(0, 212, 255, 0.1);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .dust-buster-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .dust-buster-title {
+          color: #fff;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        .dust-buster-subtitle {
+          color: #888;
+          font-size: 13px;
+        }
+
+        /* Dust Buster Overlay */
+        .dust-buster-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.85);
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          padding: 40px 20px;
+          z-index: 1000;
+          overflow-y: auto;
+        }
+
+        .dust-buster-panel {
+          background: #0f0f0f;
+          border-radius: 16px;
+          border: 1px solid #333;
+          width: 100%;
+          max-width: 600px;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .dust-buster-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 20px 24px;
+          border-bottom: 1px solid #333;
+          position: sticky;
+          top: 0;
+          background: #0f0f0f;
+          z-index: 10;
+        }
+
+        .dust-buster-header h3 {
+          margin: 0;
+          color: #fff;
+          font-size: 20px;
+        }
+
         @media (max-width: 480px) {
           .wallet-hero h1 {
             font-size: 26px;
@@ -1701,6 +1829,15 @@ export default function WalletManager({ userId }) {
 
           .total-value {
             font-size: 32px;
+          }
+
+          .dust-buster-panel {
+            max-width: 100%;
+            border-radius: 12px;
+          }
+
+          .dust-buster-overlay {
+            padding: 20px 12px;
           }
         }
       `}</style>
