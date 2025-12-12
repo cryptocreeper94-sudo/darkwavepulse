@@ -861,7 +861,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             padding: 10px;
           }
           .bento-quick, .bento-market, .bento-trending, .bento-news { 
-            display: none;
+            display: none !important;
           }
           .bento-table { min-height: 300px; }
           .bento-chart-section { 
