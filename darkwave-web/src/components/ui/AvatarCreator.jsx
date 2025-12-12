@@ -123,11 +123,16 @@ const avatarOptions = {
 }
 
 const dicebearStyles = [
-  { id: 'personas', label: 'Personas' },
-  { id: 'notionists', label: 'Notionists' },
-  { id: 'avataaars', label: 'Avataaars' },
-  { id: 'lorelei', label: 'Lorelei' },
-  { id: 'micah', label: 'Micah' },
+  { id: 'thumbs', label: 'Thumbs', premium: false },
+  { id: 'lorelei', label: 'Anime', premium: true },
+  { id: 'adventurer', label: 'Illustrated', premium: true },
+  { id: 'big-ears', label: 'Cute', premium: true },
+  { id: 'avataaars', label: 'Cartoon', premium: true },
+  { id: 'pixel-art', label: 'Pixel Art', premium: true },
+  { id: 'micah', label: 'Minimalist', premium: true },
+  { id: 'fun-emoji', label: 'Emoji', premium: true },
+  { id: 'personas', label: 'Personas', premium: true },
+  { id: 'notionists', label: 'Notionists', premium: true },
 ]
 
 const defaultAvatar = {
@@ -143,7 +148,7 @@ const defaultAvatar = {
   accessories: 'none',
   background: 'dark',
   name: 'My Avatar',
-  dicebearStyle: 'personas'
+  dicebearStyle: 'thumbs'
 }
 
 function buildDicebearUrl(avatar, size = 200) {
@@ -304,15 +309,17 @@ function OptionGrid({ options, selected, onSelect, type = 'icon' }) {
   )
 }
 
-function StyleSelector({ selected, onSelect }) {
+function StyleSelector({ selected, onSelect, isPremium = false }) {
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {dicebearStyles.map(style => {
         const previewUrl = `https://api.dicebear.com/9.x/${style.id}/svg?seed=preview&size=48&backgroundColor=1a1a1a`
+        const isLocked = style.premium && !isPremium
         return (
           <button
             key={style.id}
-            onClick={() => onSelect(style.id)}
+            onClick={() => !isLocked && onSelect(style.id)}
+            disabled={isLocked}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -322,9 +329,11 @@ function StyleSelector({ selected, onSelect }) {
               background: selected === style.id ? 'rgba(0, 212, 255, 0.15)' : 'rgba(255,255,255,0.05)',
               border: selected === style.id ? '2px solid #00D4FF' : '1px solid rgba(255,255,255,0.15)',
               borderRadius: 10,
-              cursor: 'pointer',
+              cursor: isLocked ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
-              boxShadow: selected === style.id ? '0 0 15px rgba(0,212,255,0.3)' : 'none'
+              boxShadow: selected === style.id ? '0 0 15px rgba(0,212,255,0.3)' : 'none',
+              opacity: isLocked ? 0.5 : 1,
+              position: 'relative'
             }}
           >
             <img 
@@ -344,9 +353,31 @@ function StyleSelector({ selected, onSelect }) {
             }}>
               {style.label}
             </span>
+            {isLocked && (
+              <span style={{
+                position: 'absolute',
+                top: 2,
+                right: 2,
+                fontSize: 10,
+                color: '#888'
+              }}>🔒</span>
+            )}
           </button>
         )
       })}
+      {!isPremium && (
+        <div style={{ 
+          width: '100%', 
+          marginTop: 8, 
+          fontSize: 11, 
+          color: '#00d4aa',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4
+        }}>
+          <span>⭐</span> Upgrade to RM+ for all avatar styles
+        </div>
+      )}
     </div>
   )
 }
@@ -525,8 +556,9 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
                   Avatar Style
                 </label>
                 <StyleSelector 
-                  selected={avatar.dicebearStyle || 'personas'} 
+                  selected={avatar.dicebearStyle || 'thumbs'} 
                   onSelect={v => updateAvatar('dicebearStyle', v)} 
+                  isPremium={isPremium}
                 />
               </div>
               

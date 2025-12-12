@@ -1,0 +1,448 @@
+.trading-cards-container {
+  background: #0f0f0f;
+  min-height: 100vh;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cards-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.cards-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+.cards-header .subtitle {
+  color: #888;
+  font-size: 1.1rem;
+  margin: 0 0 20px 0;
+}
+
+.rarity-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.rarity-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.rarity-stats .stat .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.rarity-stats .stat.legendary .dot { background: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.rarity-stats .stat.epic .dot { background: #A855F7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+.rarity-stats .stat.rare .dot { background: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+.rarity-stats .stat.common .dot { background: #6B7280; }
+
+.filters-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-box input {
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  min-width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #00D4FF;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.search-box input::placeholder {
+  color: #666;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group select {
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 32px 10px 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23888'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #00D4FF;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.results-count {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.trading-card {
+  perspective: 1000px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.trading-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.card-border {
+  background: linear-gradient(135deg, var(--rarity-color) 0%, rgba(0, 0, 0, 0.8) 50%, var(--rarity-color) 100%);
+  border-radius: 16px;
+  padding: 3px;
+  box-shadow: var(--rarity-glow);
+  transition: box-shadow 0.3s ease;
+}
+
+.trading-card:hover .card-border {
+  box-shadow: var(--rarity-glow), 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.card-inner {
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rarity-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.rarity-legendary {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.rarity-epic {
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.rarity-rare {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.rarity-common {
+  background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+  color: #fff;
+}
+
+.card-number {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.avatar-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--rarity-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.agent-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #1a1a1a;
+}
+
+.avatar-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.card-name {
+  text-align: center;
+}
+
+.card-name h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-name .display-name {
+  font-size: 0.85rem;
+  color: var(--rarity-color);
+  font-weight: 600;
+}
+
+.badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-age {
+  background: rgba(0, 212, 255, 0.15);
+  color: #00D4FF;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.badge-gender {
+  background: rgba(236, 72, 153, 0.15);
+  color: #EC4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.badge-race {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22C55E;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.card-stats {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.stat-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.stat-value.risk-low { color: #22C55E; }
+.stat-value.risk-medium { color: #F59E0B; }
+.stat-value.risk-high { color: #EF4444; }
+
+.specializations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.spec-tag {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  color: #aaa;
+}
+
+.personality {
+  text-align: center;
+  padding: 0 8px;
+}
+
+.personality p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.4;
+}
+
+.catchphrase {
+  text-align: center;
+  padding: 10px;
+  background: rgba(var(--rarity-color-rgb, 107, 114, 128), 0.1);
+  border-radius: 8px;
+  border-left: 3px solid var(--rarity-color);
+}
+
+.catchphrase span {
+  font-size: 0.75rem;
+  color: #ccc;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.no-results p {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.no-results button {
+  background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.no-results button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .trading-cards-container {
+    padding: 16px;
+  }
+  
+  .cards-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box input {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .filter-group select {
+    width: 100%;
+  }
+  
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  
+  .rarity-stats {
+    gap: 12px;
+  }
+  
+  .rarity-stats .stat {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .avatar-container {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.rarity-legendary .card-border {
+  animation: shimmer 3s linear infinite;
+  background-size: 200% 100%;
+}
