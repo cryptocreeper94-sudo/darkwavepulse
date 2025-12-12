@@ -1,7 +1,6 @@
 import { demoTradeService, DemoPortfolio } from '../../services/demoTradeService';
 import { telegramNotificationService } from '../../services/telegramNotificationService';
-import { agentAvatarService } from '../../services/agentAvatarService';
-import { agentPersonas, AgentPersonaId } from '../ai/agentPersonas';
+import { userAvatarService, AVATAR_STYLES } from '../../services/userAvatarService';
 import axios from 'axios';
 import Stripe from 'stripe';
 
@@ -515,85 +514,90 @@ export const demoRoutes = [
     }
   },
   {
-    path: "/api/agents/avatars",
+    path: "/api/user/avatar/styles",
     method: "GET",
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
       try {
-        const size = parseInt(c.req.query('size') || '200');
-        const avatars = agentAvatarService.generateAllAgentAvatars(size);
+        const isSubscriber = c.req.query('subscriber') === 'true';
+        const styles = userAvatarService.getAvailableStyles(isSubscriber);
         
-        logger?.info('🎨 [Agents] Generated all avatars', { count: avatars.length });
-        return c.json({ success: true, avatars });
+        logger?.info('🎨 [Avatar] Retrieved styles', { count: styles.length, isSubscriber });
+        return c.json({ success: true, styles, allStyles: AVATAR_STYLES });
       } catch (error: any) {
-        logger?.error('❌ [Agents] Avatar generation error', { error: error.message });
-        return c.json({ success: false, error: 'Failed to generate avatars' }, 500);
+        logger?.error('❌ [Avatar] Styles error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to get avatar styles' }, 500);
       }
     }
   },
   {
-    path: "/api/agents/:agentId/avatar",
-    method: "GET",
+    path: "/api/user/avatar/generate",
+    method: "POST",
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
       try {
-        const agentId = c.req.param('agentId') as AgentPersonaId;
-        const size = parseInt(c.req.query('size') || '200');
+        const body = await c.req.json();
+        const { style, seed, backgroundColor, size = 200 } = body;
         
-        if (!agentPersonas[agentId]) {
-          return c.json({ success: false, error: 'Agent not found' }, 404);
+        if (!style || !seed) {
+          return c.json({ success: false, error: 'Style and seed required' }, 400);
         }
         
-        const avatar = agentAvatarService.generateAgentAvatar(agentId, size);
-        const agent = agentPersonas[agentId];
+        const styleInfo = userAvatarService.getStyleById(style);
+        if (!styleInfo) {
+          return c.json({ success: false, error: 'Invalid style' }, 400);
+        }
         
-        logger?.info('🎨 [Agents] Generated avatar', { agentId });
+        const avatarUrl = userAvatarService.generateUserAvatarUrl({
+          style,
+          seed,
+          backgroundColor: backgroundColor || '0f0f0f'
+        }, size);
+        
+        logger?.info('🎨 [Avatar] Generated user avatar', { style, seed });
         return c.json({ 
           success: true, 
           avatar: {
-            ...avatar,
-            tradingStyle: agent.tradingStyle,
-            specialization: agent.specialization,
-            personality: agent.personality,
-            catchphrase: agent.catchphrase,
-            age: agent.age,
-            gender: agent.gender,
-            race: agent.race,
-            hairColor: agent.hairColor
+            style,
+            seed,
+            backgroundColor,
+            avatarUrl,
+            styleName: styleInfo.name
           }
         });
       } catch (error: any) {
-        logger?.error('❌ [Agents] Avatar error', { error: error.message });
-        return c.json({ success: false, error: 'Failed to get avatar' }, 500);
+        logger?.error('❌ [Avatar] Generation error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to generate avatar' }, 500);
       }
     }
   },
   {
-    path: "/api/agents",
+    path: "/api/user/avatar/random",
     method: "GET",
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
       try {
-        const agents = Object.values(agentPersonas).map(agent => ({
-          id: agent.id,
-          name: agent.name,
-          displayName: agent.displayName,
-          tradingStyle: agent.tradingStyle,
-          specialization: agent.specialization,
-          age: agent.age,
-          gender: agent.gender,
-          race: agent.race,
-          hairColor: agent.hairColor,
-          personality: agent.personality,
-          catchphrase: agent.catchphrase,
-          avatarUrl: agentAvatarService.getAgentAvatarUrl(agent.id, 200)
-        }));
+        const style = c.req.query('style') || 'thumbs';
+        const seed = userAvatarService.getRandomSeed();
         
-        logger?.info('👥 [Agents] Retrieved all agents', { count: agents.length });
-        return c.json({ success: true, agents });
+        const avatarUrl = userAvatarService.generateUserAvatarUrl({
+          style,
+          seed,
+          backgroundColor: '0f0f0f'
+        }, 200);
+        
+        logger?.info('🎨 [Avatar] Generated random avatar', { style, seed });
+        return c.json({ 
+          success: true, 
+          avatar: {
+            style,
+            seed,
+            avatarUrl
+          }
+        });
       } catch (error: any) {
-        logger?.error('❌ [Agents] List error', { error: error.message });
-        return c.json({ success: false, error: 'Failed to list agents' }, 500);
+        logger?.error('❌ [Avatar] Random error', { error: error.message });
+        return c.json({ success: false, error: 'Failed to generate random avatar' }, 500);
       }
     }
   },
