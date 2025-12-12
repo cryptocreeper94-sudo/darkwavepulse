@@ -12,7 +12,8 @@ import {
   SniperBotTab,
   WalletTab,
   PricingTab,
-  AnalysisTab
+  AnalysisTab,
+  MLDashboardTab
 } from './components/tabs'
 import { GlossaryPopup, AIChatButton } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
@@ -175,6 +176,8 @@ function App() {
         return <PricingTab userId={userId} currentTier={userConfig?.subscriptionTier} />
       case 'analysis':
         return <AnalysisTab coin={selectedCoinForAnalysis} onBack={() => setActiveTab('dashboard')} />
+      case 'ml-dashboard':
+        return <MLDashboardTab />
       default:
         return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
     }
