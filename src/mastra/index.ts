@@ -48,6 +48,7 @@ import { limitOrderRoutes } from "./routes/limitOrderRoutes";
 import { walletRoutes } from "./routes/walletRoutes";
 import { paymentRoutes } from "./routes/paymentRoutes";
 import { demoRoutes } from "./routes/demoRoutes";
+import { mlRoutes } from "./routes/mlRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -5883,6 +5884,9 @@ export const mastra = new Mastra({
       
       // Stripe Payment API Routes
       ...paymentRoutes,
+      
+      // ML Stats API Routes
+      ...mlRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {
