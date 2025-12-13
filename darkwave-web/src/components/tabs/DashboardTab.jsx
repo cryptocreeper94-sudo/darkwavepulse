@@ -936,6 +936,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           background: #1a1a1a;
           color: #888;
           transition: all 0.2s ease;
+          min-width: 70px;
+          text-align: center;
         }
         .coin-filter-btn:hover {
           border-color: rgba(0, 212, 255, 0.5);
