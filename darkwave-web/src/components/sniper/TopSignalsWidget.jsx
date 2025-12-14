@@ -7,9 +7,9 @@ const CHAIN_CONFIG = {
   all: { label: 'All Chains', icon: '🌐', color: '#00D4FF' },
   solana: { label: 'Solana', icon: '◎', color: '#9945FF' },
   ethereum: { label: 'Ethereum', icon: '⬡', color: '#627EEA' },
-  base: { label: 'Base', icon: '🔵', color: '#0052FF' },
+  base: { label: 'Base', icon: '⬡', color: '#0052FF' },
   polygon: { label: 'Polygon', icon: '⬡', color: '#8247E5' },
-  arbitrum: { label: 'Arbitrum', icon: '🔷', color: '#28A0F0' },
+  arbitrum: { label: 'Arbitrum', icon: '⬡', color: '#28A0F0' },
   bsc: { label: 'BSC', icon: '⬡', color: '#F3BA2F' },
 }
 
