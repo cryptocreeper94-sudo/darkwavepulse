@@ -52,6 +52,7 @@ import { mlRoutes } from "./routes/mlRoutes";
 import { dustBusterRoutes } from "./routes/dustBusterRoutes";
 import { autoTradeRoutes } from "./routes/autoTradeRoutes";
 import { tradeExecutionRoutes } from "./routes/tradeExecutionRoutes";
+import { quantRoutes } from "./routes/quantRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6051,6 +6052,9 @@ export const mastra = new Mastra({
       
       // Dust Buster Routes
       ...dustBusterRoutes,
+      
+      // Quant System Routes
+      ...quantRoutes,
       
       // Auto Trade Routes (Autonomous Trading System)
       ...autoTradeRoutes,

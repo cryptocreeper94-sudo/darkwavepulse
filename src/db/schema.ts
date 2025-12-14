@@ -1132,3 +1132,172 @@ export const autoTrades = pgTable('auto_trades', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// ============================================
+// QUANT SYSTEM - Automated Token Scanning & Trading
+// PIN-protected developer controls with public metrics
+// ============================================
+
+// Quant Scan Config - Per-category auto-scanning settings
+export const quantScanConfig = pgTable('quant_scan_config', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  // Category: 'top' | 'meme' | 'defi' | 'dex' | 'gainers' | 'losers' | 'blue_chip'
+  category: varchar('category', { length: 50 }).notNull(),
+  
+  // Scanning Configuration
+  enabled: boolean('enabled').default(false),
+  scanIntervalMinutes: integer('scan_interval_minutes').default(5), // 5-10 minutes
+  maxTokensPerScan: integer('max_tokens_per_scan').default(20),
+  
+  // Filter Thresholds
+  minLiquidityUsd: numeric('min_liquidity_usd', { precision: 18, scale: 2 }).default('5000'),
+  minMarketCapUsd: numeric('min_market_cap_usd', { precision: 18, scale: 2 }).default('10000'),
+  maxMarketCapUsd: numeric('max_market_cap_usd', { precision: 18, scale: 2 }),
+  minSafetyScore: integer('min_safety_score').default(50),
+  minCompositeScore: integer('min_composite_score').default(60),
+  
+  // Auto-trade settings for this category
+  autoTradeEnabled: boolean('auto_trade_enabled').default(false),
+  maxTradeAmountSol: numeric('max_trade_amount_sol', { precision: 10, scale: 4 }).default('0.1'),
+  takeProfitPercent: numeric('take_profit_percent', { precision: 6, scale: 2 }).default('50'),
+  stopLossPercent: numeric('stop_loss_percent', { precision: 6, scale: 2 }).default('20'),
+  
+  // Last Scan Info
+  lastScanAt: timestamp('last_scan_at'),
+  lastScanTokensFound: integer('last_scan_tokens_found').default(0),
+  lastScanSignalsGenerated: integer('last_scan_signals_generated').default(0),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Quant Trade Sessions - Track test trading sessions
+export const quantTradeSessions = pgTable('quant_trade_sessions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  // Session Identity
+  sessionName: varchar('session_name', { length: 100 }),
+  status: varchar('status', { length: 20 }).default('active').notNull(), // 'active' | 'paused' | 'completed' | 'cancelled'
+  
+  // Session Limits
+  maxTradesAllowed: integer('max_trades_allowed').default(10),
+  maxSolAllowed: numeric('max_sol_allowed', { precision: 10, scale: 4 }).default('5'),
+  
+  // Session Performance
+  totalTrades: integer('total_trades').default(0),
+  winningTrades: integer('winning_trades').default(0),
+  losingTrades: integer('losing_trades').default(0),
+  totalSolUsed: numeric('total_sol_used', { precision: 10, scale: 4 }).default('0'),
+  totalPnlSol: numeric('total_pnl_sol', { precision: 18, scale: 8 }).default('0'),
+  totalPnlUsd: numeric('total_pnl_usd', { precision: 18, scale: 2 }).default('0'),
+  
+  // Best/Worst Trade
+  bestTradePercent: numeric('best_trade_percent', { precision: 10, scale: 2 }),
+  worstTradePercent: numeric('worst_trade_percent', { precision: 10, scale: 2 }),
+  
+  // Strategy Used
+  strategyNotes: text('strategy_notes'),
+  
+  // Timing
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  pausedAt: timestamp('paused_at'),
+  completedAt: timestamp('completed_at'),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Quant Trade Actions - Individual buys/sells within sessions
+export const quantTradeActions = pgTable('quant_trade_actions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  sessionId: varchar('session_id', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  // Token Info
+  tokenAddress: varchar('token_address', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }),
+  tokenName: varchar('token_name', { length: 255 }),
+  chain: varchar('chain', { length: 50 }).default('solana'),
+  
+  // Action Type
+  actionType: varchar('action_type', { length: 10 }).notNull(), // 'BUY' | 'SELL'
+  triggerSource: varchar('trigger_source', { length: 50 }), // 'manual' | 'auto_scanner' | 'signal' | 'stop_loss' | 'take_profit'
+  
+  // Status
+  status: varchar('status', { length: 20 }).default('pending').notNull(), // 'pending' | 'executing' | 'executed' | 'failed' | 'cancelled'
+  
+  // Amounts
+  amountSol: numeric('amount_sol', { precision: 18, scale: 8 }),
+  amountToken: numeric('amount_token', { precision: 24, scale: 8 }),
+  amountUsd: numeric('amount_usd', { precision: 18, scale: 2 }),
+  
+  // Prices
+  priceAtAction: numeric('price_at_action', { precision: 24, scale: 12 }),
+  slippagePercent: numeric('slippage_percent', { precision: 6, scale: 2 }),
+  
+  // For SELL actions - Calculate P&L
+  entryPriceUsd: numeric('entry_price_usd', { precision: 24, scale: 12 }),
+  exitPriceUsd: numeric('exit_price_usd', { precision: 24, scale: 12 }),
+  pnlSol: numeric('pnl_sol', { precision: 18, scale: 8 }),
+  pnlUsd: numeric('pnl_usd', { precision: 18, scale: 2 }),
+  pnlPercent: numeric('pnl_percent', { precision: 10, scale: 2 }),
+  isWinning: boolean('is_winning'),
+  
+  // Signal that triggered this trade (if any)
+  signalId: varchar('signal_id', { length: 255 }),
+  compositeScore: integer('composite_score'),
+  safetyScore: integer('safety_score'),
+  
+  // Transaction Details
+  txSignature: varchar('tx_signature', { length: 255 }),
+  txError: text('tx_error'),
+  
+  // Timing
+  requestedAt: timestamp('requested_at').defaultNow().notNull(),
+  executedAt: timestamp('executed_at'),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Quant Learning Metrics - Aggregated stats for public display
+export const quantLearningMetrics = pgTable('quant_learning_metrics', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  
+  // Time Period
+  periodType: varchar('period_type', { length: 20 }).notNull(), // 'daily' | 'weekly' | 'monthly' | 'all_time'
+  periodStart: timestamp('period_start').notNull(),
+  periodEnd: timestamp('period_end'),
+  
+  // Category Filter (null = all)
+  category: varchar('category', { length: 50 }),
+  
+  // Scan Metrics
+  totalScans: integer('total_scans').default(0),
+  totalTokensAnalyzed: integer('total_tokens_analyzed').default(0),
+  signalsGenerated: integer('signals_generated').default(0),
+  
+  // Trade Metrics
+  totalTrades: integer('total_trades').default(0),
+  winningTrades: integer('winning_trades').default(0),
+  losingTrades: integer('losing_trades').default(0),
+  winRate: numeric('win_rate', { precision: 6, scale: 2 }),
+  
+  // P&L
+  totalPnlSol: numeric('total_pnl_sol', { precision: 18, scale: 8 }).default('0'),
+  totalPnlUsd: numeric('total_pnl_usd', { precision: 18, scale: 2 }).default('0'),
+  avgTradeReturn: numeric('avg_trade_return', { precision: 10, scale: 2 }),
+  bestTradeReturn: numeric('best_trade_return', { precision: 10, scale: 2 }),
+  worstTradeReturn: numeric('worst_trade_return', { precision: 10, scale: 2 }),
+  
+  // Model Performance (if ML is active)
+  modelAccuracy: numeric('model_accuracy', { precision: 6, scale: 2 }),
+  predictionsMade: integer('predictions_made').default(0),
+  predictionsCorrect: integer('predictions_correct').default(0),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
