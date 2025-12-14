@@ -16,6 +16,7 @@ import {
   MLDashboardTab,
   RiskDashboardTab
 } from './components/tabs'
+import AccuracyDashboard from './components/ml/AccuracyDashboard'
 import { GlossaryPopup, AIChatButton } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
 import { AvatarProvider } from './context/AvatarContext'
@@ -179,6 +180,8 @@ function App() {
         return <AnalysisTab coin={selectedCoinForAnalysis} onBack={() => setActiveTab('dashboard')} />
       case 'ml-dashboard':
         return <MLDashboardTab />
+      case 'accuracy':
+        return <AccuracyDashboard />
       case 'risk':
         return <RiskDashboardTab userId={userId} />
       default:
