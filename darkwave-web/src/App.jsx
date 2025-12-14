@@ -13,7 +13,8 @@ import {
   WalletTab,
   PricingTab,
   AnalysisTab,
-  MLDashboardTab
+  MLDashboardTab,
+  RiskDashboardTab
 } from './components/tabs'
 import { GlossaryPopup, AIChatButton } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
@@ -178,6 +179,8 @@ function App() {
         return <AnalysisTab coin={selectedCoinForAnalysis} onBack={() => setActiveTab('dashboard')} />
       case 'ml-dashboard':
         return <MLDashboardTab />
+      case 'risk':
+        return <RiskDashboardTab userId={userId} />
       default:
         return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
     }

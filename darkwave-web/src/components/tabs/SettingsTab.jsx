@@ -61,8 +61,12 @@ export default function SettingsTab({ userId, userConfig, setUserConfig }) {
       const response = await fetch(`/api/auto-trade/stats?userId=${userId}`)
       if (response.ok) {
         const data = await response.json()
-        if (data.stats) {
-          setAutoTradeStats(data.stats)
+        if (data.success) {
+          setAutoTradeStats({
+            totalTrades: data.config?.totalTradesExecuted || 0,
+            winRate: data.winRate || 0,
+            totalPnl: parseFloat(data.config?.totalProfitLoss) || 0
+          })
         }
       }
     } catch (err) {
