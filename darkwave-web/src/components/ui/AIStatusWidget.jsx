@@ -45,10 +45,15 @@ export default function AIStatusWidget() {
   if (loading) {
     return (
       <div style={{
-        background: '#1a1a1a',
+        background: '#0f0f0f',
         borderRadius: '12px',
         padding: '16px',
-        border: '1px solid #222'
+        border: '1px solid #222',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxSizing: 'border-box',
       }}>
         <div style={{ color: '#666', fontSize: '13px' }}>Loading AI Status...</div>
       </div>
@@ -58,10 +63,15 @@ export default function AIStatusWidget() {
   if (error) {
     return (
       <div style={{
-        background: '#1a1a1a',
+        background: '#0f0f0f',
         borderRadius: '12px',
         padding: '16px',
-        border: '1px solid #333'
+        border: '1px solid #222',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        boxSizing: 'border-box',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '18px' }}>🧠</span>
@@ -90,16 +100,21 @@ export default function AIStatusWidget() {
       <div 
         onClick={() => setShowModal(true)}
         style={{
-          background: '#1a1a1a',
+          background: '#0f0f0f',
           borderRadius: '12px',
           padding: '16px',
           border: '1px solid #222',
           cursor: 'pointer',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          boxSizing: 'border-box',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = '#00D4FF'
-          e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.2)'
+          e.currentTarget.style.borderColor = '#333'
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.1)'
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = '#222'
