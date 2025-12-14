@@ -1,12 +1,41 @@
 import axios from 'axios';
 import { db } from '../db/client.js';
 import { strikeAgentSignals } from '../db/schema.js';
-import { eq, desc, and, sql } from 'drizzle-orm';
+import { eq, desc, and, sql, inArray } from 'drizzle-orm';
 import { tokenScannerService } from './tokenScannerService.js';
 import { safetyEngineService, TokenSafetyReport } from './safetyEngineService.js';
+import { evmSafetyEngine, EvmTokenSafetyReport } from './evmSafetyEngine.js';
+import { ChainId, CHAIN_CONFIGS } from './multiChainProvider.js';
 import { randomBytes } from 'crypto';
 
 const DEX_SCREENER_API = 'https://api.dexscreener.com/latest/dex';
+
+// Supported chains for scanning
+export const SUPPORTED_CHAINS: ChainId[] = ['solana', 'ethereum', 'base', 'polygon', 'arbitrum', 'bsc'];
+
+// Chain-specific popular tokens for trending search
+const CHAIN_POPULAR_TOKENS: Record<ChainId, string[]> = {
+  solana: ['BONK', 'WIF', 'POPCAT', 'MEW', 'MYRO', 'BOME', 'JUP', 'PYTH', 'JTO', 'ORCA'],
+  ethereum: ['PEPE', 'SHIB', 'FLOKI', 'MOG', 'TURBO', 'NEIRO', 'SPX', 'MAGA', 'AERO'],
+  base: ['BRETT', 'DEGEN', 'TOSHI', 'HIGHER', 'MOCHI', 'NORMIE', 'KEYCAT', 'ROCKY'],
+  polygon: ['QUICK', 'GHST', 'DFYN', 'ORBS', 'SAND', 'MANA', 'AAVEGOTCHI'],
+  arbitrum: ['ARB', 'GMX', 'MAGIC', 'RDNT', 'PENDLE', 'GNS', 'GRAIL'],
+  bsc: ['CAKE', 'BAKE', 'BURGER', 'DODO', 'BABY', 'FLOKI', 'GALA'],
+};
+
+// Normalize DexScreener chain IDs to our ChainId type
+function normalizeChainId(dexScreenerChainId: string): ChainId | null {
+  const mapping: Record<string, ChainId> = {
+    'solana': 'solana',
+    'ethereum': 'ethereum',
+    'base': 'base',
+    'polygon': 'polygon',
+    'arbitrum': 'arbitrum',
+    'bsc': 'bsc',
+    'binance-smart-chain': 'bsc',
+  };
+  return mapping[dexScreenerChainId] || null;
+}
 
 interface DexScreenerPair {
   chainId: string;
@@ -79,19 +108,19 @@ class TopSignalsService {
     return `sig_${Date.now().toString(36)}_${randomBytes(4).toString('hex')}`;
   }
 
-  async scanAndScoreTokens(): Promise<TokenSignal[]> {
-    console.log('[TopSignals] Starting token scan and scoring...');
+  async scanAndScoreTokens(chains: ChainId[] = SUPPORTED_CHAINS): Promise<TokenSignal[]> {
+    console.log(`[TopSignals] Starting token scan across ${chains.length} chains: ${chains.join(', ')}...`);
     
     try {
       const [trendingTokens, gainersTokens] = await Promise.all([
-        this.fetchTrendingTokens(),
-        this.fetchTopGainers(),
+        this.fetchTrendingTokens(chains),
+        this.fetchTopGainers(chains),
       ]);
 
       const allPairs = [...trendingTokens, ...gainersTokens];
       const uniqueTokens = this.deduplicateByAddress(allPairs);
       
-      console.log(`[TopSignals] Processing ${uniqueTokens.length} unique tokens...`);
+      console.log(`[TopSignals] Processing ${uniqueTokens.length} unique tokens across ${chains.length} chains...`);
 
       const signals: TokenSignal[] = [];
 
@@ -112,7 +141,7 @@ class TopSignalsService {
         signal.rank = index + 1;
       });
 
-      console.log(`[TopSignals] Scored ${signals.length} tokens, saving to database...`);
+      console.log(`[TopSignals] Scored ${signals.length} tokens across chains, saving to database...`);
       await this.saveSignals(signals);
 
       return signals;
@@ -126,12 +155,60 @@ class TopSignalsService {
     const tokenAddress = pair.baseToken?.address;
     if (!tokenAddress) return null;
 
-    const safetyReport = await safetyEngineService.runFullSafetyCheck(tokenAddress);
-    
-    if (!safetyReport.passesAllChecks && safetyReport.safetyScore < 30) {
+    const chainId = normalizeChainId(pair.chainId);
+    if (!chainId) {
+      console.warn(`[TopSignals] Unsupported chain: ${pair.chainId}`);
       return null;
     }
-    if (safetyReport.honeypotResult?.isHoneypot) {
+
+    // Chain-aware safety check routing
+    let safetyScore = 0;
+    let safetyIndicators: Record<string, any> = {};
+    let isHoneypot = false;
+    let passesChecks = false;
+
+    try {
+      if (chainId === 'solana') {
+        // Use Solana-specific safety engine
+        const safetyReport = await safetyEngineService.runFullSafetyCheck(tokenAddress);
+        safetyScore = safetyReport.safetyScore;
+        isHoneypot = safetyReport.honeypotResult?.isHoneypot || false;
+        passesChecks = safetyReport.passesAllChecks;
+        safetyIndicators = {
+          hasMintAuthority: safetyReport.hasMintAuthority,
+          hasFreezeAuthority: safetyReport.hasFreezeAuthority,
+          liquidityLocked: safetyReport.liquidityLocked,
+          holderCount: safetyReport.holderCount,
+          top10HoldersPercent: safetyReport.top10HoldersPercent,
+        };
+      } else {
+        // Use EVM safety engine for Ethereum, Base, Polygon, Arbitrum, BSC
+        const evmReport = await evmSafetyEngine.runFullSafetyCheck(chainId, tokenAddress);
+        safetyScore = evmReport.safetyScore;
+        isHoneypot = evmReport.honeypotResult?.isHoneypot || false;
+        passesChecks = evmReport.passesAllChecks;
+        safetyIndicators = {
+          hasOwner: evmReport.hasOwner,
+          isRenounced: evmReport.isRenounced,
+          ownerCanMint: evmReport.ownerCanMint,
+          ownerCanBlacklist: evmReport.ownerCanBlacklist,
+          buyTax: evmReport.honeypotResult?.buyTax || 0,
+          sellTax: evmReport.honeypotResult?.sellTax || 0,
+          liquidityLocked: evmReport.liquidityLocked,
+          holderCount: evmReport.holderCount,
+          top10HoldersPercent: evmReport.top10HoldersPercent,
+        };
+      }
+    } catch (error) {
+      console.warn(`[TopSignals] Safety check failed for ${chainId}:${tokenAddress}:`, error);
+      safetyScore = 50; // Default neutral score on error
+    }
+
+    // Filter out unsafe tokens
+    if (!passesChecks && safetyScore < 30) {
+      return null;
+    }
+    if (isHoneypot) {
       return null;
     }
 
@@ -139,8 +216,6 @@ class TopSignalsService {
     const technicalScore = this.calculateTechnicalScore(technicalIndicators);
     
     const momentumScore = this.calculateMomentumScore(pair);
-    
-    const safetyScore = safetyReport.safetyScore;
     
     const mlConfidence = await this.getMLConfidence(tokenAddress);
     
@@ -152,14 +227,14 @@ class TopSignalsService {
     });
 
     const category = this.categorizeToken(pair.baseToken.symbol, pair.baseToken.name);
-    const reasoning = this.generateReasoning(pair, safetyReport, technicalIndicators, compositeScore);
+    const reasoning = this.generateReasoningMultiChain(pair, chainId, safetyScore, safetyIndicators, technicalIndicators, compositeScore);
 
     return {
       id: this.generateSignalId(),
       tokenAddress,
       tokenSymbol: pair.baseToken.symbol || 'UNKNOWN',
       tokenName: pair.baseToken.name || 'Unknown Token',
-      chain: pair.chainId === 'solana' ? 'solana' : pair.chainId,
+      chain: chainId,
       priceUsd: parseFloat(pair.priceUsd || '0'),
       marketCapUsd: pair.fdv || 0,
       liquidityUsd: pair.liquidity?.usd || 0,
@@ -170,13 +245,7 @@ class TopSignalsService {
       mlConfidence,
       indicators: {
         technical: technicalIndicators,
-        safety: {
-          hasMintAuthority: safetyReport.hasMintAuthority,
-          hasFreezeAuthority: safetyReport.hasFreezeAuthority,
-          liquidityLocked: safetyReport.liquidityLocked,
-          holderCount: safetyReport.holderCount,
-          top10HoldersPercent: safetyReport.top10HoldersPercent,
-        },
+        safety: safetyIndicators,
         priceChange: pair.priceChange,
         volume: pair.volume,
       },
@@ -377,12 +446,95 @@ class TopSignalsService {
     return reasons.join(' ');
   }
 
-  async getTopSignals(limit: number = 10, category?: string): Promise<TokenSignal[]> {
-    try {
-      let query = db.select().from(strikeAgentSignals).orderBy(desc(strikeAgentSignals.compositeScore));
+  generateReasoningMultiChain(
+    pair: DexScreenerPair,
+    chain: ChainId,
+    safetyScore: number,
+    safetyIndicators: Record<string, any>,
+    indicators: TechnicalIndicators,
+    compositeScore: number
+  ): string {
+    const reasons: string[] = [];
+    const chainName = CHAIN_CONFIGS[chain]?.name || chain;
 
+    if (compositeScore >= 70) {
+      reasons.push(`Strong score of ${compositeScore}/100 on ${chainName}.`);
+    } else if (compositeScore >= 50) {
+      reasons.push(`Moderate opportunity (${compositeScore}/100) on ${chainName}.`);
+    }
+
+    if (safetyScore >= 70) {
+      reasons.push('Passes key safety checks.');
+    }
+    
+    // EVM-specific safety indicators
+    if (safetyIndicators.isRenounced) {
+      reasons.push('Ownership renounced.');
+    }
+    if (safetyIndicators.liquidityLocked) {
+      reasons.push('Liquidity locked.');
+    }
+    if (safetyIndicators.buyTax === 0 && safetyIndicators.sellTax === 0) {
+      reasons.push('No buy/sell tax.');
+    } else if (safetyIndicators.buyTax > 0 || safetyIndicators.sellTax > 0) {
+      const totalTax = (safetyIndicators.buyTax || 0) + (safetyIndicators.sellTax || 0);
+      if (totalTax <= 10) {
+        reasons.push(`Low tax (${safetyIndicators.buyTax || 0}%/${safetyIndicators.sellTax || 0}%).`);
+      }
+    }
+
+    if (indicators.rsiSignal === 'oversold') {
+      reasons.push('RSI oversold - potential bounce.');
+    }
+    if (indicators.macdSignal === 'bullish') {
+      reasons.push('MACD bullish.');
+    }
+    if (indicators.emaCrossover === 'golden') {
+      reasons.push('Golden cross detected.');
+    }
+    if (indicators.volumeSpike) {
+      reasons.push('Volume spike.');
+    }
+
+    const priceChange24h = pair.priceChange?.h24 || 0;
+    if (priceChange24h > 20) {
+      reasons.push(`+${priceChange24h.toFixed(1)}% in 24h.`);
+    }
+
+    const volume24h = pair.volume?.h24 || 0;
+    if (volume24h > 500000) {
+      reasons.push(`$${(volume24h / 1000000).toFixed(2)}M volume.`);
+    }
+
+    if (reasons.length === 0) {
+      reasons.push(`Token on ${chainName} shows potential.`);
+    }
+
+    return reasons.join(' ');
+  }
+
+  async getTopSignals(limit: number = 10, category?: string, chain?: ChainId | 'all'): Promise<TokenSignal[]> {
+    try {
+      let conditions: any[] = [];
+      
       if (category) {
-        query = query.where(eq(strikeAgentSignals.category, category)) as any;
+        conditions.push(eq(strikeAgentSignals.category, category));
+      }
+      
+      if (chain && chain !== 'all') {
+        conditions.push(eq(strikeAgentSignals.chain, chain));
+      }
+
+      let query;
+      if (conditions.length > 0) {
+        query = db.select()
+          .from(strikeAgentSignals)
+          .where(and(...conditions))
+          .orderBy(desc(strikeAgentSignals.compositeScore));
+      } else {
+        query = db.select()
+          .from(strikeAgentSignals)
+          .orderBy(desc(strikeAgentSignals.compositeScore));
       }
 
       const results = await query.limit(limit);
@@ -450,24 +602,30 @@ class TopSignalsService {
     }
   }
 
-  private async fetchTrendingTokens(): Promise<DexScreenerPair[]> {
+  private async fetchTrendingTokens(chains: ChainId[] = SUPPORTED_CHAINS): Promise<DexScreenerPair[]> {
     try {
-      const popularTokens = ['BONK', 'WIF', 'POPCAT', 'MEW', 'MYRO', 'BOME', 'JUP', 'PYTH', 'JTO', 'ORCA'];
       const allPairs: DexScreenerPair[] = [];
       
-      for (const token of popularTokens.slice(0, 5)) {
-        try {
-          const response = await axios.get(`${DEX_SCREENER_API}/search?q=${token}`, {
-            timeout: 10000,
-          });
-          const pairs = (response.data?.pairs || []).filter((p: any) => p.chainId === 'solana');
-          allPairs.push(...pairs.slice(0, 3));
-        } catch (err) {
-          console.warn(`[TopSignals] Failed to fetch ${token}`);
+      // Fetch trending tokens for each chain
+      for (const chain of chains) {
+        const tokens = CHAIN_POPULAR_TOKENS[chain] || [];
+        for (const token of tokens.slice(0, 3)) {
+          try {
+            const response = await axios.get(`${DEX_SCREENER_API}/search?q=${token}`, {
+              timeout: 10000,
+            });
+            // Filter to only include pairs from the target chain
+            const pairs = (response.data?.pairs || []).filter((p: any) => 
+              normalizeChainId(p.chainId) === chain
+            );
+            allPairs.push(...pairs.slice(0, 2));
+          } catch (err) {
+            console.warn(`[TopSignals] Failed to fetch ${token} on ${chain}`);
+          }
         }
       }
       
-      console.log(`[TopSignals] Fetched ${allPairs.length} trending tokens`);
+      console.log(`[TopSignals] Fetched ${allPairs.length} trending tokens across ${chains.length} chains`);
       return allPairs;
     } catch (error) {
       console.error('[TopSignals] Error fetching trending tokens:', error);
@@ -475,9 +633,10 @@ class TopSignalsService {
     }
   }
 
-  private async fetchTopGainers(): Promise<DexScreenerPair[]> {
+  private async fetchTopGainers(chains: ChainId[] = SUPPORTED_CHAINS): Promise<DexScreenerPair[]> {
     try {
-      const memeTokens = ['DOGE', 'PEPE', 'SHIB', 'FLOKI', 'BRETT', 'MOG', 'NEIRO', 'SPX', 'GIGA', 'PNUT'];
+      // Universal meme tokens that exist on multiple chains
+      const memeTokens = ['DOGE', 'PEPE', 'SHIB', 'FLOKI', 'MOG', 'NEIRO', 'SPX', 'GIGA'];
       const allPairs: DexScreenerPair[] = [];
       
       for (const token of memeTokens.slice(0, 5)) {
@@ -485,10 +644,12 @@ class TopSignalsService {
           const response = await axios.get(`${DEX_SCREENER_API}/search?q=${token}`, {
             timeout: 10000,
           });
-          const pairs = (response.data?.pairs || []).filter((p: any) => 
-            p.chainId === 'solana' && (p.priceChange?.h24 || 0) > 5
-          );
-          allPairs.push(...pairs.slice(0, 3));
+          // Include pairs from all target chains with positive price change
+          const pairs = (response.data?.pairs || []).filter((p: any) => {
+            const chain = normalizeChainId(p.chainId);
+            return chain && chains.includes(chain) && (p.priceChange?.h24 || 0) > 5;
+          });
+          allPairs.push(...pairs.slice(0, 5));
         } catch (err) {
           console.warn(`[TopSignals] Failed to fetch ${token}`);
         }
@@ -498,7 +659,7 @@ class TopSignalsService {
         .sort((a, b) => (b.priceChange?.h24 || 0) - (a.priceChange?.h24 || 0))
         .slice(0, 50);
       
-      console.log(`[TopSignals] Fetched ${sorted.length} gainers`);
+      console.log(`[TopSignals] Fetched ${sorted.length} gainers across ${chains.length} chains`);
       return sorted;
     } catch (error) {
       console.error('[TopSignals] Error fetching top gainers:', error);

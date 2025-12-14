@@ -1146,6 +1146,9 @@ export const quantScanConfig = pgTable('quant_scan_config', {
   // Category: 'top' | 'meme' | 'defi' | 'dex' | 'gainers' | 'losers' | 'blue_chip'
   category: varchar('category', { length: 50 }).notNull(),
   
+  // Chains to scan (JSON array: ["solana", "ethereum", "base", "polygon", "arbitrum", "bsc"])
+  chains: text('chains').default('["solana","ethereum","base","polygon","arbitrum","bsc"]'),
+  
   // Scanning Configuration
   enabled: boolean('enabled').default(false),
   scanIntervalMinutes: integer('scan_interval_minutes').default(5), // 5-10 minutes
