@@ -66,8 +66,10 @@ export default function MobileCardCarousel({ children }) {
           justify-content: center;
           align-items: center;
           gap: 16px;
-          margin-top: 12px;
-          padding: 8px 0;
+          margin-top: 16px;
+          padding: 12px 0;
+          position: relative;
+          z-index: 100;
         }
         
         .carousel-arrow {

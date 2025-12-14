@@ -982,6 +982,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           background: rgba(20, 20, 20, 0.85);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
+          overflow: hidden;
+          position: relative;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 16px;
           padding: 16px;
@@ -1187,6 +1189,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                   )}
                   showDots={false}
                   showArrows={false}
+                  showCounter={false}
                   autoPlay={false}
                   interval={6000}
                 />
@@ -1209,6 +1212,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                   )}
                   showDots={false}
                   showArrows={false}
+                  showCounter={false}
                   autoPlay={false}
                   interval={5000}
                 />
@@ -1233,6 +1237,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                     )}
                     showDots={false}
                     showArrows={false}
+                    showCounter={false}
                     autoPlay={false}
                     interval={4000}
                   />
