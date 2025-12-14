@@ -2998,3 +2998,114 @@
     gap: 4px;
   }
 }
+
+/* ============================================ */
+/* GLOSSARY COMPONENTS                          */
+/* ============================================ */
+
+.glossary-term {
+  color: #00D4FF;
+  cursor: pointer;
+  border-bottom: 1px dotted rgba(0, 212, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.glossary-term:hover {
+  color: #4DE8FF;
+  border-bottom-color: #00D4FF;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+}
+
+.glossary-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: glossaryFadeIn 0.2s ease;
+}
+
+@keyframes glossaryFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.glossary-modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  box-shadow: 
+    0 0 30px rgba(0, 212, 255, 0.15),
+    0 0 60px rgba(0, 212, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: glossarySlideUp 0.3s ease;
+}
+
+@keyframes glossarySlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.glossary-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #888;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glossary-modal-close:hover {
+  background: rgba(255, 68, 68, 0.2);
+  color: #FF4444;
+}
+
+.glossary-modal-content {
+  text-align: center;
+}
+
+.glossary-modal-term {
+  font-size: 18px;
+  font-weight: 700;
+  color: #00D4FF;
+  margin: 0 0 16px 0;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.glossary-modal-definition {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #bbb;
+  margin: 0;
+}
