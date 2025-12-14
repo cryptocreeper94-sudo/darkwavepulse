@@ -322,6 +322,31 @@ export const clientWalletService = {
   deleteAllWallets() {
     localStorage.removeItem(WALLETS_STORAGE_KEY)
     localStorage.removeItem(ACTIVE_WALLET_KEY)
+  },
+
+  async signSolanaTransaction(password, transactionBase64, walletId = null) {
+    const wallets = getWalletsFromStorage()
+    const targetId = walletId || getActiveWalletId()
+    const wallet = wallets.find(w => w.id === targetId)
+    
+    if (!wallet) throw new Error('No wallet found')
+    
+    const mnemonic = await decryptMnemonic(wallet.encrypted, password)
+    
+    const seed = await bip39.mnemonicToSeed(mnemonic)
+    const path = "m/44'/501'/0'/0'"
+    const { derivePath } = await import('ed25519-hd-key')
+    const { key } = derivePath(path, Buffer.from(seed).toString('hex'))
+    const { Keypair, VersionedTransaction } = await import('@solana/web3.js')
+    const keypair = Keypair.fromSeed(Uint8Array.from(key.slice(0, 32)))
+    
+    const transactionBuf = Buffer.from(transactionBase64, 'base64')
+    const transaction = VersionedTransaction.deserialize(transactionBuf)
+    
+    transaction.sign([keypair])
+    
+    const signedBuf = transaction.serialize()
+    return Buffer.from(signedBuf).toString('base64')
   }
 }
 
