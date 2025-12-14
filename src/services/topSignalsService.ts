@@ -452,10 +452,23 @@ class TopSignalsService {
 
   private async fetchTrendingTokens(): Promise<DexScreenerPair[]> {
     try {
-      const response = await axios.get(`${DEX_SCREENER_API}/tokens/solana`, {
-        timeout: 15000,
-      });
-      return response.data?.pairs || [];
+      const popularTokens = ['BONK', 'WIF', 'POPCAT', 'MEW', 'MYRO', 'BOME', 'JUP', 'PYTH', 'JTO', 'ORCA'];
+      const allPairs: DexScreenerPair[] = [];
+      
+      for (const token of popularTokens.slice(0, 5)) {
+        try {
+          const response = await axios.get(`${DEX_SCREENER_API}/search?q=${token}`, {
+            timeout: 10000,
+          });
+          const pairs = (response.data?.pairs || []).filter((p: any) => p.chainId === 'solana');
+          allPairs.push(...pairs.slice(0, 3));
+        } catch (err) {
+          console.warn(`[TopSignals] Failed to fetch ${token}`);
+        }
+      }
+      
+      console.log(`[TopSignals] Fetched ${allPairs.length} trending tokens`);
+      return allPairs;
     } catch (error) {
       console.error('[TopSignals] Error fetching trending tokens:', error);
       return [];
@@ -464,15 +477,29 @@ class TopSignalsService {
 
   private async fetchTopGainers(): Promise<DexScreenerPair[]> {
     try {
-      const response = await axios.get(`${DEX_SCREENER_API}/search?q=solana`, {
-        timeout: 15000,
-      });
+      const memeTokens = ['DOGE', 'PEPE', 'SHIB', 'FLOKI', 'BRETT', 'MOG', 'NEIRO', 'SPX', 'GIGA', 'PNUT'];
+      const allPairs: DexScreenerPair[] = [];
       
-      const pairs: DexScreenerPair[] = response.data?.pairs || [];
-      return pairs
-        .filter(p => p.chainId === 'solana' && (p.priceChange?.h24 || 0) > 10)
+      for (const token of memeTokens.slice(0, 5)) {
+        try {
+          const response = await axios.get(`${DEX_SCREENER_API}/search?q=${token}`, {
+            timeout: 10000,
+          });
+          const pairs = (response.data?.pairs || []).filter((p: any) => 
+            p.chainId === 'solana' && (p.priceChange?.h24 || 0) > 5
+          );
+          allPairs.push(...pairs.slice(0, 3));
+        } catch (err) {
+          console.warn(`[TopSignals] Failed to fetch ${token}`);
+        }
+      }
+      
+      const sorted = allPairs
         .sort((a, b) => (b.priceChange?.h24 || 0) - (a.priceChange?.h24 || 0))
         .slice(0, 50);
+      
+      console.log(`[TopSignals] Fetched ${sorted.length} gainers`);
+      return sorted;
     } catch (error) {
       console.error('[TopSignals] Error fetching top gainers:', error);
       return [];
