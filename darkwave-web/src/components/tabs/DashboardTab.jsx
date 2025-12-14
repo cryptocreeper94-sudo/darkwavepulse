@@ -1014,18 +1014,31 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           padding-top: 60px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: minmax(150px, auto) minmax(150px, auto) minmax(280px, auto) minmax(350px, auto);
-          gap: 8px;
+          grid-template-rows: minmax(180px, auto) minmax(380px, auto) minmax(400px, auto);
+          gap: 12px;
         }
-        .bento-quick { grid-area: 1 / 1 / 3 / 4; }
-        .bento-market { grid-area: 1 / 4 / 3 / 7; }
-        .bento-trending { grid-area: 1 / 7 / 3 / 10; }
-        .bento-news { grid-area: 1 / 10 / 3 / 13; }
-        .bento-table { grid-area: 3 / 1 / 4 / 13; }
+        /* Row 1: 4 compact cards */
+        .bento-quick { grid-area: 1 / 1 / 2 / 4; }
+        .bento-market { grid-area: 1 / 4 / 2 / 7; }
+        .bento-trending { grid-area: 1 / 7 / 2 / 10; }
+        .bento-news { grid-area: 1 / 10 / 2 / 13; display: none; }
+        /* Row 2: Table left, News right */
+        .bento-table { grid-area: 2 / 1 / 3 / 7; }
+        .desktop-news-grid { 
+          grid-area: 2 / 7 / 3 / 13;
+          background: #0f0f0f;
+          border: 1px solid #222;
+          border-radius: 12px;
+          padding: 16px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+        /* Row 3: Chart full width */
         .bento-chart-section { 
-          grid-area: 4 / 1 / 5 / 13;
+          grid-area: 3 / 1 / 4 / 13;
           display: grid;
-          grid-template-columns: 1fr 3fr;
+          grid-template-columns: 280px 1fr;
           gap: 12px;
         }
         .chart-metrics {
@@ -1042,6 +1055,27 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           min-height: 300px;
         }
         
+        @media (max-width: 1200px) {
+          .bento-dashboard {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto auto auto;
+            gap: 10px;
+            padding: 10px;
+            padding-top: 60px;
+          }
+          .bento-quick, .bento-market, .bento-trending, .bento-news {
+            grid-area: auto;
+            min-height: 180px;
+          }
+          .bento-table { grid-column: 1 / -1; min-height: 350px; }
+          .desktop-news-grid { display: none; }
+          .bento-chart-section { 
+            grid-column: 1 / -1;
+            min-height: 400px;
+            grid-template-columns: 1fr 2fr;
+          }
+        }
+        
         @media (max-width: 1024px) {
           .bento-dashboard {
             grid-template-columns: repeat(2, 1fr);
@@ -1050,15 +1084,15 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             padding: 10px;
             padding-top: 60px;
           }
-          .bento-quick, .bento-market, .bento-trending, .bento-news,
-          .bento-table, .bento-chart-section {
+          .bento-quick, .bento-market, .bento-trending, .bento-news {
             grid-area: auto;
           }
           .bento-quick { min-height: 160px; }
           .bento-market { min-height: 160px; }
           .bento-trending { min-height: 160px; }
-          .bento-news { min-height: 160px; }
+          .bento-news { min-height: 160px; display: flex; }
           .bento-table { min-height: 350px; grid-column: 1 / -1; }
+          .desktop-news-grid { display: none; }
           .bento-chart-section { 
             min-height: 400px; 
             grid-column: 1 / -1;
@@ -1497,6 +1531,50 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         />
       </BentoTile>
 
+      {!isMobile && news.length > 0 && (
+        <div className="desktop-news-grid">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <TileLabel color="#00D4FF">Latest News</TileLabel>
+          </div>
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}>
+            {news.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="desktop-news-card"
+                style={{
+                  background: '#141414',
+                  border: '1px solid #222',
+                  borderRadius: 10,
+                  padding: 14,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0,
+                }}
+              >
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#00D4FF', textTransform: 'uppercase', marginBottom: 6 }}>
+                  {item.source}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>
+                  {item.title}
+                </div>
+                <div style={{ fontSize: 10, color: '#666' }}>
+                  {item.time}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="bento-chart-section">
         <div className="chart-metrics">
           <ChartMetricsPanel coin={selectedCoin} />
@@ -1506,76 +1584,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         </div>
       </div>
 
-      {!isMobile && news.length > 0 && (
-        <div className="desktop-news-section" style={{
-          marginTop: 20,
-          padding: '16px 0',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <TileLabel color="#00D4FF">Latest News</TileLabel>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                className="news-arrow-btn"
-                onClick={() => {
-                  const container = document.querySelector('.news-scroll-container');
-                  if (container) container.scrollBy({ left: -320, behavior: 'smooth' });
-                }}
-              >
-                ‹
-              </button>
-              <button
-                className="news-arrow-btn"
-                onClick={() => {
-                  const container = document.querySelector('.news-scroll-container');
-                  if (container) container.scrollBy({ left: 320, behavior: 'smooth' });
-                }}
-              >
-                ›
-              </button>
-            </div>
-          </div>
-          <div 
-            className="news-scroll-container"
-            style={{
-              display: 'flex',
-              gap: 16,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              paddingBottom: 8,
-            }}
-          >
-            {news.map((item, idx) => (
-              <a
-                key={idx}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="desktop-news-card"
-                style={{
-                  flex: '0 0 300px',
-                  background: '#0f0f0f',
-                  border: '1px solid #222',
-                  borderRadius: 12,
-                  padding: 16,
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#00D4FF', textTransform: 'uppercase', marginBottom: 8 }}>
-                  {item.source}
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', lineHeight: 1.4, marginBottom: 10, minHeight: 40 }}>
-                  {item.title}
-                </div>
-                <div style={{ fontSize: 11, color: '#666' }}>
-                  {item.time}
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
 
       {isMobile && news.length > 0 && (
         <div className="mobile-news-section">
