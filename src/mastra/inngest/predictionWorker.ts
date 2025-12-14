@@ -14,17 +14,122 @@ type Horizon = '1h' | '4h' | '24h' | '7d';
 
 const HORIZONS: Horizon[] = ['1h', '4h', '24h', '7d'];
 
+const TICKER_TO_COINGECKO: Record<string, string> = {
+  'btc': 'bitcoin',
+  'bitcoin': 'bitcoin',
+  'eth': 'ethereum',
+  'ethereum': 'ethereum',
+  'sol': 'solana',
+  'solana': 'solana',
+  'xrp': 'ripple',
+  'ripple': 'ripple',
+  'doge': 'dogecoin',
+  'dogecoin': 'dogecoin',
+  'ada': 'cardano',
+  'cardano': 'cardano',
+  'avax': 'avalanche-2',
+  'avalanche': 'avalanche-2',
+  'avalanche-2': 'avalanche-2',
+  'dot': 'polkadot',
+  'polkadot': 'polkadot',
+  'link': 'chainlink',
+  'chainlink': 'chainlink',
+  'near': 'near',
+  'atom': 'cosmos',
+  'cosmos': 'cosmos',
+  'ltc': 'litecoin',
+  'litecoin': 'litecoin',
+  'uni': 'uniswap',
+  'uniswap': 'uniswap',
+  'xlm': 'stellar',
+  'stellar': 'stellar',
+  'algo': 'algorand',
+  'algorand': 'algorand',
+  'vet': 'vechain',
+  'vechain': 'vechain',
+  'icp': 'internet-computer',
+  'internet-computer': 'internet-computer',
+  'fil': 'filecoin',
+  'filecoin': 'filecoin',
+  'grt': 'the-graph',
+  'the-graph': 'the-graph',
+  'aave': 'aave',
+  'bnb': 'binancecoin',
+  'binancecoin': 'binancecoin',
+  'usdt': 'tether',
+  'tether': 'tether',
+  'usdc': 'usd-coin',
+  'usd-coin': 'usd-coin',
+  'matic': 'matic-network',
+  'polygon': 'matic-network',
+  'shib': 'shiba-inu',
+  'trx': 'tron',
+  'tron': 'tron',
+  'ton': 'the-open-network',
+  'sui': 'sui',
+  'apt': 'aptos',
+  'aptos': 'aptos',
+  'arb': 'arbitrum',
+  'arbitrum': 'arbitrum',
+  'op': 'optimism',
+  'optimism': 'optimism',
+  'sei': 'sei-network',
+  'inj': 'injective-protocol',
+  'injective': 'injective-protocol',
+  'render': 'render-token',
+  'rndr': 'render-token',
+  'hbar': 'hedera-hashgraph',
+  'hedera': 'hedera-hashgraph',
+  'ftm': 'fantom',
+  'fantom': 'fantom',
+  'sand': 'the-sandbox',
+  'mana': 'decentraland',
+  'axs': 'axie-infinity',
+  'ape': 'apecoin',
+  'ldo': 'lido-dao',
+  'crv': 'curve-dao-token',
+  'mkr': 'maker',
+  'snx': 'synthetix-network-token',
+  'comp': 'compound-governance-token',
+  'rune': 'thorchain',
+  'kava': 'kava',
+  'celo': 'celo',
+  'flow': 'flow',
+  'mina': 'mina-protocol',
+  'theta': 'theta-token',
+  'egld': 'elrond-erd-2',
+  'xtz': 'tezos',
+  'tezos': 'tezos',
+  'eos': 'eos',
+  'neo': 'neo',
+  'zec': 'zcash',
+  'xmr': 'monero',
+  'monero': 'monero',
+  'dash': 'dash',
+  'etc': 'ethereum-classic',
+  'bch': 'bitcoin-cash',
+  'pepe': 'pepe',
+  'wif': 'dogwifcoin',
+  'bonk': 'bonk',
+  'floki': 'floki',
+  'brett': 'brett',
+  'popcat': 'popcat',
+  'mog': 'mog-coin',
+};
+
+function getCoingeckoId(ticker: string): string {
+  const normalized = ticker.toLowerCase().trim();
+  return TICKER_TO_COINGECKO[normalized] || normalized;
+}
+
 async function fetchCurrentPrice(ticker: string): Promise<number | null> {
   try {
-    const cgTicker = ticker.toLowerCase();
+    const coinId = getCoingeckoId(ticker);
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/simple/price`,
       {
         params: {
-          ids: cgTicker === 'btc' ? 'bitcoin' : 
-               cgTicker === 'eth' ? 'ethereum' :
-               cgTicker === 'sol' ? 'solana' :
-               cgTicker,
+          ids: coinId,
           vs_currencies: 'usd',
         },
         timeout: 10000,
@@ -33,15 +138,10 @@ async function fetchCurrentPrice(ticker: string): Promise<number | null> {
         } : {},
       }
     );
-
-    const coinId = cgTicker === 'btc' ? 'bitcoin' : 
-                   cgTicker === 'eth' ? 'ethereum' :
-                   cgTicker === 'sol' ? 'solana' :
-                   cgTicker;
     
     return response.data[coinId]?.usd || null;
   } catch (error: any) {
-    console.error(`[PredictionWorker] Failed to fetch price for ${ticker}:`, error.message);
+    console.error(`[PredictionWorker] Failed to fetch price for ${ticker} (${getCoingeckoId(ticker)}):`, error.message);
     return null;
   }
 }
