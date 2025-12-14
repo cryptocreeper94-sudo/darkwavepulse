@@ -1014,20 +1014,23 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           padding-top: 60px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: minmax(160px, auto) minmax(380px, auto) minmax(400px, auto);
+          grid-template-rows: minmax(120px, auto) minmax(160px, auto) minmax(380px, auto) minmax(400px, auto);
           gap: 12px;
           max-width: 1200px;
           margin: 0 auto;
         }
-        /* Row 1: 4 compact cards */
-        .bento-quick { grid-area: 1 / 1 / 2 / 4; }
-        .bento-market { grid-area: 1 / 4 / 2 / 7; }
-        .bento-trending { grid-area: 1 / 7 / 2 / 10; }
-        .bento-news { grid-area: 1 / 10 / 2 / 13; display: none; }
-        /* Row 2: Table left, News right */
-        .bento-table { grid-area: 2 / 1 / 3 / 7; }
+        /* Row 1: AI Status left, Quick Actions right */
+        .bento-ai-status { grid-area: 1 / 1 / 2 / 7; }
+        .bento-quick { grid-area: 1 / 7 / 2 / 13; }
+        /* Row 2: Predictive System left, Market/Trending/News right */
+        .bento-predict { grid-area: 2 / 1 / 3 / 7; }
+        .bento-market { grid-area: 2 / 7 / 3 / 10; }
+        .bento-trending { grid-area: 2 / 10 / 3 / 13; }
+        .bento-news { display: none; }
+        /* Row 3: Table left, News right */
+        .bento-table { grid-area: 3 / 1 / 4 / 7; }
         .desktop-news-grid { 
-          grid-area: 2 / 7 / 3 / 13;
+          grid-area: 3 / 7 / 4 / 13;
           background: #0f0f0f;
           border: 1px solid #222;
           border-radius: 12px;
@@ -1036,9 +1039,9 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           display: flex;
           flex-direction: column;
         }
-        /* Row 3: Chart full width */
+        /* Row 4: Chart full width */
         .bento-chart-section { 
-          grid-area: 3 / 1 / 4 / 13;
+          grid-area: 4 / 1 / 5 / 13;
           display: grid;
           grid-template-columns: 280px 1fr;
           gap: 12px;
@@ -1060,14 +1063,14 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         @media (max-width: 1200px) {
           .bento-dashboard {
             grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: auto auto auto auto;
+            grid-template-rows: auto auto auto auto auto;
             gap: 10px;
             padding: 10px;
             padding-top: 60px;
           }
-          .bento-quick, .bento-market, .bento-trending, .bento-news {
+          .bento-ai-status, .bento-quick, .bento-predict, .bento-market, .bento-trending, .bento-news {
             grid-area: auto;
-            min-height: 180px;
+            min-height: 140px;
           }
           .bento-table { grid-column: 1 / -1; min-height: 350px; }
           .desktop-news-grid { display: none; }
@@ -1086,9 +1089,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             padding: 10px;
             padding-top: 60px;
           }
-          .bento-quick, .bento-market, .bento-trending, .bento-news {
+          .bento-ai-status, .bento-quick, .bento-predict, .bento-market, .bento-trending, .bento-news {
             grid-area: auto;
           }
+          .bento-ai-status { min-height: 100px; }
+          .bento-predict { min-height: 140px; }
           .bento-quick { min-height: 160px; }
           .bento-market { min-height: 160px; }
           .bento-trending { min-height: 160px; }
@@ -1110,7 +1115,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             padding: 10px;
             padding-top: 60px;
           }
-          .bento-quick, .bento-market, .bento-trending, .bento-news { 
+          .bento-ai-status, .bento-predict, .bento-quick, .bento-market, .bento-trending, .bento-news { 
             display: none !important;
           }
           .bento-table { 
@@ -1362,84 +1367,79 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
       `}</style>
       <div className="bento-dashboard">
       
-      <div style={{ 
-        gridColumn: '1 / 7', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: 12 
-      }}>
+      <div className="bento-ai-status">
         <AIStatusWidget />
-        
-        <BentoTile style={{ padding: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-            <div style={{
-              width: 48,
-              height: 48,
-              background: 'linear-gradient(135deg, #9D4EDD 0%, #00D4FF 100%)',
-              borderRadius: 12,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 24,
-              flexShrink: 0,
-              boxShadow: '0 0 20px rgba(157, 78, 221, 0.4)',
-            }}>
-              🧠
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-                Predictive AI System
-              </div>
-              <div style={{ fontSize: 11, color: '#888', lineHeight: 1.5 }}>
-                Our AI learns from every analysis, tracking predictions at 1h, 4h, 24h, and 7d intervals. As accuracy improves beyond 55%, the system becomes eligible to power autonomous trading through StrikeAgent.
-              </div>
-            </div>
-          </div>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(4, 1fr)', 
-            gap: 10, 
-            marginTop: 14,
-            paddingTop: 14,
-            borderTop: '1px solid #222',
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#00D4FF' }}>1H</div>
-              <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>Short-term</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#39FF14' }}>4H</div>
-              <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>Swing</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#FFD700' }}>24H</div>
-              <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>Daily</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#9D4EDD' }}>7D</div>
-              <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>Weekly</div>
-            </div>
-          </div>
-          
+      </div>
+
+      <BentoTile className="bento-predict" style={{ padding: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
           <div style={{
-            marginTop: 14,
-            padding: '10px 12px',
-            background: 'rgba(0, 212, 255, 0.08)',
-            borderRadius: 8,
-            border: '1px solid rgba(0, 212, 255, 0.15)',
+            width: 44,
+            height: 44,
+            background: 'linear-gradient(135deg, #9D4EDD 0%, #00D4FF 100%)',
+            borderRadius: 12,
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            justifyContent: 'center',
+            fontSize: 22,
+            flexShrink: 0,
+            boxShadow: '0 0 20px rgba(157, 78, 221, 0.4)',
           }}>
-            <span style={{ fontSize: 14 }}>🔗</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: '#00D4FF', fontWeight: 600 }}>Blockchain Verified</div>
-              <div style={{ fontSize: 10, color: '#666' }}>Every prediction is hashed on Solana for transparency</div>
+            🧠
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+              Predictive AI System
+            </div>
+            <div style={{ fontSize: 11, color: '#888', lineHeight: 1.5 }}>
+              Our AI learns from every analysis, tracking predictions at multiple intervals. As accuracy improves beyond 55%, it powers autonomous trading.
             </div>
           </div>
-        </BentoTile>
-      </div>
+        </div>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(4, 1fr)', 
+          gap: 8, 
+          marginTop: 12,
+          paddingTop: 12,
+          borderTop: '1px solid #222',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#00D4FF' }}>1H</div>
+            <div style={{ fontSize: 9, color: '#666' }}>Short</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#39FF14' }}>4H</div>
+            <div style={{ fontSize: 9, color: '#666' }}>Swing</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#FFD700' }}>24H</div>
+            <div style={{ fontSize: 9, color: '#666' }}>Daily</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#9D4EDD' }}>7D</div>
+            <div style={{ fontSize: 9, color: '#666' }}>Weekly</div>
+          </div>
+        </div>
+        
+        <div style={{
+          marginTop: 10,
+          padding: '8px 10px',
+          background: 'rgba(0, 212, 255, 0.08)',
+          borderRadius: 8,
+          border: '1px solid rgba(0, 212, 255, 0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span style={{ fontSize: 12 }}>🔗</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, color: '#00D4FF', fontWeight: 600 }}>Blockchain Verified</div>
+            <div style={{ fontSize: 9, color: '#666' }}>Predictions hashed on Solana</div>
+          </div>
+        </div>
+      </BentoTile>
 
       {isMobile && (
         <div className="mobile-categories-wrapper">
