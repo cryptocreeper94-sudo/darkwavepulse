@@ -4,6 +4,7 @@ import HamburgerMenu from './HamburgerMenu'
 import BugReportModal from '../modals/BugReportModal'
 import DisclaimerModal from '../modals/DisclaimerModal'
 import AvatarCreator from '../ui/AvatarCreator'
+import FooterAgent from '../ui/FooterAgent'
 import { useTheme } from '../../context/ThemeContext'
 
 export default function Layout({ children, activeTab, onTabChange, userTier, accessLevel }) {
@@ -72,6 +73,8 @@ export default function Layout({ children, activeTab, onTabChange, userTier, acc
       <main className="app-content">
         {children}
       </main>
+
+      <FooterAgent />
 
       <BugReportModal 
         isOpen={isBugModalOpen} 
