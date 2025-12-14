@@ -55,7 +55,7 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
         background: '#0f0f0f',
         border: '1px solid #222',
         borderRadius: 12,
-        padding: 12,
+        padding: 10,
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'border-color 0.2s, box-shadow 0.2s',
@@ -100,24 +100,24 @@ function QuickActionContent({ action }) {
       alignItems: 'center', 
       justifyContent: 'center',
       height: '100%',
-      gap: 8,
-      padding: 16,
+      gap: 6,
+      padding: 12,
     }}>
       <div style={{ 
-        fontSize: 32,
-        width: 56,
-        height: 56,
+        fontSize: 28,
+        width: 48,
+        height: 48,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: `${action.color}20`,
-        borderRadius: 12,
-        boxShadow: `0 0 20px ${action.color}30`,
+        borderRadius: 10,
+        boxShadow: `0 0 16px ${action.color}30`,
       }}>
         {action.icon}
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{action.title}</div>
-      <div style={{ fontSize: 11, color: '#666' }}>{action.subtitle}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{action.title}</div>
+      <div style={{ fontSize: 10, color: '#666' }}>{action.subtitle}</div>
     </div>
   )
 }
@@ -132,19 +132,19 @@ function MetricContent({ title, value, change }) {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      minHeight: 140,
-      padding: 16,
+      minHeight: 110,
+      padding: 12,
       textAlign: 'center',
     }}>
-      <div style={{ fontSize: 11, color: '#888', fontWeight: 600, textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>
+      <div style={{ fontSize: 10, color: '#888', fontWeight: 600, textTransform: 'uppercase', marginBottom: 10, letterSpacing: 1 }}>
         {title}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: hasChange ? 8 : 0 }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: hasChange ? 6 : 0 }}>
         {value}
       </div>
       {hasChange && (
         <div style={{ 
-          fontSize: 14, 
+          fontSize: 13, 
           fontWeight: 600, 
           color: isPositive ? '#39FF14' : '#ff4444',
           display: 'flex',
@@ -168,21 +168,21 @@ function GaugeContent({ title, value, type, accentColor }) {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      minHeight: 140,
-      padding: 16,
+      minHeight: 110,
+      padding: 12,
     }}>
       <div style={{ 
         color: accentColor, 
-        fontSize: 11, 
+        fontSize: 10, 
         fontWeight: 700, 
         textTransform: 'uppercase', 
         letterSpacing: 1,
-        marginBottom: 8,
+        marginBottom: 6,
       }}>
         {title}
       </div>
-      <div style={{ width: '100%', maxWidth: 100, display: 'flex', justifyContent: 'center' }}>
-        <Gauge value={value} type={type} size={100} showLabels={false} />
+      <div style={{ width: '100%', maxWidth: 80, display: 'flex', justifyContent: 'center' }}>
+        <Gauge value={value} type={type} size={80} showLabels={false} />
       </div>
     </div>
   )
@@ -444,9 +444,9 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
             style={{
-              width: 200,
-              padding: '6px 10px',
-              fontSize: 10,
+              width: 220,
+              padding: '8px 12px',
+              fontSize: 12,
               background: '#1a1a1a',
               border: '1px solid #333',
               borderRadius: 8,
@@ -464,18 +464,18 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
           )}
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-        <div style={{ fontSize: 8, color: '#444', display: 'flex', padding: '4px 0', borderBottom: '1px solid #222', position: 'sticky', top: 0, background: '#0f0f0f', zIndex: 1, minWidth: 500 }}>
-          <span style={{ width: '3%', minWidth: 24, textAlign: 'center' }}>#</span>
-          <span style={{ width: '12%', minWidth: 60 }}>Coin</span>
-          <span style={{ width: '12%', minWidth: 60, textAlign: 'right' }}>Price</span>
-          <span style={{ width: '8%', minWidth: 40, textAlign: 'right' }}>24h</span>
-          <span style={{ width: '8%', minWidth: 40, textAlign: 'right' }}>7d</span>
-          <span style={{ width: '10%', minWidth: 50, textAlign: 'right' }}>MC</span>
-          <span style={{ width: '10%', minWidth: 50, textAlign: 'right' }}>Vol</span>
-          <span style={{ width: '12%', minWidth: 55, textAlign: 'right' }}>Circ</span>
-          <span style={{ width: '15%', minWidth: 50, textAlign: 'center' }}>7d Chart</span>
-          <span style={{ width: '10%', minWidth: 45, textAlign: 'right' }}>ATH</span>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
+        <div style={{ fontSize: 11, color: '#444', display: 'flex', padding: '8px 4px', borderBottom: '1px solid #222', position: 'sticky', top: 0, background: '#0f0f0f', zIndex: 1, minWidth: 580, letterSpacing: '0.04em' }}>
+          <span style={{ width: '3%', minWidth: 28, textAlign: 'center' }}>#</span>
+          <span style={{ width: '12%', minWidth: 75 }}>Coin</span>
+          <span style={{ width: '12%', minWidth: 75, textAlign: 'right' }}>Price</span>
+          <span style={{ width: '8%', minWidth: 50, textAlign: 'right' }}>24h</span>
+          <span style={{ width: '8%', minWidth: 50, textAlign: 'right' }}>7d</span>
+          <span style={{ width: '10%', minWidth: 60, textAlign: 'right' }}>MC</span>
+          <span style={{ width: '10%', minWidth: 60, textAlign: 'right' }}>Vol</span>
+          <span style={{ width: '12%', minWidth: 65, textAlign: 'right' }}>Circ</span>
+          <span style={{ width: '15%', minWidth: 55, textAlign: 'center' }}>7d Chart</span>
+          <span style={{ width: '10%', minWidth: 55, textAlign: 'right' }}>ATH</span>
         </div>
         {displayCoins.length === 0 && (
           <div style={{ padding: 20, textAlign: 'center', color: '#666', fontSize: 11 }}>
@@ -500,67 +500,67 @@ function MiniCoinTable({ coins, onCoinClick, favorites, selectedCoinId }) {
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                padding: '5px 0',
+                padding: '10px 4px',
                 borderBottom: '1px solid #1a1a1a',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
                 background: isSelected ? 'rgba(0, 212, 255, 0.1)' : 'transparent',
                 borderLeft: isSelected ? '2px solid #00D4FF' : '2px solid transparent',
-                minWidth: 500,
+                minWidth: 580,
               }}
               onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#1a1a1a' }}
               onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
             >
-              <div style={{ width: '3%', minWidth: 24, textAlign: 'center', fontSize: 9, color: '#666' }}>
+              <div style={{ width: '3%', minWidth: 28, textAlign: 'center', fontSize: 11, color: '#666' }}>
                 {coin.market_cap_rank || i + 1}
               </div>
-              <div style={{ width: '12%', minWidth: 60, display: 'flex', alignItems: 'center', gap: 3 }}>
+              <div style={{ width: '12%', minWidth: 75, display: 'flex', alignItems: 'center', gap: 4 }}>
                 {coin.image && (
-                  <img src={coin.image} alt="" style={{ width: 14, height: 14, borderRadius: '50%' }} />
+                  <img src={coin.image} alt="" style={{ width: 18, height: 18, borderRadius: '50%' }} />
                 )}
-                <span style={{ fontSize: 9, fontWeight: 600, color: '#fff' }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
                   {coin.symbol?.toUpperCase()}
-                  {isFavorite(coin.symbol) && <span style={{ color: '#FFD700', marginLeft: 2 }}>★</span>}
+                  {isFavorite(coin.symbol) && <span style={{ color: '#FFD700', marginLeft: 3 }}>★</span>}
                 </span>
               </div>
-              <div style={{ width: '12%', minWidth: 60, textAlign: 'right', fontSize: 9, color: '#fff' }}>
+              <div style={{ width: '12%', minWidth: 75, textAlign: 'right', fontSize: 12, color: '#fff' }}>
                 {formatPrice(coin.current_price)}
               </div>
-              <div style={{ width: '8%', minWidth: 40, textAlign: 'right', fontSize: 9, fontWeight: 600, color: isPositive24h ? '#39FF14' : '#ff4444' }}>
+              <div style={{ width: '8%', minWidth: 50, textAlign: 'right', fontSize: 11, fontWeight: 600, color: isPositive24h ? '#39FF14' : '#ff4444' }}>
                 {change24h.toFixed(1)}%
               </div>
-              <div style={{ width: '8%', minWidth: 40, textAlign: 'right', fontSize: 9, fontWeight: 600, color: isPositive7d ? '#39FF14' : '#ff4444' }}>
+              <div style={{ width: '8%', minWidth: 50, textAlign: 'right', fontSize: 11, fontWeight: 600, color: isPositive7d ? '#39FF14' : '#ff4444' }}>
                 {change7d.toFixed(1)}%
               </div>
-              <div style={{ width: '10%', minWidth: 50, textAlign: 'right', fontSize: 9, color: '#888' }}>
+              <div style={{ width: '10%', minWidth: 60, textAlign: 'right', fontSize: 11, color: '#888' }}>
                 {mc}
               </div>
-              <div style={{ width: '10%', minWidth: 50, textAlign: 'right', fontSize: 9, color: '#888' }}>
+              <div style={{ width: '10%', minWidth: 60, textAlign: 'right', fontSize: 11, color: '#888' }}>
                 {vol}
               </div>
-              <div style={{ width: '12%', minWidth: 55, textAlign: 'right', fontSize: 9, color: '#888' }}>
+              <div style={{ width: '12%', minWidth: 65, textAlign: 'right', fontSize: 11, color: '#888' }}>
                 {supply}
               </div>
-              <div style={{ width: '15%', minWidth: 50, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ width: '15%', minWidth: 55, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 {sparkline.length > 0 ? (
-                  <svg width="32" height="14" viewBox="0 0 32 14">
+                  <svg width="36" height="16" viewBox="0 0 36 16">
                     <polyline
                       fill="none"
                       stroke={sparkline[sparkline.length - 1] >= sparkline[0] ? '#39FF14' : '#ff4444'}
-                      strokeWidth="1.2"
+                      strokeWidth="1.4"
                       points={sparkline.filter((_, idx) => idx % Math.ceil(sparkline.length / 16) === 0).map((price, idx, arr) => {
                         const min = Math.min(...arr)
                         const max = Math.max(...arr)
                         const range = max - min || 1
-                        const x = (idx / (arr.length - 1)) * 32
-                        const y = 12 - ((price - min) / range) * 10
+                        const x = (idx / (arr.length - 1)) * 36
+                        const y = 14 - ((price - min) / range) * 12
                         return `${x},${y}`
                       }).join(' ')}
                     />
                   </svg>
-                ) : <span style={{ fontSize: 8, color: '#444' }}>-</span>}
+                ) : <span style={{ fontSize: 10, color: '#444' }}>-</span>}
               </div>
-              <div style={{ width: '10%', minWidth: 45, textAlign: 'right', fontSize: 9, color: athChange >= -10 ? '#39FF14' : athChange >= -50 ? '#FFD700' : '#ff4444' }}>
+              <div style={{ width: '10%', minWidth: 55, textAlign: 'right', fontSize: 11, color: athChange >= -10 ? '#39FF14' : athChange >= -50 ? '#FFD700' : '#ff4444' }}>
                 {athChange.toFixed(0)}%
               </div>
             </div>
@@ -836,8 +836,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           padding: 12px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: minmax(220px, auto) minmax(220px, auto) minmax(280px, auto) minmax(350px, auto);
-          gap: 10px;
+          grid-template-rows: minmax(150px, auto) minmax(150px, auto) minmax(280px, auto) minmax(350px, auto);
+          gap: 8px;
         }
         .bento-quick { grid-area: 1 / 1 / 3 / 4; }
         .bento-market { grid-area: 1 / 4 / 3 / 7; }
@@ -868,17 +868,17 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           .bento-dashboard {
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: auto;
-            gap: 10px;
+            gap: 8px;
             padding: 10px;
           }
           .bento-quick, .bento-market, .bento-trending, .bento-news,
           .bento-table, .bento-chart-section {
             grid-area: auto;
           }
-          .bento-quick { min-height: 200px; }
-          .bento-market { min-height: 200px; }
-          .bento-trending { min-height: 200px; }
-          .bento-news { min-height: 200px; }
+          .bento-quick { min-height: 160px; }
+          .bento-market { min-height: 160px; }
+          .bento-trending { min-height: 160px; }
+          .bento-news { min-height: 160px; }
           .bento-table { min-height: 350px; grid-column: 1 / -1; }
           .bento-chart-section { 
             min-height: 400px; 
