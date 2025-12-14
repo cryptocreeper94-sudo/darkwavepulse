@@ -1,6 +1,59 @@
 const API_BASE = '/api/vault'
 
 export const vaultService = {
+  async getProposals(vaultId, status = null) {
+    const params = new URLSearchParams({ vaultId })
+    if (status) params.append('status', status)
+    const res = await fetch(`${API_BASE}/proposals?${params}`)
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to fetch proposals')
+    return data.proposals
+  },
+
+  async createProposal(config) {
+    const res = await fetch(`${API_BASE}/proposal/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to create proposal')
+    return data
+  },
+
+  async voteOnProposal(proposalId, signerAddress, vote) {
+    const res = await fetch(`${API_BASE}/proposal/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, signerAddress, vote })
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to vote on proposal')
+    return data
+  },
+
+  async prepareProposalExecution(proposalId, executorAddress) {
+    const res = await fetch(`${API_BASE}/proposal/prepare-execution`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, executorAddress })
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to prepare execution')
+    return data
+  },
+
+  async markProposalExecuted(proposalId, executedBy, txHash) {
+    const res = await fetch(`${API_BASE}/proposal/executed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, executedBy, txHash })
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to mark proposal executed')
+    return data
+  },
+
   async getSupportedChains() {
     const res = await fetch(`${API_BASE}/chains`)
     const data = await res.json()
