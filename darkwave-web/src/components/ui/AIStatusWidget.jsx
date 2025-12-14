@@ -186,8 +186,10 @@ export default function AIStatusWidget() {
               background: '#1a1a1a',
               borderRadius: '16px',
               padding: '24px',
-              maxWidth: '420px',
+              maxWidth: 'min(420px, 90vw)',
               width: '100%',
+              maxHeight: '85vh',
+              overflow: 'auto',
               border: '1px solid #333',
               boxShadow: '0 0 40px rgba(0, 212, 255, 0.15)'
             }}

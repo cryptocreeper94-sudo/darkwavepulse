@@ -444,15 +444,15 @@ export default function AvatarCreator({ isOpen, onClose, onSave, isPremium = fal
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 16
+      padding: 20
     }} onClick={onClose}>
       <div style={{
         background: '#0f0f0f',
         borderRadius: 16,
         border: '1px solid rgba(0, 212, 255, 0.2)',
         width: '100%',
-        maxWidth: 720,
-        maxHeight: '92vh',
+        maxWidth: 'min(720px, 90vw)',
+        maxHeight: '85vh',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',

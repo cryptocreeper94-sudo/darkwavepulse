@@ -1244,6 +1244,7 @@ img {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding: 20px;
 }
 
 .analysis-modal-overlay.visible {
@@ -1253,13 +1254,13 @@ img {
 
 .analysis-modal-container {
   width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
+  max-width: min(500px, 90vw);
+  max-height: 85vh;
   background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
   border: 1px solid var(--border-color);
   border-bottom: none;
   border-radius: 20px 20px 0 0;
-  overflow: hidden;
+  overflow: auto;
   transform: translateY(100%);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -1694,12 +1695,12 @@ img {
 
 .modal-container {
   width: 100%;
-  max-width: 440px;
-  max-height: 90vh;
+  max-width: min(440px, 90vw);
+  max-height: 85vh;
   background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: auto;
   position: relative;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1716,8 +1717,8 @@ img {
 }
 
 .modal-disclaimer {
-  max-width: 520px;
-  max-height: 80vh;
+  max-width: min(520px, 90vw);
+  max-height: 85vh;
   overflow-y: auto;
 }
 

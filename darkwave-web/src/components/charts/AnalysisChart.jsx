@@ -805,7 +805,7 @@ const styles = {
     zIndex: 99999,
     display: 'flex',
     flexDirection: 'column',
-    padding: '16px',
+    padding: '20px',
   },
   fullscreenContainer: {
     flex: 1,
