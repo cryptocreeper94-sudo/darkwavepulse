@@ -222,7 +222,7 @@ export default function AIStatusWidget() {
               marginBottom: '10px'
             }}>
               <div style={{ 
-                fontSize: '28px', 
+                fontSize: '36px', 
                 fontWeight: 700, 
                 color: getAccuracyColor(overallAccuracy),
                 lineHeight: 1
@@ -230,8 +230,8 @@ export default function AIStatusWidget() {
                 {overallAccuracy}%
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#888' }}>Overall Accuracy</div>
-                <div style={{ fontSize: '10px', color: '#555' }}>{totalPredictions} predictions</div>
+                <div style={{ fontSize: '14px', color: '#888' }}>Overall Accuracy</div>
+                <div style={{ fontSize: '12px', color: '#555' }}>{totalPredictions} predictions</div>
               </div>
             </div>
             <div style={{ 
