@@ -4,7 +4,7 @@ import { sessions } from '../../db/schema.js';
 import { eq, lt } from 'drizzle-orm';
 
 // Session expiry durations
-const FREE_TIER_DURATION_MS = 7 * 24 * 60 * 60 * 1000;     // 7 days for free tier
+const FREE_TIER_DURATION_MS = 2 * 24 * 60 * 60 * 1000;     // 2 days for free tier (777 trial)
 const PREMIUM_DURATION_MS = 30 * 24 * 60 * 60 * 1000;      // 30 days for paid premium
 const WHITELIST_DURATION_MS = 10 * 365 * 24 * 60 * 60 * 1000; // 10 years for whitelisted (effectively permanent)
 
