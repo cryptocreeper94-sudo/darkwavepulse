@@ -1159,14 +1159,15 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         <div className="mobile-categories-wrapper">
           <MobileCardCarousel>
             <div className="mobile-category-card">
-              <TileLabel color="#00D4FF">StrikeAgent</TileLabel>
-              <div style={{ flex: 1 }}>
+              <TileLabel color="#00D4FF">Quick Actions</TileLabel>
+              <div style={{ height: 180 }}>
                 <FlipCarousel
                   items={quickActions}
+                  style={{ height: 180 }}
                   renderItem={(action) => (
                     <div 
                       onClick={() => onNavigate && onNavigate(action.tab)}
-                      style={{ height: '100%', cursor: 'pointer' }}
+                      style={{ height: 180, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f0f', borderRadius: 12 }}
                     >
                       <QuickActionContent action={action} />
                     </div>
@@ -1180,13 +1181,17 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             
             <div className="mobile-category-card">
               <TileLabel color="#00D4FF">Market Overview</TileLabel>
-              <div style={{ flex: 1 }}>
+              <div style={{ height: 180 }}>
                 <FlipCarousel
                   items={marketOverviewItems}
+                  style={{ height: 180 }}
                   renderItem={(item) => (
-                    item.type === 'metric' 
-                      ? <MetricContent title={item.title} value={item.value} change={item.change} />
-                      : <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} />
+                    <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f0f', borderRadius: 12 }}>
+                      {item.type === 'metric' 
+                        ? <MetricContent title={item.title} value={item.value} change={item.change} />
+                        : <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} />
+                      }
+                    </div>
                   )}
                   showDots={true}
                   autoPlay={false}
@@ -1197,16 +1202,17 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             
             <div className="mobile-category-card">
               <TileLabel color="#00D4FF">Trending</TileLabel>
-              <div style={{ flex: 1 }}>
+              <div style={{ height: 180 }}>
                 {coinsLoading ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 180, color: '#666' }}>
                     Loading...
                   </div>
                 ) : (
                   <FlipCarousel
                     items={coins.slice(0, 10)}
+                    style={{ height: 180 }}
                     renderItem={(coin) => (
-                      <div onClick={() => handleCoinClick(coin)} style={{ height: '100%', cursor: 'pointer' }}>
+                      <div onClick={() => handleCoinClick(coin)} style={{ height: 180, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f0f', borderRadius: 12 }}>
                         <CoinContent coin={coin} isFavorite={isFavorite(coin.symbol)} />
                       </div>
                     )}
