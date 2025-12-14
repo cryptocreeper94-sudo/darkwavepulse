@@ -14,8 +14,10 @@ import {
   PricingTab,
   AnalysisTab,
   MLDashboardTab,
-  RiskDashboardTab
+  RiskDashboardTab,
+  DevelopersPortalTab
 } from './components/tabs'
+import useAnalytics from './hooks/useAnalytics'
 import AccuracyDashboard from './components/ml/AccuracyDashboard'
 import AutoTradeConfig from './components/ml/AutoTradeConfig'
 import { GlossaryPopup, AIChatButton } from './components/ui'
@@ -181,6 +183,12 @@ function App() {
   const [userConfig, setUserConfig] = useState(isDemoMode ? { isDemoMode: true, demoBalance: 10000 } : null)
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
   
+  const { trackPageView } = useAnalytics('pulse')
+  
+  useEffect(() => {
+    trackPageView(`/tab/${activeTab}`)
+  }, [activeTab, trackPageView])
+  
   useEffect(() => {
     if (!isDemoMode) {
       const existingUser = localStorage.getItem('dwp_user')
@@ -275,6 +283,8 @@ function App() {
         return <AutoTradeConfig userId={userId} />
       case 'risk':
         return <RiskDashboardTab userId={userId} />
+      case 'dev-portal':
+        return <DevelopersPortalTab />
       default:
         return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
     }

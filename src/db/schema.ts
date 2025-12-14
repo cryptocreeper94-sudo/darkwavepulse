@@ -1488,3 +1488,20 @@ export const vaultActivityLog = pgTable('vault_activity_log', {
   
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// Analytics - Page Views tracking for Developers Portal
+export const pageViews = pgTable('page_views', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  tenantId: text('tenant_id').default('pulse'),
+  page: text('page').notNull(),
+  referrer: text('referrer'),
+  userAgent: text('user_agent'),
+  ipHash: text('ip_hash'),
+  sessionId: text('session_id'),
+  deviceType: text('device_type'),
+  browser: text('browser'),
+  country: text('country'),
+  city: text('city'),
+  duration: integer('duration'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

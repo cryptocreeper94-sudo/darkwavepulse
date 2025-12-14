@@ -1,0 +1,243 @@
+# ANALYTICS SYSTEM HANDOFF - COMPLETE BUILD GUIDE
+
+## OVERVIEW
+Full-stack analytics tracking: page views, unique visitors, device detection, live users, traffic patterns, multi-tenant support.
+
+## 1. DATABASE SCHEMA (shared/schema.ts)
+
+// Page Views Table - Every visit tracked
+export const pageViews = pgTable("page_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: text("tenant_id").default("npp"),
+  page: text("page").notNull(),
+  referrer: text("referrer"),
+  userAgent: text("user_agent"),
+  ipHash: text("ip_hash"),
+  sessionId: text("session_id"),
+  deviceType: text("device_type"), // desktop, mobile, tablet
+  browser: text("browser"),
+  country: text("country"),
+  city: text("city"),
+  duration: integer("duration"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPageViewSchema = createInsertSchema(pageViews).omit({ id: true, createdAt: true });
+export type InsertPageView = z.infer<typeof insertPageViewSchema>;
+export type PageView = typeof pageViews.$inferSelect;
+
+// Optional: Analytics Summary Cache
+export const analyticsSummary = pgTable("analytics_summary", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(),
+  totalViews: integer("total_views").default(0).notNull(),
+  uniqueVisitors: integer("unique_visitors").default(0).notNull(),
+  avgDuration: integer("avg_duration").default(0),
+  bounceRate: decimal("bounce_rate", { precision: 5, scale: 2 }),
+  topPages: jsonb("top_pages").default([]),
+  topReferrers: jsonb("top_referrers").default([]),
+  deviceBreakdown: jsonb("device_breakdown").default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+## 2. STORAGE LAYER (server/storage.ts)
+
+// Add to IStorage interface:
+trackPageView(view: InsertPageView): Promise<PageView>;
+getPageViews(startDate?: Date, endDate?: Date): Promise<PageView[]>;
+getLiveVisitorCount(): Promise<number>;
+getAnalyticsDashboard(): Promise<AnalyticsDashboardData>;
+getAnalyticsDashboardByTenant(tenantId: string): Promise<AnalyticsDashboardData>;
+getAvailableTenants(): Promise<string[]>;
+
+// Implementation:
+async trackPageView(view: InsertPageView): Promise<PageView> {
+  const [result] = await db.insert(pageViews).values(view).returning();
+  return result;
+}
+
+async getLiveVisitorCount(): Promise<number> {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  const result = await db.select({ count: sql<number>`count(distinct ${pageViews.sessionId})::int` })
+    .from(pageViews)
+    .where(sql`${pageViews.createdAt} >= ${fiveMinutesAgo}`);
+  return result[0]?.count || 0;
+}
+
+async getAnalyticsDashboard() {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay()); startOfWeek.setHours(0,0,0,0);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const todayStats = await db.select({
+    views: sql<number>`count(*)::int`,
+    visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`
+  }).from(pageViews).where(sql`${pageViews.createdAt} >= ${startOfToday}`);
+
+  const weekStats = await db.select({
+    views: sql<number>`count(*)::int`,
+    visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`
+  }).from(pageViews).where(sql`${pageViews.createdAt} >= ${startOfWeek}`);
+
+  const monthStats = await db.select({
+    views: sql<number>`count(*)::int`,
+    visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`
+  }).from(pageViews).where(sql`${pageViews.createdAt} >= ${startOfMonth}`);
+
+  const allTimeStats = await db.select({
+    views: sql<number>`count(*)::int`,
+    visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`
+  }).from(pageViews);
+
+  const topPages = await db.select({
+    page: pageViews.page,
+    views: sql<number>`count(*)::int`
+  }).from(pageViews).groupBy(pageViews.page).orderBy(desc(sql`count(*)`)).limit(10);
+
+  const topReferrers = await db.select({
+    referrer: pageViews.referrer,
+    count: sql<number>`count(*)::int`
+  }).from(pageViews).where(sql`${pageViews.referrer} is not null`).groupBy(pageViews.referrer).orderBy(desc(sql`count(*)`)).limit(10);
+
+  const deviceStats = await db.select({
+    deviceType: pageViews.deviceType,
+    count: sql<number>`count(*)::int`
+  }).from(pageViews).groupBy(pageViews.deviceType);
+
+  const deviceBreakdown = { desktop: 0, mobile: 0, tablet: 0 };
+  deviceStats.forEach(d => { if (d.deviceType && d.deviceType in deviceBreakdown) deviceBreakdown[d.deviceType as keyof typeof deviceBreakdown] = d.count; });
+
+  const hourlyTraffic = await db.select({
+    hour: sql<number>`extract(hour from ${pageViews.createdAt})::int`,
+    views: sql<number>`count(*)::int`
+  }).from(pageViews).where(sql`${pageViews.createdAt} >= ${startOfToday}`).groupBy(sql`extract(hour from ${pageViews.createdAt})`);
+
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const dailyTraffic = await db.select({
+    date: sql<string>`to_char(${pageViews.createdAt}, 'YYYY-MM-DD')`,
+    views: sql<number>`count(*)::int`,
+    visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`
+  }).from(pageViews).where(sql`${pageViews.createdAt} >= ${thirtyDaysAgo}`).groupBy(sql`to_char(${pageViews.createdAt}, 'YYYY-MM-DD')`).orderBy(sql`to_char(${pageViews.createdAt}, 'YYYY-MM-DD')`);
+
+  return {
+    today: todayStats[0] || { views: 0, visitors: 0 },
+    thisWeek: weekStats[0] || { views: 0, visitors: 0 },
+    thisMonth: monthStats[0] || { views: 0, visitors: 0 },
+    allTime: allTimeStats[0] || { views: 0, visitors: 0 },
+    topPages, topReferrers, deviceBreakdown, hourlyTraffic, dailyTraffic
+  };
+}
+
+async getAvailableTenants(): Promise<string[]> {
+  const result = await db.selectDistinct({ tenantId: pageViews.tenantId }).from(pageViews);
+  return result.map(r => r.tenantId).filter(Boolean) as string[];
+}
+
+## 3. API ROUTES (server/routes.ts)
+
+// POST /api/analytics/track - Track page view
+app.post("/api/analytics/track", async (req, res) => {
+  const { page, referrer, sessionId, duration, tenantId } = req.body;
+  const userAgent = req.headers["user-agent"] || "";
+  let deviceType = "desktop";
+  if (/mobile/i.test(userAgent)) deviceType = "mobile";
+  else if (/tablet|ipad/i.test(userAgent)) deviceType = "tablet";
+  let browser = "unknown";
+  if (/chrome/i.test(userAgent)) browser = "Chrome";
+  else if (/firefox/i.test(userAgent)) browser = "Firefox";
+  else if (/safari/i.test(userAgent)) browser = "Safari";
+  else if (/edge/i.test(userAgent)) browser = "Edge";
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
+  const ipHash = Buffer.from(String(ip)).toString("base64").slice(0, 16);
+  const pageView = await storage.trackPageView({ page: page || "/", referrer, userAgent: userAgent.slice(0, 500), ipHash, sessionId, deviceType, browser, duration, tenantId: tenantId || "npp" });
+  res.status(201).json({ success: true, id: pageView.id });
+});
+
+// GET /api/analytics/dashboard
+app.get("/api/analytics/dashboard", async (req, res) => {
+  const { tenantId } = req.query;
+  const dashboard = tenantId ? await storage.getAnalyticsDashboardByTenant(tenantId as string) : await storage.getAnalyticsDashboard();
+  const liveCount = await storage.getLiveVisitorCount();
+  res.json({ ...dashboard, liveVisitors: liveCount });
+});
+
+// GET /api/analytics/live
+app.get("/api/analytics/live", async (req, res) => {
+  const count = await storage.getLiveVisitorCount();
+  res.json({ liveVisitors: count });
+});
+
+// GET /api/analytics/tenants
+app.get("/api/analytics/tenants", async (req, res) => {
+  const tenants = await storage.getAvailableTenants();
+  res.json({ tenants });
+});
+
+## 4. CLIENT-SIDE HOOK (client/src/hooks/useAnalytics.ts)
+
+import { useEffect, useRef } from "react";
+import { useLocation } from "wouter";
+
+function generateSessionId(): string {
+  let sessionId = sessionStorage.getItem("analytics_session_id");
+  if (!sessionId) {
+    sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    sessionStorage.setItem("analytics_session_id", sessionId);
+  }
+  return sessionId;
+}
+
+export function useAnalytics(tenantId = "default") {
+  const [location] = useLocation();
+  const lastPageRef = useRef<string | null>(null);
+  const pageStartTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    const sessionId = generateSessionId();
+    const referrer = document.referrer || null;
+
+    const trackPageView = async (page: string, duration?: number) => {
+      await fetch("/api/analytics/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page, referrer: lastPageRef.current || referrer, sessionId, duration, tenantId })
+      });
+    };
+
+    if (lastPageRef.current && lastPageRef.current !== location) {
+      const duration = Math.round((Date.now() - pageStartTimeRef.current) / 1000);
+      trackPageView(lastPageRef.current, duration);
+    }
+
+    lastPageRef.current = location;
+    pageStartTimeRef.current = Date.now();
+    trackPageView(location);
+
+    const handleBeforeUnload = () => {
+      navigator.sendBeacon("/api/analytics/track", JSON.stringify({
+        page: location, sessionId, duration: Math.round((Date.now() - pageStartTimeRef.current) / 1000), tenantId
+      }));
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [location, tenantId]);
+}
+
+## 5. USAGE - Add to App.tsx or Layout
+
+import { useAnalytics } from "@/hooks/useAnalytics";
+function App() {
+  useAnalytics("your-tenant-id"); // Tracks all page views automatically
+  return <Router>...</Router>;
+}
+
+## 6. DASHBOARD COMPONENT - Displays analytics (uses @tanstack/react-query + recharts)
+- Fetches from /api/analytics/dashboard
+- Shows: Live visitors, Today/Week/Month/All-time stats, Top pages, Top referrers, Device breakdown (pie chart), Hourly traffic (bar chart), Daily traffic (area chart)
+- Auto-refreshes every 30 seconds
+
+## MIGRATION
+Run: npm run db:push --force
