@@ -1185,7 +1185,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                       <QuickActionContent action={action} />
                     </div>
                   )}
-                  showDots={true}
+                  showDots={false}
+                  showArrows={false}
                   autoPlay={false}
                   interval={6000}
                 />
@@ -1206,7 +1207,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                       }
                     </div>
                   )}
-                  showDots={true}
+                  showDots={false}
+                  showArrows={false}
                   autoPlay={false}
                   interval={5000}
                 />
@@ -1229,7 +1231,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                         <CoinContent coin={coin} isFavorite={isFavorite(coin.symbol)} />
                       </div>
                     )}
-                    showDots={true}
+                    showDots={false}
+                    showArrows={false}
                     autoPlay={false}
                     interval={4000}
                   />
