@@ -191,8 +191,6 @@ body {
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
@@ -203,8 +201,9 @@ body {
 .menu-content {
   padding: 16px;
   padding-bottom: 100px;
-  flex: 1;
-  overflow-y: scroll;
+  height: 100%;
+  max-height: calc(100vh - var(--header-height));
+  overflow-y: auto !important;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
