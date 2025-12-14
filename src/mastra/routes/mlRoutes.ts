@@ -1,6 +1,7 @@
 import { db } from '../../db/client.js';
 import { predictionEvents, predictionOutcomes, predictionModelVersions, strikeagentPredictions, strikeagentOutcomes } from '../../db/schema';
 import { desc, gte, lte, sql, and } from 'drizzle-orm';
+import { predictionLearningService } from '../../services/predictionLearningService';
 
 export const mlRoutes = [
   {
@@ -327,6 +328,32 @@ export const mlRoutes = [
           technicalAnalysis: { overall: { currentWinRate: null, trend: 'unknown' }, byHorizon: {} },
           strikeAgent: { currentWinRate: null, trend: 'unknown' },
           period: {}
+        });
+      }
+    }
+  },
+  {
+    path: "/api/ml/drift-status",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const windowDays = parseInt(c.req.query('windowDays') || '7');
+        const driftStatus = await predictionLearningService.checkAllHorizonsDrift(windowDays);
+        
+        return c.json({
+          success: true,
+          ...driftStatus,
+          checkedAt: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('❌ [MLStats] Error checking drift status', { error: error.message });
+        return c.json({
+          success: false,
+          hasAnyDrift: false,
+          horizonStatus: {},
+          overallRecommendation: 'Unable to check drift status',
+          checkedAt: new Date().toISOString()
         });
       }
     }

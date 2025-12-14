@@ -281,19 +281,116 @@ const PredictionRow = ({ prediction }) => {
   )
 }
 
+const DriftAlertCard = ({ driftStatus }) => {
+  if (!driftStatus || !driftStatus.hasAnyDrift) return null
+  
+  const severityColors = {
+    'CRITICAL': { bg: '#FF6B6B20', border: '#FF6B6B', text: '#FF6B6B' },
+    'HIGH': { bg: '#FF8C4220', border: '#FF8C42', text: '#FF8C42' },
+    'MEDIUM': { bg: '#F3BA2F20', border: '#F3BA2F', text: '#F3BA2F' },
+    'LOW': { bg: '#00D4FF20', border: '#00D4FF', text: '#00D4FF' }
+  }
+  
+  const horizonsWithDrift = Object.entries(driftStatus.horizonStatus || {})
+    .filter(([_, data]) => data.hasDrift)
+    .sort((a, b) => {
+      const order = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 }
+      return (order[a[1].severity] || 4) - (order[b[1].severity] || 4)
+    })
+  
+  const highestSeverity = horizonsWithDrift[0]?.[1]?.severity || 'LOW'
+  const colors = severityColors[highestSeverity]
+  
+  return (
+    <div style={{
+      background: colors.bg,
+      border: `1px solid ${colors.border}`,
+      borderRadius: '12px',
+      padding: '16px 20px',
+      marginBottom: '24px'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '10px',
+        marginBottom: '12px'
+      }}>
+        <span style={{ fontSize: '20px' }}>
+          {highestSeverity === 'CRITICAL' ? '🚨' : highestSeverity === 'HIGH' ? '⚠️' : '📊'}
+        </span>
+        <span style={{ 
+          color: colors.text, 
+          fontWeight: 600, 
+          fontSize: '15px'
+        }}>
+          Model Drift Detected
+        </span>
+        <span style={{
+          padding: '3px 8px',
+          background: colors.border,
+          color: '#0f0f0f',
+          borderRadius: '4px',
+          fontSize: '11px',
+          fontWeight: 700
+        }}>
+          {highestSeverity}
+        </span>
+      </div>
+      
+      <p style={{ 
+        color: '#ccc', 
+        fontSize: '13px', 
+        margin: '0 0 12px 0',
+        lineHeight: 1.5
+      }}>
+        {driftStatus.overallRecommendation}
+      </p>
+      
+      <div style={{ 
+        display: 'flex', 
+        gap: '8px', 
+        flexWrap: 'wrap' 
+      }}>
+        {horizonsWithDrift.map(([horizon, data]) => (
+          <div key={horizon} style={{
+            padding: '6px 12px',
+            background: '#0f0f0f',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <span style={{ color: '#fff', fontSize: '12px', fontWeight: 500 }}>
+              {horizon}
+            </span>
+            <span style={{ 
+              color: severityColors[data.severity]?.text || '#888',
+              fontSize: '11px'
+            }}>
+              {data.recentAccuracy}% ({data.severity})
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function AccuracyDashboard() {
   const [stats, setStats] = useState(null)
   const [modelStatus, setModelStatus] = useState(null)
   const [trends, setTrends] = useState(null)
+  const [driftStatus, setDriftStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState(null)
 
   const fetchData = useCallback(async () => {
     try {
-      const [statsRes, modelRes, trendsRes] = await Promise.all([
+      const [statsRes, modelRes, trendsRes, driftRes] = await Promise.all([
         fetch('/api/ml/stats'),
         fetch('/api/ml/model-status'),
-        fetch('/api/ml/accuracy-trends')
+        fetch('/api/ml/accuracy-trends'),
+        fetch('/api/ml/drift-status')
       ])
       
       if (statsRes.ok) {
@@ -309,6 +406,11 @@ export default function AccuracyDashboard() {
       if (trendsRes.ok) {
         const data = await trendsRes.json()
         setTrends(data)
+      }
+      
+      if (driftRes.ok) {
+        const data = await driftRes.json()
+        setDriftStatus(data)
       }
       
       setLastRefresh(new Date())
@@ -399,6 +501,8 @@ export default function AccuracyDashboard() {
           </button>
         </div>
       </div>
+
+      <DriftAlertCard driftStatus={driftStatus} />
 
       <div style={{ 
         display: 'flex', 
