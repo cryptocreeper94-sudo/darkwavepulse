@@ -795,8 +795,10 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   }, [])
 
   useEffect(() => {
-    const fetchCoins = async () => {
-      setCoinsLoading(true)
+    let retryCount = 0
+    const maxRetries = 5
+    const fetchCoins = async (isRetry = false) => {
+      if (!isRetry) setCoinsLoading(true)
       try {
         const response = await fetch('/api/market-overview?category=top')
         if (response.ok) {
@@ -806,15 +808,23 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           if (!selectedCoin && coinList.length > 0) {
             setSelectedCoin(coinList[0])
           }
+          retryCount = 0
+        } else if (retryCount < maxRetries) {
+          retryCount++
+          setTimeout(() => fetchCoins(true), 3000)
         }
       } catch (err) {
-        console.log('Failed to fetch coins')
+        console.log('Failed to fetch coins, retrying...')
+        if (retryCount < maxRetries) {
+          retryCount++
+          setTimeout(() => fetchCoins(true), 3000)
+        }
       } finally {
-        setCoinsLoading(false)
+        if (!retryCount) setCoinsLoading(false)
       }
     }
     fetchCoins()
-    const interval = setInterval(fetchCoins, 60000)
+    const interval = setInterval(() => fetchCoins(), 60000)
     return () => clearInterval(interval)
   }, [])
 
