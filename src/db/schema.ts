@@ -1304,3 +1304,187 @@ export const quantLearningMetrics = pgTable('quant_learning_metrics', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// ============================================
+// MULTI-SIG VAULT SYSTEM
+// Supports Solana (Squads) + EVM (Safe) multi-sig vaults
+// ============================================
+
+// Multi-Sig Vaults - Parent vault record for both Solana and EVM
+export const multisigVaults = pgTable('multisig_vaults', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  // Vault Identity
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  
+  // Chain Information
+  chainType: varchar('chain_type', { length: 20 }).notNull(), // 'solana' | 'evm'
+  chainId: varchar('chain_id', { length: 50 }).notNull(), // 'solana' | 'ethereum' | 'base' | 'polygon' etc.
+  
+  // Vault Address (PDA for Solana, Safe address for EVM)
+  vaultAddress: varchar('vault_address', { length: 255 }).notNull(),
+  
+  // Solana-specific (Squads)
+  multisigPda: varchar('multisig_pda', { length: 255 }),
+  createKey: varchar('create_key', { length: 255 }),
+  vaultBump: integer('vault_bump'),
+  transactionIndex: integer('transaction_index').default(0),
+  
+  // EVM-specific (Safe)
+  safeAddress: varchar('safe_address', { length: 255 }),
+  safeVersion: varchar('safe_version', { length: 20 }),
+  fallbackHandler: varchar('fallback_handler', { length: 255 }),
+  
+  // Threshold Configuration
+  threshold: integer('threshold').notNull(),
+  
+  // Optional Features
+  timeLock: integer('time_lock').default(0),
+  spendingLimit: numeric('spending_limit', { precision: 24, scale: 8 }),
+  spendingLimitToken: varchar('spending_limit_token', { length: 255 }),
+  
+  // Status
+  status: varchar('status', { length: 20 }).default('active').notNull(),
+  
+  // Metadata
+  avatarUrl: text('avatar_url'),
+  color: varchar('color', { length: 20 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Vault Signers - Members who can sign transactions
+export const vaultSigners = pgTable('vault_signers', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  vaultId: varchar('vault_id', { length: 255 }).notNull(),
+  
+  // Signer Identity
+  address: varchar('address', { length: 255 }).notNull(),
+  nickname: varchar('nickname', { length: 100 }),
+  
+  // Role & Permissions
+  role: varchar('role', { length: 20 }).default('signer').notNull(),
+  
+  // Permissions
+  canInitiate: boolean('can_initiate').default(true),
+  canVote: boolean('can_vote').default(true),
+  canExecute: boolean('can_execute').default(true),
+  
+  // Status
+  status: varchar('status', { length: 20 }).default('active').notNull(),
+  addedBy: varchar('added_by', { length: 255 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Vault Proposals - Pending transactions requiring approval
+export const vaultProposals = pgTable('vault_proposals', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  vaultId: varchar('vault_id', { length: 255 }).notNull(),
+  
+  // Proposal Identity
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  proposalIndex: integer('proposal_index').notNull(),
+  
+  // Transaction Details
+  txType: varchar('tx_type', { length: 50 }).notNull(),
+  
+  // For transfers
+  toAddress: varchar('to_address', { length: 255 }),
+  amount: numeric('amount', { precision: 24, scale: 8 }),
+  tokenAddress: varchar('token_address', { length: 255 }),
+  tokenSymbol: varchar('token_symbol', { length: 20 }),
+  tokenDecimals: integer('token_decimals'),
+  
+  // For config changes
+  newThreshold: integer('new_threshold'),
+  signerToAdd: varchar('signer_to_add', { length: 255 }),
+  signerToRemove: varchar('signer_to_remove', { length: 255 }),
+  
+  // Raw transaction data
+  rawTxData: text('raw_tx_data'),
+  
+  // Solana-specific
+  squadsTransactionPda: varchar('squads_transaction_pda', { length: 255 }),
+  
+  // EVM-specific
+  safeTxHash: varchar('safe_tx_hash', { length: 255 }),
+  safeNonce: integer('safe_nonce'),
+  
+  // Approval Tracking
+  approvalsRequired: integer('approvals_required').notNull(),
+  approvalsReceived: integer('approvals_received').default(0),
+  rejectionsReceived: integer('rejections_received').default(0),
+  
+  // Timing
+  expiresAt: timestamp('expires_at'),
+  executionTimeLock: timestamp('execution_time_lock'),
+  
+  // Status
+  status: varchar('status', { length: 20 }).default('pending').notNull(),
+  
+  // Execution Details
+  executedBy: varchar('executed_by', { length: 255 }),
+  executedTxHash: varchar('executed_tx_hash', { length: 255 }),
+  executionError: text('execution_error'),
+  
+  // Creator
+  createdBy: varchar('created_by', { length: 255 }).notNull(),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  executedAt: timestamp('executed_at'),
+});
+
+// Proposal Votes - Individual signer votes on proposals
+export const proposalVotes = pgTable('proposal_votes', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  proposalId: varchar('proposal_id', { length: 255 }).notNull(),
+  vaultId: varchar('vault_id', { length: 255 }).notNull(),
+  
+  // Voter
+  signerAddress: varchar('signer_address', { length: 255 }).notNull(),
+  
+  // Vote
+  vote: varchar('vote', { length: 20 }).notNull(),
+  
+  // On-chain signature
+  signature: text('signature'),
+  
+  // EVM signature components
+  signatureV: integer('signature_v'),
+  signatureR: varchar('signature_r', { length: 255 }),
+  signatureS: varchar('signature_s', { length: 255 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Vault Activity Log - Audit trail
+export const vaultActivityLog = pgTable('vault_activity_log', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  vaultId: varchar('vault_id', { length: 255 }).notNull(),
+  
+  // Event Type
+  eventType: varchar('event_type', { length: 50 }).notNull(),
+  
+  // Actor
+  actorAddress: varchar('actor_address', { length: 255 }),
+  
+  // Event Data (JSON)
+  eventData: text('event_data'),
+  
+  // Related entities
+  proposalId: varchar('proposal_id', { length: 255 }),
+  txHash: varchar('tx_hash', { length: 255 }),
+  
+  // Amount
+  amount: numeric('amount', { precision: 24, scale: 8 }),
+  tokenAddress: varchar('token_address', { length: 255 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
