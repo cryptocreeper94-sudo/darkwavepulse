@@ -1029,6 +1029,77 @@ class MultiChainVaultService {
       limit,
     });
   }
+
+  async updateVaultSettings(
+    vaultId: string, 
+    settings: { spendingLimit?: number; spendingLimitToken?: string; timeLock?: number },
+    updatedBy: string
+  ) {
+    const vault = await db.query.multisigVaults.findFirst({
+      where: eq(multisigVaults.id, vaultId),
+    });
+
+    if (!vault) {
+      return { success: false, error: 'Vault not found' };
+    }
+
+    const updateData: any = { updatedAt: new Date() };
+    
+    if (settings.spendingLimit !== undefined) {
+      updateData.spendingLimit = settings.spendingLimit.toString();
+    }
+    if (settings.spendingLimitToken !== undefined) {
+      updateData.spendingLimitToken = settings.spendingLimitToken;
+    }
+    if (settings.timeLock !== undefined) {
+      if (settings.timeLock < 0) {
+        return { success: false, error: 'Time lock cannot be negative' };
+      }
+      updateData.timeLock = settings.timeLock;
+    }
+
+    await db.update(multisigVaults)
+      .set(updateData)
+      .where(eq(multisigVaults.id, vaultId));
+
+    await this.logActivity(vaultId, 'settings_updated', updatedBy, {
+      spendingLimit: settings.spendingLimit,
+      spendingLimitToken: settings.spendingLimitToken,
+      timeLock: settings.timeLock,
+    });
+
+    return { success: true };
+  }
+
+  async updateSignerRole(vaultId: string, signerAddress: string, role: string, updatedBy: string) {
+    if (role !== 'admin' && role !== 'signer') {
+      return { success: false, error: 'Role must be "admin" or "signer"' };
+    }
+
+    const signer = await db.query.vaultSigners.findFirst({
+      where: and(
+        eq(vaultSigners.vaultId, vaultId),
+        eq(vaultSigners.address, signerAddress),
+        eq(vaultSigners.status, 'active')
+      ),
+    });
+
+    if (!signer) {
+      return { success: false, error: 'Signer not found' };
+    }
+
+    await db.update(vaultSigners)
+      .set({ role, updatedAt: new Date() })
+      .where(eq(vaultSigners.id, signer.id));
+
+    await this.logActivity(vaultId, 'signer_role_changed', updatedBy, {
+      signerAddress,
+      oldRole: signer.role,
+      newRole: role,
+    });
+
+    return { success: true };
+  }
 }
 
 export const vaultService = new MultiChainVaultService();

@@ -392,4 +392,64 @@ export const vaultRoutes = [
       }
     }
   },
+
+  {
+    path: "/api/vault/settings",
+    method: "PUT" as const,
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { vaultId, spendingLimit, spendingLimitToken, timeLock, updatedBy } = await c.req.json();
+
+        if (!vaultId || !updatedBy) {
+          return c.json({ error: 'vaultId and updatedBy required' }, 400);
+        }
+
+        logger?.info('⚙️ [Vault] Updating vault settings', { vaultId, spendingLimit, timeLock });
+
+        const result = await vaultService.updateVaultSettings(vaultId, {
+          spendingLimit,
+          spendingLimitToken,
+          timeLock,
+        }, updatedBy);
+
+        if (result.success) {
+          logger?.info('✅ [Vault] Settings updated', { vaultId });
+        }
+
+        return c.json(result);
+      } catch (error: any) {
+        logger?.error('❌ [Vault] Update settings error', { error: error.message });
+        return c.json({ success: false, error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/vault/signer/role",
+    method: "PUT" as const,
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { vaultId, signerAddress, role, updatedBy } = await c.req.json();
+
+        if (!vaultId || !signerAddress || !role || !updatedBy) {
+          return c.json({ error: 'vaultId, signerAddress, role, and updatedBy required' }, 400);
+        }
+
+        logger?.info('👤 [Vault] Updating signer role', { vaultId, signerAddress, role });
+
+        const result = await vaultService.updateSignerRole(vaultId, signerAddress, role, updatedBy);
+
+        if (result.success) {
+          logger?.info('✅ [Vault] Signer role updated', { vaultId, signerAddress, role });
+        }
+
+        return c.json(result);
+      } catch (error: any) {
+        logger?.error('❌ [Vault] Update signer role error', { error: error.message });
+        return c.json({ success: false, error: error.message }, 500);
+      }
+    }
+  },
 ];

@@ -108,6 +108,28 @@ export const vaultService = {
     return data
   },
 
+  async updateVaultSettings(vaultId, settings, updatedBy) {
+    const res = await fetch(`${API_BASE}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vaultId, ...settings, updatedBy })
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to update vault settings')
+    return data
+  },
+
+  async updateSignerRole(vaultId, signerAddress, role, updatedBy) {
+    const res = await fetch(`${API_BASE}/signer/role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vaultId, signerAddress, role, updatedBy })
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Failed to update signer role')
+    return data
+  },
+
   validateSolanaAddress(address) {
     if (!address || typeof address !== 'string') return false
     const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/

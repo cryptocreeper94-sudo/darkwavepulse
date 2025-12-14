@@ -947,10 +947,469 @@ const proposalListStyles = `
   }
 `
 
+function VaultSettings({ vault, userAddress, onBack, onSave }) {
+  const signers = vault.signers || []
+  const [spendingLimit, setSpendingLimit] = useState(vault.spendingLimit || '')
+  const [spendingLimitToken, setSpendingLimitToken] = useState(vault.spendingLimitToken || (vault.chainType === 'solana' ? 'SOL' : 'ETH'))
+  const [timeLock, setTimeLock] = useState(vault.timeLock || 0)
+  const [signerRoles, setSignerRoles] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  useEffect(() => {
+    const roles = {}
+    signers.forEach(s => {
+      roles[s.address] = s.role || 'signer'
+    })
+    setSignerRoles(roles)
+  }, [signers])
+
+  const handleRoleToggle = (address) => {
+    setSignerRoles(prev => ({
+      ...prev,
+      [address]: prev[address] === 'admin' ? 'signer' : 'admin'
+    }))
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError('')
+    setSuccess('')
+    try {
+      await vaultService.updateVaultSettings(vault.id, {
+        spendingLimit: spendingLimit ? parseFloat(spendingLimit) : null,
+        spendingLimitToken: spendingLimitToken || null,
+        timeLock: parseInt(timeLock) || 0
+      }, userAddress)
+
+      for (const signer of signers) {
+        const newRole = signerRoles[signer.address]
+        if (newRole && newRole !== signer.role) {
+          await vaultService.updateSignerRole(vault.id, signer.address, newRole, userAddress)
+        }
+      }
+
+      setSuccess('Settings saved successfully!')
+      if (onSave) onSave()
+    } catch (err) {
+      setError(err.message || 'Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const timeLockOptions = [
+    { value: 0, label: 'None' },
+    { value: 1, label: '1 Hour' },
+    { value: 6, label: '6 Hours' },
+    { value: 24, label: '24 Hours' },
+    { value: 168, label: '7 Days' }
+  ]
+
+  const tokenOptions = vault.chainType === 'solana' 
+    ? ['SOL', 'USDC', 'USDT', 'BONK']
+    : ['ETH', 'USDC', 'USDT', 'DAI']
+
+  return (
+    <div className="vault-settings">
+      <button className="back-btn" onClick={onBack}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Dashboard
+      </button>
+
+      <div className="settings-header">
+        <div className="settings-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </div>
+        <div className="settings-info">
+          <h1>Vault Settings</h1>
+          <span className="vault-context">{vault.name}</span>
+        </div>
+      </div>
+
+      {error && <div className="settings-error">{error}</div>}
+      {success && <div className="settings-success">{success}</div>}
+
+      <div className="settings-section">
+        <h2>Spending Limit</h2>
+        <p className="section-desc">Set a maximum amount that can be spent per transaction without additional approvals.</p>
+        <div className="settings-row">
+          <div className="settings-field">
+            <label>Amount</label>
+            <input
+              type="number"
+              value={spendingLimit}
+              onChange={e => setSpendingLimit(e.target.value)}
+              placeholder="0.00"
+              min="0"
+              step="any"
+            />
+          </div>
+          <div className="settings-field token-field">
+            <label>Token</label>
+            <select value={spendingLimitToken} onChange={e => setSpendingLimitToken(e.target.value)}>
+              {tokenOptions.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="settings-section">
+        <h2>Time Lock</h2>
+        <p className="section-desc">Add a delay before approved transactions can be executed.</p>
+        <div className="settings-field">
+          <label>Delay Period</label>
+          <select value={timeLock} onChange={e => setTimeLock(e.target.value)}>
+            {timeLockOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="settings-section">
+        <h2>Signer Roles</h2>
+        <p className="section-desc">Admins can modify vault settings. Signers can only approve transactions.</p>
+        <div className="signers-role-list">
+          {signers.length > 0 ? signers.map((signer, index) => (
+            <div key={index} className="signer-role-item">
+              <div className="signer-role-info">
+                <span className="signer-role-name">{signer.name || `Signer ${index + 1}`}</span>
+                <span className="signer-role-address">{signer.address?.slice(0, 8)}...{signer.address?.slice(-6)}</span>
+              </div>
+              <div className="role-toggle-wrapper">
+                <span className={`role-label ${signerRoles[signer.address] === 'signer' ? 'active' : ''}`}>Signer</span>
+                <button
+                  className={`role-toggle ${signerRoles[signer.address] === 'admin' ? 'admin' : ''}`}
+                  onClick={() => handleRoleToggle(signer.address)}
+                  type="button"
+                >
+                  <div className="toggle-slider" />
+                </button>
+                <span className={`role-label ${signerRoles[signer.address] === 'admin' ? 'active' : ''}`}>Admin</span>
+              </div>
+            </div>
+          )) : (
+            <div className="no-signers-msg">No signers configured</div>
+          )}
+        </div>
+      </div>
+
+      <div className="settings-actions">
+        <button className="cancel-settings-btn" onClick={onBack} disabled={saving}>
+          Cancel
+        </button>
+        <button className="save-settings-btn" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Settings'}
+        </button>
+      </div>
+
+      <style>{vaultSettingsStyles}</style>
+    </div>
+  )
+}
+
+const vaultSettingsStyles = `
+  .vault-settings {
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .settings-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #00D4FF, #9945FF);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+  }
+
+  .settings-info h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #fff;
+  }
+
+  .settings-info .vault-context {
+    color: #888;
+    font-size: 14px;
+  }
+
+  .settings-error {
+    padding: 14px 18px;
+    background: #1a1a1a;
+    border: 1px solid #FF6B6B;
+    border-radius: 10px;
+    color: #FF6B6B;
+    margin-bottom: 20px;
+  }
+
+  .settings-success {
+    padding: 14px 18px;
+    background: #1a1a1a;
+    border: 1px solid #14F195;
+    border-radius: 10px;
+    color: #14F195;
+    margin-bottom: 20px;
+  }
+
+  .settings-section {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .settings-section h2 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .section-desc {
+    margin: 0 0 20px 0;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .settings-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .settings-field {
+    flex: 1;
+  }
+
+  .settings-field.token-field {
+    flex: 0 0 120px;
+  }
+
+  .settings-field label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .settings-field input,
+  .settings-field select {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .settings-field input:focus,
+  .settings-field select:focus {
+    border-color: #00D4FF;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+  }
+
+  .settings-field select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  .signers-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .signer-role-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 10px;
+  }
+
+  .signer-role-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .signer-role-name {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .signer-role-address {
+    color: #666;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  .role-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .role-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+
+  .role-label.active {
+    color: #00D4FF;
+  }
+
+  .role-toggle {
+    width: 48px;
+    height: 26px;
+    background: #333;
+    border: none;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .role-toggle.admin {
+    background: linear-gradient(135deg, #00D4FF, #9945FF);
+  }
+
+  .toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+
+  .role-toggle.admin .toggle-slider {
+    transform: translateX(22px);
+  }
+
+  .no-signers-msg {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .settings-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .cancel-settings-btn {
+    flex: 1;
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: #888;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cancel-settings-btn:hover:not(:disabled) {
+    color: #fff;
+    border-color: #444;
+  }
+
+  .save-settings-btn {
+    flex: 1;
+    padding: 16px;
+    background: linear-gradient(135deg, #00D4FF, #9945FF);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .save-settings-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  }
+
+  .save-settings-btn:disabled,
+  .cancel-settings-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 640px) {
+    .vault-settings {
+      padding: 16px;
+    }
+
+    .settings-row {
+      flex-direction: column;
+    }
+
+    .settings-field.token-field {
+      flex: 1;
+    }
+
+    .signer-role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .role-toggle-wrapper {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+`
+
 function VaultDashboard({ vault, userAddress, onBack }) {
   const signers = vault.signers || []
   const [showProposals, setShowProposals] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [proposalCount, setProposalCount] = useState(0)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -966,6 +1425,17 @@ function VaultDashboard({ vault, userAddress, onBack }) {
   useEffect(() => {
     loadProposalCount()
   }, [loadProposalCount, refreshKey])
+
+  if (showSettings) {
+    return (
+      <VaultSettings
+        vault={vault}
+        userAddress={userAddress}
+        onBack={() => setShowSettings(false)}
+        onSave={() => setRefreshKey(k => k + 1)}
+      />
+    )
+  }
 
   if (showProposals) {
     return (
@@ -1088,6 +1558,13 @@ function VaultDashboard({ vault, userAddress, onBack }) {
             <path d="M12 5v14M5 12h14"/>
           </svg>
           New Proposal
+        </button>
+        <button className="action-btn settings-btn" onClick={() => setShowSettings(true)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+          Settings
         </button>
       </div>
 
@@ -1390,6 +1867,12 @@ const dashboardStyles = `
   .create-btn:hover {
     border-color: #9945FF;
     box-shadow: 0 0 16px rgba(153, 69, 255, 0.2);
+  }
+
+  .settings-btn:hover {
+    border-color: #00D4FF;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(153, 69, 255, 0.1));
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.2);
   }
 
   .proposal-count-badge {
