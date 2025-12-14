@@ -1041,6 +1041,40 @@ export const autoTradeConfig = pgTable('auto_trade_config', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// ============================================
+// STRIKE AGENT SIGNALS - Top 10 Tokens to Watch
+// Scored tokens from DexScreener with safety/technical analysis
+// ============================================
+
+export const strikeAgentSignals = pgTable('strike_agent_signals', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  
+  tokenAddress: varchar('token_address', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }).notNull(),
+  tokenName: varchar('token_name', { length: 255 }).notNull(),
+  chain: varchar('chain', { length: 50 }).notNull().default('solana'),
+  
+  priceUsd: numeric('price_usd', { precision: 24, scale: 12 }),
+  marketCapUsd: numeric('market_cap_usd', { precision: 24, scale: 2 }),
+  liquidityUsd: numeric('liquidity_usd', { precision: 24, scale: 2 }),
+  
+  compositeScore: integer('composite_score').notNull().default(0),
+  technicalScore: integer('technical_score').notNull().default(0),
+  safetyScore: integer('safety_score').notNull().default(0),
+  momentumScore: integer('momentum_score').notNull().default(0),
+  mlConfidence: numeric('ml_confidence', { precision: 5, scale: 4 }),
+  
+  indicators: text('indicators'),
+  reasoning: text('reasoning'),
+  
+  rank: integer('rank').notNull().default(0),
+  category: varchar('category', { length: 50 }).notNull().default('new'),
+  dex: varchar('dex', { length: 50 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Auto Trades - track each trade executed by the autonomous system
 export const autoTrades = pgTable('auto_trades', {
   id: varchar('id', { length: 255 }).primaryKey(),
