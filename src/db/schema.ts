@@ -987,3 +987,114 @@ export const dustBusterStats = pgTable('dust_buster_stats', {
   totalTokensBurned: integer('total_tokens_burned').default(0),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+// ============================================
+// AUTONOMOUS TRADING SYSTEM
+// AI-driven auto-trading with safety controls
+// ============================================
+
+// Auto Trade Config - user's autonomous trading preferences
+export const autoTradeConfig = pgTable('auto_trade_config', {
+  userId: varchar('user_id', { length: 255 }).primaryKey(),
+  
+  // Master Switch
+  enabled: boolean('enabled').default(false),
+  
+  // Trading Mode: 'observer' | 'approval' | 'semi-auto' | 'full-auto'
+  mode: varchar('mode', { length: 20 }).default('observer').notNull(),
+  
+  // Confidence & Accuracy Gates
+  confidenceThreshold: numeric('confidence_threshold', { precision: 4, scale: 2 }).default('0.70'), // 0.60 - 0.90
+  accuracyThreshold: numeric('accuracy_threshold', { precision: 4, scale: 2 }).default('0.55'), // 0.55 - 0.75
+  
+  // Position Limits
+  maxPerTrade: numeric('max_per_trade', { precision: 10, scale: 2 }).default('10.00'), // USD
+  maxPerDay: numeric('max_per_day', { precision: 10, scale: 2 }).default('50.00'), // USD
+  maxOpenPositions: integer('max_open_positions').default(3),
+  
+  // Safety Controls
+  stopAfterLosses: integer('stop_after_losses').default(3), // Pause after X consecutive losses
+  isPaused: boolean('is_paused').default(false), // Manual or auto-triggered pause
+  pauseReason: text('pause_reason'), // Why trading was paused
+  pausedAt: timestamp('paused_at'),
+  
+  // Signal Filters (JSON arrays)
+  allowedSignals: text('allowed_signals').default('["BUY", "STRONG_BUY"]'), // JSON array
+  allowedHorizons: text('allowed_horizons').default('["1h", "4h"]'), // JSON array
+  
+  // Notification Settings
+  notifyOnTrade: boolean('notify_on_trade').default(true),
+  notifyOnRecommendation: boolean('notify_on_recommendation').default(true),
+  notifyChannel: varchar('notify_channel', { length: 20 }).default('telegram'), // 'telegram' | 'email' | 'both'
+  
+  // Wallet for trading (references built-in wallet)
+  tradingWalletId: varchar('trading_wallet_id', { length: 255 }),
+  
+  // Stats
+  totalTradesExecuted: integer('total_trades_executed').default(0),
+  winningTrades: integer('winning_trades').default(0),
+  losingTrades: integer('losing_trades').default(0),
+  totalProfitLoss: numeric('total_profit_loss', { precision: 18, scale: 8 }).default('0'),
+  consecutiveLosses: integer('consecutive_losses').default(0),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Auto Trades - track each trade executed by the autonomous system
+export const autoTrades = pgTable('auto_trades', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  // Trade Details
+  tokenAddress: varchar('token_address', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }),
+  tokenName: varchar('token_name', { length: 255 }),
+  chain: varchar('chain', { length: 50 }).default('solana'),
+  
+  // Signal that triggered the trade
+  signalType: varchar('signal_type', { length: 20 }).notNull(), // 'BUY' | 'STRONG_BUY' | 'SELL'
+  signalConfidence: numeric('signal_confidence', { precision: 4, scale: 2 }).notNull(),
+  modelAccuracy: numeric('model_accuracy', { precision: 4, scale: 2 }),
+  horizon: varchar('horizon', { length: 20 }), // '1h' | '4h' | '24h'
+  predictionId: varchar('prediction_id', { length: 255 }), // Link to prediction
+  
+  // Trade Execution
+  tradeType: varchar('trade_type', { length: 10 }).notNull(), // 'BUY' | 'SELL'
+  status: varchar('status', { length: 20 }).default('pending').notNull(), // 'pending' | 'awaiting_approval' | 'approved' | 'executed' | 'failed' | 'cancelled' | 'rejected'
+  
+  // Amounts
+  amountUSD: numeric('amount_usd', { precision: 10, scale: 2 }).notNull(),
+  amountToken: numeric('amount_token', { precision: 18, scale: 8 }),
+  amountNative: numeric('amount_native', { precision: 18, scale: 8 }), // SOL/ETH amount
+  
+  // Prices
+  entryPrice: numeric('entry_price', { precision: 18, scale: 8 }),
+  exitPrice: numeric('exit_price', { precision: 18, scale: 8 }),
+  currentPrice: numeric('current_price', { precision: 18, scale: 8 }),
+  
+  // Profit/Loss
+  profitLossUSD: numeric('profit_loss_usd', { precision: 10, scale: 2 }),
+  profitLossPercent: numeric('profit_loss_percent', { precision: 6, scale: 2 }),
+  isWinning: boolean('is_winning'),
+  
+  // Transaction Details
+  txSignature: varchar('tx_signature', { length: 255 }),
+  txError: text('tx_error'),
+  gasUsed: numeric('gas_used', { precision: 18, scale: 8 }),
+  
+  // Approval (for approval mode)
+  requiresApproval: boolean('requires_approval').default(false),
+  approvedBy: varchar('approved_by', { length: 255 }),
+  approvedAt: timestamp('approved_at'),
+  rejectedAt: timestamp('rejected_at'),
+  rejectionReason: text('rejection_reason'),
+  
+  // Timing
+  recommendedAt: timestamp('recommended_at').defaultNow().notNull(),
+  executedAt: timestamp('executed_at'),
+  closedAt: timestamp('closed_at'),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
