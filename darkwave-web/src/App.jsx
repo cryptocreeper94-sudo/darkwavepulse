@@ -87,6 +87,90 @@ class SniperBotErrorBoundary extends Component {
   }
 }
 
+function StrikeAgentUpgradeCTA({ onNavigate }) {
+  return (
+    <div style={{ 
+      padding: '60px 20px', 
+      textAlign: 'center',
+      background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1))',
+      borderRadius: '16px',
+      margin: '20px 0'
+    }}>
+      <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎯</div>
+      <h2 style={{ color: '#fff', fontSize: '28px', marginBottom: '12px' }}>
+        Unlock StrikeAgent Elite
+      </h2>
+      <p style={{ color: '#9ca3af', fontSize: '16px', maxWidth: '500px', margin: '0 auto 24px' }}>
+        Get access to our AI-powered sniper bot with real-time safety checks, 
+        multi-chain support, and automated trading capabilities.
+      </p>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        gap: '16px', 
+        flexWrap: 'wrap',
+        marginBottom: '32px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00D4FF' }}>
+          <span>✓</span> AI-Powered Sniping
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00D4FF' }}>
+          <span>✓</span> Honeypot Detection
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00D4FF' }}>
+          <span>✓</span> Anti-MEV Protection
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00D4FF' }}>
+          <span>✓</span> 23+ Chains Supported
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => onNavigate('pricing')}
+          style={{
+            padding: '14px 32px',
+            background: 'linear-gradient(135deg, #00D4FF, #8B5CF6)',
+            color: '#000',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 700,
+            fontSize: '16px'
+          }}
+        >
+          View Plans - Starting at $30/mo
+        </button>
+        <button
+          onClick={() => onNavigate('dashboard')}
+          style={{
+            padding: '14px 32px',
+            background: 'transparent',
+            color: '#9ca3af',
+            border: '1px solid #374151',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          Back to Dashboard
+        </button>
+      </div>
+      <p style={{ color: '#6b7280', fontSize: '13px', marginTop: '20px' }}>
+        2-day free trial included • 3-day refund policy • Cancel anytime
+      </p>
+    </div>
+  )
+}
+
+const hasStrikeAgentAccess = (userConfig) => {
+  if (!userConfig) return false
+  const tier = userConfig.subscriptionTier
+  const paidTiers = ['strike_agent', 'strike_agent_monthly', 'strike_agent_annual', 
+                     'complete_bundle', 'complete_bundle_monthly', 'complete_bundle_annual',
+                     'founder', 'legacy_founder', 'annual', 'premium']
+  return paidTiers.includes(tier)
+}
+
 function App() {
   const isStrikeAgentDomain = window.location.hostname.includes('strikeagent')
   const isDemoPath = window.location.pathname.startsWith('/demo')
@@ -98,7 +182,6 @@ function App() {
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
   
   useEffect(() => {
-    // Clear stale demo sessions when NOT in demo mode
     if (!isDemoMode) {
       const existingUser = localStorage.getItem('dwp_user')
       if (existingUser) {
@@ -113,13 +196,11 @@ function App() {
       }
     }
     
-    // Skip session fetch for demo mode - use sessionStorage (doesn't persist)
     if (isDemoMode) {
       console.log('🎯 StrikeAgent Demo Mode - bypassing login')
       sessionStorage.setItem('dwp_demo_mode', 'true')
       sessionStorage.setItem('dwp_demo_balance', '10000')
       
-      // Switch to sniper tab after a delay to allow wallet contexts to initialize
       setTimeout(() => setActiveTab('sniper'), 500)
       return
     }
@@ -168,6 +249,12 @@ function App() {
       case 'staking':
         return <StakingTab />
       case 'sniper':
+        if (isDemoMode) {
+          return <SniperBotErrorBoundary><SniperBotTab /></SniperBotErrorBoundary>
+        }
+        if (!hasStrikeAgentAccess(userConfig)) {
+          return <StrikeAgentUpgradeCTA onNavigate={setActiveTab} />
+        }
         return <SniperBotErrorBoundary><SniperBotTab /></SniperBotErrorBoundary>
       case 'wallet':
         return <WalletTab userId={userId} />

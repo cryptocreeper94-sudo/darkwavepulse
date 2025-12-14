@@ -19,7 +19,75 @@
 .pricing-header p {
   font-size: 16px;
   color: var(--text-secondary);
-  margin: 0;
+  margin: 0 0 20px 0;
+}
+
+.billing-toggle {
+  display: inline-flex;
+  background: var(--bg-surface-2);
+  border-radius: 30px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.toggle-btn {
+  padding: 10px 24px;
+  border-radius: 26px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color: #fff;
+}
+
+.toggle-btn:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+.save-badge {
+  background: rgba(57, 255, 20, 0.2);
+  color: var(--neon-green);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.legacy-section {
+  margin-bottom: 48px;
+}
+
+.legacy-toggle {
+  cursor: pointer;
+  padding: 16px 20px;
+  background: var(--bg-surface-2);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legacy-toggle:hover {
+  background: var(--bg-surface-3);
+}
+
+.legacy-card {
+  padding: 16px 20px;
+  background: var(--bg-surface-1);
+  border-radius: 0 0 12px 12px;
+  margin-top: -8px;
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .pricing-error {

@@ -3,113 +3,146 @@ import './PricingTab.css'
 
 const PLANS = [
   {
-    id: 'free',
-    name: 'Free Trial',
-    price: '$0',
-    period: 'forever',
-    description: 'Get started with basic access',
-    features: [
-      '10 AI analysis searches',
-      'Basic market overview',
-      'Fear & Greed index',
-      'Limited chart access'
-    ],
-    notIncluded: [
-      'Advanced AI predictions',
-      'StrikeAgent access',
-      'DWAV token rewards',
-      'Priority support'
-    ],
-    cta: 'Current Plan',
-    popular: false,
-    disabled: true
-  },
-  {
-    id: 'base',
-    name: 'Base',
-    price: '$4',
+    id: 'pulse_pro',
+    name: 'Pulse Pro',
+    badge: 'MOST POPULAR',
+    price: '$14.99',
     period: '/month',
-    description: 'Unlimited access for serious traders',
+    annualPrice: '$149.99',
+    annualPeriod: '/year',
+    savings: 'Save $30/yr',
+    description: 'AI-powered predictions & unlimited searches',
     features: [
       'Unlimited AI searches',
-      'Advanced technical analysis',
+      'Advanced AI predictions',
+      'Full technical analysis',
       'Real-time price alerts',
-      'Full chart access',
-      'Knowledge Base access'
+      'Fear & Greed analytics',
+      'Knowledge Base access',
+      '2-day free trial'
     ],
     notIncluded: [
-      'StrikeAgent access',
-      'DWAV token rewards',
-      'Priority support'
+      'StrikeAgent sniper bot',
+      'Multi-chain support',
+      'DWAV token rewards'
     ],
-    cta: 'Subscribe',
+    cta: 'Start Free Trial',
+    popular: true,
+    action: 'upgradePulseMonthly',
+    annualAction: 'upgradePulseAnnual'
+  },
+  {
+    id: 'strike_agent',
+    name: 'StrikeAgent Elite',
+    price: '$30',
+    period: '/month',
+    annualPrice: '$300',
+    annualPeriod: '/year',
+    savings: 'Save $60/yr',
+    description: 'Full sniper bot with safety checks',
+    features: [
+      'AI-powered sniper bot',
+      'Honeypot detection',
+      'Anti-MEV protection',
+      'Multi-chain support (23 chains)',
+      'Built-in wallet',
+      'Trade history & analytics',
+      '2-day free trial'
+    ],
+    notIncluded: [
+      'AI predictions (Pulse Pro)',
+      'DWAV token rewards'
+    ],
+    cta: 'Start Free Trial',
     popular: false,
-    action: 'upgradeBase'
+    action: 'upgradeStrikeMonthly',
+    annualAction: 'upgradeStrikeAnnual'
+  },
+  {
+    id: 'complete_bundle',
+    name: 'DarkWave Complete',
+    badge: 'BEST VALUE',
+    price: '$39.99',
+    period: '/month',
+    annualPrice: '$399.99',
+    annualPeriod: '/year',
+    savings: 'Save $80/yr + $5/mo vs separate',
+    description: 'Everything included - ultimate trading suite',
+    features: [
+      'Everything in Pulse Pro',
+      'Everything in StrikeAgent Elite',
+      'Priority support',
+      'Early feature access',
+      'Guardian Bot access',
+      'Save $5/mo vs buying separately',
+      '2-day free trial'
+    ],
+    notIncluded: [],
+    cta: 'Start Free Trial',
+    popular: false,
+    action: 'upgradeBundleMonthly',
+    annualAction: 'upgradeBundleAnnual'
   },
   {
     id: 'founder',
     name: 'Legacy Founder',
-    badge: 'BEST VALUE',
+    badge: 'GRANDFATHERED',
     price: '$24',
     period: 'one-time',
-    description: '6 months access + lifetime token rewards',
+    description: '6 months access + 35K DWAV tokens',
     features: [
-      'Everything in Base',
-      '6 months full access',
-      '35,000 DWAV tokens (Feb 14)',
+      'Full access for 6 months',
+      '35,000 DWAV tokens (Feb 14, 2026)',
       'StrikeAgent access',
-      'Built-in multi-chain wallet',
-      'Priority support',
-      'Early feature access',
-      'Founding member badge'
+      'Founding member badge',
+      'No recurring billing'
     ],
     notIncluded: [],
-    cta: 'Claim Founder Spot',
-    popular: true,
-    action: 'upgradeLegacyFounder'
-  },
-  {
-    id: 'annual',
-    name: 'Annual',
-    price: '$80',
-    period: '/year',
-    savings: 'Save $16',
-    description: '12 months of full access',
-    features: [
-      'Everything in Base',
-      '2 months FREE',
-      'StrikeAgent access',
-      'Built-in wallet',
-      'Guardian Bot access',
-      'Priority support'
-    ],
-    notIncluded: [
-      'DWAV token rewards'
-    ],
-    cta: 'Subscribe Yearly',
+    cta: 'No Longer Available',
     popular: false,
-    action: 'upgradeAnnual'
+    disabled: true,
+    legacy: true
   }
 ]
 
 export default function PricingTab({ userId, currentTier }) {
   const [loading, setLoading] = useState(null)
   const [error, setError] = useState('')
+  const [billingCycle, setBillingCycle] = useState('monthly')
 
-  const handleUpgrade = async (plan) => {
-    if (!plan.action) return
+  const handleUpgrade = async (plan, isAnnual = false) => {
+    const action = isAnnual ? plan.annualAction : plan.action
+    if (!action) return
     
-    setLoading(plan.id)
+    setLoading(plan.id + (isAnnual ? '_annual' : ''))
     setError('')
     
     try {
       let endpoint = ''
-      if (plan.action === 'upgradeBase') {
-        endpoint = '/api/payments/stripe/create-base'
-      } else if (plan.action === 'upgradeLegacyFounder') {
-        endpoint = '/api/payments/stripe/create-founder'
-      } else if (plan.action === 'upgradeAnnual') {
-        endpoint = '/api/payments/stripe/create-annual'
+      switch (action) {
+        case 'upgradePulseMonthly':
+          endpoint = '/api/payments/stripe/create-pulse-monthly'
+          break
+        case 'upgradePulseAnnual':
+          endpoint = '/api/payments/stripe/create-pulse-annual'
+          break
+        case 'upgradeStrikeMonthly':
+          endpoint = '/api/payments/stripe/create-strike-monthly'
+          break
+        case 'upgradeStrikeAnnual':
+          endpoint = '/api/payments/stripe/create-strike-annual'
+          break
+        case 'upgradeBundleMonthly':
+          endpoint = '/api/payments/stripe/create-bundle-monthly'
+          break
+        case 'upgradeBundleAnnual':
+          endpoint = '/api/payments/stripe/create-bundle-annual'
+          break
+        case 'upgradeLegacyFounder':
+          endpoint = '/api/payments/stripe/create-founder'
+          break
+        default:
+          return
       }
       
       const response = await fetch(endpoint, {
@@ -137,13 +170,28 @@ export default function PricingTab({ userId, currentTier }) {
     <div className="tab-content pricing-tab">
       <div className="pricing-header">
         <h1>Choose Your Plan</h1>
-        <p>Unlock the full power of AI-driven trading analysis</p>
+        <p>Start your 2-day free trial • 3-day refund policy • Cancel anytime</p>
+        
+        <div className="billing-toggle">
+          <button 
+            className={`toggle-btn ${billingCycle === 'monthly' ? 'active' : ''}`}
+            onClick={() => setBillingCycle('monthly')}
+          >
+            Monthly
+          </button>
+          <button 
+            className={`toggle-btn ${billingCycle === 'annual' ? 'active' : ''}`}
+            onClick={() => setBillingCycle('annual')}
+          >
+            Annual <span className="save-badge">Save up to 17%</span>
+          </button>
+        </div>
       </div>
 
       {error && <div className="pricing-error">{error}</div>}
 
       <div className="pricing-grid">
-        {PLANS.map((plan) => (
+        {PLANS.filter(p => !p.legacy).map((plan) => (
           <div 
             key={plan.id} 
             className={`pricing-card ${plan.popular ? 'popular' : ''} ${currentTier === plan.id ? 'current' : ''}`}
@@ -153,10 +201,16 @@ export default function PricingTab({ userId, currentTier }) {
             <div className="pricing-card-header">
               <h2>{plan.name}</h2>
               <div className="pricing-price">
-                <span className="price-amount">{plan.price}</span>
-                <span className="price-period">{plan.period}</span>
+                <span className="price-amount">
+                  {billingCycle === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price}
+                </span>
+                <span className="price-period">
+                  {billingCycle === 'annual' && plan.annualPeriod ? plan.annualPeriod : plan.period}
+                </span>
               </div>
-              {plan.savings && <div className="pricing-savings">{plan.savings}</div>}
+              {billingCycle === 'annual' && plan.savings && (
+                <div className="pricing-savings">{plan.savings}</div>
+              )}
               <p className="pricing-description">{plan.description}</p>
             </div>
 
@@ -179,14 +233,25 @@ export default function PricingTab({ userId, currentTier }) {
 
             <button 
               className={`pricing-cta ${plan.popular ? 'primary' : 'secondary'}`}
-              onClick={() => handleUpgrade(plan)}
-              disabled={plan.disabled || loading === plan.id || currentTier === plan.id}
+              onClick={() => handleUpgrade(plan, billingCycle === 'annual')}
+              disabled={plan.disabled || loading === plan.id || loading === plan.id + '_annual' || currentTier === plan.id}
             >
-              {loading === plan.id ? 'Processing...' : 
+              {loading === plan.id || loading === plan.id + '_annual' ? 'Processing...' : 
                currentTier === plan.id ? 'Current Plan' : plan.cta}
             </button>
           </div>
         ))}
+      </div>
+
+      <div className="legacy-section">
+        <details>
+          <summary className="legacy-toggle">
+            <span>🏆 Legacy Founder (Grandfathered - No longer available)</span>
+          </summary>
+          <div className="legacy-card">
+            <p>The Legacy Founder plan was available during our early launch. Existing Founders retain their 6-month access and 35,000 DWAV tokens.</p>
+          </div>
+        </details>
       </div>
 
       <div className="pricing-footer">
@@ -200,8 +265,15 @@ export default function PricingTab({ userId, currentTier }) {
         <div className="pricing-guarantee">
           <span className="guarantee-icon">&#128176;</span>
           <div>
-            <strong>DWAV Token Launch</strong>
-            <p>February 14, 2026 - Founders get 35,000 tokens</p>
+            <strong>3-Day Refund Policy</strong>
+            <p>Not satisfied? Get a full refund within 3 days</p>
+          </div>
+        </div>
+        <div className="pricing-guarantee">
+          <span className="guarantee-icon">&#9889;</span>
+          <div>
+            <strong>2-Day Free Trial</strong>
+            <p>Try all features before you're charged</p>
           </div>
         </div>
       </div>
@@ -210,20 +282,20 @@ export default function PricingTab({ userId, currentTier }) {
         <h3>Frequently Asked Questions</h3>
         <div className="faq-grid">
           <div className="faq-item">
-            <h4>What is the DWAV token?</h4>
-            <p>DWAV is the DarkWave Studios ecosystem token on Solana. It powers staking rewards, premium access, and cross-app benefits across all our products.</p>
+            <h4>How does the 2-day trial work?</h4>
+            <p>Start using all features immediately. You won't be charged until after 2 days. Cancel anytime during the trial.</p>
           </div>
           <div className="faq-item">
-            <h4>When do Founders get their tokens?</h4>
-            <p>All Legacy Founder members receive 35,000 DWAV tokens on February 14, 2026 when the token launches.</p>
+            <h4>What's the difference between Pulse Pro and StrikeAgent?</h4>
+            <p>Pulse Pro focuses on AI predictions and analysis. StrikeAgent is our automated sniper bot for trading. Get both with DarkWave Complete.</p>
           </div>
           <div className="faq-item">
             <h4>Can I cancel my subscription?</h4>
-            <p>Yes, you can cancel anytime from your Settings. Your access continues until the end of your billing period.</p>
+            <p>Yes, cancel anytime from Settings. Your access continues until the end of your billing period.</p>
           </div>
           <div className="faq-item">
-            <h4>What payment methods are accepted?</h4>
-            <p>We accept all major credit/debit cards through Stripe. Crypto payments coming soon via Coinbase Commerce.</p>
+            <h4>What's the refund policy?</h4>
+            <p>Full refund within 3 days of purchase, no questions asked. After that, you can still cancel but won't receive a refund.</p>
           </div>
         </div>
       </div>

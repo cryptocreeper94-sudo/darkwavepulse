@@ -5,15 +5,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_LI
 });
 
 const PRICE_IDS = {
-  base: process.env.BASE_PRICE_ID || process.env.STRIPE_BASE_MONTHLY_PRICE,
   founder: process.env.LEGACY_FOUNDER_6MONTH_PRICE_ID || process.env.STRIPE_LEGACY_FOUNDER_PRICE,
-  annual: process.env.ANNUAL_SUBSCRIPTION_PRICE_ID || process.env.STRIPE_ANNUAL_PRICE,
-  premium: process.env.PREMIUM_PRICE_ID
+  pulseProMonthly: process.env.PULSE_PRO_MONTHLY_PRICE_ID,
+  pulseProAnnual: process.env.PULSE_PRO_ANNUAL_PRICE_ID,
+  strikeAgentMonthly: process.env.STRIKE_AGENT_MONTHLY_PRICE_ID,
+  strikeAgentAnnual: process.env.STRIKE_AGENT_ANNUAL_PRICE_ID,
+  completeBundleMonthly: process.env.COMPLETE_BUNDLE_MONTHLY_PRICE_ID,
+  completeBundleAnnual: process.env.COMPLETE_BUNDLE_ANNUAL_PRICE_ID
 };
+
+const getBaseUrl = () => process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000';
 
 export const paymentRoutes = [
   {
-    path: "/api/payments/stripe/create-base",
+    path: "/api/payments/stripe/create-pulse-monthly",
     method: "POST",
     createHandler: async ({ mastra }: any) => async (c: any) => {
       const logger = mastra.getLogger();
@@ -24,9 +29,9 @@ export const paymentRoutes = [
           return c.json({ error: 'User ID required' }, 400);
         }
 
-        const priceId = PRICE_IDS.base;
+        const priceId = PRICE_IDS.pulseProMonthly;
         if (!priceId) {
-          logger?.error('❌ [Stripe] BASE_PRICE_ID not configured');
+          logger?.error('❌ [Stripe] PULSE_PRO_MONTHLY_PRICE_ID not configured');
           return c.json({ error: 'Payment configuration missing' }, 500);
         }
 
@@ -38,18 +43,248 @@ export const paymentRoutes = [
             quantity: 1
           }],
           subscription_data: {
-            trial_period_days: 3
+            trial_period_days: 2
           },
-          success_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=settings&payment=success`,
-          cancel_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=pricing&payment=cancelled`,
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=pulse_pro`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
           client_reference_id: userId,
           metadata: {
             userId,
-            planType: 'base'
+            planType: 'pulse_pro_monthly'
           }
         });
 
-        logger?.info('✅ [Stripe] Created base checkout session', { sessionId: session.id, userId });
+        logger?.info('✅ [Stripe] Created Pulse Pro monthly checkout session', { sessionId: session.id, userId });
+        return c.json({ success: true, url: session.url });
+      } catch (error: any) {
+        logger?.error('❌ [Stripe] Create session error', { error: error.message });
+        return c.json({ error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/payments/stripe/create-pulse-annual",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { userId } = await c.req.json();
+        
+        if (!userId) {
+          return c.json({ error: 'User ID required' }, 400);
+        }
+
+        const priceId = PRICE_IDS.pulseProAnnual;
+        if (!priceId) {
+          logger?.error('❌ [Stripe] PULSE_PRO_ANNUAL_PRICE_ID not configured');
+          return c.json({ error: 'Payment configuration missing' }, 500);
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'subscription',
+          line_items: [{
+            price: priceId,
+            quantity: 1
+          }],
+          subscription_data: {
+            trial_period_days: 2
+          },
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=pulse_pro_annual`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
+          client_reference_id: userId,
+          metadata: {
+            userId,
+            planType: 'pulse_pro_annual'
+          }
+        });
+
+        logger?.info('✅ [Stripe] Created Pulse Pro annual checkout session', { sessionId: session.id, userId });
+        return c.json({ success: true, url: session.url });
+      } catch (error: any) {
+        logger?.error('❌ [Stripe] Create session error', { error: error.message });
+        return c.json({ error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/payments/stripe/create-strike-monthly",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { userId } = await c.req.json();
+        
+        if (!userId) {
+          return c.json({ error: 'User ID required' }, 400);
+        }
+
+        const priceId = PRICE_IDS.strikeAgentMonthly;
+        if (!priceId) {
+          logger?.error('❌ [Stripe] STRIKE_AGENT_MONTHLY_PRICE_ID not configured');
+          return c.json({ error: 'Payment configuration missing' }, 500);
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'subscription',
+          line_items: [{
+            price: priceId,
+            quantity: 1
+          }],
+          subscription_data: {
+            trial_period_days: 2
+          },
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=strike_agent`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
+          client_reference_id: userId,
+          metadata: {
+            userId,
+            planType: 'strike_agent_monthly'
+          }
+        });
+
+        logger?.info('✅ [Stripe] Created StrikeAgent monthly checkout session', { sessionId: session.id, userId });
+        return c.json({ success: true, url: session.url });
+      } catch (error: any) {
+        logger?.error('❌ [Stripe] Create session error', { error: error.message });
+        return c.json({ error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/payments/stripe/create-strike-annual",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { userId } = await c.req.json();
+        
+        if (!userId) {
+          return c.json({ error: 'User ID required' }, 400);
+        }
+
+        const priceId = PRICE_IDS.strikeAgentAnnual;
+        if (!priceId) {
+          logger?.error('❌ [Stripe] STRIKE_AGENT_ANNUAL_PRICE_ID not configured');
+          return c.json({ error: 'Payment configuration missing' }, 500);
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'subscription',
+          line_items: [{
+            price: priceId,
+            quantity: 1
+          }],
+          subscription_data: {
+            trial_period_days: 2
+          },
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=strike_agent_annual`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
+          client_reference_id: userId,
+          metadata: {
+            userId,
+            planType: 'strike_agent_annual'
+          }
+        });
+
+        logger?.info('✅ [Stripe] Created StrikeAgent annual checkout session', { sessionId: session.id, userId });
+        return c.json({ success: true, url: session.url });
+      } catch (error: any) {
+        logger?.error('❌ [Stripe] Create session error', { error: error.message });
+        return c.json({ error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/payments/stripe/create-bundle-monthly",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { userId } = await c.req.json();
+        
+        if (!userId) {
+          return c.json({ error: 'User ID required' }, 400);
+        }
+
+        const priceId = PRICE_IDS.completeBundleMonthly;
+        if (!priceId) {
+          logger?.error('❌ [Stripe] COMPLETE_BUNDLE_MONTHLY_PRICE_ID not configured');
+          return c.json({ error: 'Payment configuration missing' }, 500);
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'subscription',
+          line_items: [{
+            price: priceId,
+            quantity: 1
+          }],
+          subscription_data: {
+            trial_period_days: 2
+          },
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=complete_bundle`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
+          client_reference_id: userId,
+          metadata: {
+            userId,
+            planType: 'complete_bundle_monthly'
+          }
+        });
+
+        logger?.info('✅ [Stripe] Created Complete Bundle monthly checkout session', { sessionId: session.id, userId });
+        return c.json({ success: true, url: session.url });
+      } catch (error: any) {
+        logger?.error('❌ [Stripe] Create session error', { error: error.message });
+        return c.json({ error: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/payments/stripe/create-bundle-annual",
+    method: "POST",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const { userId } = await c.req.json();
+        
+        if (!userId) {
+          return c.json({ error: 'User ID required' }, 400);
+        }
+
+        const priceId = PRICE_IDS.completeBundleAnnual;
+        if (!priceId) {
+          logger?.error('❌ [Stripe] COMPLETE_BUNDLE_ANNUAL_PRICE_ID not configured');
+          return c.json({ error: 'Payment configuration missing' }, 500);
+        }
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          mode: 'subscription',
+          line_items: [{
+            price: priceId,
+            quantity: 1
+          }],
+          subscription_data: {
+            trial_period_days: 2
+          },
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=complete_bundle_annual`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
+          client_reference_id: userId,
+          metadata: {
+            userId,
+            planType: 'complete_bundle_annual'
+          }
+        });
+
+        logger?.info('✅ [Stripe] Created Complete Bundle annual checkout session', { sessionId: session.id, userId });
         return c.json({ success: true, url: session.url });
       } catch (error: any) {
         logger?.error('❌ [Stripe] Create session error', { error: error.message });
@@ -83,8 +318,8 @@ export const paymentRoutes = [
             price: priceId,
             quantity: 1
           }],
-          success_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=settings&payment=success&plan=founder`,
-          cancel_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=pricing&payment=cancelled`,
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=founder`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
           client_reference_id: userId,
           metadata: {
             userId,
@@ -94,52 +329,6 @@ export const paymentRoutes = [
         });
 
         logger?.info('✅ [Stripe] Created founder checkout session', { sessionId: session.id, userId });
-        return c.json({ success: true, url: session.url });
-      } catch (error: any) {
-        logger?.error('❌ [Stripe] Create session error', { error: error.message });
-        return c.json({ error: error.message }, 500);
-      }
-    }
-  },
-
-  {
-    path: "/api/payments/stripe/create-annual",
-    method: "POST",
-    createHandler: async ({ mastra }: any) => async (c: any) => {
-      const logger = mastra.getLogger();
-      try {
-        const { userId } = await c.req.json();
-        
-        if (!userId) {
-          return c.json({ error: 'User ID required' }, 400);
-        }
-
-        const priceId = PRICE_IDS.annual;
-        if (!priceId) {
-          logger?.error('❌ [Stripe] ANNUAL_SUBSCRIPTION_PRICE_ID not configured');
-          return c.json({ error: 'Payment configuration missing' }, 500);
-        }
-
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
-          mode: 'subscription',
-          line_items: [{
-            price: priceId,
-            quantity: 1
-          }],
-          subscription_data: {
-            trial_period_days: 3
-          },
-          success_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=settings&payment=success&plan=annual`,
-          cancel_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=pricing&payment=cancelled`,
-          client_reference_id: userId,
-          metadata: {
-            userId,
-            planType: 'annual'
-          }
-        });
-
-        logger?.info('✅ [Stripe] Created annual checkout session', { sessionId: session.id, userId });
         return c.json({ success: true, url: session.url });
       } catch (error: any) {
         logger?.error('❌ [Stripe] Create session error', { error: error.message });
@@ -173,8 +362,8 @@ export const paymentRoutes = [
             price: priceId,
             quantity: 1
           }],
-          success_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=settings&payment=success&plan=founder`,
-          cancel_url: `${process.env.REPLIT_DEV_DOMAIN ? 'https://' + process.env.REPLIT_DEV_DOMAIN : 'http://localhost:5000'}/app?tab=pricing&payment=cancelled`,
+          success_url: `${getBaseUrl()}/app?tab=settings&payment=success&plan=founder`,
+          cancel_url: `${getBaseUrl()}/app?tab=pricing&payment=cancelled`,
           client_reference_id: userId,
           metadata: {
             userId,
