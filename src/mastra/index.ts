@@ -996,6 +996,149 @@ export const mastra = new Mastra({
           }
         }
       },
+      // Coin History - OHLC data for any coin (by symbol)
+      {
+        path: "/api/crypto/coin-history",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          const symbol = c.req.query('symbol')?.toUpperCase() || 'BTC';
+          const days = c.req.query('days') || '7';
+          
+          logger?.info('📊 [CoinHistory] Request', { symbol, days });
+          
+          // Common symbol to CoinGecko ID mapping
+          const symbolToIdMap: Record<string, string> = {
+            'BTC': 'bitcoin',
+            'ETH': 'ethereum',
+            'DOGE': 'dogecoin',
+            'SOL': 'solana',
+            'XRP': 'ripple',
+            'ADA': 'cardano',
+            'DOT': 'polkadot',
+            'AVAX': 'avalanche-2',
+            'LINK': 'chainlink',
+            'MATIC': 'polygon-ecosystem-token',
+            'POL': 'polygon-ecosystem-token',
+            'SHIB': 'shiba-inu',
+            'PEPE': 'pepe',
+            'LTC': 'litecoin',
+            'UNI': 'uniswap',
+            'ATOM': 'cosmos',
+            'FIL': 'filecoin',
+            'APT': 'aptos',
+            'ARB': 'arbitrum',
+            'OP': 'optimism',
+            'SUI': 'sui',
+            'SEI': 'sei-network',
+            'TIA': 'celestia',
+            'INJ': 'injective-protocol',
+            'WIF': 'dogwifcoin',
+            'BONK': 'bonk',
+            'FLOKI': 'floki',
+            'NEAR': 'near',
+            'ICP': 'internet-computer',
+            'AAVE': 'aave',
+            'MKR': 'maker',
+            'CRV': 'curve-dao-token',
+            'LDO': 'lido-dao',
+            'RENDER': 'render-token',
+            'FET': 'fetch-ai',
+            'GRT': 'the-graph',
+            'JUP': 'jupiter-exchange-solana',
+            'RAY': 'raydium',
+            'BNB': 'binancecoin',
+            'TRX': 'tron',
+            'TON': 'the-open-network',
+            'XLM': 'stellar',
+            'HBAR': 'hedera-hashgraph',
+            'VET': 'vechain',
+            'ALGO': 'algorand',
+            'EOS': 'eos',
+            'XTZ': 'tezos',
+            'EGLD': 'elrond-erd-2',
+            'SAND': 'the-sandbox',
+            'MANA': 'decentraland',
+            'AXS': 'axie-infinity',
+            'ENJ': 'enjincoin',
+            'GALA': 'gala',
+            'IMX': 'immutable-x',
+            'CAKE': 'pancakeswap-token',
+            'SUSHI': 'sushi',
+            '1INCH': '1inch',
+            'COMP': 'compound-governance-token',
+            'SNX': 'havven',
+            'YFI': 'yearn-finance',
+            'BAL': 'balancer',
+          };
+          
+          // Check cache
+          const cacheKey = `coin-ohlc:${symbol}:${days}`;
+          const cached = apiCache.get<any[]>(cacheKey);
+          if (cached) {
+            logger?.info('📦 [CoinHistory] Returning cached data', { symbol, days });
+            return c.json(cached);
+          }
+          
+          try {
+            const daysNum = days === 'max' ? 1825 : parseInt(days);
+            
+            // Get coin ID from symbol
+            let coinId = symbolToIdMap[symbol];
+            
+            // If not in mapping, try searching
+            if (!coinId) {
+              logger?.info('🔍 [CoinHistory] Symbol not in map, searching', { symbol });
+              try {
+                const searchResult = await coinGeckoClient.get('/search', {
+                  params: { query: symbol }
+                });
+                if (searchResult?.coins && searchResult.coins.length > 0) {
+                  // Find exact symbol match
+                  const exactMatch = searchResult.coins.find(
+                    (coin: any) => coin.symbol?.toUpperCase() === symbol
+                  );
+                  coinId = exactMatch?.id || searchResult.coins[0].id;
+                  logger?.info('✅ [CoinHistory] Found coin ID via search', { symbol, coinId });
+                }
+              } catch (searchErr) {
+                logger?.warn('⚠️ [CoinHistory] Search failed, using lowercase symbol', { symbol });
+                coinId = symbol.toLowerCase();
+              }
+            }
+            
+            if (!coinId) {
+              coinId = symbol.toLowerCase();
+            }
+            
+            const ohlcData = await coinGeckoClient.getOHLC(coinId, daysNum);
+            
+            if (!ohlcData || !Array.isArray(ohlcData) || ohlcData.length === 0) {
+              logger?.warn('⚠️ [CoinHistory] No data from CoinGecko', { symbol, coinId });
+              return c.json([]);
+            }
+            
+            // Transform to chart format
+            const chartData = ohlcData.map((candle: number[]) => ({
+              time: Math.floor(candle[0] / 1000),
+              open: candle[1],
+              high: candle[2],
+              low: candle[3],
+              close: candle[4]
+            }));
+            
+            // Cache based on timeframe
+            const cacheTTL = daysNum <= 1 ? 60 : daysNum <= 7 ? 300 : 600;
+            apiCache.set(cacheKey, chartData, cacheTTL);
+            
+            logger?.info('✅ [CoinHistory] Data fetched', { symbol, coinId, days, points: chartData.length });
+            return c.json(chartData);
+          } catch (error: any) {
+            logger?.error('❌ [CoinHistory] Error', { symbol, error: error.message });
+            return c.json({ error: 'Failed to fetch history' }, 500);
+          }
+        }
+      },
       // Crypto Category Filter Routes - Used by coin table filter buttons
       {
         path: "/api/crypto/category/:category",
