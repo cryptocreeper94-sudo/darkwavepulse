@@ -46,40 +46,38 @@ export default function MobileCardCarousel({ children }) {
         .mobile-card-carousel {
           position: relative;
           width: 100%;
-          overflow: hidden;
+          overflow: visible;
         }
         
-        .carousel-track {
+        .mcc-track {
           display: flex;
           transition: transform 0.3s ease-out;
         }
         
-        .carousel-slide {
+        .mcc-slide {
           flex: 0 0 100%;
           width: 100%;
           padding: 0 4px;
           box-sizing: border-box;
         }
         
-        .carousel-nav {
+        .mcc-nav {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
           margin-top: 16px;
           padding: 12px 0;
-          position: relative;
-          z-index: 100;
         }
         
-        .carousel-arrow {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
+        .mcc-arrow {
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
           background: #1a1a1a;
           border: 1px solid #333;
           color: #fff;
-          font-size: 16px;
+          font-size: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -87,80 +85,77 @@ export default function MobileCardCarousel({ children }) {
           transition: all 0.2s;
         }
         
-        .carousel-arrow:hover {
+        .mcc-arrow:hover {
           background: #141414;
           border-color: #00D4FF;
-          box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
         }
         
-        .carousel-arrow:active {
+        .mcc-arrow:active {
           transform: scale(0.95);
         }
         
-        .carousel-dots {
+        .mcc-dots {
           display: flex;
-          gap: 8px;
+          gap: 10px;
         }
         
-        .carousel-dot {
-          width: 8px;
-          height: 8px;
+        .mcc-dot {
+          width: 10px;
+          height: 10px;
           border-radius: 50%;
           background: #444;
           cursor: pointer;
           transition: all 0.2s;
         }
         
-        .carousel-dot.active {
+        .mcc-dot.active {
           background: #00D4FF;
           box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
         }
         
-        .carousel-label {
+        .mcc-label {
           text-align: center;
-          font-size: 11px;
+          font-size: 12px;
           color: #666;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-top: 4px;
+          margin-top: 8px;
         }
       `}</style>
       
       <div
         ref={containerRef}
-        className="carousel-track"
+        className="mcc-track"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         {childArray.map((child, index) => (
-          <div key={index} className="carousel-slide">
+          <div key={index} className="mcc-slide">
             {child}
           </div>
         ))}
       </div>
       
-      <div className="carousel-nav">
-        <button className="carousel-arrow" onClick={() => goTo(currentIndex - 1)}>
+      <div className="mcc-nav">
+        <button className="mcc-arrow" onClick={() => goTo(currentIndex - 1)}>
           ‹
         </button>
         
-        <div className="carousel-dots">
+        <div className="mcc-dots">
           {childArray.map((_, index) => (
             <div
               key={index}
-              className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
+              className={`mcc-dot ${index === currentIndex ? 'active' : ''}`}
               onClick={() => goTo(index)}
             />
           ))}
         </div>
         
-        <button className="carousel-arrow" onClick={() => goTo(currentIndex + 1)}>
+        <button className="mcc-arrow" onClick={() => goTo(currentIndex + 1)}>
           ›
         </button>
       </div>
       
-      <div className="carousel-label">
+      <div className="mcc-label">
         {currentIndex + 1} / {totalCards}
       </div>
     </div>

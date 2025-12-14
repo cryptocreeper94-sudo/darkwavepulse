@@ -94,7 +94,43 @@ function TileLabel({ children, color = '#555' }) {
   )
 }
 
-function QuickActionContent({ action }) {
+function QuickActionContent({ action, fullCard = false }) {
+  if (fullCard) {
+    return (
+      <div style={{ 
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        borderRadius: 12,
+        overflow: 'hidden',
+      }}>
+        <img 
+          src={action.image} 
+          alt={action.title}
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            objectFit: 'cover',
+          }}
+          onError={(e) => {
+            e.target.style.display = 'none'
+          }}
+        />
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '40px 16px 16px',
+          background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
+        }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{action.title}</div>
+          <div style={{ fontSize: 12, color: '#aaa' }}>{action.subtitle}</div>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div style={{ 
       display: 'flex', 
@@ -111,9 +147,6 @@ function QuickActionContent({ action }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: `${action.color}15`,
-        borderRadius: 16,
-        boxShadow: `0 0 20px ${action.color}30`,
         overflow: 'hidden',
       }}>
         <img 
@@ -1173,18 +1206,17 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
       {isMobile && (
         <div className="mobile-categories-wrapper">
           <MobileCardCarousel>
-            <div className="mobile-category-card">
-              <TileLabel color="#00D4FF">Quick Actions</TileLabel>
-              <div style={{ height: 180 }}>
+            <div className="mobile-category-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ height: 220 }}>
                 <FlipCarousel
                   items={quickActions}
-                  style={{ height: 180 }}
+                  style={{ height: 220 }}
                   renderItem={(action) => (
                     <div 
                       onClick={() => onNavigate && onNavigate(action.tab)}
-                      style={{ height: 180, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0f0f', borderRadius: 12 }}
+                      style={{ height: 220, cursor: 'pointer', background: '#0f0f0f', borderRadius: 12, overflow: 'hidden' }}
                     >
-                      <QuickActionContent action={action} />
+                      <QuickActionContent action={action} fullCard={true} />
                     </div>
                   )}
                   showDots={false}
