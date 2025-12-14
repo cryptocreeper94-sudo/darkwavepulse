@@ -17,6 +17,7 @@ import {
   RiskDashboardTab
 } from './components/tabs'
 import AccuracyDashboard from './components/ml/AccuracyDashboard'
+import AutoTradeConfig from './components/ml/AutoTradeConfig'
 import { GlossaryPopup, AIChatButton } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
 import { AvatarProvider } from './context/AvatarContext'
@@ -182,6 +183,8 @@ function App() {
         return <MLDashboardTab />
       case 'accuracy':
         return <AccuracyDashboard />
+      case 'auto-trade':
+        return <AutoTradeConfig userId={userId} />
       case 'risk':
         return <RiskDashboardTab userId={userId} />
       default:

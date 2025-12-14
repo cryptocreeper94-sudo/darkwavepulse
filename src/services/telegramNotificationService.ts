@@ -202,10 +202,152 @@ function formatVolume(volume: number): string {
   return volume.toFixed(2);
 }
 
+export interface AutoTradeAlertData {
+  tradeId: string;
+  tokenSymbol: string;
+  tokenAddress: string;
+  chain: string;
+  signalType: string;
+  signalConfidence: string;
+  tradeType: 'BUY' | 'SELL';
+  amountUSD: string;
+  entryPrice?: string;
+  horizon?: string;
+  modelAccuracy?: string;
+}
+
+export interface AutoTradeResultData {
+  tradeId: string;
+  tokenSymbol: string;
+  tradeType: 'BUY' | 'SELL';
+  amountUSD: string;
+  entryPrice: string;
+  exitPrice: string;
+  profitLossUSD: string;
+  profitLossPercent: string;
+  isWinning: boolean;
+}
+
+export async function sendAutoTradeRecommendation(chatId: string | number, trade: AutoTradeAlertData): Promise<boolean> {
+  const signalEmoji = trade.signalType.includes('BUY') ? '🟢' : '🔴';
+  const tradeEmoji = trade.tradeType === 'BUY' ? '📈' : '📉';
+  const confidencePercent = (parseFloat(trade.signalConfidence) * 100).toFixed(0);
+  
+  const accuracySection = trade.modelAccuracy 
+    ? `🎯 <b>Model Accuracy:</b> ${(parseFloat(trade.modelAccuracy) * 100).toFixed(1)}%\n`
+    : '';
+  
+  const horizonSection = trade.horizon 
+    ? `⏱️ <b>Horizon:</b> ${trade.horizon}\n`
+    : '';
+
+  const message = `
+🤖 <b>AUTO-TRADE RECOMMENDATION</b>
+
+${signalEmoji} <b>Signal:</b> ${trade.signalType}
+${tradeEmoji} <b>Action:</b> ${trade.tradeType}
+━━━━━━━━━━━━━━━━━━
+
+🪙 <b>Token:</b> ${trade.tokenSymbol}
+⛓️ <b>Chain:</b> ${trade.chain}
+💵 <b>Amount:</b> $${parseFloat(trade.amountUSD).toFixed(2)}
+📊 <b>Confidence:</b> ${confidencePercent}%
+${accuracySection}${horizonSection}
+<code>${trade.tokenAddress.slice(0, 8)}...${trade.tokenAddress.slice(-6)}</code>
+
+<i>This trade requires your approval</i>
+━━━━━━━━━━━━━━━━━━
+🚀 <a href="https://pulse.darkwavestudios.io">Review in Pulse</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
+export async function sendAutoTradeExecuted(chatId: string | number, trade: AutoTradeAlertData): Promise<boolean> {
+  const tradeEmoji = trade.tradeType === 'BUY' ? '🟢' : '🔴';
+  const actionText = trade.tradeType === 'BUY' ? 'BOUGHT' : 'SOLD';
+  const confidencePercent = (parseFloat(trade.signalConfidence) * 100).toFixed(0);
+  
+  const priceSection = trade.entryPrice 
+    ? `\n💰 <b>Entry Price:</b> $${parseFloat(trade.entryPrice).toFixed(6)}`
+    : '';
+
+  const message = `
+${tradeEmoji} <b>AUTO-TRADE EXECUTED</b>
+
+📍 <b>Token:</b> ${trade.tokenSymbol}
+🎬 <b>Action:</b> ${actionText}
+━━━━━━━━━━━━━━━━━━
+
+⛓️ <b>Chain:</b> ${trade.chain}
+💵 <b>Amount:</b> $${parseFloat(trade.amountUSD).toFixed(2)}
+📊 <b>Signal:</b> ${trade.signalType} (${confidencePercent}%)${priceSection}
+
+<code>${trade.tokenAddress.slice(0, 8)}...${trade.tokenAddress.slice(-6)}</code>
+
+<i>Executed by Pulse AutoTrade</i>
+━━━━━━━━━━━━━━━━━━
+🚀 <a href="https://pulse.darkwavestudios.io">View in Pulse</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
+export async function sendAutoTradeResult(chatId: string | number, result: AutoTradeResultData): Promise<boolean> {
+  const resultEmoji = result.isWinning ? '✅' : '❌';
+  const pnlEmoji = result.isWinning ? '📈' : '📉';
+  const pnlColor = result.isWinning ? '🟢' : '🔴';
+  const pnlSign = result.isWinning ? '+' : '';
+
+  const message = `
+${resultEmoji} <b>AUTO-TRADE CLOSED</b>
+
+📍 <b>Token:</b> ${result.tokenSymbol}
+🎬 <b>Type:</b> ${result.tradeType}
+━━━━━━━━━━━━━━━━━━
+
+💵 <b>Amount:</b> $${parseFloat(result.amountUSD).toFixed(2)}
+📥 <b>Entry:</b> $${parseFloat(result.entryPrice).toFixed(6)}
+📤 <b>Exit:</b> $${parseFloat(result.exitPrice).toFixed(6)}
+
+${pnlEmoji} <b>Result:</b>
+${pnlColor} P&L: ${pnlSign}$${parseFloat(result.profitLossUSD).toFixed(2)} (${pnlSign}${parseFloat(result.profitLossPercent).toFixed(2)}%)
+
+<i>Tracked by Pulse AutoTrade</i>
+━━━━━━━━━━━━━━━━━━
+🚀 <a href="https://pulse.darkwavestudios.io">View History</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
+export async function sendTradingPausedAlert(chatId: string | number, reason: string, consecutiveLosses: number): Promise<boolean> {
+  const message = `
+🚨 <b>AUTO-TRADE PAUSED</b>
+
+⚠️ Trading has been automatically paused.
+
+━━━━━━━━━━━━━━━━━━
+📉 <b>Reason:</b> ${reason}
+🔢 <b>Consecutive Losses:</b> ${consecutiveLosses}
+━━━━━━━━━━━━━━━━━━
+
+<i>Review your strategy and resume when ready.</i>
+
+🚀 <a href="https://pulse.darkwavestudios.io">Resume Trading</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
 export const telegramNotificationService = {
   sendHotTokenAlert,
   sendTradeConfirmation,
   sendSafetyWarning,
   sendDailyDigest,
-  sendWelcomeMessage
+  sendWelcomeMessage,
+  sendAutoTradeRecommendation,
+  sendAutoTradeExecuted,
+  sendAutoTradeResult,
+  sendTradingPausedAlert
 };

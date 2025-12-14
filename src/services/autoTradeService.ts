@@ -2,8 +2,18 @@ import { db } from '../db/client';
 import { autoTradeConfig, autoTrades } from '../db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import pino from 'pino';
+import { 
+  sendAutoTradeRecommendation, 
+  sendAutoTradeExecuted, 
+  sendAutoTradeResult,
+  sendTradingPausedAlert,
+  type AutoTradeAlertData,
+  type AutoTradeResultData
+} from './telegramNotificationService';
 
 const logger = pino({ name: 'AutoTradeService' });
+
+const ADMIN_TELEGRAM_ID = process.env.ADMIN_TELEGRAM_ID;
 
 export type AutoTradeStatus = 
   | 'pending'
@@ -321,6 +331,34 @@ class AutoTradeService {
     logger.info({ tradeId: id }, '[AutoTrade] Trade created');
     
     const trade = await this.getTradeById(id);
+    
+    // Send notification if enabled
+    try {
+      const config = await this.getConfig(input.userId);
+      if (config.notifyOnRecommendation && input.requiresApproval) {
+        const chatId = ADMIN_TELEGRAM_ID;
+        if (chatId) {
+          const alertData: AutoTradeAlertData = {
+            tradeId: id,
+            tokenSymbol: input.tokenSymbol || 'Unknown',
+            tokenAddress: input.tokenAddress,
+            chain: input.chain || 'solana',
+            signalType: input.signalType,
+            signalConfidence: input.signalConfidence,
+            tradeType: input.tradeType,
+            amountUSD: input.amountUSD,
+            entryPrice: input.entryPrice,
+            horizon: input.horizon,
+            modelAccuracy: input.modelAccuracy
+          };
+          await sendAutoTradeRecommendation(chatId, alertData);
+          logger.info({ tradeId: id }, '[AutoTrade] Recommendation notification sent');
+        }
+      }
+    } catch (err) {
+      logger.warn({ tradeId: id, error: err }, '[AutoTrade] Failed to send recommendation notification');
+    }
+    
     return trade!;
   }
 
@@ -343,6 +381,36 @@ class AutoTradeService {
     await db.update(autoTrades)
       .set(updateData)
       .where(eq(autoTrades.id, tradeId));
+    
+    // Send notification when trade is executed
+    if (status === 'executed') {
+      try {
+        const trade = await this.getTradeById(tradeId);
+        if (trade) {
+          const config = await this.getConfig(trade.userId);
+          const chatId = ADMIN_TELEGRAM_ID;
+          if (chatId && config.notifyOnTrade) {
+            const alertData: AutoTradeAlertData = {
+              tradeId: trade.id,
+              tokenSymbol: trade.tokenSymbol || 'Unknown',
+              tokenAddress: trade.tokenAddress,
+              chain: trade.chain,
+              signalType: trade.signalType,
+              signalConfidence: trade.signalConfidence,
+              tradeType: trade.tradeType as 'BUY' | 'SELL',
+              amountUSD: trade.amountUSD,
+              entryPrice: trade.entryPrice || undefined,
+              horizon: trade.horizon || undefined,
+              modelAccuracy: trade.modelAccuracy || undefined
+            };
+            await sendAutoTradeExecuted(chatId, alertData);
+            logger.info({ tradeId }, '[AutoTrade] Trade executed notification sent');
+          }
+        }
+      } catch (err) {
+        logger.warn({ tradeId, error: err }, '[AutoTrade] Failed to send trade executed notification');
+      }
+    }
   }
 
   async approveTrade(tradeId: string, approvedBy: string): Promise<AutoTrade | null> {
@@ -435,6 +503,41 @@ class AutoTradeService {
     
     if (shouldPause) {
       logger.warn({ userId: trade.userId, consecutiveLosses: newConsecutiveLosses }, '[AutoTrade] Trading auto-paused due to consecutive losses');
+    }
+    
+    // Send notifications
+    try {
+      const chatId = ADMIN_TELEGRAM_ID;
+      if (chatId) {
+        // Send trade result notification
+        if (config.notifyOnTrade) {
+          const resultData: AutoTradeResultData = {
+            tradeId: trade.id,
+            tokenSymbol: trade.tokenSymbol || 'Unknown',
+            tradeType: trade.tradeType as 'BUY' | 'SELL',
+            amountUSD: trade.amountUSD,
+            entryPrice: trade.entryPrice || '0',
+            exitPrice,
+            profitLossUSD: profitLoss.usd,
+            profitLossPercent: profitLoss.percent,
+            isWinning
+          };
+          await sendAutoTradeResult(chatId, resultData);
+          logger.info({ tradeId }, '[AutoTrade] Trade result notification sent');
+        }
+        
+        // Send pause notification if trading was auto-paused
+        if (shouldPause) {
+          await sendTradingPausedAlert(
+            chatId, 
+            `${newConsecutiveLosses} consecutive losses reached limit`,
+            newConsecutiveLosses
+          );
+          logger.info({ userId: trade.userId }, '[AutoTrade] Trading paused notification sent');
+        }
+      }
+    } catch (err) {
+      logger.warn({ tradeId, error: err }, '[AutoTrade] Failed to send trade result notification');
     }
     
     return this.getTradeById(tradeId);
