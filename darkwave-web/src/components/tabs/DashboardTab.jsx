@@ -1014,8 +1014,10 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           padding-top: 60px;
           display: grid;
           grid-template-columns: repeat(12, 1fr);
-          grid-template-rows: minmax(180px, auto) minmax(380px, auto) minmax(400px, auto);
+          grid-template-rows: minmax(160px, auto) minmax(380px, auto) minmax(400px, auto);
           gap: 12px;
+          max-width: 1200px;
+          margin: 0 auto;
         }
         /* Row 1: 4 compact cards */
         .bento-quick { grid-area: 1 / 1 / 2 / 4; }
