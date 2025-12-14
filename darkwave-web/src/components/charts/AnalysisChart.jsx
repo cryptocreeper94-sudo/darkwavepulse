@@ -286,8 +286,12 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
 
       chartRef.current = chart
 
+      // For live mode (1S), always use area chart since we only have point prices
+      const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+      const useCandlestick = chartType === 'candlestick' && !selectedTimeframe?.isLive
+
       let series
-      if (chartType === 'candlestick') {
+      if (useCandlestick) {
         series = chart.addSeries(CandlestickSeries, {
           upColor: DEFAULT_COLORS.upColor,
           downColor: DEFAULT_COLORS.downColor,
@@ -341,14 +345,18 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
     } catch (err) {
       console.log('Chart initialization error:', err)
     }
-  }, [chartType])
+  }, [chartType, timeframe])
 
   useEffect(() => {
     if (!seriesRef.current || !chartRef.current) return
 
     try {
       if (data.length > 0) {
-        if (chartType === 'candlestick') {
+        // For live mode (1S), always use area format since we only have point prices
+        const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+        const useCandlestick = chartType === 'candlestick' && !selectedTimeframe?.isLive
+        
+        if (useCandlestick) {
           seriesRef.current.setData(data)
         } else {
           seriesRef.current.setData(data.map(d => ({ time: d.time, value: d.close })))
@@ -383,7 +391,7 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
     } catch (err) {
       console.log('Chart data update error:', err)
     }
-  }, [data, chartType, showSma, showEma])
+  }, [data, chartType, timeframe, showSma, showEma])
 
   useEffect(() => {
     if (!isFullscreen || !fullscreenChartRef.current || data.length === 0) {
@@ -415,7 +423,11 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
 
       fullscreenChartInstance.current = chart
 
-      if (chartType === 'candlestick') {
+      // For live mode (1S), always use area chart since we only have point prices
+      const selectedTimeframe = TIMEFRAMES.find(t => t.id === timeframe)
+      const useCandlestick = chartType === 'candlestick' && !selectedTimeframe?.isLive
+
+      if (useCandlestick) {
         const series = chart.addSeries(CandlestickSeries, {
           upColor: DEFAULT_COLORS.upColor,
           downColor: DEFAULT_COLORS.downColor,
@@ -472,7 +484,7 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
         fullscreenChartInstance.current = null
       }
     }
-  }, [isFullscreen, data, chartType, showSma, showEma])
+  }, [isFullscreen, data, chartType, timeframe, showSma, showEma])
 
   const symbol = coinSymbol?.toUpperCase() || 'BTC'
   const { lastPrice, priceChange } = priceInfo
