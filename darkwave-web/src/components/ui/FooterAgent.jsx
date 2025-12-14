@@ -15,153 +15,123 @@ const greetings = [
 ]
 
 export default function FooterAgent() {
-  const [isGreeting, setIsGreeting] = useState(true)
-  const [isVisible, setIsVisible] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showInitialGreeting, setShowInitialGreeting] = useState(false)
   const [agentImage] = useState(() => agentImages[Math.floor(Math.random() * agentImages.length)])
   const [greeting] = useState(() => greetings[Math.floor(Math.random() * greetings.length)])
-  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     const hasSeenGreeting = sessionStorage.getItem('agent_greeted')
-    if (hasSeenGreeting) {
-      setIsGreeting(false)
-      return
+    if (!hasSeenGreeting) {
+      setShowInitialGreeting(true)
+      const timer = setTimeout(() => {
+        setShowInitialGreeting(false)
+        sessionStorage.setItem('agent_greeted', 'true')
+      }, 5000)
+      return () => clearTimeout(timer)
     }
-
-    const timer = setTimeout(() => {
-      setIsGreeting(false)
-      sessionStorage.setItem('agent_greeted', 'true')
-    }, 5000)
-
-    return () => clearTimeout(timer)
   }, [])
 
-  const handleAgentClick = () => {
-    if (!isGreeting) {
-      setIsGreeting(true)
-      setTimeout(() => setIsGreeting(false), 5000)
-    }
+  const handleClick = () => {
+    setIsExpanded(!isExpanded)
   }
+
+  const showBubble = showInitialGreeting || isExpanded
 
   return (
     <div 
-      className="footer-agent-container"
       style={{
         position: 'fixed',
-        bottom: 0,
+        bottom: 10,
         right: 20,
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        pointerEvents: 'none',
       }}
     >
-      <div 
-        className={`agent-speech-bubble ${isGreeting ? 'visible' : 'hidden'}`}
-        style={{
-          background: 'rgba(20, 20, 20, 0.95)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(0, 212, 255, 0.3)',
-          borderRadius: 16,
-          padding: '14px 18px',
-          marginBottom: 10,
-          maxWidth: 280,
-          boxShadow: '0 0 30px rgba(0, 212, 255, 0.2)',
-          opacity: isGreeting ? 1 : 0,
-          transform: isGreeting ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.9)',
-          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          pointerEvents: 'auto',
-        }}
-      >
-        <div style={{
-          fontSize: 13,
-          color: '#fff',
-          lineHeight: 1.5,
-          fontWeight: 500,
-        }}>
-          {greeting}
+      {showBubble && (
+        <div 
+          style={{
+            background: '#141414',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(0, 212, 255, 0.3)',
+            borderRadius: 16,
+            padding: '14px 18px',
+            marginBottom: 10,
+            maxWidth: 260,
+            boxShadow: '0 0 30px rgba(0, 212, 255, 0.2)',
+            animation: 'fadeInUp 0.3s ease',
+          }}
+        >
+          <div style={{
+            fontSize: 13,
+            color: '#fff',
+            lineHeight: 1.5,
+          }}>
+            {greeting}
+          </div>
         </div>
-        <div style={{
-          position: 'absolute',
-          bottom: -8,
-          right: 40,
-          width: 16,
-          height: 16,
-          background: 'rgba(20, 20, 20, 0.95)',
-          border: '1px solid rgba(0, 212, 255, 0.3)',
-          borderTop: 'none',
-          borderLeft: 'none',
-          transform: 'rotate(45deg)',
-        }} />
-      </div>
+      )}
 
       <div 
-        onClick={handleAgentClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleClick}
         style={{
-          width: isGreeting ? 120 : 70,
-          height: isGreeting ? 140 : 80,
+          width: 50,
+          height: 50,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+          border: '2px solid rgba(0, 212, 255, 0.4)',
           cursor: 'pointer',
-          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          transform: isHovered && !isGreeting ? 'scale(1.1) translateY(-5px)' : 'translateY(0)',
-          pointerEvents: 'auto',
-          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)'
+          e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 212, 255, 0.4)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)'
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)'
         }}
       >
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: isGreeting ? 60 : 40,
-          height: 8,
-          background: 'radial-gradient(ellipse, rgba(0,212,255,0.4) 0%, transparent 70%)',
-          filter: 'blur(4px)',
-          transition: 'all 0.5s ease',
-        }} />
-        
         <img 
           src={agentImage}
           alt="AI Agent"
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain',
-            objectPosition: 'bottom',
-            filter: 'drop-shadow(0 0 15px rgba(0, 212, 255, 0.3))',
-            transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            width: 44,
+            height: 44,
+            objectFit: 'cover',
+            objectPosition: 'top',
+            borderRadius: '50%',
           }}
           onError={(e) => {
             e.target.style.display = 'none'
+            e.target.parentElement.innerHTML = '<span style="font-size: 24px">🤖</span>'
           }}
         />
       </div>
 
       <style>{`
-        @keyframes agent-wave {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(-10deg); }
-          75% { transform: rotate(10deg); }
-        }
-        
-        @keyframes agent-bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
-        
-        .footer-agent-container img {
-          animation: ${isGreeting ? 'agent-bounce 1s ease-in-out infinite' : 'none'};
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         @media (max-width: 640px) {
           .footer-agent-container {
             right: 10px !important;
-          }
-          .agent-speech-bubble {
-            max-width: 220px !important;
-            font-size: 12px !important;
+            bottom: 70px !important;
           }
         }
       `}</style>
