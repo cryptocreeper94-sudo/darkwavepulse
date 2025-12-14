@@ -6,6 +6,7 @@ const allMenuItems = [
   { id: 'markets', icon: '📊', label: 'Markets' },
   { id: 'wallet', icon: '💼', label: 'Wallet', highlight: true },
   { id: 'sniper', icon: '🎯', label: 'StrikeAgent', highlight: true },
+  { id: 'accuracy', icon: '📊', label: 'AI Accuracy', highlight: true },
   { id: 'ml-dashboard', icon: '🧠', label: 'ML Dashboard', highlight: true, adminOnly: true },
   { id: 'pricing', icon: '💳', label: 'Pricing', highlight: true },
   { id: 'projects', icon: '🚀', label: 'Projects' },
