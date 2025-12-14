@@ -54,6 +54,7 @@ import { autoTradeRoutes } from "./routes/autoTradeRoutes";
 import { tradeExecutionRoutes } from "./routes/tradeExecutionRoutes";
 import { quantRoutes } from "./routes/quantRoutes";
 import { cryptoOnrampRoutes } from "./routes/cryptoOnrampRoutes";
+import { swapRoutes } from "./routes/swapRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6065,6 +6066,7 @@ export const mastra = new Mastra({
       
       // Crypto Onramp Routes (Stripe fiat-to-crypto)
       ...cryptoOnrampRoutes,
+      ...swapRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {

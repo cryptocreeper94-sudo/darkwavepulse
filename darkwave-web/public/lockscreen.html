@@ -61,10 +61,12 @@
     }
 
     html, body {
-      height: 100%;
+      height: auto;
+      min-height: 100%;
       overflow-y: auto !important;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      position: relative;
     }
 
     body {
@@ -72,11 +74,21 @@
       background: #0f0f0f;
       color: #FFFFFF;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      display: block;
       padding: 60px 20px 40px 20px;
+      text-align: center;
+    }
+
+    /* Watermark background - ensure it doesn't block scrolling */
+    .watermark-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      background: transparent;
     }
 
     .lockscreen-container {
@@ -86,7 +98,8 @@
       flex-direction: column;
       align-items: center;
       gap: 30px;
-      margin: auto;
+      margin: 0 auto;
+      padding-bottom: 40px;
     }
 
     .crypto-cat-container {
@@ -98,6 +111,7 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 20px;
+      background: transparent !important;
     }
 
     .crypto-cat-img {
@@ -107,6 +121,7 @@
       filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
       animation: catPulse 3s ease-in-out infinite;
       margin: auto;
+      background: transparent !important;
     }
 
     @keyframes catPulse {
@@ -550,7 +565,6 @@
     @media (max-width: 480px) {
       body {
         padding: 40px 20px 30px 20px;
-        justify-content: flex-start;
       }
 
       .lockscreen-container {
@@ -560,6 +574,11 @@
       .crypto-cat-container {
         max-width: 100%;
         margin-bottom: 15px;
+        background: transparent !important;
+      }
+
+      .crypto-cat-img {
+        background: transparent !important;
       }
 
       .lockscreen-title {
