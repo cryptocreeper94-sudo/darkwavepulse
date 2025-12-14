@@ -2311,3 +2311,690 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ============================================ */
+/* QUANT SYSTEM SECTION - GLASSMORPHIC UI      */
+/* ============================================ */
+
+.quant-system-container {
+  background: linear-gradient(180deg, #0f0f0f 0%, #141414 100%);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quant-system-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 480px) {
+  .quant-system-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.quant-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quant-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(90deg, #00D4FF, #9D4EDD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quant-icon {
+  font-size: 24px;
+  -webkit-text-fill-color: initial;
+}
+
+.quant-subtitle {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.quant-header-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.quant-badge-dot {
+  width: 8px;
+  height: 8px;
+  background: #00D4FF;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px #00D4FF;
+}
+
+.quant-badge-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00D4FF;
+  letter-spacing: 1px;
+}
+
+/* Glassmorphic Card Base */
+.quant-glass-card {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.quant-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+.quant-glass-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Cards Grid Layout */
+.quant-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .quant-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .quant-metrics-card {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .quant-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .quant-metrics-card {
+    grid-column: span 1;
+  }
+}
+
+/* Card Header */
+.quant-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.quant-card-icon {
+  font-size: 18px;
+}
+
+.quant-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  flex: 1;
+}
+
+.quant-live-indicator {
+  font-size: 10px;
+  font-weight: 600;
+  color: #39FF14;
+  animation: pulse 1.5s infinite;
+}
+
+/* Learning Metrics Card */
+.quant-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 480px) {
+  .quant-metrics-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.quant-metric-item {
+  text-align: center;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quant-metric-value {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.quant-metric-value.cyan { color: #00D4FF; text-shadow: 0 0 10px rgba(0, 212, 255, 0.4); }
+.quant-metric-value.purple { color: #9D4EDD; text-shadow: 0 0 10px rgba(157, 78, 221, 0.4); }
+.quant-metric-value.green { color: #39FF14; text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
+
+.quant-metric-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quant-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.quant-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00D4FF, #9D4EDD);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.quant-progress-label {
+  font-size: 10px;
+  color: #555;
+  text-align: center;
+}
+
+/* Live Trade Feed Card */
+.quant-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.quant-feed-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.quant-feed-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 2px;
+}
+
+.quant-feed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.quant-feed-item.buy {
+  border-left-color: #39FF14;
+}
+
+.quant-feed-item.sell {
+  border-left-color: #FF4444;
+}
+
+.quant-feed-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.quant-feed-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quant-feed-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.quant-feed-type.buy { color: #39FF14; }
+.quant-feed-type.sell { color: #FF4444; }
+
+.quant-feed-token {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.quant-feed-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.quant-feed-price {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  font-family: monospace;
+}
+
+.quant-feed-pnl {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.quant-feed-pnl.green {
+  color: #39FF14;
+  background: rgba(57, 255, 20, 0.1);
+}
+
+.quant-feed-pnl.red {
+  color: #FF4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.quant-feed-time {
+  font-size: 10px;
+  color: #555;
+}
+
+/* Accuracy Stats Card */
+.quant-accuracy-main {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.quant-winrate-circle {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.quant-winrate-circle svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.quant-circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 8;
+}
+
+.quant-circle-progress {
+  fill: none;
+  stroke: url(#quantGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke: #39FF14;
+  filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.5));
+}
+
+.quant-winrate-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  font-size: 22px;
+  font-weight: 800;
+  color: #39FF14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+}
+
+.quant-winrate-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 40%);
+  font-size: 9px;
+  color: #666;
+  letter-spacing: 1px;
+}
+
+.quant-accuracy-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quant-accuracy-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.quant-accuracy-label {
+  font-size: 11px;
+  color: #888;
+}
+
+.quant-accuracy-value {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.quant-accuracy-value.cyan { color: #00D4FF; }
+.quant-accuracy-value.green { color: #39FF14; }
+.quant-accuracy-value.red { color: #FF4444; }
+
+/* Private Controls Section */
+.quant-private-section {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.quant-private-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.quant-private-icon {
+  font-size: 18px;
+}
+
+.quant-private-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  flex: 1;
+}
+
+.quant-unlocked-badge {
+  padding: 4px 10px;
+  background: rgba(57, 255, 20, 0.15);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #39FF14;
+  letter-spacing: 0.5px;
+}
+
+/* PIN Gate */
+.quant-pin-gate {
+  text-align: center;
+  padding: 20px;
+}
+
+.quant-pin-text {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 16px 0;
+}
+
+.quant-pin-input-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quant-pin-input {
+  width: 100px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 4px;
+}
+
+.quant-pin-input:focus {
+  outline: none;
+  border-color: #00D4FF;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.quant-pin-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #00D4FF, #9D4EDD);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quant-pin-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+/* Unlocked Controls Grid */
+.quant-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .quant-controls-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .quant-settings-card {
+    grid-column: span 2;
+  }
+}
+
+.quant-control-card {
+  padding: 16px;
+}
+
+.quant-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.quant-toggle-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.quant-toggle-btn.active {
+  background: linear-gradient(135deg, #39FF14, #00D4FF);
+  color: #000;
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+}
+
+.quant-control-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quant-control-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: #666;
+}
+
+.quant-control-input,
+.quant-control-select {
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.quant-control-input:focus,
+.quant-control-select:focus {
+  outline: none;
+  border-color: #00D4FF;
+}
+
+.quant-control-select option {
+  background: #1a1a1a;
+}
+
+/* Trade Buttons */
+.quant-trade-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quant-trade-btn {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quant-trade-btn.buy {
+  background: rgba(57, 255, 20, 0.15);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  color: #39FF14;
+}
+
+.quant-trade-btn.buy:hover {
+  background: rgba(57, 255, 20, 0.25);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.quant-trade-btn.sell {
+  background: rgba(255, 68, 68, 0.15);
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  color: #FF4444;
+}
+
+.quant-trade-btn.sell:hover {
+  background: rgba(255, 68, 68, 0.25);
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+}
+
+.quant-trade-btn.stop {
+  background: rgba(255, 165, 0, 0.15);
+  border: 1px solid rgba(255, 165, 0, 0.4);
+  color: #FFA500;
+}
+
+.quant-trade-btn.stop:hover {
+  background: rgba(255, 165, 0, 0.25);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+}
+
+/* Settings Grid */
+.quant-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .quant-settings-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.quant-setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: #666;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 320px) {
+  .quant-system-container {
+    padding: 12px;
+  }
+  
+  .quant-title {
+    font-size: 18px;
+  }
+  
+  .quant-metric-value {
+    font-size: 16px;
+  }
+  
+  .quant-glass-card {
+    padding: 14px;
+  }
+  
+  .quant-feed-left,
+  .quant-feed-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

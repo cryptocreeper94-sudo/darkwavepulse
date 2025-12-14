@@ -465,6 +465,321 @@ function BuiltInWalletUnlock({ onUnlock, loading }) {
   )
 }
 
+function QuantSystemSection() {
+  const [quantMetrics, setQuantMetrics] = useState({
+    totalScans: 12847,
+    tokensAnalyzed: 89234,
+    signalsGenerated: 3421,
+    modelAccuracy: 73.2
+  })
+  
+  const [tradeFeed, setTradeFeed] = useState([
+    { id: 1, type: 'buy', token: 'BONK', price: 0.00002341, pnl: null, timestamp: new Date(Date.now() - 120000) },
+    { id: 2, type: 'sell', token: 'WIF', price: 2.34, pnl: 12.5, timestamp: new Date(Date.now() - 300000) },
+    { id: 3, type: 'sell', token: 'POPCAT', price: 1.87, pnl: -5.2, timestamp: new Date(Date.now() - 600000) },
+    { id: 4, type: 'buy', token: 'MEW', price: 0.0089, pnl: null, timestamp: new Date(Date.now() - 900000) },
+    { id: 5, type: 'sell', token: 'MYRO', price: 0.156, pnl: 28.3, timestamp: new Date(Date.now() - 1200000) },
+  ])
+  
+  const [accuracyStats, setAccuracyStats] = useState({
+    winRate: 67.8,
+    totalPredictions: 1247,
+    bestTrade: { token: 'BONK', pnl: 156.2 },
+    worstTrade: { token: 'SLERF', pnl: -42.5 }
+  })
+  
+  const [pinUnlocked, setPinUnlocked] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const [scannerActive, setScannerActive] = useState(false)
+  const [scanInterval, setScanInterval] = useState(5)
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  useEffect(() => {
+    const fetchQuantData = async () => {
+      try {
+        const [metricsRes, feedRes] = await Promise.all([
+          fetch('/api/quant/metrics').catch(() => null),
+          fetch('/api/quant/trade-feed').catch(() => null)
+        ])
+        if (metricsRes?.ok) {
+          const data = await metricsRes.json()
+          if (data.totalScans !== undefined) {
+            setQuantMetrics({
+              totalScans: data.totalScans || 0,
+              tokensAnalyzed: data.totalTokensAnalyzed || 0,
+              signalsGenerated: data.signalsGenerated || 0,
+              modelAccuracy: parseFloat(data.modelAccuracy) || 0
+            })
+          }
+          if (data.winRate !== undefined) {
+            setAccuracyStats(prev => ({
+              ...prev,
+              winRate: parseFloat(data.winRate) || prev.winRate,
+              totalPredictions: data.tradesExecuted || prev.totalPredictions
+            }))
+          }
+        }
+        if (feedRes?.ok) {
+          const data = await feedRes.json()
+          if (data.trades && data.trades.length > 0) {
+            setTradeFeed(data.trades.map(t => ({
+              id: t.id,
+              type: t.type?.toLowerCase() || 'buy',
+              token: t.tokenSymbol || t.token || '???',
+              price: parseFloat(t.priceUsd) || parseFloat(t.price) || 0,
+              pnl: t.pnlPercent !== null ? parseFloat(t.pnlPercent) : null,
+              timestamp: t.executedAt || t.timestamp || new Date()
+            })))
+          }
+        }
+      } catch (err) {
+        console.log('Using mock quant data')
+      }
+    }
+    fetchQuantData()
+  }, [])
+
+  const handlePinSubmit = () => {
+    if (pinInput === '0424') {
+      setPinUnlocked(true)
+      setPinInput('')
+    } else {
+      alert('Invalid PIN')
+      setPinInput('')
+    }
+  }
+
+  const formatTime = (date) => {
+    const now = new Date()
+    const diff = Math.floor((now - new Date(date)) / 1000)
+    if (diff < 60) return `${diff}s ago`
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+    return `${Math.floor(diff / 3600)}h ago`
+  }
+
+  return (
+    <div className="quant-system-container">
+      <div className="quant-system-header">
+        <div className="quant-header-left">
+          <h2 className="quant-title">
+            <span className="quant-icon">🧠</span>
+            QUANT SYSTEM
+          </h2>
+          <p className="quant-subtitle">AI-Powered Market Intelligence</p>
+        </div>
+        <div className="quant-header-badge">
+          <span className="quant-badge-dot"></span>
+          <span className="quant-badge-text">LEARNING</span>
+        </div>
+      </div>
+
+      <div className="quant-cards-grid">
+        <div className="quant-glass-card quant-metrics-card">
+          <div className="quant-card-header">
+            <span className="quant-card-icon">📊</span>
+            <h3 className="quant-card-title">Learning Metrics</h3>
+          </div>
+          <div className="quant-metrics-grid">
+            <div className="quant-metric-item">
+              <div className="quant-metric-value cyan">{quantMetrics.totalScans.toLocaleString()}</div>
+              <div className="quant-metric-label">Total Scans</div>
+            </div>
+            <div className="quant-metric-item">
+              <div className="quant-metric-value purple">{quantMetrics.tokensAnalyzed.toLocaleString()}</div>
+              <div className="quant-metric-label">Tokens Analyzed</div>
+            </div>
+            <div className="quant-metric-item">
+              <div className="quant-metric-value cyan">{quantMetrics.signalsGenerated.toLocaleString()}</div>
+              <div className="quant-metric-label">Signals Generated</div>
+            </div>
+            <div className="quant-metric-item">
+              <div className="quant-metric-value green">{quantMetrics.modelAccuracy}%</div>
+              <div className="quant-metric-label">Model Accuracy</div>
+            </div>
+          </div>
+          <div className="quant-progress-bar">
+            <div className="quant-progress-fill" style={{ width: `${quantMetrics.modelAccuracy}%` }}></div>
+          </div>
+          <div className="quant-progress-label">System Learning Progress</div>
+        </div>
+
+        <div className="quant-glass-card quant-feed-card">
+          <div className="quant-card-header">
+            <span className="quant-card-icon">⚡</span>
+            <h3 className="quant-card-title">Live Trade Feed</h3>
+            <span className="quant-live-indicator">● LIVE</span>
+          </div>
+          <div className="quant-feed-list">
+            {tradeFeed.map(trade => (
+              <div key={trade.id} className={`quant-feed-item ${trade.type}`}>
+                <div className="quant-feed-left">
+                  <span className={`quant-feed-type ${trade.type}`}>
+                    {trade.type === 'buy' ? '🟢' : '🔴'} {trade.type.toUpperCase()}
+                  </span>
+                  <span className="quant-feed-token">{trade.token}</span>
+                </div>
+                <div className="quant-feed-right">
+                  <span className="quant-feed-price">
+                    ${trade.price < 0.01 ? trade.price.toExponential(2) : trade.price.toFixed(4)}
+                  </span>
+                  {trade.pnl !== null && (
+                    <span className={`quant-feed-pnl ${trade.pnl >= 0 ? 'green' : 'red'}`}>
+                      {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(1)}%
+                    </span>
+                  )}
+                  <span className="quant-feed-time">{formatTime(trade.timestamp)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="quant-glass-card quant-accuracy-card">
+          <div className="quant-card-header">
+            <span className="quant-card-icon">🎯</span>
+            <h3 className="quant-card-title">Accuracy Stats</h3>
+          </div>
+          <div className="quant-accuracy-main">
+            <div className="quant-winrate-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" className="quant-circle-bg" />
+                <circle 
+                  cx="50" cy="50" r="45" 
+                  className="quant-circle-progress"
+                  strokeDasharray={`${accuracyStats.winRate * 2.83} 283`}
+                />
+              </svg>
+              <div className="quant-winrate-value">{accuracyStats.winRate}%</div>
+              <div className="quant-winrate-label">WIN RATE</div>
+            </div>
+          </div>
+          <div className="quant-accuracy-stats">
+            <div className="quant-accuracy-stat">
+              <span className="quant-accuracy-label">Total Predictions</span>
+              <span className="quant-accuracy-value cyan">{accuracyStats.totalPredictions.toLocaleString()}</span>
+            </div>
+            <div className="quant-accuracy-stat best">
+              <span className="quant-accuracy-label">Best Trade</span>
+              <span className="quant-accuracy-value green">
+                {accuracyStats.bestTrade.token} +{accuracyStats.bestTrade.pnl}%
+              </span>
+            </div>
+            <div className="quant-accuracy-stat worst">
+              <span className="quant-accuracy-label">Worst Trade</span>
+              <span className="quant-accuracy-value red">
+                {accuracyStats.worstTrade.token} {accuracyStats.worstTrade.pnl}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="quant-private-section">
+        <div className="quant-private-header">
+          <span className="quant-private-icon">🔒</span>
+          <h3 className="quant-private-title">Quant Controls</h3>
+          {pinUnlocked && <span className="quant-unlocked-badge">UNLOCKED</span>}
+        </div>
+        
+        {!pinUnlocked ? (
+          <div className="quant-pin-gate">
+            <p className="quant-pin-text">Enter PIN to access trading controls</p>
+            <div className="quant-pin-input-row">
+              <input
+                type="password"
+                value={pinInput}
+                onChange={(e) => setPinInput(e.target.value)}
+                placeholder="••••"
+                maxLength={4}
+                className="quant-pin-input"
+                onKeyDown={(e) => e.key === 'Enter' && handlePinSubmit()}
+              />
+              <button className="quant-pin-btn" onClick={handlePinSubmit}>
+                Unlock
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="quant-controls-grid">
+            <div className="quant-glass-card quant-control-card">
+              <div className="quant-control-header">
+                <span>Auto-Scanner</span>
+                <button 
+                  className={`quant-toggle-btn ${scannerActive ? 'active' : ''}`}
+                  onClick={() => setScannerActive(!scannerActive)}
+                >
+                  {scannerActive ? 'ON' : 'OFF'}
+                </button>
+              </div>
+              <div className="quant-control-options">
+                <label className="quant-control-label">
+                  <span>Interval (min)</span>
+                  <input 
+                    type="number" 
+                    value={scanInterval}
+                    onChange={(e) => setScanInterval(Number(e.target.value))}
+                    className="quant-control-input"
+                    min={1}
+                    max={60}
+                  />
+                </label>
+                <label className="quant-control-label">
+                  <span>Category</span>
+                  <select 
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="quant-control-select"
+                  >
+                    <option value="all">All</option>
+                    <option value="meme">Meme</option>
+                    <option value="defi">DeFi</option>
+                    <option value="gaming">Gaming</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div className="quant-glass-card quant-control-card">
+              <div className="quant-control-header">
+                <span>Trade Actions</span>
+              </div>
+              <div className="quant-trade-buttons">
+                <button className="quant-trade-btn buy">🟢 BUY NOW</button>
+                <button className="quant-trade-btn sell">🔴 SELL NOW</button>
+                <button className="quant-trade-btn stop">⛔ STOP ALL</button>
+              </div>
+            </div>
+
+            <div className="quant-glass-card quant-control-card quant-settings-card">
+              <div className="quant-control-header">
+                <span>Settings</span>
+              </div>
+              <div className="quant-settings-grid">
+                <label className="quant-setting-item">
+                  <span>Min Score</span>
+                  <input type="number" defaultValue={60} className="quant-control-input" />
+                </label>
+                <label className="quant-setting-item">
+                  <span>Max Risk</span>
+                  <input type="number" defaultValue={30} className="quant-control-input" />
+                </label>
+                <label className="quant-setting-item">
+                  <span>Stop Loss %</span>
+                  <input type="number" defaultValue={15} className="quant-control-input" />
+                </label>
+                <label className="quant-setting-item">
+                  <span>Take Profit %</span>
+                  <input type="number" defaultValue={50} className="quant-control-input" />
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function QuickSettingsPanel({ config, updateConfig, expanded, onToggle }) {
   return (
     <div className="section-box sniper-settings-panel">
@@ -1430,6 +1745,10 @@ export default function SniperBotTab() {
             </BentoItem>
           </>
         )}
+
+        <BentoItem span={2} className="quant-system-section">
+          <QuantSystemSection />
+        </BentoItem>
       </BentoGrid>
     </div>
   )
