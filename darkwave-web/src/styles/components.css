@@ -251,9 +251,11 @@ body {
 }
 
 .menu-footer {
-  padding: 16px;
+  padding: 12px 16px;
   border-top: 1px solid var(--border-color);
   text-align: center;
+  max-height: 50px;
+  box-sizing: border-box;
 }
 
 .menu-footer-text {
