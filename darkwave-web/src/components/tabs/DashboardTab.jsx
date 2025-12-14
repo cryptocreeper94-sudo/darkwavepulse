@@ -787,9 +787,9 @@ function TrendingModal({ coins, onClose, onSelectCoin, favorites }) {
           background: '#141414',
           borderRadius: 16,
           border: '1px solid #333',
-          maxWidth: 500,
+          maxWidth: 'min(500px, 90vw)',
           width: '100%',
-          maxHeight: '80vh',
+          maxHeight: '85vh',
           overflow: 'hidden',
           boxShadow: '0 0 40px rgba(0, 212, 255, 0.2)',
         }}
