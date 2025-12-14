@@ -344,9 +344,24 @@ function getSafetyGradeColor(grade) {
   }
 }
 
+const CHAIN_CONFIG = {
+  solana: { icon: '◎', name: 'SOL', color: '#9945FF' },
+  ethereum: { icon: '⬡', name: 'ETH', color: '#627EEA' },
+  base: { icon: '⬡', name: 'BASE', color: '#0052FF' },
+  polygon: { icon: '⬡', name: 'MATIC', color: '#8247E5' },
+  arbitrum: { icon: '⬡', name: 'ARB', color: '#28A0F0' },
+  bsc: { icon: '⬡', name: 'BSC', color: '#F3BA2F' },
+}
+
+function getChainInfo(chain) {
+  const normalizedChain = (chain || 'solana').toLowerCase()
+  return CHAIN_CONFIG[normalizedChain] || CHAIN_CONFIG.solana
+}
+
 function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, disabled, isDemoMode, onTermClick }) {
   const gradeColor = getSafetyGradeColor(token.safetyGrade)
   const dexColor = token.dex === 'pumpfun' ? '#FF69B4' : token.dex === 'raydium' ? '#9D4EDD' : '#00D4FF'
+  const chainInfo = getChainInfo(token.chain)
 
   return (
     <div className="section-box sniper-token-card">
@@ -357,7 +372,18 @@ function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, disabled,
             <span className="sniper-grade-score">{token.safetyScore || 0}</span>
           </div>
           <div className="sniper-token-details">
-            <div className="sniper-token-name">{token.symbol}</div>
+            <div className="sniper-token-name-row">
+              <span className="sniper-token-name">{token.symbol}</span>
+              <span 
+                className="sniper-chain-badge"
+                style={{
+                  '--chain-color': chainInfo.color
+                }}
+              >
+                <span className="sniper-chain-icon">{chainInfo.icon}</span>
+                <span className="sniper-chain-name">{chainInfo.name}</span>
+              </span>
+            </div>
             <div className="sniper-token-fullname">{token.name?.slice(0, 20)}</div>
             <div className="sniper-token-dex" style={{ color: dexColor }}>{token.dex}</div>
           </div>

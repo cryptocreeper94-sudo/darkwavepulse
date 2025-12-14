@@ -3,6 +3,7 @@ import InfoTooltip from '../ui/InfoTooltip'
 import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
 import DustBuster from './DustBuster'
 import FlipCarousel from '../ui/FlipCarousel'
+import clientWalletService from '../../services/clientWalletService'
 
 const WALLET_TIPS = [
   "Your portfolio is looking great!",
@@ -82,6 +83,12 @@ export default function WalletManager({ userId }) {
   const [showSendPanel, setShowSendPanel] = useState(false)
   const [activeChain, setActiveChain] = useState(null)
   const [showDustBuster, setShowDustBuster] = useState(false)
+  
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false)
+  const [recoveryPassword, setRecoveryPassword] = useState('')
+  const [recoveryMnemonic, setRecoveryMnemonic] = useState('')
+  const [showRecoveryWords, setShowRecoveryWords] = useState(false)
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
   
   useEffect(() => {
     if (builtInWallet.hasWallet) {
@@ -228,6 +235,34 @@ export default function WalletManager({ userId }) {
         setView('landing')
       }
     }
+  }
+  
+  const handleViewRecoveryPhrase = async () => {
+    clearMessages()
+    if (!recoveryPassword) {
+      setError('Please enter your password')
+      return
+    }
+    
+    setRecoveryLoading(true)
+    try {
+      const result = await clientWalletService.unlock(recoveryPassword, builtInWallet.activeWalletId)
+      setRecoveryMnemonic(result.mnemonic)
+      setShowRecoveryWords(false)
+      setError('')
+    } catch (err) {
+      setError('Invalid password. Please try again.')
+    } finally {
+      setRecoveryLoading(false)
+    }
+  }
+  
+  const closeRecoveryModal = () => {
+    setShowRecoveryModal(false)
+    setRecoveryPassword('')
+    setRecoveryMnemonic('')
+    setShowRecoveryWords(false)
+    setError('')
   }
   
   const copyAddress = (address) => {
@@ -818,6 +853,15 @@ export default function WalletManager({ userId }) {
               <span className="quick-action-label">Dust Buster</span>
             </button>
           )}
+          <button className="quick-action-card backup" onClick={() => setShowRecoveryModal(true)}>
+            <div className="quick-action-icon backup">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 15V3M12 3l-4 4M12 3l4 4"/>
+                <path d="M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/>
+              </svg>
+            </div>
+            <span className="quick-action-label">Backup Wallet</span>
+          </button>
         </div>
       </div>
 
@@ -902,6 +946,96 @@ export default function WalletManager({ userId }) {
             >
               {builtInWallet.loading ? 'Sending...' : 'Send Transaction'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showRecoveryModal && (
+        <div className="recovery-overlay" onClick={closeRecoveryModal}>
+          <div className="recovery-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="recovery-header">
+              <h3>View Recovery Phrase</h3>
+              <button className="close-btn" onClick={closeRecoveryModal}>×</button>
+            </div>
+            
+            {!recoveryMnemonic ? (
+              <>
+                <div className="recovery-warning">
+                  <div className="warning-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" strokeWidth="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <div className="warning-content">
+                    <strong>Sensitive Information</strong>
+                    <p>Your recovery phrase grants full access to your wallet. Never share it with anyone or enter it on untrusted websites.</p>
+                  </div>
+                </div>
+                
+                <div className="form-field">
+                  <label>Enter your password to continue</label>
+                  <input
+                    type="password"
+                    value={recoveryPassword}
+                    onChange={(e) => setRecoveryPassword(e.target.value)}
+                    placeholder="Enter wallet password"
+                    onKeyDown={(e) => e.key === 'Enter' && handleViewRecoveryPhrase()}
+                    autoFocus
+                  />
+                </div>
+                
+                {error && <div className="form-error">{error}</div>}
+                
+                <button 
+                  className="wallet-cta primary full-width" 
+                  onClick={handleViewRecoveryPhrase}
+                  disabled={recoveryLoading || !recoveryPassword}
+                >
+                  {recoveryLoading ? 'Verifying...' : 'View Recovery Phrase'}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="recovery-warning active">
+                  <div className="warning-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" strokeWidth="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <div className="warning-content">
+                    <strong>Keep This Secret!</strong>
+                    <p>Write these words down on paper. Store them in a safe place. Never take a screenshot or save digitally.</p>
+                  </div>
+                </div>
+                
+                <div className="mnemonic-grid recovery">
+                  {recoveryMnemonic.split(' ').map((word, i) => (
+                    <div key={i} className="mnemonic-word">
+                      <span className="word-num">{i + 1}</span>
+                      <span className="word-text">{showRecoveryWords ? word : '•••••'}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <button 
+                  className="wallet-cta secondary full-width" 
+                  onClick={() => setShowRecoveryWords(!showRecoveryWords)}
+                >
+                  {showRecoveryWords ? '🙈 Hide Words' : '👁️ Reveal Words'}
+                </button>
+                
+                <button 
+                  className="wallet-cta primary full-width" 
+                  onClick={closeRecoveryModal}
+                >
+                  Done
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -1559,6 +1693,94 @@ export default function WalletManager({ userId }) {
           display: flex;
           align-items: center;
           gap: 6px;
+        }
+
+        /* Recovery Phrase Modal */
+        .recovery-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 20px;
+        }
+
+        .recovery-panel {
+          background: #1a1a1a;
+          border: 1px solid #333;
+          border-radius: 20px;
+          padding: 24px;
+          width: 100%;
+          max-width: 420px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .recovery-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .recovery-header h3 {
+          font-size: 20px;
+          color: #fff;
+          margin: 0;
+        }
+
+        .recovery-warning {
+          display: flex;
+          gap: 14px;
+          padding: 16px;
+          background: rgba(255, 107, 107, 0.1);
+          border: 1px solid rgba(255, 107, 107, 0.3);
+          border-radius: 12px;
+        }
+
+        .recovery-warning.active {
+          background: rgba(255, 107, 107, 0.15);
+          border-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .recovery-warning .warning-icon {
+          flex-shrink: 0;
+          width: 24px;
+          height: 24px;
+        }
+
+        .recovery-warning .warning-content {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .recovery-warning .warning-content strong {
+          color: #FF6B6B;
+          font-size: 14px;
+        }
+
+        .recovery-warning .warning-content p {
+          color: #ccc;
+          font-size: 13px;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .mnemonic-grid.recovery {
+          margin-top: 8px;
+        }
+
+        .quick-action-card.backup .quick-action-icon {
+          background: linear-gradient(135deg, #FF6B6B, #FF4757);
+        }
+
+        .quick-action-icon.backup {
+          background: linear-gradient(135deg, #FF6B6B, #FF4757);
         }
 
         /* Wallet Selector */
