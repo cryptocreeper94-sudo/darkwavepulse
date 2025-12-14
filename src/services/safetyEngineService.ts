@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const HELIUS_RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+const RUGCHECK_API = 'https://api.rugcheck.xyz/v1';
 
 export interface TokenSafetyReport {
   tokenAddress: string;
@@ -480,7 +481,75 @@ class SafetyEngineService {
   }
 
   // ============================================
-  // HONEYPOT SIMULATION
+  // RUGCHECK API INTEGRATION
+  // ============================================
+
+  async getRugCheckReport(tokenAddress: string): Promise<{
+    success: boolean;
+    score: number;
+    risks: Array<{ level: string; name: string; description: string }>;
+    isHoneypot: boolean;
+    mintAuthorityActive: boolean;
+    freezeAuthorityActive: boolean;
+    top10HoldersPercent: number;
+    liquidityLocked: boolean;
+  } | null> {
+    try {
+      console.log(`[SafetyEngine] Fetching RugCheck report for ${tokenAddress}`);
+      
+      const response = await axios.get(
+        `${RUGCHECK_API}/tokens/${tokenAddress}/report/summary`,
+        { timeout: 15000 }
+      );
+
+      const data = response.data;
+      if (!data) return null;
+
+      // Parse risks from RugCheck response
+      const risks = data.risks || [];
+      
+      // Check for specific honeypot indicators in risks
+      const honeypotRisks = risks.filter((r: any) => 
+        r.name?.toLowerCase().includes('honeypot') ||
+        r.name?.toLowerCase().includes('cannot sell') ||
+        r.name?.toLowerCase().includes('transfer blocked') ||
+        r.description?.toLowerCase().includes('cannot sell') ||
+        r.description?.toLowerCase().includes('honeypot')
+      );
+
+      // Check for mint/freeze authority
+      const mintRisk = risks.find((r: any) => 
+        r.name?.toLowerCase().includes('mint') && 
+        r.level !== 'none'
+      );
+      const freezeRisk = risks.find((r: any) => 
+        r.name?.toLowerCase().includes('freeze') && 
+        r.level !== 'none'
+      );
+
+      // RugCheck score: lower = safer, higher = riskier
+      const score = data.score || 0;
+
+      console.log(`[SafetyEngine] RugCheck score: ${score}, risks: ${risks.length}`);
+
+      return {
+        success: true,
+        score,
+        risks,
+        isHoneypot: honeypotRisks.length > 0,
+        mintAuthorityActive: !!mintRisk,
+        freezeAuthorityActive: !!freezeRisk,
+        top10HoldersPercent: data.topHolders?.percentage || 0,
+        liquidityLocked: data.liquidity?.locked || false,
+      };
+    } catch (error: any) {
+      console.log(`[SafetyEngine] RugCheck API unavailable: ${error.message}`);
+      return null;
+    }
+  }
+
+  // ============================================
+  // HONEYPOT SIMULATION (Multi-Source)
   // ============================================
 
   async simulateHoneypot(tokenAddress: string): Promise<{
@@ -489,72 +558,104 @@ class SafetyEngineService {
     buyTax: number;
     isHoneypot: boolean;
     simulationError?: string;
+    source: string;
   }> {
+    console.log(`[SafetyEngine] Running multi-source honeypot check for ${tokenAddress}`);
+
+    // Source 1: Try RugCheck API first (most reliable)
+    const rugCheckResult = await this.getRugCheckReport(tokenAddress);
+    
+    if (rugCheckResult?.success) {
+      // RugCheck explicitly detected honeypot
+      if (rugCheckResult.isHoneypot) {
+        console.log(`[SafetyEngine] RugCheck confirmed honeypot`);
+        return {
+          canSell: false,
+          sellTax: 100,
+          buyTax: 0,
+          isHoneypot: true,
+          source: 'rugcheck',
+        };
+      }
+      
+      // RugCheck says it's safe - trust it
+      // Score under 50 is generally safe (lower = safer in RugCheck)
+      if (rugCheckResult.score < 50) {
+        console.log(`[SafetyEngine] RugCheck score ${rugCheckResult.score} - likely safe`);
+        return {
+          canSell: true,
+          sellTax: 0,
+          buyTax: 0,
+          isHoneypot: false,
+          source: 'rugcheck',
+        };
+      }
+    }
+
+    // Source 2: Jupiter quote simulation as secondary check
     try {
-      // Use Jupiter quote API to simulate a sell
       const inputMint = tokenAddress;
       const outputMint = 'So11111111111111111111111111111111111111112'; // SOL
-      const amount = '1000000'; // 1 token (assuming 6 decimals)
+      
+      // Try multiple amounts to avoid false negatives from low liquidity
+      const amounts = ['1000000000', '100000000', '10000000']; // 1B, 100M, 10M
+      
+      for (const amount of amounts) {
+        try {
+          const quoteResponse = await axios.get(
+            `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=2000`,
+            { timeout: 8000 }
+          );
 
-      const quoteResponse = await axios.get(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=1000`,
-        { timeout: 10000 }
-      );
-
-      if (quoteResponse.data?.error) {
-        // Can't get quote = likely honeypot
-        return {
-          canSell: false,
-          sellTax: 100,
-          buyTax: 0,
-          isHoneypot: true,
-          simulationError: quoteResponse.data.error,
-        };
+          if (quoteResponse.data && quoteResponse.data.outAmount) {
+            // Successfully got a quote - can sell
+            const priceImpact = Math.abs(parseFloat(quoteResponse.data.priceImpactPct || '0'));
+            const sellTax = Math.min(priceImpact, 100);
+            
+            // Only mark as honeypot if sell tax is extremely high (>80%)
+            const isHoneypot = sellTax > 80;
+            
+            console.log(`[SafetyEngine] Jupiter quote success - sell tax: ${sellTax}%`);
+            return {
+              canSell: true,
+              sellTax,
+              buyTax: 0,
+              isHoneypot,
+              source: 'jupiter',
+            };
+          }
+        } catch (err) {
+          // Try next amount
+          continue;
+        }
       }
-
-      const routeInfo = quoteResponse.data;
-      if (!routeInfo || !routeInfo.outAmount) {
-        return {
-          canSell: false,
-          sellTax: 100,
-          buyTax: 0,
-          isHoneypot: true,
-          simulationError: 'No route found for selling',
-        };
-      }
-
-      // Calculate effective tax from price impact
-      const priceImpact = Math.abs(parseFloat(routeInfo.priceImpactPct || '0'));
-      const sellTax = Math.min(priceImpact, 100);
-
-      // Also check buy direction for buy tax
-      const buyQuote = await axios.get(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${outputMint}&outputMint=${inputMint}&amount=1000000000&slippageBps=1000`,
-        { timeout: 10000 }
-      ).catch(() => null);
-
-      const buyPriceImpact = buyQuote?.data?.priceImpactPct 
-        ? Math.abs(parseFloat(buyQuote.data.priceImpactPct)) 
-        : 0;
-
-      const isHoneypot = sellTax > 50 || !routeInfo.outAmount;
-
-      return {
-        canSell: true,
-        sellTax,
-        buyTax: buyPriceImpact,
-        isHoneypot,
-      };
-    } catch (error: any) {
-      console.error('[SafetyEngine] Honeypot simulation error:', error.message);
+      
+      // No Jupiter route found - but this doesn't mean honeypot!
+      // Could be low liquidity, new token, or niche DEX
+      console.log(`[SafetyEngine] No Jupiter route - returning unknown (not marking as honeypot)`);
       return {
         canSell: false,
         sellTax: 0,
         buyTax: 0,
-        isHoneypot: false,
-        simulationError: error.message || 'Simulation failed',
+        isHoneypot: false, // Don't assume honeypot just because no route
+        simulationError: 'No trading route found - may have low liquidity',
+        source: 'jupiter',
       };
+      
+    } catch (error: any) {
+      console.error('[SafetyEngine] Jupiter simulation error:', error.message);
     }
+
+    // Fallback: Unknown - don't mark as honeypot without evidence
+    console.log(`[SafetyEngine] All checks inconclusive - not marking as honeypot`);
+    return {
+      canSell: false,
+      sellTax: 0,
+      buyTax: 0,
+      isHoneypot: false,
+      simulationError: 'Could not verify - proceed with caution',
+      source: 'unknown',
+    };
   }
 
   // ============================================

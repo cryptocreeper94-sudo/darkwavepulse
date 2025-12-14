@@ -1,5 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import axios from 'axios';
+import { safetyEngineService } from './safetyEngineService';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const HELIUS_RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
@@ -209,70 +210,17 @@ class TokenAuthorityService {
     error?: string;
   }> {
     try {
-      const jupiterQuoteUrl = 'https://quote-api.jup.ag/v6/quote';
-      const SOL_MINT = 'So11111111111111111111111111111111111111112';
-      const amountLamports = Math.floor(amountSol * 1e9);
-
-      const buyQuote = await axios.get(jupiterQuoteUrl, {
-        params: {
-          inputMint: SOL_MINT,
-          outputMint: tokenAddress,
-          amount: amountLamports,
-          slippageBps: 5000
-        },
-        timeout: 10000
-      });
-
-      const canBuy = buyQuote.data?.outAmount > 0;
-      const buyTax = buyQuote.data?.priceImpactPct ? parseFloat(buyQuote.data.priceImpactPct) : 0;
-
-      if (!canBuy) {
-        return {
-          canBuy: false,
-          canSell: false,
-          buyTax: 100,
-          sellTax: 100,
-          isHoneypot: true,
-          error: 'Cannot buy token'
-        };
-      }
-
-      const tokensReceived = buyQuote.data.outAmount;
-
-      const sellQuote = await axios.get(jupiterQuoteUrl, {
-        params: {
-          inputMint: tokenAddress,
-          outputMint: SOL_MINT,
-          amount: tokensReceived,
-          slippageBps: 5000
-        },
-        timeout: 10000
-      });
-
-      const canSell = sellQuote.data?.outAmount > 0;
-      const sellTax = sellQuote.data?.priceImpactPct ? parseFloat(sellQuote.data.priceImpactPct) : 0;
-
-      if (!canSell) {
-        return {
-          canBuy: true,
-          canSell: false,
-          buyTax,
-          sellTax: 100,
-          isHoneypot: true,
-          error: 'Cannot sell token - HONEYPOT DETECTED'
-        };
-      }
-
-      const roundTripLoss = ((amountLamports - parseFloat(sellQuote.data.outAmount)) / amountLamports) * 100;
-      const isHoneypot = roundTripLoss > 50 || sellTax > 30;
-
+      console.log(`[TokenAuthority] Delegating honeypot check to SafetyEngine for ${tokenAddress}`);
+      
+      const result = await safetyEngineService.simulateHoneypot(tokenAddress);
+      
       return {
         canBuy: true,
-        canSell: true,
-        buyTax,
-        sellTax,
-        isHoneypot,
-        error: isHoneypot ? `High round-trip loss: ${roundTripLoss.toFixed(1)}%` : undefined
+        canSell: result.canSell,
+        buyTax: result.buyTax,
+        sellTax: result.sellTax,
+        isHoneypot: result.isHoneypot,
+        error: result.simulationError
       };
 
     } catch (error: any) {
@@ -282,8 +230,8 @@ class TokenAuthorityService {
         canSell: false,
         buyTax: 0,
         sellTax: 0,
-        isHoneypot: true,
-        error: error.message || 'Simulation failed'
+        isHoneypot: false,
+        error: error.message || 'Simulation failed - proceed with caution'
       };
     }
   }
@@ -315,6 +263,10 @@ class TokenAuthorityService {
 
     if (honeypot.isHoneypot) {
       allRisks.push('HONEYPOT DETECTED - Cannot sell tokens');
+    } else if (!honeypot.canSell && honeypot.error) {
+      allWarnings.push(`SELL ROUTE UNVERIFIED - ${honeypot.error}`);
+    } else if (!honeypot.canSell) {
+      allWarnings.push('SELL ROUTE UNVERIFIED - May have low liquidity or be unsellable');
     }
 
     const liquidityNotChecked = liquidity.notChecked === true;
