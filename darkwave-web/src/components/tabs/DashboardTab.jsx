@@ -969,6 +969,32 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           }
         }
         
+        /* Default - hide mobile wrapper */
+        .mobile-categories-wrapper {
+          display: none;
+        }
+        
+        .mobile-category-card {
+          background: #0f0f0f;
+          border: 1px solid #222;
+          border-radius: 16px;
+          padding: 16px;
+          min-height: 220px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+          overflow: hidden;
+        }
+        .mobile-category-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
+        }
+        
         /* Landscape mode on mobile - show full table layout */
         @media (max-height: 500px) and (orientation: landscape) {
           .bento-dashboard {
@@ -1005,36 +1031,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           .mobile-news-section {
             display: none !important;
           }
-        }
-        
-        .mobile-categories-wrapper {
-          display: none;
-        }
-        
-        .mobile-category-card {
-          background: rgba(20, 20, 20, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          overflow: hidden;
-          position: relative;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          padding: 16px;
-          min-height: 220px;
-          display: flex;
-          flex-direction: column;
-          box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
-          position: relative;
-          overflow: hidden;
-        }
-        .mobile-category-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
         }
         .mobile-category-card .market-item-wrapper {
           flex: 1;
@@ -1144,10 +1140,8 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             cursor: pointer;
             border-radius: 16px;
             overflow: hidden;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f0f0f;
+            border: 1px solid #222;
             transition: transform 0.2s ease;
           }
           .mobile-news-card:active {
