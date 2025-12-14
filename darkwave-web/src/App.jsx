@@ -20,7 +20,7 @@ import {
 import useAnalytics from './hooks/useAnalytics'
 import AccuracyDashboard from './components/ml/AccuracyDashboard'
 import AutoTradeConfig from './components/ml/AutoTradeConfig'
-import { GlossaryPopup, AIChatButton } from './components/ui'
+import { GlossaryPopup } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
 import { AvatarProvider } from './context/AvatarContext'
 import { FavoritesProvider } from './context/FavoritesContext'
@@ -28,7 +28,6 @@ import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { SkinsProvider } from './context/SkinsContext'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
-import AgentPopup from './components/engagement/AgentPopup'
 import './styles/components.css'
 
 class SniperBotErrorBoundary extends Component {
@@ -303,11 +302,6 @@ function App() {
                   </div>
                 </Layout>
                 <GlossaryPopup />
-                <AgentPopup enabled={true} interval={90000} selectedAgentId={userConfig?.selectedAgentId || 1} />
-                <AIChatButton 
-                  isSubscribed={userConfig?.subscriptionTier && userConfig.subscriptionTier !== 'free'} 
-                  selectedAgentId={userConfig?.selectedAgentId || 1}
-                />
               </GlossaryProvider>
             </FavoritesProvider>
           </BuiltInWalletProvider>
