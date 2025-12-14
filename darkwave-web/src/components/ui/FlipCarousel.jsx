@@ -7,6 +7,7 @@ export default function FlipCarousel({
   interval = 5000,
   showArrows = true,
   showDots = true,
+  showCounter = true,
   className = '',
   style = {}
 }) {
@@ -207,16 +208,18 @@ export default function FlipCarousel({
         </div>
       )}
 
-      <div style={{
-        position: 'absolute',
-        top: 6,
-        right: 6,
-        fontSize: 9,
-        color: '#555',
-        zIndex: 10,
-      }}>
-        {currentIndex + 1}/{items.length}
-      </div>
+      {showCounter && (
+        <div style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          fontSize: 9,
+          color: '#555',
+          zIndex: 10,
+        }}>
+          {currentIndex + 1}/{items.length}
+        </div>
+      )}
     </div>
   )
 }
