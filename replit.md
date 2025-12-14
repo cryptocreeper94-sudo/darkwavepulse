@@ -9,12 +9,12 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages
 - Call him "Jason" not "DW"
 - **IMPORTANT**: Always check with Jason before proceeding to verify any task - confirm changes look correct before moving on
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color
-- Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects - NO glassmorphism, NO transparency, NO backdrop-filter
+- Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is ALLOWED for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements.
 
 ## System Architecture
 
 ### UI/UX Decisions
-The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with free-floating elements and glow effects, explicitly avoiding glassmorphism, transparency, and backdrop-filters. The design includes a slim 50px header with a hamburger menu, a dynamic footer, SVG gauge components for market sentiment, metric cards for market cap and volume, and a customizable Bitcoin chart using `lightweight-charts`. UI elements should avoid frames or boxes, with agents appearing as if walking in front of a screen, using full-body, rembg-treated, Pixar/MIB style with sweep-in animations. The color palette strictly avoids orange, yellow, and brown. A light mode theme with softer blue-tinted grays and enhanced contrast is also implemented.
+The platform features a solid dark theme (`#0f0f0f`, `#1a1a1a`, `#141414`) with free-floating elements and glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is used for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements. The design includes a slim 50px header with a hamburger menu, a dynamic footer, SVG gauge components for market sentiment, metric cards for market cap and volume, and a customizable Bitcoin chart using `lightweight-charts`. UI elements should avoid frames or boxes, with agents appearing as if walking in front of a screen, using full-body, rembg-treated, Pixar/MIB style with sweep-in animations. The color palette strictly avoids orange, yellow, and brown. A light mode theme with softer blue-tinted grays and enhanced contrast is also implemented.
 
 ### Technical Implementations
 - **Frontend**: React 19 and Vite 7 web app, plus React Native + Expo mobile app (darkwave-mobile/) with tab navigation (Markets, StrikeAgent, Portfolio, Settings).

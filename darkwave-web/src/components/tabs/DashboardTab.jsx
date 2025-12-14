@@ -975,8 +975,10 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         }
         
         .mobile-category-card {
-          background: #0f0f0f;
-          border: 1px solid #222;
+          background: rgba(20, 20, 20, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 16px;
           padding: 16px;
           min-height: 220px;
@@ -1140,8 +1142,10 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             cursor: pointer;
             border-radius: 16px;
             overflow: hidden;
-            background: #0f0f0f;
-            border: 1px solid #222;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform 0.2s ease;
           }
           .mobile-news-card:active {
