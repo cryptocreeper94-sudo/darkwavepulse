@@ -88,14 +88,36 @@ export default function AIStatusWidget() {
 
   const totalPredictions = stats?.totalPredictions || 0
   const progress = Math.min((totalPredictions / TARGET_PREDICTIONS) * 100, 100)
+  const outcomesByHorizon = stats?.outcomesByHorizon || {}
+  
+  const calculateOverallAccuracy = () => {
+    let totalCorrect = 0
+    let totalOutcomes = 0
+    Object.values(outcomesByHorizon).forEach((h) => {
+      totalCorrect += h.correct || 0
+      totalOutcomes += h.total || 0
+    })
+    if (totalOutcomes === 0) return null
+    return ((totalCorrect / totalOutcomes) * 100).toFixed(1)
+  }
+  
+  const overallAccuracy = calculateOverallAccuracy()
+  const isActive = totalPredictions >= TARGET_PREDICTIONS
   
   const getStatus = () => {
-    if (totalPredictions >= TARGET_PREDICTIONS) return { label: 'Active', color: '#00ff88' }
+    if (isActive) return { label: 'Active', color: '#00ff88' }
     if (totalPredictions >= TARGET_PREDICTIONS / 2) return { label: 'Training', color: '#ffaa00' }
     return { label: 'Learning', color: '#00D4FF' }
   }
 
   const status = getStatus()
+  
+  const getAccuracyColor = (rate) => {
+    const num = parseFloat(rate)
+    if (num >= 60) return '#00ff88'
+    if (num >= 50) return '#ffaa00'
+    return '#ff4444'
+  }
 
   return (
     <>
@@ -147,38 +169,81 @@ export default function AIStatusWidget() {
           </span>
         </div>
 
-        <div style={{ marginBottom: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ color: '#888', fontSize: '12px' }}>Learning Progress</span>
-            <span style={{ color: '#fff', fontSize: '12px' }}>{totalPredictions} / {TARGET_PREDICTIONS}</span>
-          </div>
-          <div style={{ 
-            background: '#333', 
-            borderRadius: '6px', 
-            height: '8px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              width: `${progress}%`,
-              height: '100%',
-              background: status.color,
-              borderRadius: '6px',
-              transition: 'width 0.5s ease'
-            }} />
-          </div>
-        </div>
-
-        <p style={{ 
-          color: '#888', 
-          fontSize: '12px', 
-          margin: 0,
-          lineHeight: 1.4
-        }}>
-          {totalPredictions >= TARGET_PREDICTIONS 
-            ? "AI is actively improving predictions based on your analyses!"
-            : `${totalPredictions} predictions collected - Your analyses help train our AI!`
-          }
-        </p>
+        {isActive && overallAccuracy ? (
+          <>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              marginBottom: '10px'
+            }}>
+              <div style={{ 
+                fontSize: '28px', 
+                fontWeight: 700, 
+                color: getAccuracyColor(overallAccuracy),
+                lineHeight: 1
+              }}>
+                {overallAccuracy}%
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#888' }}>Overall Accuracy</div>
+                <div style={{ fontSize: '10px', color: '#555' }}>{totalPredictions} predictions</div>
+              </div>
+            </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(4, 1fr)', 
+              gap: '6px',
+            }}>
+              {['1h', '4h', '24h', '7d'].map(h => {
+                const data = outcomesByHorizon[h] || { winRate: '0', total: 0 }
+                return (
+                  <div key={h} style={{ textAlign: 'center' }}>
+                    <div style={{ 
+                      fontSize: '12px', 
+                      fontWeight: 600, 
+                      color: data.total > 0 ? getAccuracyColor(data.winRate) : '#444' 
+                    }}>
+                      {data.total > 0 ? `${data.winRate}%` : '-'}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>{h}</div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#888', fontSize: '12px' }}>Learning Progress</span>
+                <span style={{ color: '#fff', fontSize: '12px' }}>{totalPredictions} / {TARGET_PREDICTIONS}</span>
+              </div>
+              <div style={{ 
+                background: '#333', 
+                borderRadius: '6px', 
+                height: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: `${progress}%`,
+                  height: '100%',
+                  background: status.color,
+                  borderRadius: '6px',
+                  transition: 'width 0.5s ease'
+                }} />
+              </div>
+            </div>
+            <p style={{ 
+              color: '#888', 
+              fontSize: '12px', 
+              margin: 0,
+              lineHeight: 1.4
+            }}>
+              {totalPredictions} predictions collected - Your analyses help train our AI!
+            </p>
+          </>
+        )}
       </div>
 
       {showModal && (
