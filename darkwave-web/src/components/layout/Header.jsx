@@ -1,11 +1,15 @@
 import { useAvatar } from '../../context/AvatarContext'
 import { useWalletState, WalletMultiButton } from '../../context/WalletContext'
 import MiniAvatar from '../ui/MiniAvatar'
+import VerificationBadge from '../ui/VerificationBadge'
 
 export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, activeTab, onBackClick }) {
   const { avatar, isCustomMode } = useAvatar()
   const wallet = useWalletState()
   const showBackButton = activeTab && activeTab !== 'dashboard' && activeTab !== 'markets'
+  
+  const hallmarkId = '000000000-01'
+  const walletAddress = wallet?.publicKey?.toBase58() || null
   
   return (
     <header className="header">
@@ -36,6 +40,10 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
       <h1 className="header-title">PULSE</h1>
       
       <div className="header-right">
+        <VerificationBadge 
+          hallmarkId={hallmarkId}
+          walletAddress={walletAddress}
+        />
         <WalletMultiButton />
         <MiniAvatar 
           size={32} 
