@@ -1,6 +1,8 @@
 import { db } from '../../db/client.js';
-import { quantScanConfig, quantTradeSessions, quantTradeActions, quantLearningMetrics } from '../../db/schema';
-import { desc, eq, and, gte, sql } from 'drizzle-orm';
+import { quantScanConfig, quantTradeSessions, quantTradeActions, quantLearningMetrics, strikeAgentSignals } from '../../db/schema';
+import { desc, eq, and, gte, sql, inArray } from 'drizzle-orm';
+import { SUPPORTED_CHAINS } from '../../services/topSignalsService.js';
+import { ChainId } from '../../services/multiChainProvider.js';
 
 const QUANT_PIN = '0424';
 
@@ -106,10 +108,19 @@ export const quantRoutes = [
       const logger = mastra.getLogger();
       try {
         const body = await c.req.json();
-        const { pin, category, enabled, scanIntervalMinutes, minLiquidityUsd, minMarketCapUsd, maxMarketCapUsd, minSafetyScore, minCompositeScore } = body;
+        const { pin, category, chains, enabled, scanIntervalMinutes, minLiquidityUsd, minMarketCapUsd, maxMarketCapUsd, minSafetyScore, minCompositeScore } = body;
 
         if (pin !== QUANT_PIN) {
           return c.json({ error: 'Invalid PIN' }, 403);
+        }
+
+        // Validate chains if provided
+        let chainsJson: string | null = null;
+        if (chains && Array.isArray(chains)) {
+          const validChains = chains.filter(c => SUPPORTED_CHAINS.includes(c));
+          if (validChains.length > 0) {
+            chainsJson = JSON.stringify(validChains);
+          }
         }
 
         const existing = await db.select()
@@ -121,6 +132,7 @@ export const quantRoutes = [
         if (existing.length > 0) {
           await db.update(quantScanConfig)
             .set({
+              chains: chainsJson ?? existing[0].chains,
               enabled: enabled ?? existing[0].enabled,
               scanIntervalMinutes: scanIntervalMinutes ?? existing[0].scanIntervalMinutes,
               minLiquidityUsd: minLiquidityUsd ?? existing[0].minLiquidityUsd,
@@ -139,6 +151,7 @@ export const quantRoutes = [
             id,
             userId: 'system',
             category,
+            chains: chainsJson ?? JSON.stringify(SUPPORTED_CHAINS),
             enabled: enabled ?? true,
             scanIntervalMinutes: scanIntervalMinutes ?? 5,
             minLiquidityUsd: minLiquidityUsd?.toString() ?? '5000',
@@ -172,6 +185,104 @@ export const quantRoutes = [
       } catch (error: any) {
         return c.json({ sessions: [] });
       }
+    }
+  },
+  {
+    path: "/api/quant/signals",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        const chain = c.req.query('chain') as ChainId | 'all' | undefined;
+        const category = c.req.query('category') as string | undefined;
+        const limit = parseInt(c.req.query('limit') || '20');
+
+        let query = db.select()
+          .from(strikeAgentSignals)
+          .orderBy(desc(strikeAgentSignals.compositeScore));
+        
+        // Build conditions
+        if (chain && chain !== 'all' && category) {
+          query = db.select()
+            .from(strikeAgentSignals)
+            .where(and(eq(strikeAgentSignals.chain, chain), eq(strikeAgentSignals.category, category)))
+            .orderBy(desc(strikeAgentSignals.compositeScore));
+        } else if (chain && chain !== 'all') {
+          query = db.select()
+            .from(strikeAgentSignals)
+            .where(eq(strikeAgentSignals.chain, chain))
+            .orderBy(desc(strikeAgentSignals.compositeScore));
+        } else if (category) {
+          query = db.select()
+            .from(strikeAgentSignals)
+            .where(eq(strikeAgentSignals.category, category))
+            .orderBy(desc(strikeAgentSignals.compositeScore));
+        }
+
+        const signals = await query.limit(Math.min(limit, 100));
+
+        // Get chain distribution
+        const chainCounts = await db.select({
+          chain: strikeAgentSignals.chain,
+          count: sql<number>`count(*)::int`,
+        })
+          .from(strikeAgentSignals)
+          .groupBy(strikeAgentSignals.chain);
+
+        return c.json({
+          signals: signals.map(s => ({
+            id: s.id,
+            tokenAddress: s.tokenAddress,
+            tokenSymbol: s.tokenSymbol,
+            tokenName: s.tokenName,
+            chain: s.chain,
+            priceUsd: s.priceUsd,
+            marketCapUsd: s.marketCapUsd,
+            liquidityUsd: s.liquidityUsd,
+            compositeScore: s.compositeScore,
+            technicalScore: s.technicalScore,
+            safetyScore: s.safetyScore,
+            momentumScore: s.momentumScore,
+            reasoning: s.reasoning,
+            rank: s.rank,
+            category: s.category,
+            dex: s.dex,
+            createdAt: s.createdAt,
+          })),
+          chainDistribution: chainCounts.reduce((acc, c) => {
+            acc[c.chain] = c.count;
+            return acc;
+          }, {} as Record<string, number>),
+          supportedChains: SUPPORTED_CHAINS,
+          total: signals.length,
+        });
+      } catch (error: any) {
+        logger?.error('❌ [QuantSignals] Error fetching signals', { error: error.message });
+        return c.json({ signals: [], chainDistribution: {}, supportedChains: SUPPORTED_CHAINS, total: 0 });
+      }
+    }
+  },
+  {
+    path: "/api/quant/chains",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      return c.json({
+        chains: SUPPORTED_CHAINS.map(chain => ({
+          id: chain,
+          name: chain === 'solana' ? 'Solana' :
+                chain === 'ethereum' ? 'Ethereum' :
+                chain === 'base' ? 'Base' :
+                chain === 'polygon' ? 'Polygon' :
+                chain === 'arbitrum' ? 'Arbitrum' :
+                chain === 'bsc' ? 'BNB Chain' : chain,
+          symbol: chain === 'solana' ? 'SOL' :
+                  chain === 'ethereum' ? 'ETH' :
+                  chain === 'base' ? 'ETH' :
+                  chain === 'polygon' ? 'MATIC' :
+                  chain === 'arbitrum' ? 'ETH' :
+                  chain === 'bsc' ? 'BNB' : chain.toUpperCase(),
+        })),
+      });
     }
   },
 ];

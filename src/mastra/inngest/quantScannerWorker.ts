@@ -1,7 +1,8 @@
 import { inngest } from './client';
 import { db } from '../../db/client.js';
 import { quantScanConfig, quantLearningMetrics, strikeAgentSignals } from '../../db/schema.js';
-import { topSignalsService } from '../../services/topSignalsService.js';
+import { topSignalsService, SUPPORTED_CHAINS } from '../../services/topSignalsService.js';
+import { ChainId } from '../../services/multiChainProvider.js';
 import { eq, and, desc, lte } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 
@@ -38,10 +39,23 @@ export const quantCategoryScanner = inngest.createFunction(
             continue;
           }
 
-          console.log(`[QuantScanner] Scanning category: ${config.category}`);
+          // Parse chains from config (defaults to all supported chains)
+          let chains: ChainId[] = SUPPORTED_CHAINS;
+          try {
+            if (config.chains) {
+              const parsedChains = JSON.parse(config.chains);
+              if (Array.isArray(parsedChains) && parsedChains.length > 0) {
+                chains = parsedChains.filter(c => SUPPORTED_CHAINS.includes(c));
+              }
+            }
+          } catch (e) {
+            console.warn(`[QuantScanner] Failed to parse chains config, using all chains`);
+          }
+
+          console.log(`[QuantScanner] Scanning category: ${config.category} on chains: ${chains.join(', ')}`);
           
           try {
-            const signals = await topSignalsService.scanAndScoreTokens();
+            const signals = await topSignalsService.scanAndScoreTokens(chains);
             
             const filteredSignals = signals.filter(s => {
               if (config.category !== 'all' && s.category !== config.category) return false;
