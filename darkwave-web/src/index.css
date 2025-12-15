@@ -450,3 +450,36 @@ body {
     text-align: center;
   }
 }
+
+/* Dashboard Bento Grid - Critical Production CSS */
+/* These rules ensure bottom cards display correctly at tablet breakpoints */
+
+@media (max-width: 1200px) {
+  .bento-market,
+  .bento-trending,
+  .bento-news {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 180px !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .bento-market,
+  .bento-trending,
+  .bento-news {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 180px !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-market,
+  .bento-trending,
+  .bento-news {
+    display: none !important;
+  }
+}
