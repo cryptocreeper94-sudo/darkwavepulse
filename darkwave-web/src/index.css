@@ -482,4 +482,10 @@ body {
   .bento-news {
     display: none !important;
   }
+  
+  .mobile-categories-wrapper {
+    display: block !important;
+    width: 100%;
+    margin-bottom: 16px;
+  }
 }
