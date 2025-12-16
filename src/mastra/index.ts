@@ -57,6 +57,7 @@ import { cryptoOnrampRoutes } from "./routes/cryptoOnrampRoutes";
 import { swapRoutes } from "./routes/swapRoutes";
 import { vaultRoutes } from "./routes/vaultRoutes";
 import { analyticsRoutes } from "./routes/analyticsRoutes";
+import { apiBillingRoutes } from "./routes/apiBillingRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6170,6 +6171,9 @@ export const mastra = new Mastra({
       
       // Analytics Routes (Developers Portal)
       ...analyticsRoutes,
+      
+      // API Billing Routes (Developer API subscriptions)
+      ...apiBillingRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {

@@ -285,6 +285,7 @@ export default function DevelopersPortalTab() {
   const [newKeyEnvironment, setNewKeyEnvironment] = useState('live');
   const [newKeyGenerated, setNewKeyGenerated] = useState(null);
   const [apiKeysCopied, setApiKeysCopied] = useState({});
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
   
   useEffect(() => {
     localStorage.setItem('adminTasks', JSON.stringify(tasks));
@@ -348,6 +349,44 @@ export default function DevelopersPortalTab() {
     { id: 'tasks', label: 'Tasks', icon: '✅' },
     { id: 'analytics', label: 'Analytics', icon: '📈' },
   ];
+
+  const handleApiUpgrade = async (tier) => {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+      const userId = session.id || session.email;
+      
+      if (!userId) {
+        console.error('No user session found');
+        return;
+      }
+      
+      let endpoint;
+      if (tier === 'enterprise') {
+        endpoint = billingPeriod === 'annual' 
+          ? '/api/developer/billing/create-enterprise-annual'
+          : '/api/developer/billing/create-enterprise-monthly';
+      } else {
+        endpoint = billingPeriod === 'annual'
+          ? '/api/developer/billing/create-pro-annual'
+          : '/api/developer/billing/create-pro-monthly';
+      }
+      
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      
+      const data = await res.json();
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('Failed to create checkout session:', data.error);
+      }
+    } catch (e) {
+      console.error('Upgrade error:', e);
+    }
+  };
 
   const handleGenerateApiKey = async () => {
     if (!newKeyName.trim()) return;
@@ -543,29 +582,117 @@ export default function DevelopersPortalTab() {
             border: '1px solid #00D4FF30',
             boxShadow: '0 0 30px #00D4FF15',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '24px' }}>🚀</span>
-              <div>
-                <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Pulse Developer API</h3>
-                <p style={{ margin: '4px 0 0', color: '#888', fontSize: '13px' }}>Access AI signals, market data & safety scanning</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '24px' }}>🚀</span>
+                <div>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Pulse Developer API</h3>
+                  <p style={{ margin: '4px 0 0', color: '#888', fontSize: '13px' }}>Access AI signals, market data & safety scanning</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', background: '#0f0f0f', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
+                  <button
+                    onClick={() => setBillingPeriod('monthly')}
+                    style={{
+                      background: billingPeriod === 'monthly' ? 'linear-gradient(135deg, #00D4FF, #0099CC)' : 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '8px 16px',
+                      color: billingPeriod === 'monthly' ? '#fff' : '#888',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '12px',
+                    }}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setBillingPeriod('annual')}
+                    style={{
+                      background: billingPeriod === 'annual' ? 'linear-gradient(135deg, #39FF14, #2ECC71)' : 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '8px 16px',
+                      color: billingPeriod === 'annual' ? '#000' : '#888',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '12px',
+                    }}
+                  >
+                    Annual
+                  </button>
+                </div>
+                {billingPeriod === 'annual' && (
+                  <span style={{ 
+                    background: 'linear-gradient(135deg, #39FF14, #2ECC71)', 
+                    color: '#000', 
+                    fontSize: '10px', 
+                    fontWeight: '700', 
+                    padding: '4px 8px', 
+                    borderRadius: '12px' 
+                  }}>
+                    ~17% savings
+                  </span>
+                )}
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginTop: '16px' }}>
-              <div style={{ textAlign: 'center', padding: '16px', background: '#0f0f0f', borderRadius: '10px', border: '1px solid #2a2a2a' }}>
-                <div style={{ fontSize: '24px', fontWeight: '700', color: '#00D4FF' }}>Free</div>
-                <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>60 req/min</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>Market + Signals</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '16px' }}>
+              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #2a2a2a' }}>
+                <div style={{ fontSize: '20px', fontWeight: '700', color: '#00D4FF' }}>Free</div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>$0</div>
+                <div style={{ fontSize: '11px', color: '#888' }}>60 req/min • 2K/day</div>
+                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>Market Data + Signals</div>
+                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
+                  market:read, signals:read
+                </div>
+                <div style={{ marginTop: '12px', padding: '8px 16px', background: '#333', borderRadius: '6px', color: '#888', fontSize: '12px' }}>
+                  Current Plan
+                </div>
               </div>
-              <div style={{ textAlign: 'center', padding: '16px', background: '#0f0f0f', borderRadius: '10px', border: '1px solid #39FF1430' }}>
-                <div style={{ fontSize: '24px', fontWeight: '700', color: '#39FF14' }}>Pro</div>
-                <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>600 req/min</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>+ Predictions</div>
+              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #39FF1440', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #39FF14, #2ECC71)', color: '#000', fontSize: '10px', fontWeight: '700', padding: '4px 12px', borderRadius: '12px' }}>POPULAR</div>
+                <div style={{ fontSize: '20px', fontWeight: '700', color: '#39FF14' }}>Pro</div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>
+                  {billingPeriod === 'annual' ? '$24' : '$29'}
+                  <span style={{ fontSize: '14px', color: '#888' }}>/mo</span>
+                </div>
+                {billingPeriod === 'annual' && (
+                  <div style={{ fontSize: '10px', color: '#39FF14', marginBottom: '4px' }}>$288/year (billed annually)</div>
+                )}
+                <div style={{ fontSize: '11px', color: '#888' }}>600 req/min • 100K/day</div>
+                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>+ Predictions + Accuracy</div>
+                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
+                  + predictions:read, accuracy:read
+                </div>
+                <button
+                  onClick={() => handleApiUpgrade('pro')}
+                  style={{ marginTop: '12px', padding: '10px 20px', background: 'linear-gradient(135deg, #39FF14, #2ECC71)', border: 'none', borderRadius: '6px', color: '#000', fontSize: '12px', fontWeight: '700', cursor: 'pointer', width: '100%' }}
+                >
+                  Upgrade to Pro
+                </button>
               </div>
-              <div style={{ textAlign: 'center', padding: '16px', background: '#0f0f0f', borderRadius: '10px', border: '1px solid #8B5CF630' }}>
-                <div style={{ fontSize: '24px', fontWeight: '700', color: '#8B5CF6' }}>Enterprise</div>
-                <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>3000 req/min</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>+ Webhooks</div>
+              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #8B5CF640' }}>
+                <div style={{ fontSize: '20px', fontWeight: '700', color: '#8B5CF6' }}>Enterprise</div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>
+                  {billingPeriod === 'annual' ? '$82' : '$99'}
+                  <span style={{ fontSize: '14px', color: '#888' }}>/mo</span>
+                </div>
+                {billingPeriod === 'annual' && (
+                  <div style={{ fontSize: '10px', color: '#8B5CF6', marginBottom: '4px' }}>$984/year (billed annually)</div>
+                )}
+                <div style={{ fontSize: '11px', color: '#888' }}>3000 req/min • 1M/day</div>
+                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>+ StrikeAgent + Webhooks</div>
+                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
+                  + strikeagent:read, webhooks:write
+                </div>
+                <button
+                  onClick={() => handleApiUpgrade('enterprise')}
+                  style={{ marginTop: '12px', padding: '10px 20px', background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '700', cursor: 'pointer', width: '100%' }}
+                >
+                  Upgrade to Enterprise
+                </button>
               </div>
             </div>
           </div>
