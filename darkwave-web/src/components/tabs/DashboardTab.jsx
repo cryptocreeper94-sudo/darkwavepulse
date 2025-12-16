@@ -356,9 +356,10 @@ function NewsContent({ news }) {
 }
 
 function MobileNewsCard({ news }) {
+  if (!news) return null
   return (
     <div 
-      onClick={() => news.url && window.open(news.url, '_blank')}
+      onClick={() => news?.url && window.open(news.url, '_blank')}
       style={{
         background: 'rgba(20, 20, 20, 0.85)',
         backdropFilter: 'blur(16px)',
@@ -966,7 +967,12 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
     totalVolumeChange: -1.8,
     btcDominance: 54.5,
   })
-  const [news, setNews] = useState([])
+  const [news, setNews] = useState([
+    { source: 'CoinDesk', title: 'Bitcoin Holds Above $90K as Market Awaits Fed Decision', time: '2h ago', url: 'https://coindesk.com' },
+    { source: 'CoinTelegraph', title: 'Ethereum Layer-2 Solutions See Record Growth in Q4', time: '4h ago', url: 'https://cointelegraph.com' },
+    { source: 'The Block', title: 'Solana DeFi TVL Surges Past $5 Billion Milestone', time: '6h ago', url: 'https://theblock.co' },
+    { source: 'Decrypt', title: 'AI Tokens Lead Altcoin Rally as Sector Gains Momentum', time: '8h ago', url: 'https://decrypt.co' },
+  ])
 
   useEffect(() => {
     const fetchMarketData = async () => {
