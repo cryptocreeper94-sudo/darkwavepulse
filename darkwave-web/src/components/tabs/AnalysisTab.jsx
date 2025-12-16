@@ -284,6 +284,35 @@ const pageStyles = {
     minHeight: '100vh',
     paddingBottom: '100px',
   },
+  coinInfoBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '16px',
+    padding: '8px 0',
+  },
+  coinLogoSmall: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    objectFit: 'cover',
+    background: 'rgba(255, 255, 255, 0.1)',
+  },
+  coinInfoText: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1px',
+  },
+  coinNameSmall: {
+    fontSize: '15px',
+    fontWeight: '600',
+    color: '#fff',
+  },
+  coinSymbolSmall: {
+    fontSize: '11px',
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontWeight: '500',
+  },
   header: {
     display: 'flex',
     alignItems: 'center',
@@ -624,52 +653,18 @@ export default function AnalysisTab({ coin, onBack }) {
   
   return (
     <div style={pageStyles.container}>
-      <div style={pageStyles.header}>
-        <button 
-          style={pageStyles.backButton} 
-          onClick={onBack}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 212, 255, 0.2)'
-            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.4)'
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-          }}
-        >
-          ←
-        </button>
-        
-        <div style={pageStyles.coinInfo}>
-          <img 
-            src={coin.logo} 
-            alt={coin.name}
-            style={pageStyles.coinLogo}
-            onError={(e) => e.target.src = '/darkwave-coin.png'}
-          />
-          <div style={pageStyles.coinDetails}>
-            <h2 style={pageStyles.coinName}>
-              {coin.name}
-              {usingMockData && <span style={pageStyles.mockBadge}>Demo</span>}
-            </h2>
-            <span style={pageStyles.coinSymbol}>{coin.symbol}</span>
-          </div>
+      <div style={pageStyles.coinInfoBar}>
+        <img 
+          src={coin?.logo || '/darkwave-coin.png'} 
+          alt={coin?.name || 'Coin'}
+          style={pageStyles.coinLogoSmall}
+          onError={(e) => e.target.src = '/darkwave-coin.png'}
+        />
+        <div style={pageStyles.coinInfoText}>
+          <span style={pageStyles.coinNameSmall}>{coin?.name || 'Unknown'}</span>
+          <span style={pageStyles.coinSymbolSmall}>{coin?.symbol || '—'}</span>
         </div>
-        
-        <div style={pageStyles.priceBlock}>
-          <div style={{
-            ...pageStyles.currentPrice,
-            color: isPositive ? '#39FF14' : '#FF4444',
-          }}>
-            {coin.price}
-          </div>
-          <div style={{
-            ...pageStyles.priceChange,
-            color: isPositive ? '#39FF14' : '#FF4444',
-          }}>
-            {isPositive ? '▲' : '▼'} {coin.change}
-          </div>
-        </div>
+        {usingMockData && <span style={pageStyles.mockBadge}>Demo</span>}
       </div>
       
       {isLoading ? (
