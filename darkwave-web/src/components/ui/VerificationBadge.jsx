@@ -32,7 +32,7 @@ export default function VerificationBadge({
           gap: 6px;
           padding: 6px 12px;
           height: 32px;
-          background: linear-gradient(135deg, #9945FF, #14F195);
+          background: transparent;
           border: none;
           border-radius: 16px;
           cursor: pointer;
@@ -41,7 +41,6 @@ export default function VerificationBadge({
         }
 
         .verification-badge:hover {
-          box-shadow: 0 0 15px rgba(153, 69, 255, 0.5), 0 0 25px rgba(20, 241, 149, 0.3);
           transform: scale(1.05);
         }
 
@@ -57,18 +56,18 @@ export default function VerificationBadge({
         .verification-id {
           font-size: 11px;
           font-weight: 700;
-          color: #fff;
+          color: #14F195;
           letter-spacing: 0.5px;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 0 8px rgba(20, 241, 149, 0.5);
         }
 
         @media (max-width: 480px) {
           .verification-badge {
-            padding: 5px 8px;
+            padding: 5px;
             height: 28px;
             gap: 0;
-            border-radius: 50%;
-            width: 28px;
+            background: transparent;
+            width: auto;
             justify-content: center;
           }
 
