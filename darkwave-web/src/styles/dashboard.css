@@ -200,9 +200,15 @@
   }
   
   .market-overview-card {
-    flex: 0 0 140px;
-    min-height: 100px;
+    flex: 0 0 160px;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    height: 140px;
+    min-height: 140px;
+    max-height: 140px;
     scroll-snap-align: start;
+    box-sizing: border-box;
   }
   
   .bento-dashboard {
