@@ -95,7 +95,7 @@ function SimpleWalletButton() {
     gap: '8px',
     minWidth: '120px',
     justifyContent: 'center',
-    marginRight: '9px',
+    marginRight: '13px',
   }
 
   return (
