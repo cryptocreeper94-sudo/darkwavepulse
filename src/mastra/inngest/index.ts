@@ -9,6 +9,7 @@ import { backgroundPredictionWorkerFunctions } from "./backgroundPredictionWorke
 import { autoTradeWorkerFunctions } from "./autoTradeWorker.js";
 import { topSignalsWorkerFunctions } from "./topSignalsWorker.js";
 import { quantScannerWorkerFunctions } from "./quantScannerWorker.js";
+import { modelTrainingWorkerFunctions } from "./modelTrainingWorker.js";
 
 // Initialize Inngest with Mastra to get Inngest-compatible workflow helpers
 const {
@@ -118,7 +119,7 @@ export function inngestServe({
   return originalInngestServe({
     mastra,
     inngest,
-    functions: [...inngestFunctions, ...predictionWorkerFunctions, ...backgroundPredictionWorkerFunctions, ...autoTradeWorkerFunctions, ...topSignalsWorkerFunctions, ...quantScannerWorkerFunctions, limitOrderMonitorWorker],
+    functions: [...inngestFunctions, ...predictionWorkerFunctions, ...backgroundPredictionWorkerFunctions, ...autoTradeWorkerFunctions, ...topSignalsWorkerFunctions, ...quantScannerWorkerFunctions, ...modelTrainingWorkerFunctions, limitOrderMonitorWorker],
     registerOptions: { serveHost },
   });
 }

@@ -58,6 +58,8 @@ import { swapRoutes } from "./routes/swapRoutes";
 import { vaultRoutes } from "./routes/vaultRoutes";
 import { analyticsRoutes } from "./routes/analyticsRoutes";
 import { apiBillingRoutes } from "./routes/apiBillingRoutes";
+import { socialTradingRoutes } from "./routes/socialTradingRoutes";
+import { exchangeRoutes } from "./routes/exchangeRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6174,6 +6176,12 @@ export const mastra = new Mastra({
       
       // API Billing Routes (Developer API subscriptions)
       ...apiBillingRoutes,
+      
+      // Social Trading Routes (Leaderboard, Copy Trading, Signals)
+      ...socialTradingRoutes,
+      
+      // Exchange Connector Routes (CEX/DEX Trading Integrations)
+      ...exchangeRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {

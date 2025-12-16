@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Switch, Alert, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useAuth } from '../../src/context/AuthContext';
 import { PricingCard } from '../../src/components/PricingCard';
 import { checkoutService, PRICING_PLANS, PricingPlan } from '../../src/services/checkoutService';
+import { tradeService } from '../../src/services/tradeService';
 
 function SettingItem({ 
   icon, 
@@ -35,7 +38,9 @@ function SettingItem({
 }
 
 export default function SettingsTab() {
+  const { user, isAuthenticated, logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
   const [pricingModalVisible, setPricingModalVisible] = useState(false);
 
   const handleSelectPlan = async (plan: PricingPlan) => {
@@ -47,6 +52,24 @@ export default function SettingsTab() {
     if (!result.success) {
       Alert.alert('Checkout Error', result.message || 'Failed to start checkout');
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Sign Out', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/(auth)/login');
+          }
+        },
+      ]
+    );
   };
 
   const handleResetDemo = () => {
@@ -79,12 +102,38 @@ export default function SettingsTab() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {isAuthenticated && user ? (
+          <View style={styles.userCard}>
+            <View style={styles.userAvatar}>
+              <Ionicons name="person" size={28} color="#00FFFF" />
+            </View>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user.username || user.email.split('@')[0]}</Text>
+              <Text style={styles.userEmail}>{user.email}</Text>
+            </View>
+            <View style={styles.tierBadge}>
+              <Text style={styles.tierText}>{user.subscriptionTier || 'Free'}</Text>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.signInCard} onPress={() => router.push('/(auth)/login')}>
+            <View style={styles.signInIcon}>
+              <Ionicons name="person-add" size={24} color="#00FFFF" />
+            </View>
+            <View style={styles.signInContent}>
+              <Text style={styles.signInTitle}>Sign In</Text>
+              <Text style={styles.signInSubtitle}>Access all features</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#666" />
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity style={styles.upgradeCard} onPress={() => setPricingModalVisible(true)}>
           <View style={styles.upgradeIcon}>
-            <Ionicons name="flash" size={28} color="#00d4aa" />
+            <Ionicons name="flash" size={28} color="#00FFFF" />
           </View>
           <View style={styles.upgradeContent}>
-            <Text style={styles.upgradeTitle}>Upgrade to RM+</Text>
+            <Text style={styles.upgradeTitle}>Upgrade to Pulse Pro</Text>
             <Text style={styles.upgradeSubtitle}>Unlock real trading & unlimited AI</Text>
           </View>
           <View style={styles.upgradeBadge}>
@@ -103,7 +152,7 @@ export default function SettingsTab() {
             icon="📊"
             title="Trading History"
             subtitle="View past trades and performance"
-            onPress={() => {}}
+            onPress={() => router.push('/(tabs)/portfolio')}
           />
         </View>
 
@@ -117,16 +166,28 @@ export default function SettingsTab() {
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: '#333', true: 'rgba(0, 212, 170, 0.5)' }}
-                thumbColor={notifications ? '#00d4aa' : '#666'}
+                trackColor={{ false: '#333', true: 'rgba(0, 255, 255, 0.5)' }}
+                thumbColor={notifications ? '#00FFFF' : '#666'}
               />
             }
           />
           <SettingItem
-            icon="🎨"
-            title="Theme"
-            subtitle="Dark mode"
-            onPress={() => Alert.alert('Theme', 'Only dark mode is available')}
+            icon="🌙"
+            title="Dark Mode"
+            subtitle="Currently active"
+            rightElement={
+              <Switch
+                value={darkMode}
+                onValueChange={(value) => {
+                  if (!value) {
+                    Alert.alert('Theme', 'Only dark mode is available in this version');
+                  }
+                  setDarkMode(true);
+                }}
+                trackColor={{ false: '#333', true: 'rgba(0, 255, 255, 0.5)' }}
+                thumbColor={darkMode ? '#00FFFF' : '#666'}
+              />
+            }
           />
         </View>
 
@@ -135,17 +196,17 @@ export default function SettingsTab() {
           <SettingItem
             icon="❓"
             title="Help & FAQ"
-            onPress={() => {}}
+            onPress={() => Alert.alert('Help', 'Visit our support center for assistance.')}
           />
           <SettingItem
             icon="🐛"
             title="Report a Bug"
-            onPress={() => {}}
+            onPress={() => Alert.alert('Report Bug', 'Thank you for helping improve Pulse!')}
           />
           <SettingItem
             icon="📧"
             title="Contact Us"
-            onPress={() => {}}
+            onPress={() => Alert.alert('Contact', 'Email: support@darkwavestudios.io')}
           />
         </View>
 
@@ -164,7 +225,7 @@ export default function SettingsTab() {
           <SettingItem
             icon="⚠️"
             title="Risk Disclaimer"
-            onPress={() => {}}
+            onPress={() => Alert.alert('Risk Disclaimer', 'Cryptocurrency trading involves significant risk. Never invest more than you can afford to lose.')}
           />
         </View>
 
@@ -177,10 +238,19 @@ export default function SettingsTab() {
             onPress={handleResetDemo}
             danger
           />
+          {isAuthenticated && (
+            <SettingItem
+              icon="🚪"
+              title="Sign Out"
+              subtitle="Log out of your account"
+              onPress={handleLogout}
+              danger
+            />
+          )}
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>StrikeAgent v1.0.0</Text>
+          <Text style={styles.footerText}>Pulse by DarkWave Studios v2.0.0</Text>
           <Text style={styles.footerText}>© 2024 DarkWave Studios</Text>
         </View>
 
@@ -213,11 +283,11 @@ export default function SettingsTab() {
             ))}
             <View style={styles.modalFooter}>
               <View style={styles.guarantee}>
-                <Ionicons name="shield-checkmark" size={20} color="#00d4aa" />
+                <Ionicons name="shield-checkmark" size={20} color="#00FFFF" />
                 <Text style={styles.guaranteeText}>Secure payment via Stripe</Text>
               </View>
               <View style={styles.guarantee}>
-                <Ionicons name="refresh" size={20} color="#00d4aa" />
+                <Ionicons name="refresh" size={20} color="#00FFFF" />
                 <Text style={styles.guaranteeText}>Cancel anytime</Text>
               </View>
             </View>
@@ -238,7 +308,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: '#1a1a1a',
   },
   headerTitle: {
     fontSize: 20,
@@ -252,15 +322,92 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
   },
+  userCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0f0f0f',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#1a1a1a',
+  },
+  userAvatar: {
+    width: 52,
+    height: 52,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  userEmail: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
+  tierBadge: {
+    backgroundColor: 'rgba(0, 255, 255, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 255, 255, 0.3)',
+  },
+  tierText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#00FFFF',
+  },
+  signInCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0f0f0f',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#1a1a1a',
+  },
+  signInIcon: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  signInContent: {
+    flex: 1,
+  },
+  signInTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  signInSubtitle: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
   upgradeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 212, 170, 0.1)',
+    backgroundColor: 'rgba(0, 255, 255, 0.08)',
     borderRadius: 14,
     padding: 16,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(0, 212, 170, 0.3)',
+    borderColor: 'rgba(0, 255, 255, 0.2)',
   },
   upgradeIcon: {
     width: 48,
@@ -277,7 +424,7 @@ const styles = StyleSheet.create({
   upgradeTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#00d4aa',
+    color: '#00FFFF',
   },
   upgradeSubtitle: {
     fontSize: 12,
@@ -285,7 +432,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   upgradeBadge: {
-    backgroundColor: '#00d4aa',
+    backgroundColor: '#00FFFF',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
@@ -299,7 +446,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#666',
     letterSpacing: 1,
@@ -309,12 +456,12 @@ const styles = StyleSheet.create({
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#141414',
+    backgroundColor: '#0f0f0f',
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#2a2a2a',
+    borderColor: '#1a1a1a',
   },
   settingIcon: {
     width: 36,
@@ -368,7 +515,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: '#1a1a1a',
   },
   modalTitle: {
     fontSize: 20,
@@ -394,7 +541,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#222',
+    borderTopColor: '#1a1a1a',
   },
   guarantee: {
     flexDirection: 'row',
