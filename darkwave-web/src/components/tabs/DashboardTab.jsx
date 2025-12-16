@@ -358,16 +358,84 @@ function NewsContent({ news }) {
 function MobileNewsCard({ news }) {
   return (
     <div 
-      className="mobile-news-card"
       onClick={() => news.url && window.open(news.url, '_blank')}
+      style={{
+        background: 'rgba(20, 20, 20, 0.85)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: 20,
+        padding: 24,
+        minHeight: 180,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 212, 255, 0.1)',
+        transition: 'all 0.3s ease',
+      }}
     >
-      <div className="news-card-bg">
-        <div className="news-card-overlay"></div>
-        <div className="news-card-content">
-          <div className="news-source">{news.source}</div>
-          <div className="news-title">{news.title}</div>
-          <div className="news-time">{news.time}</div>
-        </div>
+      {/* Top glow accent */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: '20%',
+        right: '20%',
+        height: 1,
+        background: 'linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.6), transparent)',
+      }} />
+      
+      {/* Corner glow */}
+      <div style={{
+        position: 'absolute',
+        top: -50,
+        right: -50,
+        width: 150,
+        height: 150,
+        background: 'radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      
+      <div style={{ 
+        fontSize: 11, 
+        color: '#00D4FF', 
+        fontWeight: 700, 
+        marginBottom: 12, 
+        textTransform: 'uppercase',
+        letterSpacing: '1px',
+      }}>
+        {news.source}
+      </div>
+      <div style={{ 
+        fontSize: 16, 
+        fontWeight: 600, 
+        color: '#fff', 
+        lineHeight: 1.5,
+        display: '-webkit-box',
+        WebkitLineClamp: 3,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        marginBottom: 14,
+      }}>
+        {news.title}
+      </div>
+      <div style={{ fontSize: 11, color: '#666' }}>{news.time}</div>
+      
+      {/* Swipe hint */}
+      <div style={{
+        position: 'absolute',
+        bottom: 8,
+        right: 12,
+        fontSize: 10,
+        color: '#444',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}>
+        <span>Swipe</span>
+        <span style={{ fontSize: 12 }}>→</span>
       </div>
     </div>
   )
