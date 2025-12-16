@@ -957,7 +957,14 @@ export const mastra = new Mastra({
         method: "GET",
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
-          const symbol = (c.req.query('symbol') || 'BTC').toUpperCase();
+          const rawSymbol = c.req.query('symbol');
+          
+          // Validate symbol parameter
+          if (!rawSymbol || typeof rawSymbol !== 'string' || rawSymbol.trim().length === 0) {
+            return c.json({ error: 'Missing required symbol parameter', example: '/api/crypto/coin-price?symbol=BTC' }, 400);
+          }
+          
+          const symbol = rawSymbol.trim().toUpperCase();
           
           // Common symbol to CoinGecko ID mapping
           const symbolToId: Record<string, string> = {
