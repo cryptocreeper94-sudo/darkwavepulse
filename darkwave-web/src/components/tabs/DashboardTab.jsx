@@ -1121,64 +1121,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         </div>
       </BentoTile>
 
-      <BentoTile className="bento-market" style={{ minHeight: 180, height: 'auto' }}>
-        <TileLabel>Market Overview</TileLabel>
-        <div style={{ flex: 1, minHeight: 140 }}>
-          <FlipCarousel
-            items={marketOverviewItems}
-            renderItem={(item) => (
-              item.type === 'metric' 
-                ? <MetricContent title={item.title} value={item.value} change={item.change} />
-                : <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={false} />
-            )}
-            showDots={true}
-            autoPlay={true}
-            interval={5000}
-          />
-        </div>
-      </BentoTile>
-
-      <BentoTile className="bento-trending" onClick={() => setShowTrendingModal(true)} style={{ cursor: 'pointer', minHeight: 180, height: 'auto' }}>
-        <TileLabel>Trending</TileLabel>
-        <div style={{ flex: 1, minHeight: 140, position: 'relative' }}>
-          {coinsLoading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666' }}>
-              Loading...
-            </div>
-          ) : (
-            <>
-              <FlipCarousel
-                items={coins.slice(0, 10)}
-                renderItem={(coin) => (
-                  <div style={{ height: '100%', cursor: 'pointer' }}>
-                    <CoinContent coin={coin} isFavorite={isFavorite(coin.symbol)} />
-                  </div>
-                )}
-                showDots={true}
-                autoPlay={true}
-                interval={4000}
-              />
-              <div style={{ position: 'absolute', bottom: 20, left: 0, right: 0, textAlign: 'center', fontSize: 10, color: '#00D4FF', pointerEvents: 'none' }}>
-                Click to see all trending
-              </div>
-            </>
-          )}
-        </div>
-      </BentoTile>
-
-      <BentoTile className="bento-news" style={{ minHeight: 180, height: 'auto' }}>
-        <TileLabel>News</TileLabel>
-        <div style={{ flex: 1, minHeight: 140 }}>
-          <FlipCarousel
-            items={news}
-            renderItem={(item) => <NewsContent news={item} />}
-            showDots={true}
-            autoPlay={true}
-            interval={7000}
-          />
-        </div>
-      </BentoTile>
-
       <BentoTile className="bento-table">
         <MiniCoinTable 
           coins={coins} 
