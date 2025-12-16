@@ -76,6 +76,7 @@ body {
   justify-content: center;
   gap: 5px;
   transition: all 0.2s ease;
+  margin-left: -4px;
 }
 
 .hamburger-btn:hover {
