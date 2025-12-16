@@ -6365,6 +6365,111 @@ export const mastra = new Mastra({
         }
       },
       
+      // API Key Management - Regenerate key
+      {
+        path: "/api/developer/keys/regenerate",
+        method: "POST",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const body = await c.req.json();
+            const { sessionToken, keyId } = body;
+            
+            if (!sessionToken || !keyId) {
+              return c.json({ error: 'sessionToken and keyId are required' }, 400);
+            }
+            
+            // Verify session
+            const { db } = await import('../db/client.js');
+            const { sessions, apiKeys } = await import('../db/schema.js');
+            const { eq, and } = await import('drizzle-orm');
+            
+            const sessionRecords = await db.select().from(sessions).where(eq(sessions.token, sessionToken));
+            if (sessionRecords.length === 0) {
+              return c.json({ error: 'Invalid session' }, 401);
+            }
+            
+            const session = sessionRecords[0];
+            const userId = session.userId || session.email || 'anonymous';
+            
+            // Get the old key to preserve its settings
+            const oldKeyRecords = await db.select().from(apiKeys).where(and(eq(apiKeys.id, parseInt(keyId)), eq(apiKeys.userId, userId)));
+            if (oldKeyRecords.length === 0) {
+              return c.json({ error: 'Key not found or unauthorized' }, 404);
+            }
+            
+            const oldKey = oldKeyRecords[0];
+            
+            // Revoke old key
+            const { apiKeyService } = await import('../services/apiKeyService.js');
+            await apiKeyService.revokeApiKey(keyId, userId);
+            
+            // Generate new key with same settings
+            const result = await apiKeyService.generateApiKey(
+              userId, 
+              oldKey.name || 'Regenerated Key', 
+              oldKey.tier || 'free',
+              oldKey.description,
+              oldKey.environment || 'live'
+            );
+            
+            logger?.info('🔄 [API Keys] Key regenerated', { oldKeyId: keyId, newKeyId: result.keyId, userId });
+            
+            return c.json({
+              success: true,
+              apiKey: result.key,
+              keyId: result.keyId,
+              prefix: result.prefix,
+              environment: result.environment,
+              message: 'New key generated - save it now, it cannot be retrieved again'
+            });
+          } catch (error: any) {
+            logger?.error('❌ [API Keys] Error regenerating key', { error: error.message });
+            return c.json({ error: 'Failed to regenerate API key' }, 500);
+          }
+        }
+      },
+      
+      // API Subscription - Get user's current subscription
+      {
+        path: "/api/developer/subscription",
+        method: "GET",
+        createHandler: async ({ mastra }) => async (c: any) => {
+          const logger = mastra.getLogger();
+          try {
+            const userId = c.req.query('userId');
+            
+            if (!userId) {
+              return c.json({ error: 'userId is required' }, 400);
+            }
+            
+            const { ApiBillingService } = await import('../services/apiBillingService.js');
+            const billingService = new ApiBillingService();
+            const subscription = await billingService.getUserApiSubscription(userId);
+            
+            if (!subscription) {
+              return c.json({
+                success: true,
+                subscription: {
+                  tier: 'free',
+                  status: 'active',
+                  currentPeriodEnd: null,
+                  cancelAtPeriodEnd: false
+                }
+              });
+            }
+            
+            return c.json({
+              success: true,
+              subscription
+            });
+          } catch (error: any) {
+            logger?.error('❌ [API Subscription] Error fetching subscription', { error: error.message });
+            return c.json({ error: 'Failed to fetch subscription' }, 500);
+          }
+        }
+      },
+      
       // API Key Management - Get usage stats
       {
         path: "/api/developer/keys/:keyId/usage",

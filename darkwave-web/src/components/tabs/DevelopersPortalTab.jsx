@@ -18,14 +18,33 @@ const DEFAULT_TASKS = [
   { id: 8, text: 'Deploy StrikeAgent to mainnet', done: false, priority: 'high' },
 ];
 
-const SectionCard = ({ title, icon, children, fullWidth }) => (
+const TIER_COLORS = {
+  free: '#00D4FF',
+  pro: '#39FF14',
+  enterprise: '#8B5CF6',
+};
+
+const TIER_SCOPES = {
+  free: ['market:read', 'signals:read'],
+  pro: ['market:read', 'signals:read', 'predictions:read', 'accuracy:read'],
+  enterprise: ['market:read', 'signals:read', 'predictions:read', 'accuracy:read', 'strikeagent:read', 'webhooks:write'],
+};
+
+const glassmorphism = {
+  background: 'rgba(26, 26, 26, 0.6)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+};
+
+const SectionCard = ({ title, icon, children, fullWidth, glowColor }) => (
   <div style={{
-    background: 'rgba(26, 26, 26, 0.8)',
-    backdropFilter: 'blur(10px)',
+    ...glassmorphism,
     borderRadius: '16px',
     padding: '20px',
-    border: '1px solid #2a2a2a',
+    border: `1px solid ${glowColor ? `${glowColor}40` : '#2a2a2a'}`,
     gridColumn: fullWidth ? '1 / -1' : 'span 1',
+    boxShadow: glowColor ? `0 0 30px ${glowColor}20` : 'none',
+    transition: 'all 0.3s ease',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
       <span style={{ fontSize: '20px' }}>{icon}</span>
@@ -37,10 +56,10 @@ const SectionCard = ({ title, icon, children, fullWidth }) => (
 
 const StatCard = ({ title, value, subtitle, icon, glow }) => (
   <div style={{
-    background: '#1a1a1a',
+    ...glassmorphism,
     borderRadius: '16px',
     padding: '20px',
-    border: '1px solid #2a2a2a',
+    border: `1px solid ${glow ? `${glow}40` : '#2a2a2a'}`,
     boxShadow: glow ? `0 0 20px ${glow}20` : 'none',
   }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -56,11 +75,11 @@ const StatCard = ({ title, value, subtitle, icon, glow }) => (
 
 const LiveVisitors = ({ count }) => (
   <div style={{
-    background: 'linear-gradient(135deg, #0f0f0f, #1a1a1a)',
+    ...glassmorphism,
     borderRadius: '16px',
     padding: '24px',
-    border: '1px solid #00D4FF30',
-    boxShadow: '0 0 30px #00D4FF15',
+    border: '1px solid rgba(0, 212, 255, 0.3)',
+    boxShadow: '0 0 40px rgba(0, 212, 255, 0.15)',
     textAlign: 'center',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -82,7 +101,7 @@ const LiveVisitors = ({ count }) => (
 
 const TopList = ({ title, items, labelKey, valueKey, icon }) => (
   <div style={{
-    background: '#1a1a1a',
+    ...glassmorphism,
     borderRadius: '16px',
     padding: '20px',
     border: '1px solid #2a2a2a',
@@ -117,7 +136,7 @@ const DeviceBreakdown = ({ data }) => {
   
   return (
     <div style={{
-      background: '#1a1a1a',
+      ...glassmorphism,
       borderRadius: '16px',
       padding: '20px',
       border: '1px solid #2a2a2a',
@@ -144,20 +163,22 @@ const BusinessDocCard = ({ doc, onView }) => (
   <div 
     onClick={() => onView(doc)}
     style={{
-      background: '#1a1a1a',
+      ...glassmorphism,
       borderRadius: '12px',
       padding: '16px',
       border: '1px solid #2a2a2a',
       cursor: 'pointer',
-      transition: 'all 0.2s ease',
+      transition: 'all 0.3s ease',
     }}
     onMouseOver={(e) => {
       e.currentTarget.style.borderColor = '#00D4FF';
       e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)';
     }}
     onMouseOut={(e) => {
       e.currentTarget.style.borderColor = '#2a2a2a';
       e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -180,7 +201,9 @@ const TodoItem = ({ task, onToggle }) => {
         alignItems: 'center',
         gap: '12px',
         padding: '12px',
-        background: task.done ? '#1a2a1a' : '#1a1a1a',
+        background: task.done ? 'rgba(26, 42, 26, 0.6)' : 'rgba(26, 26, 26, 0.6)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         borderRadius: '8px',
         border: `1px solid ${task.done ? '#39FF1430' : '#2a2a2a'}`,
         cursor: 'pointer',
@@ -254,7 +277,7 @@ const DocViewer = ({ doc, content, onClose }) => (
     <div style={{
       flex: 1,
       overflow: 'auto',
-      background: '#1a1a1a',
+      ...glassmorphism,
       borderRadius: '12px',
       padding: '24px',
       whiteSpace: 'pre-wrap',
@@ -267,6 +290,274 @@ const DocViewer = ({ doc, content, onClose }) => (
     </div>
   </div>
 );
+
+const PricingCard = ({ tier, price, monthlyPrice, annualPrice, billingPeriod, features, limits, scopes, isCurrentPlan, isPopular, onUpgrade, onManage }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const color = TIER_COLORS[tier];
+  const displayPrice = billingPeriod === 'annual' ? annualPrice : monthlyPrice;
+  
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        ...glassmorphism,
+        textAlign: 'center',
+        padding: '24px 20px',
+        borderRadius: '16px',
+        border: `1px solid ${color}40`,
+        position: 'relative',
+        boxShadow: isHovered ? `0 0 40px ${color}40, 0 0 60px ${color}20` : `0 0 20px ${color}15`,
+        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+        transition: 'all 0.3s ease',
+      }}
+    >
+      {isPopular && (
+        <div style={{
+          position: 'absolute',
+          top: '-12px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: `linear-gradient(135deg, ${color}, ${color}CC)`,
+          color: tier === 'pro' ? '#000' : '#fff',
+          fontSize: '10px',
+          fontWeight: '700',
+          padding: '6px 16px',
+          borderRadius: '12px',
+          boxShadow: `0 0 15px ${color}60`,
+        }}>
+          POPULAR
+        </div>
+      )}
+      
+      {isCurrentPlan && (
+        <div style={{
+          position: 'absolute',
+          top: '-12px',
+          right: '12px',
+          background: 'linear-gradient(135deg, #00D4FF, #0099CC)',
+          color: '#fff',
+          fontSize: '9px',
+          fontWeight: '700',
+          padding: '4px 10px',
+          borderRadius: '8px',
+          textTransform: 'uppercase',
+        }}>
+          Current Plan
+        </div>
+      )}
+      
+      <div style={{ fontSize: '22px', fontWeight: '700', color, marginTop: isPopular ? '8px' : 0 }}>
+        {tier.charAt(0).toUpperCase() + tier.slice(1)}
+      </div>
+      
+      <div style={{ fontSize: '36px', fontWeight: '800', color: '#fff', margin: '12px 0 4px' }}>
+        ${displayPrice}
+        <span style={{ fontSize: '14px', color: '#888', fontWeight: '400' }}>/mo</span>
+      </div>
+      
+      {billingPeriod === 'annual' && tier !== 'free' && (
+        <div style={{ fontSize: '11px', color, marginBottom: '8px' }}>
+          ${displayPrice * 12}/year (billed annually)
+        </div>
+      )}
+      
+      <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{limits}</div>
+      <div style={{ fontSize: '11px', color: '#666', marginBottom: '12px' }}>{features}</div>
+      
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '4px',
+        justifyContent: 'center',
+        marginTop: '12px',
+        padding: '10px',
+        background: 'rgba(15, 15, 15, 0.6)',
+        borderRadius: '8px',
+      }}>
+        {scopes.map((scope, i) => (
+          <span
+            key={i}
+            style={{
+              fontSize: '9px',
+              padding: '3px 6px',
+              borderRadius: '4px',
+              background: `${color}20`,
+              color: color,
+              border: `1px solid ${color}40`,
+            }}
+          >
+            {scope}
+          </span>
+        ))}
+      </div>
+      
+      <div style={{ marginTop: '16px' }}>
+        {isCurrentPlan ? (
+          tier === 'free' ? (
+            <div style={{
+              padding: '10px 20px',
+              background: '#333',
+              borderRadius: '8px',
+              color: '#888',
+              fontSize: '12px',
+            }}>
+              Current Plan
+            </div>
+          ) : (
+            <button
+              onClick={onManage}
+              style={{
+                width: '100%',
+                padding: '12px 20px',
+                background: 'transparent',
+                border: `1px solid ${color}`,
+                borderRadius: '8px',
+                color: color,
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Manage Subscription
+            </button>
+          )
+        ) : (
+          <button
+            onClick={() => onUpgrade(tier)}
+            style={{
+              width: '100%',
+              padding: '12px 20px',
+              background: tier === 'free' ? '#333' : `linear-gradient(135deg, ${color}, ${color}CC)`,
+              border: 'none',
+              borderRadius: '8px',
+              color: tier === 'pro' ? '#000' : '#fff',
+              fontSize: '12px',
+              fontWeight: '700',
+              cursor: tier === 'free' ? 'default' : 'pointer',
+              boxShadow: tier !== 'free' ? `0 0 15px ${color}40` : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {tier === 'free' ? 'Free Forever' : `Upgrade to ${tier.charAt(0).toUpperCase() + tier.slice(1)}`}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const EnvironmentBadge = ({ environment }) => {
+  const isLive = environment === 'live';
+  return (
+    <span style={{
+      padding: '3px 8px',
+      borderRadius: '4px',
+      fontSize: '9px',
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      letterSpacing: '0.5px',
+      background: isLive ? 'rgba(57, 255, 20, 0.15)' : 'rgba(255, 184, 0, 0.15)',
+      color: isLive ? '#39FF14' : '#FFB800',
+      border: `1px solid ${isLive ? 'rgba(57, 255, 20, 0.4)' : 'rgba(255, 184, 0, 0.4)'}`,
+    }}>
+      {isLive ? 'LIVE' : 'TEST'}
+    </span>
+  );
+};
+
+const ScopeBadge = ({ scope }) => {
+  const colors = {
+    'market:read': '#00D4FF',
+    'signals:read': '#39FF14',
+    'predictions:read': '#8B5CF6',
+    'accuracy:read': '#FFB800',
+    'strikeagent:read': '#FF6B35',
+    'webhooks:write': '#FF4444',
+  };
+  const color = colors[scope] || '#888';
+  
+  return (
+    <span style={{
+      padding: '2px 5px',
+      borderRadius: '3px',
+      fontSize: '8px',
+      fontWeight: '600',
+      background: `${color}15`,
+      color: color,
+      border: `1px solid ${color}30`,
+    }}>
+      {scope}
+    </span>
+  );
+};
+
+const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.85)',
+      zIndex: 10001,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+    }}>
+      <div style={{
+        ...glassmorphism,
+        borderRadius: '16px',
+        padding: '24px',
+        maxWidth: '400px',
+        width: '100%',
+        border: '1px solid #FF444440',
+        boxShadow: '0 0 40px rgba(255, 68, 68, 0.2)',
+      }}>
+        <h3 style={{ margin: '0 0 12px', color: '#fff', fontSize: '18px' }}>{title}</h3>
+        <p style={{ margin: '0 0 20px', color: '#888', fontSize: '14px', lineHeight: 1.5 }}>{message}</p>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={onCancel}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: '#333',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '13px',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: 'linear-gradient(135deg, #FF4444, #FF6B6B)',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+          >
+            Regenerate
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function DevelopersPortalTab() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -283,9 +574,12 @@ export default function DevelopersPortalTab() {
   const [apiLoading, setApiLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [newKeyEnvironment, setNewKeyEnvironment] = useState('live');
+  const [newKeyScopes, setNewKeyScopes] = useState(['market:read', 'signals:read']);
   const [newKeyGenerated, setNewKeyGenerated] = useState(null);
   const [apiKeysCopied, setApiKeysCopied] = useState({});
   const [billingPeriod, setBillingPeriod] = useState('monthly');
+  const [currentTier, setCurrentTier] = useState('free');
+  const [regenerateConfirm, setRegenerateConfirm] = useState(null);
   
   useEffect(() => {
     localStorage.setItem('adminTasks', JSON.stringify(tasks));
@@ -321,6 +615,31 @@ export default function DevelopersPortalTab() {
     return () => clearInterval(interval);
   }, []);
   
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+        const sessionToken = session.sessionToken || session.token;
+        if (!sessionToken) return;
+        
+        const res = await fetch('/api/developer/subscription', {
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          body: JSON.stringify({ sessionToken }),
+        });
+        const data = await res.json();
+        if (data.tier) {
+          setCurrentTier(data.tier);
+          setNewKeyScopes(TIER_SCOPES[data.tier] || TIER_SCOPES.free);
+        }
+      } catch (e) {
+        console.error('Failed to fetch subscription:', e);
+      }
+    };
+    
+    fetchSubscription();
+  }, []);
+  
   const handleViewDoc = async (doc) => {
     setViewingDoc(doc);
     setDocContent('Loading...');
@@ -351,6 +670,7 @@ export default function DevelopersPortalTab() {
   ];
 
   const handleApiUpgrade = async (tier) => {
+    if (tier === 'free') return;
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}');
       const userId = session.id || session.email;
@@ -387,6 +707,26 @@ export default function DevelopersPortalTab() {
       console.error('Upgrade error:', e);
     }
   };
+  
+  const handleManageSubscription = async () => {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+      const sessionToken = session.sessionToken || session.token;
+      
+      const res = await fetch('/api/developer/billing/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken }),
+      });
+      
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      console.error('Failed to open billing portal:', e);
+    }
+  };
 
   const handleGenerateApiKey = async () => {
     if (!newKeyName.trim()) return;
@@ -406,7 +746,8 @@ export default function DevelopersPortalTab() {
         body: JSON.stringify({ 
           sessionToken, 
           name: newKeyName.trim(),
-          environment: newKeyEnvironment 
+          environment: newKeyEnvironment,
+          scopes: newKeyScopes,
         }),
       });
       const data = await res.json();
@@ -417,6 +758,7 @@ export default function DevelopersPortalTab() {
           prefix: data.prefix,
           name: newKeyName.trim(),
           environment: data.environment || newKeyEnvironment,
+          scopes: data.scopes || newKeyScopes,
         });
         setNewKeyName('');
         setApiKeys(prev => [...prev, {
@@ -424,6 +766,7 @@ export default function DevelopersPortalTab() {
           name: newKeyName.trim(),
           prefix: data.prefix,
           environment: data.environment || newKeyEnvironment,
+          scopes: data.scopes || newKeyScopes,
           createdAt: new Date().toISOString(),
           status: 'active',
         }]);
@@ -434,6 +777,39 @@ export default function DevelopersPortalTab() {
       console.error('Failed to generate API key:', e);
     } finally {
       setApiLoading(false);
+    }
+  };
+  
+  const handleRegenerateKey = async (keyId) => {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+      const sessionToken = session.sessionToken || session.token;
+      
+      const res = await fetch('/api/developer/keys/regenerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken, keyId }),
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        const key = apiKeys.find(k => k.id === keyId);
+        setNewKeyGenerated({
+          key: data.apiKey,
+          keyId: data.keyId,
+          prefix: data.prefix,
+          name: key?.name || 'Regenerated Key',
+          environment: key?.environment || 'live',
+          scopes: key?.scopes || newKeyScopes,
+        });
+        setApiKeys(prev => prev.map(k => 
+          k.id === keyId ? { ...k, prefix: data.prefix } : k
+        ));
+      }
+    } catch (e) {
+      console.error('Failed to regenerate key:', e);
+    } finally {
+      setRegenerateConfirm(null);
     }
   };
 
@@ -464,7 +840,9 @@ export default function DevelopersPortalTab() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             style={{
-              background: activeTab === tab.id ? 'linear-gradient(135deg, #00D4FF, #0099CC)' : '#1a1a1a',
+              background: activeTab === tab.id ? 'linear-gradient(135deg, #00D4FF, #0099CC)' : 'rgba(26, 26, 26, 0.6)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
               border: activeTab === tab.id ? 'none' : '1px solid #2a2a2a',
               borderRadius: '8px',
               padding: '10px 16px',
@@ -476,6 +854,7 @@ export default function DevelopersPortalTab() {
               whiteSpace: 'nowrap',
               fontSize: '13px',
               fontWeight: activeTab === tab.id ? '600' : '400',
+              transition: 'all 0.2s ease',
             }}
           >
             <span>{tab.icon}</span>
@@ -508,7 +887,7 @@ export default function DevelopersPortalTab() {
               onClick={() => setActiveTab('tasks')}
               style={{
                 width: '100%',
-                background: '#2a2a2a',
+                background: 'rgba(42, 42, 42, 0.6)',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '10px',
@@ -523,11 +902,11 @@ export default function DevelopersPortalTab() {
           
           <SectionCard title="Quick Stats" icon="⚡">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div style={{ textAlign: 'center', padding: '12px', background: '#0f0f0f', borderRadius: '8px' }}>
+              <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '8px' }}>
                 <div style={{ fontSize: '24px', fontWeight: '700', color: '#00D4FF' }}>{d.today?.views || 0}</div>
                 <div style={{ fontSize: '11px', color: '#666' }}>Today</div>
               </div>
-              <div style={{ textAlign: 'center', padding: '12px', background: '#0f0f0f', borderRadius: '8px' }}>
+              <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '8px' }}>
                 <div style={{ fontSize: '24px', fontWeight: '700', color: '#39FF14' }}>{d.allTime?.views || 0}</div>
                 <div style={{ fontSize: '11px', color: '#666' }}>All Time</div>
               </div>
@@ -545,7 +924,7 @@ export default function DevelopersPortalTab() {
                     alignItems: 'center',
                     gap: '10px',
                     padding: '10px',
-                    background: '#0f0f0f',
+                    background: 'rgba(15, 15, 15, 0.6)',
                     borderRadius: '8px',
                     cursor: 'pointer',
                   }}
@@ -557,7 +936,7 @@ export default function DevelopersPortalTab() {
               <button
                 onClick={() => setActiveTab('documents')}
                 style={{
-                  background: '#2a2a2a',
+                  background: 'rgba(42, 42, 42, 0.6)',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '10px',
@@ -574,35 +953,47 @@ export default function DevelopersPortalTab() {
       )}
       
       {activeTab === 'api' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(12, 1fr)', 
+          gap: '16px',
+        }}>
           <div style={{
-            background: 'linear-gradient(135deg, #0f0f0f, #1a1a1a)',
-            borderRadius: '16px',
-            padding: '24px',
-            border: '1px solid #00D4FF30',
-            boxShadow: '0 0 30px #00D4FF15',
+            gridColumn: '1 / -1',
+            ...glassmorphism,
+            borderRadius: '20px',
+            padding: '28px',
+            border: '1px solid rgba(0, 212, 255, 0.3)',
+            boxShadow: '0 0 50px rgba(0, 212, 255, 0.15)',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '24px' }}>🚀</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <span style={{ fontSize: '28px' }}>🚀</span>
                 <div>
-                  <h3 style={{ margin: 0, color: '#fff', fontSize: '18px' }}>Pulse Developer API</h3>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '20px', fontWeight: '700' }}>Pulse Developer API</h3>
                   <p style={{ margin: '4px 0 0', color: '#888', fontSize: '13px' }}>Access AI signals, market data & safety scanning</p>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ display: 'flex', background: '#0f0f0f', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  background: 'rgba(15, 15, 15, 0.6)', 
+                  borderRadius: '10px', 
+                  padding: '4px', 
+                  border: '1px solid #333' 
+                }}>
                   <button
                     onClick={() => setBillingPeriod('monthly')}
                     style={{
                       background: billingPeriod === 'monthly' ? 'linear-gradient(135deg, #00D4FF, #0099CC)' : 'transparent',
                       border: 'none',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      padding: '10px 18px',
                       color: billingPeriod === 'monthly' ? '#fff' : '#888',
                       cursor: 'pointer',
                       fontWeight: '600',
                       fontSize: '12px',
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     Monthly
@@ -612,12 +1003,13 @@ export default function DevelopersPortalTab() {
                     style={{
                       background: billingPeriod === 'annual' ? 'linear-gradient(135deg, #39FF14, #2ECC71)' : 'transparent',
                       border: 'none',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      padding: '10px 18px',
                       color: billingPeriod === 'annual' ? '#000' : '#888',
                       cursor: 'pointer',
                       fontWeight: '600',
                       fontSize: '12px',
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     Annual
@@ -629,8 +1021,9 @@ export default function DevelopersPortalTab() {
                     color: '#000', 
                     fontSize: '10px', 
                     fontWeight: '700', 
-                    padding: '4px 8px', 
-                    borderRadius: '12px' 
+                    padding: '6px 12px', 
+                    borderRadius: '12px',
+                    boxShadow: '0 0 10px rgba(57, 255, 20, 0.4)',
                   }}>
                     ~17% savings
                   </span>
@@ -638,276 +1031,329 @@ export default function DevelopersPortalTab() {
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '16px' }}>
-              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #2a2a2a' }}>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#00D4FF' }}>Free</div>
-                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>$0</div>
-                <div style={{ fontSize: '11px', color: '#888' }}>60 req/min • 2K/day</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>Market Data + Signals</div>
-                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
-                  market:read, signals:read
-                </div>
-                <div style={{ marginTop: '12px', padding: '8px 16px', background: '#333', borderRadius: '6px', color: '#888', fontSize: '12px' }}>
-                  Current Plan
-                </div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #39FF1440', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #39FF14, #2ECC71)', color: '#000', fontSize: '10px', fontWeight: '700', padding: '4px 12px', borderRadius: '12px' }}>POPULAR</div>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#39FF14' }}>Pro</div>
-                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>
-                  {billingPeriod === 'annual' ? '$24' : '$29'}
-                  <span style={{ fontSize: '14px', color: '#888' }}>/mo</span>
-                </div>
-                {billingPeriod === 'annual' && (
-                  <div style={{ fontSize: '10px', color: '#39FF14', marginBottom: '4px' }}>$288/year (billed annually)</div>
-                )}
-                <div style={{ fontSize: '11px', color: '#888' }}>600 req/min • 100K/day</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>+ Predictions + Accuracy</div>
-                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
-                  + predictions:read, accuracy:read
-                </div>
-                <button
-                  onClick={() => handleApiUpgrade('pro')}
-                  style={{ marginTop: '12px', padding: '10px 20px', background: 'linear-gradient(135deg, #39FF14, #2ECC71)', border: 'none', borderRadius: '6px', color: '#000', fontSize: '12px', fontWeight: '700', cursor: 'pointer', width: '100%' }}
-                >
-                  Upgrade to Pro
-                </button>
-              </div>
-              <div style={{ textAlign: 'center', padding: '20px', background: '#0f0f0f', borderRadius: '12px', border: '1px solid #8B5CF640' }}>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#8B5CF6' }}>Enterprise</div>
-                <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>
-                  {billingPeriod === 'annual' ? '$82' : '$99'}
-                  <span style={{ fontSize: '14px', color: '#888' }}>/mo</span>
-                </div>
-                {billingPeriod === 'annual' && (
-                  <div style={{ fontSize: '10px', color: '#8B5CF6', marginBottom: '4px' }}>$984/year (billed annually)</div>
-                )}
-                <div style={{ fontSize: '11px', color: '#888' }}>3000 req/min • 1M/day</div>
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>+ StrikeAgent + Webhooks</div>
-                <div style={{ fontSize: '10px', color: '#444', marginTop: '8px', padding: '8px', background: '#1a1a1a', borderRadius: '6px' }}>
-                  + strikeagent:read, webhooks:write
-                </div>
-                <button
-                  onClick={() => handleApiUpgrade('enterprise')}
-                  style={{ marginTop: '12px', padding: '10px 20px', background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '700', cursor: 'pointer', width: '100%' }}
-                >
-                  Upgrade to Enterprise
-                </button>
-              </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+              gap: '20px', 
+              marginTop: '20px' 
+            }}>
+              <PricingCard
+                tier="free"
+                monthlyPrice={0}
+                annualPrice={0}
+                billingPeriod={billingPeriod}
+                limits="60 req/min • 2K/day"
+                features="Market Data + Signals"
+                scopes={TIER_SCOPES.free}
+                isCurrentPlan={currentTier === 'free'}
+                onUpgrade={handleApiUpgrade}
+                onManage={handleManageSubscription}
+              />
+              <PricingCard
+                tier="pro"
+                monthlyPrice={29}
+                annualPrice={24}
+                billingPeriod={billingPeriod}
+                limits="600 req/min • 100K/day"
+                features="+ Predictions + Accuracy"
+                scopes={TIER_SCOPES.pro}
+                isCurrentPlan={currentTier === 'pro'}
+                isPopular={true}
+                onUpgrade={handleApiUpgrade}
+                onManage={handleManageSubscription}
+              />
+              <PricingCard
+                tier="enterprise"
+                monthlyPrice={99}
+                annualPrice={82}
+                billingPeriod={billingPeriod}
+                limits="3000 req/min • 1M/day"
+                features="+ StrikeAgent + Webhooks"
+                scopes={TIER_SCOPES.enterprise}
+                isCurrentPlan={currentTier === 'enterprise'}
+                onUpgrade={handleApiUpgrade}
+                onManage={handleManageSubscription}
+              />
             </div>
           </div>
           
-          <SectionCard title="Generate API Key" icon="🔐">
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-              <input
-                type="text"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
-                placeholder="Key name (e.g., My Trading Bot)"
-                style={{
-                  flex: 1,
-                  minWidth: '200px',
-                  background: '#0f0f0f',
-                  border: '1px solid #333',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  color: '#fff',
-                  fontSize: '14px',
-                }}
-              />
-              <div style={{ display: 'flex', gap: '4px', background: '#0f0f0f', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
-                <button
-                  onClick={() => setNewKeyEnvironment('live')}
+          <div style={{ gridColumn: 'span 12', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+            <SectionCard title="Generate API Key" icon="🔐" glowColor="#00D4FF">
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  placeholder="Key name (e.g., My Trading Bot)"
                   style={{
-                    background: newKeyEnvironment === 'live' ? 'linear-gradient(135deg, #39FF14, #2ECC71)' : 'transparent',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    color: newKeyEnvironment === 'live' ? '#000' : '#888',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    fontSize: '12px',
+                    flex: 1,
+                    minWidth: '200px',
+                    background: 'rgba(15, 15, 15, 0.6)',
+                    border: '1px solid #333',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    color: '#fff',
+                    fontSize: '14px',
                   }}
-                >
-                  Live
-                </button>
-                <button
-                  onClick={() => setNewKeyEnvironment('test')}
-                  style={{
-                    background: newKeyEnvironment === 'test' ? 'linear-gradient(135deg, #FFB800, #FF8C00)' : 'transparent',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 14px',
-                    color: newKeyEnvironment === 'test' ? '#000' : '#888',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    fontSize: '12px',
-                  }}
-                >
-                  Test
-                </button>
-              </div>
-              <button
-                onClick={handleGenerateApiKey}
-                disabled={apiLoading || !newKeyName.trim()}
-                style={{
-                  background: apiLoading ? '#333' : 'linear-gradient(135deg, #00D4FF, #0099CC)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '12px 20px',
-                  color: '#fff',
-                  cursor: apiLoading ? 'wait' : 'pointer',
-                  fontWeight: '600',
-                  opacity: !newKeyName.trim() ? 0.5 : 1,
-                }}
-              >
-                {apiLoading ? 'Generating...' : 'Generate Key'}
-              </button>
-            </div>
-            <div style={{ fontSize: '11px', color: '#666', marginBottom: '12px' }}>
-              {newKeyEnvironment === 'live' 
-                ? '🟢 Live keys access real data and count against rate limits' 
-                : '🟡 Test keys return mock data for development - no rate limit impact'}
-            </div>
-            
-            {newKeyGenerated && (
-              <div style={{
-                background: '#0a1a0a',
-                border: '1px solid #39FF1440',
-                borderRadius: '10px',
-                padding: '16px',
-                marginTop: '12px',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span style={{ color: '#39FF14', fontSize: '16px' }}>✓</span>
-                  <span style={{ color: '#39FF14', fontWeight: '600' }}>API Key Generated!</span>
-                </div>
-                <p style={{ color: '#888', fontSize: '12px', margin: '0 0 12px' }}>
-                  Copy this key now - it won't be shown again!
-                </p>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  background: '#0f0f0f',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  fontFamily: 'monospace',
-                }}>
-                  <code style={{ flex: 1, color: '#00D4FF', fontSize: '13px', wordBreak: 'break-all' }}>
-                    {newKeyGenerated.key}
-                  </code>
+                />
+                <div style={{ display: 'flex', gap: '4px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
                   <button
-                    onClick={() => copyToClipboard(newKeyGenerated.key, 'newKey')}
+                    onClick={() => setNewKeyEnvironment('live')}
                     style={{
-                      background: apiKeysCopied['newKey'] ? '#39FF14' : '#333',
+                      background: newKeyEnvironment === 'live' ? 'linear-gradient(135deg, #39FF14, #2ECC71)' : 'transparent',
                       border: 'none',
                       borderRadius: '6px',
-                      padding: '8px 12px',
-                      color: apiKeysCopied['newKey'] ? '#000' : '#fff',
+                      padding: '8px 14px',
+                      color: newKeyEnvironment === 'live' ? '#000' : '#888',
                       cursor: 'pointer',
+                      fontWeight: '600',
                       fontSize: '12px',
                     }}
                   >
-                    {apiKeysCopied['newKey'] ? 'Copied!' : 'Copy'}
+                    Live
+                  </button>
+                  <button
+                    onClick={() => setNewKeyEnvironment('test')}
+                    style={{
+                      background: newKeyEnvironment === 'test' ? 'linear-gradient(135deg, #FFB800, #FF8C00)' : 'transparent',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '8px 14px',
+                      color: newKeyEnvironment === 'test' ? '#000' : '#888',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '12px',
+                    }}
+                  >
+                    Test
                   </button>
                 </div>
                 <button
-                  onClick={() => setNewKeyGenerated(null)}
+                  onClick={handleGenerateApiKey}
+                  disabled={apiLoading || !newKeyName.trim()}
                   style={{
-                    marginTop: '12px',
-                    background: '#2a2a2a',
+                    background: apiLoading ? '#333' : 'linear-gradient(135deg, #00D4FF, #0099CC)',
                     border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 16px',
-                    color: '#888',
-                    cursor: 'pointer',
-                    fontSize: '12px',
+                    borderRadius: '8px',
+                    padding: '12px 20px',
+                    color: '#fff',
+                    cursor: apiLoading ? 'wait' : 'pointer',
+                    fontWeight: '600',
+                    opacity: !newKeyName.trim() ? 0.5 : 1,
+                    boxShadow: !apiLoading && newKeyName.trim() ? '0 0 15px rgba(0, 212, 255, 0.3)' : 'none',
                   }}
                 >
-                  Dismiss
+                  {apiLoading ? 'Generating...' : 'Generate Key'}
                 </button>
               </div>
-            )}
-          </SectionCard>
-          
-          {apiKeys.length > 0 && (
-            <SectionCard title="Your API Keys" icon="📋">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {apiKeys.map((key) => (
-                  <div
-                    key={key.id}
+              <div style={{ fontSize: '11px', color: '#666', marginBottom: '12px' }}>
+                {newKeyEnvironment === 'live' 
+                  ? '🟢 Live keys access real data and count against rate limits' 
+                  : '🟡 Test keys return mock data for development - no rate limit impact'}
+              </div>
+              
+              {newKeyGenerated && (
+                <div style={{
+                  background: 'rgba(10, 26, 10, 0.6)',
+                  border: '2px solid #39FF14',
+                  borderRadius: '12px',
+                  padding: '20px',
+                  marginTop: '16px',
+                  boxShadow: '0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.05)',
+                  animation: 'glowPulse 2s ease-in-out infinite',
+                }}>
+                  <style>{`
+                    @keyframes glowPulse {
+                      0%, 100% { box-shadow: 0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.05); }
+                      50% { box-shadow: 0 0 40px rgba(57, 255, 20, 0.5), inset 0 0 30px rgba(57, 255, 20, 0.1); }
+                    }
+                  `}</style>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                    <span style={{ color: '#39FF14', fontSize: '20px' }}>✓</span>
+                    <span style={{ color: '#39FF14', fontWeight: '700', fontSize: '16px' }}>API Key Generated!</span>
+                  </div>
+                  <div style={{
+                    background: 'rgba(255, 68, 68, 0.1)',
+                    border: '1px solid rgba(255, 68, 68, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    marginBottom: '16px',
+                  }}>
+                    <p style={{ color: '#FF6B6B', fontSize: '13px', margin: 0, fontWeight: '600' }}>
+                      ⚠️ Save this key now - it cannot be retrieved again!
+                    </p>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    background: 'rgba(15, 15, 15, 0.8)',
+                    padding: '14px',
+                    borderRadius: '10px',
+                    border: '1px solid #39FF1440',
+                    fontFamily: 'monospace',
+                  }}>
+                    <code style={{ flex: 1, color: '#00D4FF', fontSize: '13px', wordBreak: 'break-all' }}>
+                      {newKeyGenerated.key}
+                    </code>
+                    <button
+                      onClick={() => copyToClipboard(newKeyGenerated.key, 'newKey')}
+                      style={{
+                        background: apiKeysCopied['newKey'] ? '#39FF14' : 'linear-gradient(135deg, #333, #444)',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '10px 16px',
+                        color: apiKeysCopied['newKey'] ? '#000' : '#fff',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {apiKeysCopied['newKey'] ? '✓ Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setNewKeyGenerated(null)}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px',
-                      background: '#0f0f0f',
+                      marginTop: '16px',
+                      background: 'rgba(42, 42, 42, 0.6)',
+                      border: '1px solid #444',
                       borderRadius: '8px',
-                      border: '1px solid #2a2a2a',
+                      padding: '10px 20px',
+                      color: '#888',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      transition: 'all 0.2s ease',
                     }}
                   >
-                    <div>
-                      <div style={{ color: '#fff', fontWeight: '500', fontSize: '14px' }}>{key.name}</div>
-                      <div style={{ color: '#666', fontSize: '12px', fontFamily: 'monospace' }}>{key.prefix}...</div>
-                    </div>
-                    <div style={{
-                      padding: '4px 10px',
-                      borderRadius: '12px',
-                      background: key.status === 'active' ? '#39FF1420' : '#FF6B3520',
-                      color: key.status === 'active' ? '#39FF14' : '#FF6B35',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                    }}>
-                      {key.status === 'active' ? 'Active' : 'Revoked'}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    Dismiss
+                  </button>
+                </div>
+              )}
             </SectionCard>
-          )}
+            
+            {apiKeys.length > 0 && (
+              <SectionCard title="Your API Keys" icon="📋" glowColor="#8B5CF6">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {apiKeys.map((key) => (
+                    <div
+                      key={key.id}
+                      style={{
+                        ...glassmorphism,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                        padding: '14px',
+                        borderRadius: '10px',
+                        border: '1px solid #2a2a2a',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div>
+                            <div style={{ color: '#fff', fontWeight: '600', fontSize: '14px' }}>{key.name}</div>
+                            <div style={{ color: '#666', fontSize: '12px', fontFamily: 'monospace' }}>{key.prefix}...</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <EnvironmentBadge environment={key.environment} />
+                          <span style={{
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            background: key.status === 'active' ? 'rgba(57, 255, 20, 0.15)' : 'rgba(255, 107, 53, 0.15)',
+                            color: key.status === 'active' ? '#39FF14' : '#FF6B35',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                          }}>
+                            {key.status === 'active' ? 'Active' : 'Revoked'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {key.scopes && key.scopes.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {key.scopes.map((scope, i) => (
+                            <ScopeBadge key={i} scope={scope} />
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                        <button
+                          onClick={() => setRegenerateConfirm(key.id)}
+                          style={{
+                            padding: '8px 14px',
+                            background: 'rgba(255, 184, 0, 0.1)',
+                            border: '1px solid rgba(255, 184, 0, 0.3)',
+                            borderRadius: '6px',
+                            color: '#FFB800',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          🔄 Regenerate
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
+          </div>
           
-          <SectionCard title="API Documentation" icon="📖" fullWidth>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ padding: '12px', background: '#0f0f0f', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ background: '#39FF14', color: '#000', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>GET</span>
-                  <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/market-overview?category=top</code>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <SectionCard title="API Documentation" icon="📖" fullWidth glowColor="#00D4FF">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+                <div style={{ padding: '14px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '10px', border: '1px solid #2a2a2a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ background: '#39FF14', color: '#000', padding: '3px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>GET</span>
+                    <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/market-overview?category=top</code>
+                  </div>
+                  <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get market overview with top coins, BTC dominance, and sentiment</p>
                 </div>
-                <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get market overview with top coins, BTC dominance, and sentiment</p>
+                
+                <div style={{ padding: '14px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '10px', border: '1px solid #2a2a2a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ background: '#39FF14', color: '#000', padding: '3px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>GET</span>
+                    <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/price/:symbol</code>
+                  </div>
+                  <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get current price for a cryptocurrency (e.g., BTC, ETH, SOL)</p>
+                </div>
+                
+                <div style={{ padding: '14px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '10px', border: '1px solid #2a2a2a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ background: '#39FF14', color: '#000', padding: '3px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>GET</span>
+                    <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/signals?symbol=BTC</code>
+                  </div>
+                  <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get AI analysis signals for a coin (BUY/SELL/HOLD with confidence)</p>
+                </div>
+                
+                <div style={{ padding: '14px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ background: '#8B5CF6', color: '#fff', padding: '3px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>PRO</span>
+                    <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/predictions/:symbol?horizon=4h</code>
+                  </div>
+                  <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get ML predictions with probability scores (Pro tier required)</p>
+                </div>
               </div>
               
-              <div style={{ padding: '12px', background: '#0f0f0f', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ background: '#39FF14', color: '#000', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>GET</span>
-                  <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/price/:symbol</code>
-                </div>
-                <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get current price for a cryptocurrency (e.g., BTC, ETH, SOL)</p>
-              </div>
-              
-              <div style={{ padding: '12px', background: '#0f0f0f', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ background: '#39FF14', color: '#000', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>GET</span>
-                  <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/signals?symbol=BTC</code>
-                </div>
-                <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get AI analysis signals for a coin (BUY/SELL/HOLD with confidence)</p>
-              </div>
-              
-              <div style={{ padding: '12px', background: '#0f0f0f', borderRadius: '8px', border: '1px solid #8B5CF630' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ background: '#8B5CF6', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>PRO</span>
-                  <code style={{ color: '#ccc', fontSize: '13px' }}>/api/v1/predictions/:symbol?horizon=4h</code>
-                </div>
-                <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Get ML predictions with probability scores (Pro tier required)</p>
-              </div>
-              
-              <div style={{ marginTop: '8px', padding: '12px', background: '#1a1a2a', borderRadius: '8px', border: '1px solid #00D4FF30' }}>
-                <p style={{ color: '#00D4FF', fontSize: '12px', margin: 0 }}>
-                  <strong>Authentication:</strong> Include your API key in the <code style={{ background: '#0f0f0f', padding: '2px 6px', borderRadius: '4px' }}>X-Pulse-Api-Key</code> header
+              <div style={{ 
+                marginTop: '16px', 
+                padding: '14px', 
+                background: 'rgba(26, 26, 42, 0.6)', 
+                borderRadius: '10px', 
+                border: '1px solid rgba(0, 212, 255, 0.3)' 
+              }}>
+                <p style={{ color: '#00D4FF', fontSize: '13px', margin: 0 }}>
+                  <strong>Authentication:</strong> Include your API key in the <code style={{ background: 'rgba(15, 15, 15, 0.6)', padding: '3px 8px', borderRadius: '4px' }}>X-Pulse-Api-Key</code> header
                 </p>
               </div>
-            </div>
-          </SectionCard>
+            </SectionCard>
+          </div>
         </div>
       )}
       
@@ -922,7 +1368,7 @@ export default function DevelopersPortalTab() {
       {activeTab === 'tasks' && (
         <div>
           <div style={{
-            background: '#1a1a1a',
+            ...glassmorphism,
             borderRadius: '12px',
             padding: '20px',
             marginBottom: '20px',
@@ -976,7 +1422,7 @@ export default function DevelopersPortalTab() {
               <TopList title="Top Referrers" items={d.topReferrers || []} labelKey="referrer" valueKey="count" icon="🔗" />
               <DeviceBreakdown data={d.deviceBreakdown || { desktop: 0, mobile: 0, tablet: 0 }} />
               <div style={{
-                background: '#1a1a1a',
+                ...glassmorphism,
                 borderRadius: '16px',
                 padding: '20px',
                 border: '1px solid #2a2a2a',
@@ -994,6 +1440,14 @@ export default function DevelopersPortalTab() {
       {viewingDoc && (
         <DocViewer doc={viewingDoc} content={docContent} onClose={() => setViewingDoc(null)} />
       )}
+      
+      <ConfirmModal
+        isOpen={!!regenerateConfirm}
+        title="Regenerate API Key?"
+        message="This will invalidate your current key and generate a new one. Any applications using the old key will stop working immediately."
+        onConfirm={() => handleRegenerateKey(regenerateConfirm)}
+        onCancel={() => setRegenerateConfirm(null)}
+      />
     </div>
   );
 }
