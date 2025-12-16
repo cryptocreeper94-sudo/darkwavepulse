@@ -11,15 +11,15 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: '#0f0f0f',
             borderTopWidth: 1,
-            borderTopColor: '#222',
-            height: 60,
+            borderTopColor: '#1a1a1a',
+            height: 65,
             paddingBottom: 8,
             paddingTop: 8,
           },
-          tabBarActiveTintColor: '#00d4aa',
+          tabBarActiveTintColor: '#00FFFF',
           tabBarInactiveTintColor: '#666',
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: '600',
             letterSpacing: 0.3,
           },
@@ -28,6 +28,15 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
+            title: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="markets"
+          options={{
             title: 'Markets',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="stats-chart" size={size} color={color} />
@@ -35,19 +44,18 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="strike-agent"
+          name="predictions"
           options={{
-            title: 'StrikeAgent',
+            title: 'Predictions',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="flash" size={size} color={color} />
             ),
-            tabBarActiveTintColor: '#00d4aa',
           }}
         />
         <Tabs.Screen
-          name="portfolio"
+          name="wallet"
           options={{
-            title: 'Portfolio',
+            title: 'Wallet',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="wallet" size={size} color={color} />
             ),
@@ -60,6 +68,18 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="settings" size={size} color={color} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="portfolio"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="strike-agent"
+          options={{
+            href: null,
           }}
         />
       </Tabs>

@@ -1,4 +1,5 @@
-import { pgTable, varchar, timestamp, boolean, text, integer, serial, json, numeric } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, timestamp, boolean, text, integer, serial, json, numeric, decimal } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const subscriptions = pgTable('subscriptions', {
   userId: varchar('user_id', { length: 255 }).primaryKey(),
@@ -1619,4 +1620,130 @@ export const pageViews = pgTable('page_views', {
   city: text('city'),
   duration: integer('duration'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// ============================================
+// SOCIAL TRADING SYSTEM
+// Leaderboards, Copy Trading, Community Signals
+// ============================================
+
+// Trader leaderboard - tracks user trading performance
+export const traderProfiles = pgTable('trader_profiles', {
+  id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id", { length: 36 }).notNull(),
+  displayName: varchar("display_name", { length: 50 }),
+  bio: text("bio"),
+  totalPnl: decimal("total_pnl", { precision: 18, scale: 2 }).default("0"),
+  winRate: decimal("win_rate", { precision: 5, scale: 2 }).default("0"),
+  totalTrades: integer("total_trades").default(0),
+  followers: integer("followers").default(0),
+  rank: integer("rank"),
+  isPublic: boolean("is_public").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Copy trading subscriptions
+export const copyTradingSubscriptions = pgTable('copy_trading_subscriptions', {
+  id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+  followerId: varchar("follower_id", { length: 36 }).notNull(),
+  traderId: varchar("trader_id", { length: 36 }).notNull(),
+  allocationPercent: decimal("allocation_percent", { precision: 5, scale: 2 }).default("10"),
+  maxPositionSize: decimal("max_position_size", { precision: 18, scale: 2 }),
+  isActive: boolean("is_active").default(true),
+  totalCopiedTrades: integer("total_copied_trades").default(0),
+  totalPnlFromCopying: decimal("total_pnl_from_copying", { precision: 18, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Community signals
+export const communitySignals = pgTable('community_signals', {
+  id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+  traderId: varchar("trader_id", { length: 36 }).notNull(),
+  ticker: varchar("ticker", { length: 20 }).notNull(),
+  signal: varchar("signal", { length: 20 }).notNull(),
+  targetPrice: decimal("target_price", { precision: 18, scale: 8 }),
+  stopLoss: decimal("stop_loss", { precision: 18, scale: 8 }),
+  analysis: text("analysis"),
+  upvotes: integer("upvotes").default(0),
+  downvotes: integer("downvotes").default(0),
+  status: varchar("status", { length: 20 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+});
+
+// Signal votes - track who voted on which signals
+export const signalVotes = pgTable('signal_votes', {
+  id: varchar("id", { length: 36 }).primaryKey().default(sql`gen_random_uuid()`),
+  signalId: varchar("signal_id", { length: 36 }).notNull(),
+  userId: varchar("user_id", { length: 36 }).notNull(),
+  vote: integer("vote").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ============================================
+// EXCHANGE CONNECTIONS - CEX/DEX Trading
+// Encrypted API key storage for exchange integrations
+// ============================================
+
+export const exchangeConnections = pgTable('exchange_connections', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  exchangeName: varchar('exchange_name', { length: 50 }).notNull(),
+  exchangeType: varchar('exchange_type', { length: 10 }).notNull(),
+  
+  encryptedCredentials: text('encrypted_credentials').notNull(),
+  
+  nickname: varchar('nickname', { length: 100 }),
+  isActive: boolean('is_active').default(true),
+  lastValidated: timestamp('last_validated'),
+  validationStatus: varchar('validation_status', { length: 20 }).default('pending'),
+  
+  permissions: text('permissions'),
+  
+  rateLimitRemaining: integer('rate_limit_remaining'),
+  rateLimitResetAt: timestamp('rate_limit_reset_at'),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const exchangeOrders = pgTable('exchange_orders', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  connectionId: varchar('connection_id', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  exchangeOrderId: varchar('exchange_order_id', { length: 255 }).notNull(),
+  symbol: varchar('symbol', { length: 50 }).notNull(),
+  side: varchar('side', { length: 10 }).notNull(),
+  type: varchar('type', { length: 20 }).notNull(),
+  status: varchar('status', { length: 20 }).notNull(),
+  
+  price: varchar('price', { length: 50 }),
+  stopPrice: varchar('stop_price', { length: 50 }),
+  quantity: varchar('quantity', { length: 50 }).notNull(),
+  executedQty: varchar('executed_qty', { length: 50 }),
+  avgPrice: varchar('avg_price', { length: 50 }),
+  
+  fee: varchar('fee', { length: 50 }),
+  feeAsset: varchar('fee_asset', { length: 20 }),
+  
+  clientOrderId: varchar('client_order_id', { length: 255 }),
+  timeInForce: varchar('time_in_force', { length: 10 }),
+  
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  filledAt: timestamp('filled_at'),
+});
+
+export const exchangeBalanceSnapshots = pgTable('exchange_balance_snapshots', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  connectionId: varchar('connection_id', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  
+  balances: text('balances').notNull(),
+  totalUsdValue: varchar('total_usd_value', { length: 50 }),
+  
+  snapshotAt: timestamp('snapshot_at').defaultNow().notNull(),
 });
