@@ -38,6 +38,7 @@ export default function VerificationBadge({
           cursor: pointer;
           transition: all 0.3s ease;
           flex-shrink: 0;
+          margin-right: 4px;
         }
 
         .verification-badge:hover {
