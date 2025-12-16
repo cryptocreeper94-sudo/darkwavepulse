@@ -1589,6 +1589,21 @@ export const apiRequestLogs = pgTable('api_request_logs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// API Subscriptions - Developer API tier subscriptions
+export const apiSubscriptions = pgTable('api_subscriptions', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
+  stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }),
+  tier: varchar('tier', { length: 50 }).notNull().default('free'), // free, pro, enterprise
+  status: varchar('status', { length: 50 }).notNull().default('active'), // active, canceled, past_due
+  currentPeriodStart: timestamp('current_period_start'),
+  currentPeriodEnd: timestamp('current_period_end'),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
 // Analytics - Page Views tracking for Developers Portal
 export const pageViews = pgTable('page_views', {
   id: varchar('id', { length: 255 }).primaryKey(),
