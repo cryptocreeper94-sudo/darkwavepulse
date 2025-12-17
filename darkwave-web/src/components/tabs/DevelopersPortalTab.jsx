@@ -16,6 +16,10 @@ const DEFAULT_TASKS = [
   { id: 6, text: 'Update investor brief with Q4 metrics', done: false, priority: 'medium' },
   { id: 7, text: 'Configure Stripe production keys', done: true, priority: 'high' },
   { id: 8, text: 'Deploy StrikeAgent to mainnet', done: false, priority: 'high' },
+  { id: 9, text: 'Set up MoonPay crypto on-ramp (dashboard.moonpay.com)', done: false, priority: 'high', link: 'https://dashboard.moonpay.com', instructions: '1. Create account at dashboard.moonpay.com\n2. Complete business verification\n3. Get your API key (pk_live_xxx)\n4. Get your Secret key for URL signing\n5. Add keys to Replit Secrets: MOONPAY_API_KEY, MOONPAY_SECRET_KEY' },
+  { id: 10, text: 'Set up Transak crypto on-ramp (dashboard.transak.com)', done: false, priority: 'high', link: 'https://dashboard.transak.com', instructions: '1. Create account at dashboard.transak.com\n2. Complete KYB verification\n3. Get your API key from Settings\n4. Add key to Replit Secrets: TRANSAK_API_KEY' },
+  { id: 11, text: 'Apply for Stripe Crypto Onramp (stripe.com/crypto)', done: false, priority: 'medium', link: 'https://stripe.com/crypto', instructions: '1. Go to Stripe Dashboard > Products > Crypto Onramp\n2. Click "Request Access"\n3. Complete application form\n4. Wait for approval (1-2 weeks)\n5. Once approved, existing keys work automatically' },
+  { id: 12, text: 'Test built-in wallet with real funds', done: false, priority: 'high' },
 ];
 
 const TIER_COLORS = {
@@ -193,51 +197,107 @@ const BusinessDocCard = ({ doc, onView }) => (
 
 const TodoItem = ({ task, onToggle }) => {
   const priorityColors = { high: '#FF4444', medium: '#FFB344', low: '#44FF44' };
+  const [showInstructions, setShowInstructions] = useState(false);
+  
   return (
-    <div 
-      onClick={() => onToggle(task.id)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '12px',
-        background: task.done ? 'rgba(26, 42, 26, 0.6)' : 'rgba(26, 26, 26, 0.6)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderRadius: '8px',
-        border: `1px solid ${task.done ? '#39FF1430' : '#2a2a2a'}`,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      <div style={{
-        width: '20px',
-        height: '20px',
-        borderRadius: '4px',
-        border: `2px solid ${task.done ? '#39FF14' : '#444'}`,
-        background: task.done ? '#39FF14' : 'transparent',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        {task.done && <span style={{ color: '#000', fontSize: '12px' }}>✓</span>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div 
+        onClick={() => onToggle(task.id)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '12px',
+          background: task.done ? 'rgba(26, 42, 26, 0.6)' : 'rgba(26, 26, 26, 0.6)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: '8px',
+          border: `1px solid ${task.done ? '#39FF1430' : '#2a2a2a'}`,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+        }}
+      >
+        <div style={{
+          width: '20px',
+          height: '20px',
+          borderRadius: '4px',
+          border: `2px solid ${task.done ? '#39FF14' : '#444'}`,
+          background: task.done ? '#39FF14' : 'transparent',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          {task.done && <span style={{ color: '#000', fontSize: '12px' }}>✓</span>}
+        </div>
+        <span style={{
+          flex: 1,
+          color: task.done ? '#666' : '#fff',
+          textDecoration: task.done ? 'line-through' : 'none',
+          fontSize: '14px',
+        }}>
+          {task.text}
+        </span>
+        {task.link && (
+          <a 
+            href={task.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'linear-gradient(135deg, #00D4FF, #0099CC)',
+              color: '#000',
+              padding: '4px 10px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              fontWeight: '600',
+              textDecoration: 'none',
+              flexShrink: 0,
+            }}
+          >
+            Open →
+          </a>
+        )}
+        {task.instructions && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowInstructions(!showInstructions); }}
+            style={{
+              background: '#333',
+              border: 'none',
+              color: '#888',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            {showInstructions ? 'Hide' : 'Steps'}
+          </button>
+        )}
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: priorityColors[task.priority],
+          flexShrink: 0,
+        }} />
       </div>
-      <span style={{
-        flex: 1,
-        color: task.done ? '#666' : '#fff',
-        textDecoration: task.done ? 'line-through' : 'none',
-        fontSize: '14px',
-      }}>
-        {task.text}
-      </span>
-      <div style={{
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        background: priorityColors[task.priority],
-        flexShrink: 0,
-      }} />
+      {showInstructions && task.instructions && (
+        <div style={{
+          marginLeft: '32px',
+          padding: '12px',
+          background: 'rgba(0, 212, 255, 0.05)',
+          border: '1px solid rgba(0, 212, 255, 0.2)',
+          borderRadius: '8px',
+          fontSize: '12px',
+          color: '#aaa',
+          whiteSpace: 'pre-line',
+          lineHeight: '1.6',
+        }}>
+          {task.instructions}
+        </div>
+      )}
     </div>
   );
 };
