@@ -211,7 +211,7 @@ function MetricContent({ title, value, change }) {
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
   const gaugeSize = isMobile ? 80 : 120
-  const extraTopMargin = type === 'fearGreed' ? (isMobile ? 12 : 18) : 0
+  const extraGaugeMargin = type === 'fearGreed' ? (isMobile ? 12 : 20) : 0
   return (
     <div style={{ 
       display: 'flex', 
@@ -221,7 +221,6 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
       height: '100%',
       minHeight: isMobile ? 110 : 140,
       padding: 12,
-      paddingTop: 12 + extraTopMargin,
     }}>
       <div style={{ 
         color: accentColor, 
@@ -229,7 +228,7 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
         fontWeight: 700, 
         textTransform: 'uppercase', 
         letterSpacing: 1,
-        marginBottom: isMobile ? 6 : 10,
+        marginBottom: (isMobile ? 6 : 10) + extraGaugeMargin,
       }}>
         {title}
       </div>
