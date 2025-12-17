@@ -118,7 +118,7 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
           <div className="menu-section">
             <div className="menu-section-title">Official Documents</div>
             <a
-              href="/docs/DWAV_WHITEPAPER.pdf"
+              href="/docs/DWAV_WHITEPAPER.md"
               target="_blank"
               rel="noopener noreferrer"
               className="menu-item"
