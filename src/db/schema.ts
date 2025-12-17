@@ -1846,3 +1846,25 @@ export const tradingMilestones = pgTable('trading_milestones', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const webauthnCredentials = pgTable('webauthn_credentials', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  sessionToken: varchar('session_token', { length: 255 }).notNull(),
+  credentialId: text('credential_id').notNull(),
+  publicKey: text('public_key').notNull(),
+  counter: integer('counter').notNull().default(0),
+  deviceName: varchar('device_name', { length: 255 }),
+  transports: text('transports'),
+  usedFor: varchar('used_for', { length: 50 }).notNull().default('2fa'),
+  lastUsedAt: timestamp('last_used_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const webauthnChallenges = pgTable('webauthn_challenges', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  sessionToken: varchar('session_token', { length: 255 }).notNull(),
+  challenge: text('challenge').notNull(),
+  type: varchar('type', { length: 50 }).notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
