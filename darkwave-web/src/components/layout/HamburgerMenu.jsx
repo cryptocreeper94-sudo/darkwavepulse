@@ -115,6 +115,50 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
             ))}
           </div>
           
+          <div className="menu-section">
+            <div className="menu-section-title">Official Documents</div>
+            <a
+              href="/docs/DWAV_WHITEPAPER.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="menu-item"
+              onClick={onClose}
+            >
+              <span className="menu-icon">📄</span>
+              Whitepaper
+            </a>
+            <a
+              href="/business-docs/DARKWAVE_ROADMAP.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="menu-item"
+              onClick={onClose}
+            >
+              <span className="menu-icon">🗺️</span>
+              Roadmap
+            </a>
+            <a
+              href="/docs/DWAV_TOKEN_INFO.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="menu-item"
+              onClick={onClose}
+            >
+              <span className="menu-icon">🪙</span>
+              Token Info
+            </a>
+            <button
+              className="menu-item"
+              onClick={() => {
+                onAction('disclaimer')
+                onClose()
+              }}
+            >
+              <span className="menu-icon">⚠️</span>
+              Legal Disclaimer
+            </button>
+          </div>
+
           <div className="menu-footer">
             <div className="menu-footer-text">
               Beta V1 - Founders Launch Feb 14
