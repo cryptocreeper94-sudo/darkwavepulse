@@ -6,6 +6,7 @@ import Gauge from '../ui/Gauge'
 import FlipCarousel from '../ui/FlipCarousel'
 import MobileCardCarousel from '../ui/MobileCardCarousel'
 import AIStatusWidget from '../ui/AIStatusWidget'
+import MetricInfoModal from '../modals/MetricInfoModal'
 import versionData from '../../data/version.json'
 import '../../styles/dashboard.css'
 
@@ -967,6 +968,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   const [coinsLoading, setCoinsLoading] = useState(true)
   const [selectedCoin, setSelectedCoin] = useState(null)
   const [showTrendingModal, setShowTrendingModal] = useState(false)
+  const [selectedMetric, setSelectedMetric] = useState(null)
   const [marketData, setMarketData] = useState({
     fearGreed: 65,
     altcoinSeason: 75,
@@ -1095,12 +1097,20 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
       {/* Market Overview Strip - TOP of page */}
       <div className="market-overview-strip">
         {marketOverviewItems.map((item, index) => (
-          <div key={index} className="market-overview-card">
+          <div 
+            key={index} 
+            className="market-overview-card market-overview-card--clickable"
+            onClick={() => setSelectedMetric(item.title)}
+            title={`Click for info about ${item.title}`}
+          >
             {item.type === 'metric' ? (
               <MetricContent title={item.title} value={item.value} change={item.change} />
             ) : (
               <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={false} />
             )}
+            <div className="metric-info-hint">
+              <span>ℹ️</span>
+            </div>
           </div>
         ))}
       </div>
@@ -1345,6 +1355,12 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
           }}
         />
       )}
+
+      <MetricInfoModal
+        isOpen={!!selectedMetric}
+        onClose={() => setSelectedMetric(null)}
+        metric={selectedMetric}
+      />
       
           </div>
     </>
