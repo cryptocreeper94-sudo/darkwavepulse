@@ -1,9 +1,9 @@
 {
-  "version": "1.20.10",
+  "version": "1.21.0",
   "major": 1,
-  "minor": 20,
-  "patch": 10,
+  "minor": 21,
+  "patch": 0,
   "releaseGate": false,
-  "lastUpdated": "2025-12-15T22:50:11.581Z",
-  "notes": "Pre-token launch version. v2.0.0 reserved for DWAV token launch on Feb 14, 2026."
+  "lastUpdated": "2025-12-17T04:45:00.000Z",
+  "notes": "Biometric authentication (WebAuthn), secure session token rotation, and enhanced wallet security. v2.0.0 reserved for DWAV token launch on Feb 14, 2026."
 }
