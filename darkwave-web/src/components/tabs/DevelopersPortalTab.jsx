@@ -1,11 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-const BUSINESS_DOCS = [
-  { id: 'executive', title: 'Executive Summary', icon: '📋', file: '/business-docs/DARKWAVE_EXECUTIVE_SUMMARY_CONSERVATIVE.md', description: 'Company overview, problem, solution, business model' },
-  { id: 'investor', title: 'Investor Brief', icon: '💼', file: '/business-docs/DARKWAVE_INVESTOR_BRIEF_CONSERVATIVE.md', description: 'Full business plan for investors' },
-  { id: 'roadmap', title: 'Product Roadmap', icon: '🗺️', file: '/business-docs/DARKWAVE_ROADMAP.md', description: '2025-2028 development timeline' },
-  { id: 'bootstrap', title: 'Bootstrap Plan', icon: '🚀', file: '/business-docs/DARKWAVE_BOOTSTRAP_PLAN.md', description: 'Lean startup strategy' },
+const DOC_CATEGORIES = [
+  {
+    id: 'business',
+    title: 'Business Documents',
+    icon: '💼',
+    color: '#00D4FF',
+    docs: [
+      { id: 'executive', title: 'Executive Summary', icon: '📋', file: '/business-docs/DARKWAVE_EXECUTIVE_SUMMARY_CONSERVATIVE.md', description: 'Company overview, problem, solution' },
+      { id: 'investor', title: 'Investor Brief', icon: '💰', file: '/business-docs/DARKWAVE_INVESTOR_BRIEF_CONSERVATIVE.md', description: 'Full business plan for investors' },
+      { id: 'roadmap', title: 'Product Roadmap', icon: '🗺️', file: '/business-docs/DARKWAVE_ROADMAP.md', description: '2025-2028 development timeline' },
+      { id: 'bootstrap', title: 'Bootstrap Plan', icon: '🚀', file: '/business-docs/DARKWAVE_BOOTSTRAP_PLAN.md', description: 'Lean startup strategy' },
+    ],
+  },
+  {
+    id: 'token',
+    title: 'DWAV Token',
+    icon: '🪙',
+    color: '#39FF14',
+    docs: [
+      { id: 'whitepaper', title: 'Whitepaper', icon: '📄', file: '/docs/DWAV_WHITEPAPER.md', description: 'Complete token documentation' },
+      { id: 'tokeninfo', title: 'Token Specifications', icon: '🔢', file: '/docs/DWAV_TOKEN_INFO.md', description: 'Technical specs & tokenomics' },
+      { id: 'contract', title: 'Smart Contract', icon: '⚡', file: '/docs/DWAV_SMART_CONTRACT.md', description: 'Anchor program documentation' },
+    ],
+  },
+  {
+    id: 'marketing',
+    title: 'Marketing & Launch',
+    icon: '📢',
+    color: '#8B5CF6',
+    docs: [
+      { id: 'social', title: 'Social Media Posts', icon: '📱', file: '/marketing/SOCIAL_MEDIA_POSTS.md', description: '7 ready-to-post templates' },
+      { id: 'action', title: '2-Week Action Plan', icon: '📅', file: '/marketing/ACTION_PLAN_2_WEEKS.md', description: 'Marketing launch strategy' },
+    ],
+  },
+  {
+    id: 'legal',
+    title: 'Legal & Compliance',
+    icon: '⚖️',
+    color: '#FFB800',
+    docs: [
+      { id: 'disclaimer', title: 'Legal Disclaimer', icon: '📜', file: '/docs/LEGAL_DISCLAIMER.md', description: 'Risk disclosures & terms' },
+    ],
+  },
 ];
+
+const BUSINESS_DOCS = DOC_CATEGORIES.flatMap(cat => cat.docs);
 
 const DEFAULT_TASKS = [
   { id: 1, text: 'Complete AI prediction system testing', done: false, priority: 'high' },
@@ -163,7 +203,7 @@ const DeviceBreakdown = ({ data }) => {
   );
 };
 
-const BusinessDocCard = ({ doc, onView }) => (
+const BusinessDocCard = ({ doc, onView, color = '#00D4FF' }) => (
   <div 
     onClick={() => onView(doc)}
     style={{
@@ -173,11 +213,13 @@ const BusinessDocCard = ({ doc, onView }) => (
       border: '1px solid #2a2a2a',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
+      minWidth: '220px',
+      flex: '0 0 auto',
     }}
     onMouseOver={(e) => {
-      e.currentTarget.style.borderColor = '#00D4FF';
+      e.currentTarget.style.borderColor = color;
       e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.2)';
+      e.currentTarget.style.boxShadow = `0 0 25px ${color}30`;
     }}
     onMouseOut={(e) => {
       e.currentTarget.style.borderColor = '#2a2a2a';
@@ -186,12 +228,160 @@ const BusinessDocCard = ({ doc, onView }) => (
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-      <span style={{ fontSize: '24px' }}>{doc.icon}</span>
+      <span style={{ fontSize: '28px' }}>{doc.icon}</span>
       <div>
         <div style={{ color: '#fff', fontWeight: '600', fontSize: '14px' }}>{doc.title}</div>
-        <div style={{ color: '#666', fontSize: '12px' }}>{doc.description}</div>
+        <div style={{ color: '#666', fontSize: '11px' }}>{doc.description}</div>
       </div>
     </div>
+  </div>
+);
+
+const DocCarousel = ({ category, onViewDoc }) => {
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    const ref = scrollRef.current;
+    if (ref) ref.addEventListener('scroll', checkScroll);
+    return () => ref?.removeEventListener('scroll', checkScroll);
+  }, []);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div style={{
+      ...glassmorphism,
+      borderRadius: '16px',
+      padding: '20px',
+      border: `1px solid ${category.color}30`,
+      boxShadow: `0 0 30px ${category.color}10`,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '24px' }}>{category.icon}</span>
+          <h3 style={{ margin: 0, color: category.color, fontSize: '16px', fontWeight: '600' }}>{category.title}</h3>
+          <span style={{
+            background: `${category.color}20`,
+            color: category.color,
+            fontSize: '10px',
+            padding: '3px 8px',
+            borderRadius: '8px',
+            fontWeight: '600',
+          }}>
+            {category.docs.length} docs
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => scroll('left')}
+            disabled={!canScrollLeft}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              border: 'none',
+              background: canScrollLeft ? category.color : '#333',
+              color: canScrollLeft ? '#000' : '#666',
+              cursor: canScrollLeft ? 'pointer' : 'not-allowed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            ←
+          </button>
+          <button
+            onClick={() => scroll('right')}
+            disabled={!canScrollRight}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              border: 'none',
+              background: canScrollRight ? category.color : '#333',
+              color: canScrollRight ? '#000' : '#666',
+              cursor: canScrollRight ? 'pointer' : 'not-allowed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            →
+          </button>
+        </div>
+      </div>
+      <div
+        ref={scrollRef}
+        style={{
+          display: 'flex',
+          gap: '12px',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          paddingBottom: '4px',
+        }}
+      >
+        {category.docs.map(doc => (
+          <BusinessDocCard key={doc.id} doc={doc} onView={onViewDoc} color={category.color} />
+        ))}
+      </div>
+      <style>{`
+        div::-webkit-scrollbar { display: none; }
+      `}</style>
+    </div>
+  );
+};
+
+const QuickAccessCard = ({ doc, onView, color }) => (
+  <div
+    onClick={() => onView(doc)}
+    style={{
+      ...glassmorphism,
+      borderRadius: '12px',
+      padding: '16px',
+      border: `1px solid ${color}30`,
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      minHeight: '100px',
+    }}
+    onMouseOver={(e) => {
+      e.currentTarget.style.borderColor = color;
+      e.currentTarget.style.boxShadow = `0 0 30px ${color}30`;
+      e.currentTarget.style.transform = 'scale(1.02)';
+    }}
+    onMouseOut={(e) => {
+      e.currentTarget.style.borderColor = `${color}30`;
+      e.currentTarget.style.boxShadow = 'none';
+      e.currentTarget.style.transform = 'scale(1)';
+    }}
+  >
+    <span style={{ fontSize: '32px', marginBottom: '8px' }}>{doc.icon}</span>
+    <div style={{ color: '#fff', fontWeight: '600', fontSize: '13px' }}>{doc.title}</div>
   </div>
 );
 
@@ -1556,10 +1746,51 @@ export default function DevelopersPortalTab() {
       )}
       
       {activeTab === 'documents' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          {BUSINESS_DOCS.map(doc => (
-            <BusinessDocCard key={doc.id} doc={doc} onView={handleViewDoc} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{
+            ...glassmorphism,
+            borderRadius: '16px',
+            padding: '20px',
+            border: '1px solid #2a2a2a',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '20px' }}>⚡</span>
+              <h3 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: '600' }}>Quick Access</h3>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+              gap: '12px',
+            }}>
+              {[
+                { ...DOC_CATEGORIES[1].docs[0], color: '#39FF14' },
+                { ...DOC_CATEGORIES[0].docs[1], color: '#00D4FF' },
+                { ...DOC_CATEGORIES[2].docs[1], color: '#8B5CF6' },
+                { ...DOC_CATEGORIES[0].docs[2], color: '#00D4FF' },
+              ].map(doc => (
+                <QuickAccessCard key={doc.id} doc={doc} onView={handleViewDoc} color={doc.color} />
+              ))}
+            </div>
+          </div>
+
+          {DOC_CATEGORIES.map(category => (
+            <DocCarousel key={category.id} category={category} onViewDoc={handleViewDoc} />
           ))}
+
+          <div style={{
+            ...glassmorphism,
+            borderRadius: '16px',
+            padding: '20px',
+            border: '1px solid #333',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '14px', color: '#888', marginBottom: '8px' }}>
+              Total Documents: {DOC_CATEGORIES.reduce((acc, cat) => acc + cat.docs.length, 0)}
+            </div>
+            <div style={{ fontSize: '11px', color: '#666' }}>
+              Click any document to view. All files are in markdown format.
+            </div>
+          </div>
         </div>
       )}
       
