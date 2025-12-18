@@ -289,6 +289,12 @@
     box-sizing: border-box;
   }
   
+  .metric-info-hint {
+    top: 4px;
+    right: 4px;
+    font-size: 10px;
+  }
+  
   .bento-dashboard {
     display: flex;
     flex-direction: column;
