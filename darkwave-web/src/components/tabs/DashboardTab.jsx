@@ -211,16 +211,16 @@ function MetricContent({ title, value, change }) {
 }
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
-  const gaugeSize = isMobile ? 80 : 120
+  const gaugeSize = isMobile ? 100 : 160
   const extraGaugeMargin = type === 'fearGreed' ? (isMobile ? 0 : 0) : 0
   return (
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center',
-      justifyContent: 'flex-start',
+      justifyContent: 'center',
       height: '100%',
-      minHeight: isMobile ? 110 : 140,
+      minHeight: isMobile ? 130 : 180,
       paddingLeft: 12,
       paddingRight: 12,
       paddingBottom: 12,
@@ -232,15 +232,15 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
         fontWeight: 700, 
         textTransform: 'uppercase', 
         letterSpacing: 1,
-        marginBottom: (isMobile ? 6 : 10) + extraGaugeMargin,
+        marginBottom: (isMobile ? 8 : 12) + extraGaugeMargin,
         textAlign: 'center',
         width: '100%',
-        paddingRight: 20,
-        paddingLeft: 20,
+        paddingRight: 16,
+        paddingLeft: 16,
       }}>
         {title}
       </div>
-      <div style={{ width: '100%', maxWidth: gaugeSize, display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: gaugeSize, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
         <Gauge value={value} type={type} size={gaugeSize} showLabels={false} />
       </div>
     </div>
@@ -1096,25 +1096,32 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
 
   return (
     <>
-      {/* Market Overview Strip - TOP of page */}
-      <div className="market-overview-strip">
-        {marketOverviewItems.map((item, index) => (
-          <div 
-            key={index} 
-            className="market-overview-card market-overview-card--clickable"
-            onClick={() => setSelectedMetric(item.title)}
-            title={`Click for info about ${item.title}`}
-          >
-            {item.type === 'metric' ? (
-              <MetricContent title={item.title} value={item.value} change={item.change} />
-            ) : (
-              <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={false} />
+      {/* Market Overview Carousel - TOP of page */}
+      <div className="market-overview-carousel-container">
+        <div style={{ height: 220, width: '100%' }}>
+          <FlipCarousel
+            items={marketOverviewItems}
+            renderItem={(item) => (
+              <div 
+                className="market-overview-card market-overview-card--clickable"
+                onClick={() => setSelectedMetric(item.title)}
+                title={`Click for info about ${item.title}`}
+                style={{ height: '100%', cursor: 'pointer' }}
+              >
+                {item.type === 'metric' ? (
+                  <MetricContent title={item.title} value={item.value} change={item.change} />
+                ) : (
+                  <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={false} />
+                )}
+                <div className="metric-info-hint">
+                  <span>ℹ️</span>
+                </div>
+              </div>
             )}
-            <div className="metric-info-hint">
-              <span>ℹ️</span>
-            </div>
-          </div>
-        ))}
+            showDots={false}
+            autoPlay={false}
+          />
+        </div>
       </div>
       
       <div className="bento-dashboard">
