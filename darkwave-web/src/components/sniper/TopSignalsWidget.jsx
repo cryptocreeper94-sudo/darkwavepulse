@@ -3,14 +3,62 @@ import './TopSignalsWidget.css'
 
 const API_BASE = ''
 
+const ChainLogos = {
+  all: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M2 12h20M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10c-2.5-2.5-4-6-4-10s1.5-7.5 4-10z" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+  solana: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M5 16.5l2.5-2.5h12l-2.5 2.5H5z" fill="currentColor"/>
+      <path d="M5 10l2.5 2.5h12L17 10H5z" fill="currentColor"/>
+      <path d="M5 7.5L7.5 5h12L17 7.5H5z" fill="currentColor"/>
+    </svg>
+  ),
+  ethereum: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L5 12l7 4 7-4-7-10z" fill="currentColor" opacity="0.6"/>
+      <path d="M12 16l-7-4 7 10 7-10-7 4z" fill="currentColor"/>
+    </svg>
+  ),
+  base: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+      <path d="M12 6c3.3 0 6 2.7 6 6s-2.7 6-6 6v-3c1.65 0 3-1.35 3-3s-1.35-3-3-3V6z" fill="#0a0a0a"/>
+    </svg>
+  ),
+  polygon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M16 8l-4-2-4 2v4l4 2 4-2V8z" fill="currentColor"/>
+      <path d="M20 10l-4-2v4l4 2v-4zM8 10l-4-2v4l4 2v-4z" fill="currentColor" opacity="0.7"/>
+    </svg>
+  ),
+  arbitrum: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="currentColor" opacity="0.3"/>
+      <path d="M12 8l4 6h-3v4l-4-6h3V8z" fill="currentColor"/>
+    </svg>
+  ),
+  bsc: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2l3 3-3 3-3-3 3-3z" fill="currentColor"/>
+      <path d="M19 9l3 3-3 3-3-3 3-3zM5 9l3 3-3 3-3-3 3-3z" fill="currentColor"/>
+      <path d="M12 16l3 3-3 3-3-3 3-3z" fill="currentColor"/>
+      <path d="M12 9l3 3-3 3-3-3 3-3z" fill="currentColor" opacity="0.5"/>
+    </svg>
+  ),
+}
+
 const CHAIN_CONFIG = {
-  all: { label: 'All Chains', icon: '🌐', color: '#00D4FF' },
-  solana: { label: 'Solana', icon: '◎', color: '#9945FF' },
-  ethereum: { label: 'Ethereum', icon: '⬡', color: '#627EEA' },
-  base: { label: 'Base', icon: '⬡', color: '#0052FF' },
-  polygon: { label: 'Polygon', icon: '⬡', color: '#8247E5' },
-  arbitrum: { label: 'Arbitrum', icon: '⬡', color: '#28A0F0' },
-  bsc: { label: 'BSC', icon: '⬡', color: '#F3BA2F' },
+  all: { label: 'All Chains', short: 'ALL', color: '#00D4FF' },
+  solana: { label: 'Solana', short: 'SOL', color: '#9945FF' },
+  ethereum: { label: 'Ethereum', short: 'ETH', color: '#627EEA' },
+  base: { label: 'Base', short: 'BASE', color: '#0052FF' },
+  polygon: { label: 'Polygon', short: 'MATIC', color: '#8247E5' },
+  arbitrum: { label: 'Arbitrum', short: 'ARB', color: '#28A0F0' },
+  bsc: { label: 'BNB Chain', short: 'BNB', color: '#F0B90B' },
 }
 
 function getChainBadge(chain) {
@@ -161,20 +209,27 @@ export default function TopSignalsWidget({ onAnalyze }) {
         ⚠️ Not financial advice - Always DYOR (Do Your Own Research)
       </div>
 
-      <div className="signals-chain-filter">
-        <div className="chain-filter-scroll">
+      <div className="signals-chain-selector">
+        <div className="chain-selector-header">
+          <span className="chain-selector-label">Select Network</span>
+          <span className="chain-selector-count">{Object.keys(CHAIN_CONFIG).length} chains</span>
+        </div>
+        <div className="chain-grid">
           {Object.entries(CHAIN_CONFIG).map(([key, config]) => (
             <button
               key={key}
-              className={`chain-filter-btn ${selectedChain === key ? 'active' : ''}`}
+              className={`chain-tile ${selectedChain === key ? 'active' : ''}`}
               onClick={() => handleChainChange(key)}
-              style={{
-                '--chain-color': config.color,
-                '--chain-glow': `${config.color}40`,
-              }}
+              style={{ '--chain-color': config.color }}
             >
-              <span className="chain-icon">{config.icon}</span>
-              <span className="chain-label">{config.label}</span>
+              <div className="chain-tile-logo" style={{ color: config.color }}>
+                {ChainLogos[key]}
+              </div>
+              <div className="chain-tile-info">
+                <span className="chain-tile-name">{config.label}</span>
+                <span className="chain-tile-short">{config.short}</span>
+              </div>
+              {selectedChain === key && <div className="chain-tile-check">✓</div>}
             </button>
           ))}
         </div>
