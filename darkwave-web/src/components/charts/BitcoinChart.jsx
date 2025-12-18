@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { createChart, CandlestickSeries, AreaSeries } from 'lightweight-charts'
 
 const TIMEFRAMES = [
-  { id: '1S', label: '1S', days: 0, isLive: true },
   { id: '1D', label: '1D', days: 1 },
   { id: '7D', label: '7D', days: 7 },
   { id: '30D', label: '30D', days: 30 },
