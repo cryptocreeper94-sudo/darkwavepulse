@@ -3,7 +3,6 @@ import SkinsSelector from './SkinsSelector';
 
 const allMenuItems = [
   { id: 'dashboard', icon: '🏠', label: 'My Dashboard' },
-  { id: 'markets', icon: '📊', label: 'Markets' },
   { id: 'wallet', icon: '💼', label: 'Wallet', highlight: true },
   { id: 'sniper', icon: '🎯', label: 'StrikeAgent', highlight: true },
   { id: 'accuracy', icon: '📊', label: 'AI Accuracy', highlight: true },
