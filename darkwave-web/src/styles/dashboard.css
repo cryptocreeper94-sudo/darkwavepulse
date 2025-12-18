@@ -11,6 +11,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
+  grid-auto-flow: row;
 }
 
 /* Individual Carousel Section */
@@ -171,36 +172,8 @@
   min-height: 300px;
 }
 
-/* Tablet breakpoint - 1200px */
-@media (max-width: 1200px) {
-  .top-carousels-container {
-    grid-template-columns: repeat(2, 1fr);
-    padding-top: 60px;
-  }
-  
-  .bento-dashboard {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto auto auto auto;
-    grid-auto-rows: minmax(140px, auto);
-    gap: 10px;
-    padding: 10px;
-    padding-top: 0;
-  }
-  .bento-ai-status, .bento-predict {
-    grid-area: auto;
-    min-height: 140px !important;
-  }
-  .bento-table { grid-column: 1 / -1; min-height: 350px !important; }
-  .desktop-news-grid { display: none; }
-  .bento-chart-section { 
-    grid-column: 1 / -1;
-    min-height: 400px !important;
-    grid-template-columns: 1fr 2fr;
-  }
-}
-
-/* Tablet breakpoint - 1024px */
-@media (max-width: 1024px) {
+/* Tablet breakpoint - 800px (changed from 1024px to keep 3-col layout longer) */
+@media (max-width: 800px) {
   .top-carousels-container {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
