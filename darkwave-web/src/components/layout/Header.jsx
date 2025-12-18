@@ -2,11 +2,19 @@ import { useAvatar } from '../../context/AvatarContext'
 import { useWalletState, WalletMultiButton } from '../../context/WalletContext'
 import MiniAvatar from '../ui/MiniAvatar'
 import VerificationBadge from '../ui/VerificationBadge'
+import { useState, useEffect } from 'react'
 
 export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, activeTab, onBackClick }) {
   const { avatar, isCustomMode } = useAvatar()
   const wallet = useWalletState()
   const showBackButton = activeTab && activeTab !== 'dashboard' && activeTab !== 'markets'
+  const [isScreenMobile, setIsScreenMobile] = useState(window.innerWidth < 640)
+
+  useEffect(() => {
+    const handleResize = () => setIsScreenMobile(window.innerWidth < 640)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   
   const hallmarkId = '000000000-01'
   const walletAddress = wallet?.publicKey?.toBase58() || null
@@ -42,31 +50,37 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
       <div className="header-right">
         <a
           href="/whitepaper"
+          title="View Whitepaper"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '8px 14px',
+            justifyContent: 'center',
+            gap: isScreenMobile ? '0' : '4px',
+            padding: '6px 8px',
             background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.15), rgba(0, 212, 255, 0.15))',
             border: '1px solid rgba(57, 255, 20, 0.3)',
-            borderRadius: '8px',
+            borderRadius: '6px',
             color: '#39FF14',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: '600',
             textDecoration: 'none',
             transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(57, 255, 20, 0.3)';
+            e.currentTarget.style.boxShadow = '0 0 12px rgba(57, 255, 20, 0.4)';
             e.currentTarget.style.borderColor = '#39FF14';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(57, 255, 20, 0.25), rgba(0, 212, 255, 0.25))';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.boxShadow = 'none';
             e.currentTarget.style.borderColor = 'rgba(57, 255, 20, 0.3)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(57, 255, 20, 0.15), rgba(0, 212, 255, 0.15))';
           }}
         >
-          <span style={{ fontSize: '14px' }}>📄</span>
-          Whitepaper
+          <span style={{ fontSize: '12px' }}>📄</span>
+          {!isScreenMobile && <span>Whitepaper</span>}
         </a>
         <VerificationBadge 
           hallmarkId={hallmarkId}

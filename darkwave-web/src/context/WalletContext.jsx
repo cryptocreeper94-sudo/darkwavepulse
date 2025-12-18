@@ -30,6 +30,14 @@ function SimpleWalletButton() {
   const { setVisible } = useWalletModal()
   const walletState = useContext(WalletStateContext)
   const [error, setError] = useState(null)
+  const [isScreenMobile, setIsScreenMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobileScreen = () => setIsScreenMobile(window.innerWidth < 640)
+    checkMobileScreen()
+    window.addEventListener('resize', checkMobileScreen)
+    return () => window.removeEventListener('resize', checkMobileScreen)
+  }, [])
 
   const handleClick = useCallback(async () => {
     setError(null)
@@ -86,16 +94,20 @@ function SimpleWalletButton() {
     border: connected ? '1px solid #39FF14' : 'none',
     borderRadius: '12px',
     color: connected ? '#39FF14' : '#fff',
-    padding: '10px 16px',
-    fontSize: '13px',
+    padding: isScreenMobile ? '8px 10px' : '10px 16px',
+    fontSize: isScreenMobile ? '11px' : '13px',
     fontWeight: '600',
     cursor: connecting ? 'wait' : 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    minWidth: '120px',
+    gap: isScreenMobile ? '4px' : '8px',
+    minWidth: isScreenMobile ? 'auto' : '120px',
+    maxWidth: isScreenMobile ? '140px' : 'auto',
     justifyContent: 'center',
     marginRight: '13px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   }
 
   return (
@@ -104,32 +116,34 @@ function SimpleWalletButton() {
       onClick={handleClick}
       disabled={connecting}
       style={buttonStyle}
+      title={connected ? `${walletState?.shortAddress || 'Connected'} (${walletState?.balance || '0'} SOL)` : 'Connect Wallet'}
     >
       {connecting ? (
-        <span>Connecting...</span>
+        <span>{isScreenMobile ? '...' : 'Connecting...'}</span>
       ) : connected ? (
         <>
           <span style={{ 
-            width: '8px', 
-            height: '8px', 
+            width: '6px', 
+            height: '6px', 
             borderRadius: '50%', 
             background: '#39FF14',
             boxShadow: '0 0 8px #39FF14',
+            flexShrink: 0,
           }}></span>
-          <span>{walletState?.shortAddress || 'Connected'}</span>
+          {!isScreenMobile && <span>{walletState?.shortAddress || 'Connected'}</span>}
           {walletState?.balance && (
-            <span style={{ color: '#888', fontSize: '11px' }}>
-              ({walletState.balance} SOL)
+            <span style={{ color: '#aaffaa', fontSize: isScreenMobile ? '10px' : '11px', fontWeight: '600' }}>
+              {isScreenMobile ? `${walletState.balance}S` : `${walletState.balance} SOL`}
             </span>
           )}
         </>
       ) : (
         <>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width={isScreenMobile ? 14 : 16} height={isScreenMobile ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="2" y="4" width="20" height="16" rx="2"/>
             <path d="M16 12h4"/>
           </svg>
-          <span>{error || 'Connect Wallet'}</span>
+          {!isScreenMobile && <span>{error || 'Connect Wallet'}</span>}
         </>
       )}
     </button>
