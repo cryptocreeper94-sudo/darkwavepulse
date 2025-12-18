@@ -183,9 +183,9 @@ export default function Gauge({
         {showLabels && (
           <>
             <text
-              x={centerX - radius - 5}
-              y={centerY + 5}
-              textAnchor="end"
+              x={centerX - radius + 10}
+              y={centerY + size * 0.12}
+              textAnchor="start"
               fill="rgba(255,255,255,0.6)"
               fontSize={size * 0.055}
               fontWeight="600"
@@ -203,9 +203,9 @@ export default function Gauge({
               {labels.center}
             </text>
             <text
-              x={centerX + radius + 5}
-              y={centerY + 5}
-              textAnchor="start"
+              x={centerX + radius - 10}
+              y={centerY + size * 0.12}
+              textAnchor="end"
               fill="rgba(255,255,255,0.6)"
               fontSize={size * 0.055}
               fontWeight="600"
@@ -227,7 +227,7 @@ export function GaugeCard({ title, value, type = 'fearGreed', onClick }) {
   return (
     <div className="gauge-card" onClick={onClick}>
       <div className="gauge-card-title">{title}</div>
-      <div style={{ marginTop: type === 'fearGreed' ? '24px' : '0' }}>
+      <div style={{ marginTop: '12px' }}>
         <Gauge value={value} type={type} size={160} />
       </div>
     </div>
