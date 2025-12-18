@@ -75,7 +75,7 @@ export default function StrikeAgentLiveWidget({ isLocked = true, onUnlock }) {
           🎯
         </div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>StrikeAgent</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>StrikeAgent</div>
           <div style={{ fontSize: 11, color: '#00D4FF', marginTop: 2 }}>AI Trading Bot</div>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function StrikeAgentLiveWidget({ isLocked = true, onUnlock }) {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
                 Signal Type
               </div>
               <div
@@ -133,16 +133,16 @@ export default function StrikeAgentLiveWidget({ isLocked = true, onUnlock }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 8 }}>
             <div>
-              <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>TOKEN</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{currentSignal.token}</div>
+              <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 4 }}>TOKEN</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{currentSignal.token}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 9, color: '#666', marginBottom: 4 }}>ENTRY</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{currentSignal.price}</div>
+              <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 4 }}>ENTRY</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{currentSignal.price}</div>
             </div>
           </div>
 
-          <div style={{ fontSize: 10, color: '#666' }}>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
             {currentSignal.timestamp}
           </div>
         </div>
@@ -157,15 +157,15 @@ export default function StrikeAgentLiveWidget({ isLocked = true, onUnlock }) {
           }}
         >
           <div style={{ textAlign: 'center', padding: '8px', background: 'rgba(0, 212, 255, 0.08)', borderRadius: 8 }}>
-            <div style={{ fontSize: 9, color: '#666', marginBottom: 2 }}>ACTIVE</div>
+            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>ACTIVE</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#00D4FF' }}>47</div>
           </div>
           <div style={{ textAlign: 'center', padding: '8px', background: 'rgba(57, 255, 20, 0.08)', borderRadius: 8 }}>
-            <div style={{ fontSize: 9, color: '#666', marginBottom: 2 }}>WIN RATE</div>
+            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>WIN RATE</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#39FF14' }}>73%</div>
           </div>
           <div style={{ textAlign: 'center', padding: '8px', background: 'rgba(255, 215, 0, 0.08)', borderRadius: 8 }}>
-            <div style={{ fontSize: 9, color: '#666', marginBottom: 2 }}>24H GAIN</div>
+            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>24H GAIN</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#FFD700' }}>+18%</div>
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function StrikeAgentLiveWidget({ isLocked = true, onUnlock }) {
               width: 6,
               height: 6,
               borderRadius: '50%',
-              background: i === activeIndex ? '#00D4FF' : '#333',
+              background: i === activeIndex ? '#00D4FF' : 'var(--border-color)',
               cursor: 'pointer',
               transition: 'all 0.2s',
               boxShadow: i === activeIndex ? '0 0 8px rgba(0, 212, 255, 0.6)' : 'none',
