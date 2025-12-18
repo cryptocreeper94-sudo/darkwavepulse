@@ -962,7 +962,7 @@ export const mastra = new Mastra({
         createHandler: async ({ mastra }) => async (c: any) => {
           const logger = mastra.getLogger();
           
-          // Check cache (5 second TTL for live price)
+          // Check cache (1 second TTL for live price - allows frequent updates)
           const cached = apiCache.get<any>('btc-live-price');
           if (cached) {
             return c.json(cached);
@@ -979,8 +979,8 @@ export const mastra = new Mastra({
               timestamp: Date.now()
             };
             
-            // Cache for 5 seconds
-            apiCache.set('btc-live-price', result, 5);
+            // Cache for 1 second to allow frequent updates
+            apiCache.set('btc-live-price', result, 1);
             
             return c.json(result);
           } catch (error: any) {
@@ -1076,8 +1076,9 @@ export const mastra = new Mastra({
           }
           
           try {
-            // Convert 'max' to number for API call
-            const daysNum = days === 'max' ? 1825 : parseInt(days);
+            // Convert 'max' to actual max supported by CoinGecko (365 days for daily candles)
+            // CoinGecko free API limits daily OHLC to ~300 data points
+            const daysNum = days === 'max' ? 365 : parseInt(days);
             
             const ohlcData = await coinGeckoClient.getOHLC('bitcoin', daysNum);
             
