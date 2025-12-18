@@ -94,6 +94,13 @@ export default function MobileCardCarousel({ children }) {
           transform: scale(0.95);
         }
         
+        .mcc-center {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+        
         .mcc-dots {
           display: flex;
           gap: 10px;
@@ -115,9 +122,8 @@ export default function MobileCardCarousel({ children }) {
         
         .mcc-label {
           text-align: center;
-          font-size: 12px;
-          color: #666;
-          margin-top: 8px;
+          font-size: 9px;
+          color: #555;
         }
       `}</style>
       
@@ -140,23 +146,24 @@ export default function MobileCardCarousel({ children }) {
           ‹
         </button>
         
-        <div className="mcc-dots">
-          {childArray.map((_, index) => (
-            <div
-              key={index}
-              className={`mcc-dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => goTo(index)}
-            />
-          ))}
+        <div className="mcc-center">
+          <div className="mcc-dots">
+            {childArray.map((_, index) => (
+              <div
+                key={index}
+                className={`mcc-dot ${index === currentIndex ? 'active' : ''}`}
+                onClick={() => goTo(index)}
+              />
+            ))}
+          </div>
+          <div className="mcc-label">
+            {currentIndex + 1} / {totalCards}
+          </div>
         </div>
         
         <button className="mcc-arrow" onClick={() => goTo(currentIndex + 1)}>
           ›
         </button>
-      </div>
-      
-      <div className="mcc-label">
-        {currentIndex + 1} / {totalCards}
       </div>
     </div>
   )
