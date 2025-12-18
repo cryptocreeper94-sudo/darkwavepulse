@@ -1,6 +1,6 @@
 .disclaimer-banner {
-  background: linear-gradient(90deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 87, 34, 0.15) 100%);
-  border-bottom: 1px solid rgba(255, 152, 0, 0.3);
+  background: linear-gradient(90deg, rgba(255, 23, 68, 0.15) 0%, rgba(229, 57, 53, 0.15) 100%);
+  border-bottom: 1px solid rgba(255, 23, 68, 0.3);
   padding: 8px 16px;
   position: relative;
   z-index: 100;
@@ -29,7 +29,7 @@
 }
 
 .disclaimer-banner-text strong {
-  color: #ff9800;
+  color: #ff1744;
 }
 
 .disclaimer-banner-text a {
