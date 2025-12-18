@@ -56,8 +56,8 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
       className={className}
       onClick={onClick}
       style={{
-        background: '#0f0f0f',
-        border: '1px solid #222',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-color)',
         borderRadius: 12,
         padding: 10,
         position: 'relative',
@@ -69,11 +69,11 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
         ...style,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = '#333'
+        e.currentTarget.style.borderColor = 'var(--bg-surface-3)'
         e.currentTarget.style.boxShadow = '0 0 20px rgba(0,212,255,0.1)'
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = '#222'
+        e.currentTarget.style.borderColor = 'var(--border-color)'
         e.currentTarget.style.boxShadow = 'none'
       }}
     >
@@ -82,7 +82,7 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
   )
 }
 
-function TileLabel({ children, color = '#555' }) {
+function TileLabel({ children, color = 'var(--text-muted)' }) {
   return (
     <div style={{
       fontSize: 9,
@@ -127,8 +127,8 @@ function QuickActionContent({ action, fullCard = false }) {
           padding: '40px 16px 16px',
           background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
         }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{action.title}</div>
-          <div style={{ fontSize: 12, color: '#aaa' }}>{action.subtitle}</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>{action.title}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{action.subtitle}</div>
         </div>
       </div>
     )
@@ -167,8 +167,8 @@ function QuickActionContent({ action, fullCard = false }) {
           }}
         />
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{action.title}</div>
-      <div style={{ fontSize: 11, color: '#888' }}>{action.subtitle}</div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{action.title}</div>
+      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{action.subtitle}</div>
     </div>
   )
 }
@@ -187,10 +187,10 @@ function MetricContent({ title, value, change }) {
       padding: 12,
       textAlign: 'center',
     }}>
-      <div style={{ fontSize: 10, color: '#888', fontWeight: 600, textTransform: 'uppercase', marginBottom: 10, letterSpacing: 1 }}>
+      <div style={{ fontSize: 10, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 10, letterSpacing: 1 }}>
         {title}
       </div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: hasChange ? 6 : 0 }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: hasChange ? 6 : 0 }}>
         {value}
       </div>
       {hasChange && (
@@ -256,9 +256,9 @@ function CoinContent({ coin, isFavorite }) {
         alignItems: 'center', 
         justifyContent: 'center',
         height: '100%',
-        background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+        background: 'linear-gradient(135deg, var(--bg-surface-2) 0%, var(--bg-surface) 100%)',
         borderRadius: 12,
-        color: '#666',
+        color: 'var(--text-muted)',
       }}>
         No data
       </div>
@@ -277,7 +277,7 @@ function CoinContent({ coin, isFavorite }) {
       height: '100%',
       padding: 12,
       gap: 8,
-      background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+      background: 'linear-gradient(135deg, var(--bg-surface-2) 0%, var(--bg-surface) 100%)',
       borderRadius: 12,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -293,7 +293,7 @@ function CoinContent({ coin, isFavorite }) {
             width: 36, 
             height: 36, 
             borderRadius: '50%', 
-            background: '#333',
+            background: 'var(--border-color)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -305,14 +305,14 @@ function CoinContent({ coin, isFavorite }) {
           </div>
         )}
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
             {coin.symbol?.toUpperCase() || 'UNKNOWN'}
             {isFavorite && <span style={{ color: '#FFD700', marginLeft: 6 }}>★</span>}
           </div>
-          <div style={{ fontSize: 11, color: '#666' }}>{coin.name || 'Unknown'}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{coin.name || 'Unknown'}</div>
         </div>
       </div>
-      <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>
+      <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>
         {formatPrice(coin.current_price || coin.price)}
       </div>
       <div style={{ 
@@ -350,7 +350,7 @@ function NewsContent({ news }) {
       <div style={{ 
         fontSize: 13, 
         fontWeight: 600, 
-        color: '#fff', 
+        color: 'var(--text-primary)', 
         lineHeight: 1.4,
         display: '-webkit-box',
         WebkitLineClamp: 3,
@@ -360,7 +360,7 @@ function NewsContent({ news }) {
       }}>
         {news.title}
       </div>
-      <div style={{ fontSize: 10, color: '#555' }}>{news.time}</div>
+      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{news.time}</div>
     </div>
   )
 }
@@ -371,10 +371,10 @@ function MobileNewsCard({ news }) {
     <div 
       onClick={() => news?.url && window.open(news.url, '_blank')}
       style={{
-        background: 'rgba(20, 20, 20, 0.85)',
+        background: 'var(--bg-surface-2)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        border: '1px solid var(--border-light)',
         borderRadius: 20,
         padding: 24,
         minHeight: 180,
@@ -422,7 +422,7 @@ function MobileNewsCard({ news }) {
       <div style={{ 
         fontSize: 16, 
         fontWeight: 600, 
-        color: '#fff', 
+        color: 'var(--text-primary)', 
         lineHeight: 1.5,
         display: '-webkit-box',
         WebkitLineClamp: 3,
@@ -432,7 +432,7 @@ function MobileNewsCard({ news }) {
       }}>
         {news.title}
       </div>
-      <div style={{ fontSize: 11, color: '#666' }}>{news.time}</div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{news.time}</div>
       
       {/* Swipe hint */}
       <div style={{
@@ -440,7 +440,7 @@ function MobileNewsCard({ news }) {
         bottom: 8,
         right: 12,
         fontSize: 10,
-        color: '#444',
+        color: 'var(--text-dim)',
         display: 'flex',
         alignItems: 'center',
         gap: 4,
@@ -558,7 +558,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
     <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
         <TileLabel>{category === 'top' ? 'Top Coins' : category === 'gainers' ? 'Top Gainers' : category === 'losers' ? 'Top Losers' : category === 'meme' ? 'Meme Coins' : category === 'defi' ? 'DeFi' : 'DEX Tokens'}</TileLabel>
-        <div style={{ display: 'flex', gap: 4, background: '#1a1a1a', borderRadius: 6, padding: 2 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--bg-surface-2)', borderRadius: 6, padding: 2 }}>
           <button
             onClick={() => setTimeframe('1h')}
             style={{
@@ -566,7 +566,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
               borderRadius: 4,
               border: 'none',
               background: timeframe === '1h' ? '#00D4FF' : 'transparent',
-              color: timeframe === '1h' ? '#000' : '#666',
+              color: timeframe === '1h' ? '#000' : 'var(--text-muted)',
               fontWeight: timeframe === '1h' ? 600 : 400,
               cursor: 'pointer',
               fontSize: 11,
@@ -581,7 +581,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
               borderRadius: 4,
               border: 'none',
               background: timeframe === '24h' ? '#00D4FF' : 'transparent',
-              color: timeframe === '24h' ? '#000' : '#666',
+              color: timeframe === '24h' ? '#000' : 'var(--text-muted)',
               fontWeight: timeframe === '24h' ? 600 : 400,
               cursor: 'pointer',
               fontSize: 11,
@@ -614,15 +614,15 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
               width: 220,
               padding: '8px 12px',
               fontSize: 12,
-              background: '#1a1a1a',
-              border: '1px solid #333',
+              background: 'var(--bg-surface-2)',
+              border: '1px solid var(--border-color)',
               borderRadius: 8,
-              color: '#fff',
+              color: 'var(--text-primary)',
               outline: 'none',
               transition: 'border-color 0.2s',
             }}
             onFocus={(e) => e.target.style.borderColor = '#00D4FF'}
-            onBlur={(e) => e.target.style.borderColor = '#333'}
+            onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
           />
           {isSearching && (
             <div style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: '#00D4FF', fontSize: 10 }}>
@@ -632,7 +632,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
         </div>
       </div>
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
-        <div style={{ fontSize: 11, color: '#444', display: 'flex', padding: '8px 4px', borderBottom: '1px solid #222', position: 'sticky', top: 0, background: '#0f0f0f', zIndex: 1, minWidth: 320, letterSpacing: '0.04em' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-dim)', display: 'flex', padding: '8px 4px', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, background: 'var(--bg-surface)', zIndex: 1, minWidth: 320, letterSpacing: '0.04em' }}>
           <span style={{ width: '10%', minWidth: 32, textAlign: 'center' }}>#</span>
           <span style={{ width: '30%', minWidth: 80 }}>Coin</span>
           <span style={{ width: '25%', minWidth: 70, textAlign: 'right' }}>Price</span>
@@ -640,13 +640,13 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
           <span style={{ width: '20%', minWidth: 60, textAlign: 'right' }}>Volume</span>
         </div>
         {loading ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#666', fontSize: 11 }}>
+          <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <span>Loading coins...</span>
             </div>
           </div>
         ) : displayCoins.length === 0 ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#666', fontSize: 11 }}>
+          <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>
             No coins found for this category
           </div>
         ) : displayCoins.map((coin, i) => {
@@ -664,14 +664,14 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
                 display: 'flex', 
                 alignItems: 'center', 
                 padding: '10px 4px',
-                borderBottom: '1px solid #1a1a1a',
+                borderBottom: '1px solid var(--bg-surface-2)',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
                 background: isSelected ? 'rgba(0, 212, 255, 0.1)' : 'transparent',
                 borderLeft: isSelected ? '2px solid #00D4FF' : '2px solid transparent',
                 minWidth: 320,
               }}
-              onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#1a1a1a' }}
+              onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--bg-surface-2)' }}
               onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
             >
               <div style={{ width: '10%', minWidth: 32, textAlign: 'center', fontSize: 12, color: '#00D4FF', fontWeight: 600 }}>
@@ -681,18 +681,18 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
                 {coin.image && (
                   <img src={coin.image} alt="" style={{ width: 20, height: 20, borderRadius: '50%' }} onError={(e) => e.target.style.display = 'none'} />
                 )}
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
                   {coin.symbol?.toUpperCase()}
                   {isFavorite(coin.symbol) && <span style={{ color: '#FFD700', marginLeft: 3 }}>★</span>}
                 </span>
               </div>
-              <div style={{ width: '25%', minWidth: 70, textAlign: 'right', fontSize: 12, color: '#fff' }}>
+              <div style={{ width: '25%', minWidth: 70, textAlign: 'right', fontSize: 12, color: 'var(--text-primary)' }}>
                 {formatPrice(priceNum)}
               </div>
               <div style={{ width: '15%', minWidth: 55, textAlign: 'right', fontSize: 11, fontWeight: 600, color: isPositive ? '#39FF14' : '#ff4444' }}>
                 {isPositive ? '+' : ''}{changeNum.toFixed(1)}%
               </div>
-              <div style={{ width: '20%', minWidth: 60, textAlign: 'right', fontSize: 11, color: '#888' }}>
+              <div style={{ width: '20%', minWidth: 60, textAlign: 'right', fontSize: 11, color: 'var(--text-secondary)' }}>
                 {vol}
               </div>
             </div>
@@ -711,7 +711,7 @@ function ChartMetricsPanel({ coin }) {
         alignItems: 'center', 
         justifyContent: 'center', 
         height: '100%',
-        color: '#666',
+        color: 'var(--text-muted)',
         fontSize: 12,
       }}>
         Select a coin to view metrics
@@ -727,29 +727,29 @@ function ChartMetricsPanel({ coin }) {
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 12, borderBottom: '1px solid #222' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 12, borderBottom: '1px solid var(--border-color)' }}>
         {coin.image && (
           <img src={coin.image} alt="" style={{ width: 36, height: 36, borderRadius: '50%' }} />
         )}
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{coin.name}</div>
-          <div style={{ fontSize: 11, color: '#666' }}>{coin.symbol?.toUpperCase()}</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{coin.name}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{coin.symbol?.toUpperCase()}</div>
         </div>
       </div>
       
-      <div style={{ fontSize: 24, fontWeight: 800, color: '#fff' }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>
         {formatPrice(coin.current_price)}
       </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <div>
-          <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', marginBottom: 2 }}>24h Change</div>
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 2 }}>24h Change</div>
           <div style={{ fontSize: 13, fontWeight: 600, color: isPositive24h ? '#39FF14' : '#ff4444' }}>
             {isPositive24h ? '+' : ''}{change24h.toFixed(2)}%
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', marginBottom: 2 }}>7d Change</div>
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 2 }}>7d Change</div>
           <div style={{ fontSize: 13, fontWeight: 600, color: isPositive7d ? '#39FF14' : '#ff4444' }}>
             {isPositive7d ? '+' : ''}{change7d.toFixed(2)}%
           </div>
@@ -758,23 +758,23 @@ function ChartMetricsPanel({ coin }) {
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#666' }}>Market Cap</span>
-          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatMarketCap(coin.market_cap)}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Market Cap</span>
+          <span style={{ fontSize: 10, color: 'var(--text-primary)', fontWeight: 600 }}>{formatMarketCap(coin.market_cap)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#666' }}>24h Volume</span>
-          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatMarketCap(coin.total_volume)}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>24h Volume</span>
+          <span style={{ fontSize: 10, color: 'var(--text-primary)', fontWeight: 600 }}>{formatMarketCap(coin.total_volume)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#666' }}>Circulating Supply</span>
-          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatSupply(coin.circulating_supply)}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Circulating Supply</span>
+          <span style={{ fontSize: 10, color: 'var(--text-primary)', fontWeight: 600 }}>{formatSupply(coin.circulating_supply)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#666' }}>ATH</span>
-          <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>{formatPrice(coin.ath)}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>ATH</span>
+          <span style={{ fontSize: 10, color: 'var(--text-primary)', fontWeight: 600 }}>{formatPrice(coin.ath)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#666' }}>From ATH</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>From ATH</span>
           <span style={{ fontSize: 10, fontWeight: 600, color: athChange >= -10 ? '#39FF14' : athChange >= -50 ? '#FFD700' : '#ff4444' }}>
             {athChange.toFixed(1)}%
           </span>
@@ -803,11 +803,11 @@ function ChartMetricsPanel({ coin }) {
             🎯
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>StrikeAgent</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>StrikeAgent</div>
             <div style={{ fontSize: 11, color: '#00D4FF' }}>AI-Powered Trading Automation</div>
           </div>
         </div>
-        <div style={{ fontSize: 11, color: '#ccc', lineHeight: 1.6, marginBottom: 10 }}>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 10 }}>
           Automate your trades on any token with AI-driven entry/exit signals, real-time safety checks, and anti-MEV protection. Set limit orders, stop-losses, and let AI monitor markets 24/7.
         </div>
         <div style={{ 
@@ -821,7 +821,7 @@ function ChartMetricsPanel({ coin }) {
           border: '1px solid rgba(57, 255, 20, 0.2)',
         }}>
           <span style={{ fontSize: 10, color: '#39FF14', fontWeight: 600 }}>SAVE 60%+</span>
-          <span style={{ fontSize: 10, color: '#888' }}>vs SolSniper ($75/mo)</span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>vs SolSniper ($75/mo)</span>
         </div>
         <button style={{
           width: '100%',
@@ -868,9 +868,9 @@ function TrendingModal({ coins, onClose, onSelectCoin, favorites }) {
     >
       <div 
         style={{
-          background: '#141414',
+          background: 'var(--bg-surface)',
           borderRadius: 16,
-          border: '1px solid #333',
+          border: '1px solid var(--border-color)',
           maxWidth: 'min(500px, 90vw)',
           width: '100%',
           maxHeight: '85vh',
@@ -881,21 +881,21 @@ function TrendingModal({ coins, onClose, onSelectCoin, favorites }) {
       >
         <div style={{
           padding: '16px 20px',
-          borderBottom: '1px solid #333',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Trending Coins</div>
-            <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>Top 10 by market cap</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>Trending Coins</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>Top 10 by market cap</div>
           </div>
           <button
             onClick={onClose}
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#888',
+              color: 'var(--text-secondary)',
               fontSize: 24,
               cursor: 'pointer',
               padding: 4,
@@ -918,12 +918,12 @@ function TrendingModal({ coins, onClose, onSelectCoin, favorites }) {
                   padding: '12px 20px',
                   cursor: 'pointer',
                   transition: 'background 0.2s',
-                  borderBottom: '1px solid #1a1a1a',
+                  borderBottom: '1px solid var(--bg-surface-2)',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#1a1a1a'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-surface-2)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
-                <div style={{ width: 28, fontSize: 12, color: '#666', fontWeight: 600 }}>
+                <div style={{ width: 28, fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
                   {idx + 1}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
@@ -931,15 +931,15 @@ function TrendingModal({ coins, onClose, onSelectCoin, favorites }) {
                     <img src={coin.image} alt="" style={{ width: 32, height: 32, borderRadius: '50%' }} />
                   )}
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                       {coin.symbol?.toUpperCase()}
                       {isFavorite(coin.symbol) && <span style={{ color: '#FFD700' }}>★</span>}
                     </div>
-                    <div style={{ fontSize: 11, color: '#888' }}>{coin.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{coin.name}</div>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                     ${coin.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div style={{ 
@@ -1192,10 +1192,10 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
             🧠
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
               Predictive AI System
             </div>
-            <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Our AI learns from every analysis, tracking predictions at multiple intervals. As accuracy improves beyond 55%, it powers autonomous trading.
             </div>
           </div>
