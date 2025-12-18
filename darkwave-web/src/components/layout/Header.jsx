@@ -9,12 +9,25 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
   const wallet = useWalletState()
   const showBackButton = activeTab && activeTab !== 'dashboard' && activeTab !== 'markets'
   const [isScreenMobile, setIsScreenMobile] = useState(window.innerWidth < 640)
+  const [theme, setTheme] = useState(() => {
+    if (typeof document !== 'undefined') {
+      return document.documentElement.getAttribute('data-theme') || localStorage.getItem('theme') || 'dark'
+    }
+    return 'dark'
+  })
 
   useEffect(() => {
     const handleResize = () => setIsScreenMobile(window.innerWidth < 640)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
+  }
   
   const hallmarkId = '000000000-01'
   const walletAddress = wallet?.publicKey?.toBase58() || null
