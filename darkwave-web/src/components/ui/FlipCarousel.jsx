@@ -124,18 +124,6 @@ export default function FlipCarousel({
           </div>
         </div>
 
-        {showCounter && (
-          <div style={{
-            position: 'absolute',
-            top: 6,
-            left: 6,
-            fontSize: 9,
-            color: '#555',
-            zIndex: 10,
-          }}>
-            {currentIndex + 1}/{items.length}
-          </div>
-        )}
       </div>
 
       {(showArrows || showDots) && items.length > 1 && (
@@ -172,30 +160,45 @@ export default function FlipCarousel({
             </button>
           )}
 
-          {showDots && (
-            <div style={{
-              display: 'flex',
-              gap: 6,
-            }}>
-              {items.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
-                  disabled={isFlipping}
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    background: idx === currentIndex ? '#00D4FF' : '#444',
-                    border: 'none',
-                    cursor: isFlipping ? 'default' : 'pointer',
-                    padding: 0,
-                    transition: 'background 0.2s',
-                  }}
-                />
-              ))}
-            </div>
-          )}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+            {showDots && (
+              <div style={{
+                display: 'flex',
+                gap: 6,
+              }}>
+                {items.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
+                    disabled={isFlipping}
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: idx === currentIndex ? '#00D4FF' : '#444',
+                      border: 'none',
+                      cursor: isFlipping ? 'default' : 'pointer',
+                      padding: 0,
+                      transition: 'background 0.2s',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+            {showCounter && (
+              <div style={{
+                fontSize: 9,
+                color: '#555',
+              }}>
+                {currentIndex + 1}/{items.length}
+              </div>
+            )}
+          </div>
 
           {showArrows && (
             <button
