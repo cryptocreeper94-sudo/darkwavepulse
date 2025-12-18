@@ -53,7 +53,8 @@ const DEFAULT_TASKS = [
   { id: 3, text: 'Set up Facebook business page', done: false, priority: 'medium' },
   { id: 4, text: 'Apply for CEX listings (post-launch)', done: false, priority: 'low' },
   { id: 5, text: 'Set up MoonPay crypto on-ramp', done: false, priority: 'medium', link: 'https://dashboard.moonpay.com', instructions: '1. Create account at dashboard.moonpay.com\n2. Complete business verification\n3. Get your API key (pk_live_xxx)\n4. Get your Secret key for URL signing\n5. Add keys to Replit Secrets: MOONPAY_API_KEY, MOONPAY_SECRET_KEY' },
-  { id: 6, text: 'Apply for Stripe Crypto Onramp', done: false, priority: 'low', link: 'https://stripe.com/crypto', instructions: '1. Go to Stripe Dashboard > Products > Crypto Onramp\n2. Click "Request Access"\n3. Complete application form\n4. Wait for approval (1-2 weeks)' },
+  { id: 6, text: 'Set up Transak crypto on-ramp', done: false, priority: 'low', link: 'https://dashboard.transak.com', instructions: '1. Create account at dashboard.transak.com\n2. Complete KYB verification\n3. Get your API key from Settings\n4. Add key to Replit Secrets: TRANSAK_API_KEY' },
+  { id: 7, text: 'Apply for Stripe Crypto Onramp', done: false, priority: 'low', link: 'https://stripe.com/crypto', instructions: '1. Go to Stripe Dashboard > Products > Crypto Onramp\n2. Click "Request Access"\n3. Complete application form\n4. Wait for approval (1-2 weeks)' },
 ];
 
 const TIER_COLORS = {
