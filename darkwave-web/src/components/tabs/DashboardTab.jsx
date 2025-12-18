@@ -1086,7 +1086,6 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
     { image: '/assets/generated_images/ai_trading_strikeagent_icon.png', title: 'StrikeAgent', subtitle: 'AI Predictive Trading', color: '#00D4FF', tab: 'sniper' },
     { image: '/assets/generated_images/multi-chain_wallet_icon.png', title: 'Wallet', subtitle: 'Multi-chain', color: '#9D4EDD', tab: 'wallet' },
     { image: '/assets/generated_images/watchlist_limit_orders_icon.png', title: 'Watchlist', subtitle: 'Limit orders', color: 'var(--neon-green)', tab: 'watchlist' },
-    { image: '/assets/generated_images/markets_live_prices_icon.png', title: 'Markets', subtitle: 'Live prices', color: '#FF006E', tab: 'markets' },
   ]
 
   const marketOverviewItems = [
