@@ -10,11 +10,12 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages
 - Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is ALLOWED for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements.
 
 ## Recent Updates (December 18, 2025)
+- **Dashboard Layout**: Fixed 3-column carousel layout (Market Metrics, Quick Actions, Latest News) with proper responsive breakpoints (600px) to maintain horizontal alignment on desktop/tablet
+- **Metric Cards**: Made cards responsive with flexible width, centered carousel indicators below dots between navigation arrows
+- **Bitcoin Chart Timeframes**: Added 1S (live), 1H, and 4H timeframes alongside existing 1D/7D/30D/1Y/ALL options for granular market analysis
+- **Mobile Carousel Consistency**: Updated MobileCardCarousel to match desktop layout with counter centered below dots between arrows
 - **UI Responsive Improvements**: Made header elements (Whitepaper button, wallet display) responsive and compact on mobile screens
-- **Carousel Navigation**: Moved carousel arrows below card content with dots for cleaner layout
-- **Metric Cards**: Fixed Fear & Greed title overlap with info button, aligned all gauge metrics properly
 - **Disclaimer Banner**: Changed from brown/orange to attention-grabbing red color scheme
-- **Recent Predictions Table**: Reorganized with proper table headers, help tooltips for each column (Ticker, Signal, Confidence, Price, Outcomes), and clean row/column grid layout
 
 ## System Architecture
 
