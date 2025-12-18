@@ -1,12 +1,12 @@
 /* Dashboard Layout - External CSS File */
-/* Three-Column Top Carousels, then bento grid below */
+/* Two-Column Top Carousels, then bento grid below */
 
-/* Three-Column Top Section with Self-Contained Carousels */
+/* Two-Column Top Section with Self-Contained Carousels */
 .top-carousels-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
-  padding: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
   padding-top: 60px;
   width: 100%;
   max-width: 100%;
@@ -172,21 +172,21 @@
   min-height: 300px;
 }
 
-/* Tablet breakpoint - 600px (static 3-col, no scroll) */
+/* Tablet breakpoint - 600px (static 2-col, no scroll) */
 @media (max-width: 600px) {
   .top-carousels-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    padding: 6px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
     padding-top: 60px;
     overflow: visible;
   }
   
   .carousel-section {
-    min-height: 180px;
+    min-height: 200px;
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     overflow: hidden;
   }
   
@@ -223,7 +223,7 @@
   }
 }
 
-/* Mobile breakpoint - 640px (static 3-col, compact) */
+/* Mobile breakpoint - 640px (static 2-col, compact) */
 @media (max-width: 640px) {
   /* Prevent horizontal overflow on mobile */
   body, html, #root {
@@ -233,25 +233,25 @@
   
   .top-carousels-container {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    padding: 4px;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
     padding-top: 55px;
     overflow: visible;
     max-width: 100%;
   }
   
   .carousel-section {
-    min-height: 160px;
+    min-height: 180px;
     width: 100%;
-    padding: 6px;
-    border-radius: 10px;
+    padding: 8px;
+    border-radius: 12px;
     overflow: hidden;
   }
   
   .carousel-label {
-    font-size: 7px;
-    margin-bottom: 3px;
+    font-size: 9px;
+    margin-bottom: 4px;
     letter-spacing: 0.5px;
   }
   
