@@ -166,6 +166,10 @@ function StrikeAgentUpgradeCTA({ onNavigate }) {
 
 const hasStrikeAgentAccess = (userConfig) => {
   if (!userConfig) return false
+  // Admin and owner always have access
+  const accessLevel = userConfig.accessLevel
+  if (accessLevel === 'admin' || accessLevel === 'owner') return true
+  
   const tier = userConfig.subscriptionTier
   const paidTiers = ['strike_agent', 'strike_agent_monthly', 'strike_agent_annual', 
                      'complete_bundle', 'complete_bundle_monthly', 'complete_bundle_annual',
