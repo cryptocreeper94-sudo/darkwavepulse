@@ -48,18 +48,12 @@ const DOC_CATEGORIES = [
 const BUSINESS_DOCS = DOC_CATEGORIES.flatMap(cat => cat.docs);
 
 const DEFAULT_TASKS = [
-  { id: 1, text: 'Complete AI prediction system testing', done: false, priority: 'high' },
-  { id: 2, text: 'Finalize token launch date', done: false, priority: 'high' },
-  { id: 3, text: 'Review and update executive summary', done: true, priority: 'medium' },
-  { id: 4, text: 'Set up marketing campaign for launch', done: false, priority: 'medium' },
-  { id: 5, text: 'Complete mobile app beta testing', done: false, priority: 'low' },
-  { id: 6, text: 'Update investor brief with Q4 metrics', done: false, priority: 'medium' },
-  { id: 7, text: 'Configure Stripe production keys', done: true, priority: 'high' },
-  { id: 8, text: 'Deploy StrikeAgent to mainnet', done: false, priority: 'high' },
-  { id: 9, text: 'Set up MoonPay crypto on-ramp (dashboard.moonpay.com)', done: false, priority: 'high', link: 'https://dashboard.moonpay.com', instructions: '1. Create account at dashboard.moonpay.com\n2. Complete business verification\n3. Get your API key (pk_live_xxx)\n4. Get your Secret key for URL signing\n5. Add keys to Replit Secrets: MOONPAY_API_KEY, MOONPAY_SECRET_KEY' },
-  { id: 10, text: 'Set up Transak crypto on-ramp (dashboard.transak.com)', done: false, priority: 'high', link: 'https://dashboard.transak.com', instructions: '1. Create account at dashboard.transak.com\n2. Complete KYB verification\n3. Get your API key from Settings\n4. Add key to Replit Secrets: TRANSAK_API_KEY' },
-  { id: 11, text: 'Apply for Stripe Crypto Onramp (stripe.com/crypto)', done: false, priority: 'medium', link: 'https://stripe.com/crypto', instructions: '1. Go to Stripe Dashboard > Products > Crypto Onramp\n2. Click "Request Access"\n3. Complete application form\n4. Wait for approval (1-2 weeks)\n5. Once approved, existing keys work automatically' },
-  { id: 12, text: 'Test built-in wallet with real funds', done: false, priority: 'high' },
+  { id: 1, text: 'Post whitepaper announcement on X/Twitter', done: false, priority: 'high' },
+  { id: 2, text: 'Share launch content on Telegram channel', done: false, priority: 'high' },
+  { id: 3, text: 'Set up Facebook business page', done: false, priority: 'medium' },
+  { id: 4, text: 'Apply for CEX listings (post-launch)', done: false, priority: 'low' },
+  { id: 5, text: 'Set up MoonPay crypto on-ramp', done: false, priority: 'medium', link: 'https://dashboard.moonpay.com', instructions: '1. Create account at dashboard.moonpay.com\n2. Complete business verification\n3. Get your API key (pk_live_xxx)\n4. Get your Secret key for URL signing\n5. Add keys to Replit Secrets: MOONPAY_API_KEY, MOONPAY_SECRET_KEY' },
+  { id: 6, text: 'Apply for Stripe Crypto Onramp', done: false, priority: 'low', link: 'https://stripe.com/crypto', instructions: '1. Go to Stripe Dashboard > Products > Crypto Onramp\n2. Click "Request Access"\n3. Complete application form\n4. Wait for approval (1-2 weeks)' },
 ];
 
 const TIER_COLORS = {
