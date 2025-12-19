@@ -1139,4 +1139,105 @@ export const sniperBotRoutes = [
       }
     }
   },
+
+  // ============================================
+  // PUBLIC API - No auth required (for marketing/transparency)
+  // ============================================
+  {
+    path: "/api/public/strikeagent/signals",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        logger?.info('[PublicAPI] Fetching public signals');
+        
+        const signals = await topSignalsService.getTopSignals(5, undefined);
+        
+        // Sanitize for public consumption - remove sensitive data
+        const publicSignals = signals.map((s: any) => ({
+          token: s.symbol || s.token,
+          name: s.name,
+          type: s.signal || (s.confidence === 'HIGH' ? 'SNIPE' : 'WATCH'),
+          confidence: s.confidence || 'MEDIUM',
+          price: s.price,
+          change24h: s.change24h,
+          timestamp: s.timestamp || new Date().toISOString(),
+        }));
+        
+        return c.json({
+          success: true,
+          signals: publicSignals,
+          count: publicSignals.length,
+          lastUpdated: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('[PublicAPI] Signals error', { error: error.message });
+        return c.json({ success: true, signals: [], count: 0, lastUpdated: new Date().toISOString() });
+      }
+    }
+  },
+  {
+    path: "/api/public/strikeagent/executions",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        logger?.info('[PublicAPI] Fetching public executions');
+        
+        // Get recent trades from ledger (sanitized - no user IDs or private data)
+        const recentTrades = await tradeLedgerService.getRecentTrades(10);
+        
+        const publicExecutions = recentTrades.map((t: any) => ({
+          token: t.tokenSymbol,
+          chain: t.chain,
+          action: t.tradeType?.toUpperCase() || 'BUY',
+          amount: t.amountUsd ? `$${t.amountUsd.toFixed(2)}` : '--',
+          pnl: t.profitLossPercent ? `${t.profitLossPercent > 0 ? '+' : ''}${t.profitLossPercent.toFixed(1)}%` : null,
+          timestamp: t.entryTimestamp,
+          txHash: t.txHash ? `${t.txHash.slice(0, 8)}...` : null,
+        }));
+        
+        return c.json({
+          success: true,
+          executions: publicExecutions,
+          count: publicExecutions.length,
+          lastUpdated: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('[PublicAPI] Executions error', { error: error.message });
+        return c.json({ success: true, executions: [], count: 0, lastUpdated: new Date().toISOString() });
+      }
+    }
+  },
+  {
+    path: "/api/public/strikeagent/stats",
+    method: "GET",
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        logger?.info('[PublicAPI] Fetching public stats');
+        
+        // Get aggregate stats - no user-specific data
+        const stats = await strikeAgentTrackingService.getAggregateStats();
+        
+        return c.json({
+          success: true,
+          stats: {
+            totalSignals: stats.totalPredictions || 0,
+            winRate: stats.outcomesByHorizon?.['24h']?.winRate || stats.outcomesByHorizon?.['1h']?.winRate || 0,
+            activeToday: stats.recentActivity || 0,
+            tradesExecuted: stats.totalTrades || 0,
+          },
+          lastUpdated: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('[PublicAPI] Stats error', { error: error.message });
+        return c.json({ 
+          success: true, 
+          stats: { totalSignals: 0, winRate: 0, activeToday: 0, tradesExecuted: 0 },
+          lastUpdated: new Date().toISOString() 
+        });
+      }
+    }
+  },
 ];
