@@ -6,7 +6,8 @@ import StrikeAgentPublicView from './pages/StrikeAgentPublicView'
 
 const PREMIUM_TIERS = ['strike_agent', 'strike_agent_monthly', 'strike_agent_annual', 
                        'complete_bundle', 'complete_bundle_monthly', 'complete_bundle_annual',
-                       'founder', 'legacy_founder', 'annual', 'premium', 'RM', 'FOUNDER']
+                       'founder', 'legacy_founder', 'annual', 'premium', 'rm', 'founder',
+                       'strikeagent', 'strike_agent']
 
 function StrikeAgentApp() {
   const [userId, setUserId] = useState(null)
@@ -14,8 +15,10 @@ function StrikeAgentApp() {
   const [loading, setLoading] = useState(true)
   const [showUpgrade, setShowUpgrade] = useState(false)
   
-  const isAdmin = userConfig?.accessLevel === 'admin' || userConfig?.accessLevel === 'owner'
-  const isPremium = PREMIUM_TIERS.includes(userConfig?.subscriptionTier?.toLowerCase?.() || userConfig?.subscriptionTier)
+  const accessLevel = (userConfig?.accessLevel || '').toLowerCase()
+  const isAdmin = accessLevel === 'admin' || accessLevel === 'owner'
+  const tier = (userConfig?.subscriptionTier || '').toString().toLowerCase()
+  const isPremium = PREMIUM_TIERS.includes(tier)
   const hasFullAccess = isAdmin || isPremium
   
   useEffect(() => {
