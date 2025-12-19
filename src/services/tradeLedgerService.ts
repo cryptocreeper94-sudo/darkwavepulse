@@ -359,6 +359,22 @@ class TradeLedgerService {
     };
   }
 
+  async getRecentTrades(limit: number = 10): Promise<Trade[]> {
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM strike_agent_trades
+        WHERE status = 'executed'
+        ORDER BY entry_timestamp DESC
+        LIMIT ${limit}
+      `);
+      return (result.rows || []) as unknown as Trade[];
+    } catch (error) {
+      return Array.from(this.trades.values())
+        .filter(t => t.status === 'executed')
+        .slice(0, limit);
+    }
+  }
+
   async getRecentTradesForLearning(minTrades: number = 50): Promise<Trade[]> {
     try {
       const result = await db.execute(sql`

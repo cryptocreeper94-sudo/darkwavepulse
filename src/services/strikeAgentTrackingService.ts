@@ -318,6 +318,38 @@ class StrikeAgentTrackingService {
       };
     }
   }
+
+  async getAggregateStats(): Promise<{
+    totalPredictions: number;
+    snipeRecommendations: number;
+    watchRecommendations: number;
+    avoidRecommendations: number;
+    outcomesByHorizon: Record<string, { total: number; correct: number; winRate: string }>;
+    recentActivity: number;
+    totalTrades: number;
+  }> {
+    const baseStats = await this.getStats();
+    
+    // Get today's predictions count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let recentActivity = 0;
+    try {
+      const predictions = await db.select().from(strikeagentPredictions);
+      recentActivity = predictions.filter(p => 
+        new Date(p.createdAt || '') >= today
+      ).length;
+    } catch (e) {
+      recentActivity = 0;
+    }
+    
+    return {
+      ...baseStats,
+      recentActivity,
+      totalTrades: baseStats.snipeRecommendations,
+    };
+  }
 }
 
 export const strikeAgentTrackingService = new StrikeAgentTrackingService();
