@@ -1,6 +1,5 @@
-const CACHE_NAME = 'strikeagent-v1.0.1';
+const CACHE_NAME = 'strikeagent-v1.0.2';
 const STATIC_ASSETS = [
-  '/live',
   '/strikeagent-icon.png',
   '/strikeagent-splash.png',
   '/manifest-strikeagent.json'
@@ -27,7 +26,15 @@ self.addEventListener('activate', (event) => {
             return caches.delete(name);
           })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      return self.clients.claim();
+    }).then(() => {
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+        });
+      });
+    })
   );
 });
 
@@ -40,21 +47,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  if (url.pathname.match(/\.(js|css|png|jpg|svg|woff2?)$/)) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request).then((cached) => {
-          const fetched = fetch(event.request).then((response) => {
-            if (response.ok) {
-              cache.put(event.request, response.clone());
-            }
-            return response;
-          });
-          return cached || fetched;
-        });
-      })
-    );
-  } else {
+  if (url.pathname.match(/\.(js|css)$/)) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -62,6 +55,28 @@ self.addEventListener('fetch', (event) => {
             const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else if (url.pathname.match(/\.(png|jpg|svg|woff2?)$/)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request).then((response) => {
+            if (response.ok) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          });
+        });
+      })
+    );
+  } else {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
           return response;
         })
         .catch(() => caches.match(event.request))
