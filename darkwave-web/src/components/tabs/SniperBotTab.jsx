@@ -1842,6 +1842,30 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
     }
   })
   const [activeTradesPanelExpanded, setActiveTradesPanelExpanded] = useState(true)
+  const [toasts, setToasts] = useState([])
+  
+  const showToast = useCallback((type, title, message) => {
+    const notifSettings = modeSettings?.['full-auto']?.notifications
+    if (notifSettings && !notifSettings.inApp) return
+    
+    const id = Date.now() + Math.random()
+    const newToast = { id, type, title, message, exiting: false }
+    setToasts(prev => [...prev.slice(-4), newToast])
+    
+    setTimeout(() => {
+      setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id))
+      }, 300)
+    }, 5000)
+  }, [modeSettings])
+  
+  const dismissToast = useCallback((id) => {
+    setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, 300)
+  }, [])
   
   const handleModeSettingsSave = useCallback((mode, settings) => {
     const validated = { ...settings }
@@ -2180,12 +2204,15 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
           sessionStorage.setItem('dwp_demo_balance', data.portfolio.balanceSol.toString())
           setHistoryRefreshKey(prev => prev + 1)
           console.log('📊 Demo buy executed:', token.symbol, buyAmountUsd)
+          showToast('success', 'Trade Executed', `Bought ${token.symbol} for $${buyAmountUsd.toFixed(2)}`)
         } else {
           alert(data.error || 'Demo trade failed')
+          showToast('error', 'Trade Failed', data.error || 'Demo trade failed')
         }
       } catch (err) {
         console.error('Demo buy error:', err)
         alert('Failed to execute demo trade')
+        showToast('error', 'Trade Error', 'Failed to execute demo trade')
       }
       return
     }
@@ -2222,9 +2249,16 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
         sessionStorage.setItem('dwp_demo_positions', JSON.stringify(data.portfolio.positions))
         setHistoryRefreshKey(prev => prev + 1)
         console.log('📊 Demo sell executed, P&L:', data.pnl)
+        const pnlValue = parseFloat(data.pnl) || 0
+        if (pnlValue >= 0) {
+          showToast('success', 'Take Profit Hit', `Sold ${position.symbol || 'token'} for +$${pnlValue.toFixed(2)} profit`)
+        } else {
+          showToast('warning', 'Stop Loss Triggered', `Sold ${position.symbol || 'token'} for -$${Math.abs(pnlValue).toFixed(2)} loss`)
+        }
       }
     } catch (err) {
       console.error('Demo sell error:', err)
+      showToast('error', 'Sell Error', 'Failed to execute sell order')
     }
   }
 
@@ -2244,6 +2278,32 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
 
   return (
     <div className={`sniper-tab sniper-bot-tab ${isViewOnly ? 'view-only' : ''}`}>
+      {toasts.length > 0 && (
+        <div className="toast-container">
+          {toasts.map(toast => (
+            <div 
+              key={toast.id} 
+              className={`toast toast-${toast.type} ${toast.exiting ? 'toast-exiting' : ''}`}
+              style={{ position: 'relative' }}
+            >
+              <div className="toast-icon">
+                {toast.type === 'success' && '✓'}
+                {toast.type === 'error' && '✕'}
+                {toast.type === 'warning' && '⚠'}
+                {toast.type === 'info' && 'ℹ'}
+              </div>
+              <div className="toast-content">
+                <p className="toast-title">{toast.title}</p>
+                <p className="toast-message">{toast.message}</p>
+              </div>
+              <button className="toast-close" onClick={() => dismissToast(toast.id)}>×</button>
+              <div className="toast-progress">
+                <div className="toast-progress-bar" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {selectedGlossaryTerm && (
         <GlossaryModal 
           term={selectedGlossaryTerm} 
@@ -2382,9 +2442,11 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
             if (data.success) {
               setAutoModeActive(false)
               console.log('[StrikeAgent] All trades stopped via kill switch')
+              showToast('warning', 'Session Paused', 'All trades have been stopped. StrikeAgent is now paused.')
             }
           } catch (err) {
             console.error('Failed to stop all trades:', err)
+            showToast('error', 'Stop Failed', 'Failed to stop all trades. Please try again.')
           }
         }}
         livePrices={livePrices}
