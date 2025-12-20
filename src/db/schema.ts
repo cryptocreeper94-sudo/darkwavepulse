@@ -1869,3 +1869,20 @@ export const webauthnChallenges = pgTable('webauthn_challenges', {
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const ecosystemApps = pgTable('ecosystem_apps', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  appName: varchar('app_name', { length: 255 }).notNull(),
+  category: varchar('category', { length: 100 }).notNull(),
+  hook: varchar('hook', { length: 255 }).notNull(),
+  valueProposition: text('value_proposition').notNull(),
+  keyTags: json('key_tags').$type<string[]>().default([]),
+  imagePrompt: text('image_prompt'),
+  generatedImageUrl: text('generated_image_url'),
+  websiteUrl: varchar('website_url', { length: 500 }),
+  status: varchar('status', { length: 50 }).notNull().default('pending'),
+  submittedBy: varchar('submitted_by', { length: 255 }),
+  apiKey: varchar('api_key', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
