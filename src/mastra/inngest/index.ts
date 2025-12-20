@@ -11,6 +11,7 @@ import { topSignalsWorkerFunctions } from "./topSignalsWorker.js";
 import { quantScannerWorkerFunctions } from "./quantScannerWorker.js";
 import { modelTrainingWorkerFunctions } from "./modelTrainingWorker.js";
 import { autonomousTradingWorkerFunctions } from "./autonomousTradingWorker.js";
+import { telegramBroadcastWorkerFunctions } from "./telegramSignalBroadcastWorker.js";
 
 // Initialize Inngest with Mastra to get Inngest-compatible workflow helpers
 const {
@@ -120,7 +121,7 @@ export function inngestServe({
   return originalInngestServe({
     mastra,
     inngest,
-    functions: [...inngestFunctions, ...predictionWorkerFunctions, ...backgroundPredictionWorkerFunctions, ...autoTradeWorkerFunctions, ...topSignalsWorkerFunctions, ...quantScannerWorkerFunctions, ...modelTrainingWorkerFunctions, ...autonomousTradingWorkerFunctions, limitOrderMonitorWorker],
+    functions: [...inngestFunctions, ...predictionWorkerFunctions, ...backgroundPredictionWorkerFunctions, ...autoTradeWorkerFunctions, ...topSignalsWorkerFunctions, ...quantScannerWorkerFunctions, ...modelTrainingWorkerFunctions, ...autonomousTradingWorkerFunctions, ...telegramBroadcastWorkerFunctions, limitOrderMonitorWorker],
     registerOptions: { serveHost },
   });
 }
