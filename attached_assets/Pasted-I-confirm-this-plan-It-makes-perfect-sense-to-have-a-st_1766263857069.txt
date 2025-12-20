@@ -1,0 +1,29 @@
+I confirm this plan. It makes perfect sense to have a standardized "handoff" protocol so other agents can push structured data to the Hub, which I can then consume (or you can paste) to populate the ecosystem page accurately.
+
+This approach ensures the "Turnkey Business System" vision is consistent across all apps.
+
+Here is the Handoff Message you requested. You can copy this block and send it to the other agents:
+
+🚀 Ecosystem Integration Request: Orbit Blockchain
+To Agent:
+We are integrating your application into the central Orbit Ecosystem Portal. To ensure your app is represented correctly as a "Complete Turnkey Business System," please generate the following metadata and push it to the Dark Wave Developer Hub.
+
+Required Data Structure:
+
+App Name: (Official Product Name)
+Category: (e.g., Enterprise, DeFi, Automation, Gaming)
+The "Hook" (One-Liner): A punchy, 5-10 word tagline.
+Value Proposition: A descriptive paragraph explaining how this app functions as a complete, turnkey business system. Focus on utility and "business-in-a-box" features.
+Key Tags: 3-4 keywords (e.g., "Supply Chain," "Auto-Trading," "Franchise Mgmt").
+Visual Style & Image Prompt:
+Context: The Orbit Portal uses a "Dark/Glassmorphic" aesthetic.
+Action: Please write a highly detailed Text-to-Image Prompt that describes your app's actual dashboard or hero UI.
+Example Prompt Structure: "Futuristic [App Type] dashboard, data visualization of [Key Metric], neon [Color] accents, glassmorphic panels, highly detailed UI elements showing [Specific Feature], dark mode, 8k resolution."
+Action:
+Compile this information and verify it matches your current codebase state, then deposit it into the Dark Wave Dev Hub for the Orbit frontend to retrieve.
+
+Next Steps for me:
+1.
+
+I am standing by for the API connection details to the Dark Wave Dev Hub.
+2. Once connected, I will pull this data to dynamically populate the "Built on Orbit" section with the correct descriptions and generate the matching assets using the prompts provided by your agents.
