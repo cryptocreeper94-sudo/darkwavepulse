@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { inngest } from './client';
 import { db } from '../../db/client.js';
-import { predictionEvents } from '../../db/schema.js';
+import { strikeAgentSignals } from '../../db/schema.js';
 import { desc, gte } from 'drizzle-orm';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -28,52 +28,59 @@ async function sendChannelMessage(text: string): Promise<boolean> {
   }
 }
 
-interface SignalData {
-  ticker: string;
-  signal: string;
-  confidence: string;
+interface StrikeSignalData {
+  symbol: string;
+  name: string;
+  chain: string;
+  signal: 'SNIPE' | 'WATCH' | 'AVOID';
   price: number;
-  reason: string;
+  marketCap: number;
+  liquidity: number;
+  compositeScore: number;
+  safetyScore: number;
+  momentumScore: number;
+  reasoning: string;
 }
 
-async function getTopSignals(): Promise<SignalData[]> {
+async function getStrikeAgentSignals(): Promise<StrikeSignalData[]> {
   try {
     const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
     
-    const recentPredictions = await db.select()
-      .from(predictionEvents)
-      .where(gte(predictionEvents.createdAt, fourHoursAgo))
-      .orderBy(desc(predictionEvents.createdAt))
-      .limit(10);
+    const recentSignals = await db.select()
+      .from(strikeAgentSignals)
+      .where(gte(strikeAgentSignals.createdAt, fourHoursAgo))
+      .orderBy(desc(strikeAgentSignals.compositeScore))
+      .limit(5);
 
-    const signals: SignalData[] = [];
-    const seenTickers = new Set<string>();
+    const signals: StrikeSignalData[] = [];
+    const seenTokens = new Set<string>();
 
-    for (const pred of recentPredictions) {
-      if (seenTickers.has(pred.ticker)) continue;
-      seenTickers.add(pred.ticker);
+    for (const sig of recentSignals) {
+      if (seenTokens.has(sig.tokenAddress)) continue;
+      seenTokens.add(sig.tokenAddress);
 
-      let reason = 'Market momentum detected';
-      try {
-        const indicators = JSON.parse(pred.indicators || '{}');
-        if (indicators.rsi) {
-          if (indicators.rsi > 70) reason = 'Overbought conditions';
-          else if (indicators.rsi < 30) reason = 'Oversold conditions';
-          else if (indicators.rsi > 50) reason = 'Moderate upward trend';
-          else reason = 'Downward pressure building';
-        }
-        if (indicators.macdSignal === 'bullish') reason = 'Bullish MACD crossover';
-        if (indicators.macdSignal === 'bearish') reason = 'Bearish MACD crossover';
-      } catch (e) {}
-
-      const confidenceNum = pred.confidence === 'HIGH' ? 85 : pred.confidence === 'MEDIUM' ? 65 : 50;
+      const composite = sig.compositeScore || 0;
+      const safety = sig.safetyScore || 0;
+      
+      let signal: 'SNIPE' | 'WATCH' | 'AVOID' = 'WATCH';
+      if (composite >= 75 && safety >= 60) {
+        signal = 'SNIPE';
+      } else if (composite < 40 || safety < 30) {
+        signal = 'AVOID';
+      }
 
       signals.push({
-        ticker: pred.ticker,
-        signal: pred.signal || 'HOLD',
-        confidence: `${confidenceNum}%`,
-        price: parseFloat(pred.priceAtPrediction?.toString() || '0'),
-        reason
+        symbol: sig.tokenSymbol,
+        name: sig.tokenName,
+        chain: sig.chain || 'solana',
+        signal,
+        price: parseFloat(sig.priceUsd?.toString() || '0'),
+        marketCap: parseFloat(sig.marketCapUsd?.toString() || '0'),
+        liquidity: parseFloat(sig.liquidityUsd?.toString() || '0'),
+        compositeScore: composite,
+        safetyScore: safety,
+        momentumScore: sig.momentumScore || 0,
+        reasoning: sig.reasoning || 'AI analysis complete'
       });
 
       if (signals.length >= 3) break;
@@ -81,88 +88,95 @@ async function getTopSignals(): Promise<SignalData[]> {
 
     return signals;
   } catch (error: any) {
-    console.error('[TelegramBroadcast] Error fetching signals:', error.message);
+    console.error('[TelegramBroadcast] Error fetching StrikeAgent signals:', error.message);
     return [];
   }
 }
 
-async function fetchLivePrices(): Promise<SignalData[]> {
+async function fetchDexScreenerTrending(): Promise<StrikeSignalData[]> {
   try {
-    const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
-      params: {
-        vs_currency: 'usd',
-        order: 'market_cap_desc',
-        per_page: 10,
-        page: 1,
-        sparkline: false,
-        price_change_percentage: '24h'
-      },
+    const response = await axios.get('https://api.dexscreener.com/latest/dex/tokens/SOL', {
       timeout: 10000
     });
 
-    const coins = response.data;
-    const signals: SignalData[] = [];
+    const pairs = response.data?.pairs || [];
+    const signals: StrikeSignalData[] = [];
 
-    for (const coin of coins.slice(0, 3)) {
-      const priceChange = coin.price_change_percentage_24h || 0;
+    for (const pair of pairs.slice(0, 5)) {
+      const priceChange = pair.priceChange?.h24 || 0;
+      const liquidity = pair.liquidity?.usd || 0;
+      const volume = pair.volume?.h24 || 0;
       
-      let signal = 'HOLD';
-      let confidence = '50%';
-      let reason = 'Consolidating';
-
-      if (priceChange > 5) {
-        signal = 'BUY';
-        confidence = '75%';
-        reason = 'Strong upward momentum';
-      } else if (priceChange > 2) {
-        signal = 'BUY';
-        confidence = '65%';
-        reason = 'Moderate upward trend';
-      } else if (priceChange < -5) {
-        signal = 'SELL';
-        confidence = '75%';
-        reason = 'Strong downward pressure';
-      } else if (priceChange < -2) {
-        signal = 'SELL';
-        confidence = '65%';
-        reason = 'Downward pressure building';
+      if (liquidity < 10000) continue;
+      
+      let signal: 'SNIPE' | 'WATCH' | 'AVOID' = 'WATCH';
+      let safetyScore = 50;
+      
+      if (liquidity > 100000 && volume > 50000) {
+        safetyScore = 70;
+        if (priceChange > 20) signal = 'SNIPE';
+      } else if (liquidity < 25000) {
+        safetyScore = 30;
+        signal = 'AVOID';
       }
 
       signals.push({
-        ticker: coin.symbol.toUpperCase(),
+        symbol: pair.baseToken?.symbol || 'UNKNOWN',
+        name: pair.baseToken?.name || 'Unknown Token',
+        chain: 'solana',
         signal,
-        confidence,
-        price: coin.current_price,
-        reason
+        price: parseFloat(pair.priceUsd || '0'),
+        marketCap: pair.fdv || 0,
+        liquidity,
+        compositeScore: Math.min(100, Math.round((priceChange + 50) * safetyScore / 100)),
+        safetyScore,
+        momentumScore: Math.min(100, Math.round(priceChange + 50)),
+        reasoning: priceChange > 10 ? 'Strong momentum detected' : 'Market activity monitoring'
       });
+
+      if (signals.length >= 3) break;
     }
 
     return signals;
   } catch (error: any) {
-    console.error('[TelegramBroadcast] Error fetching live prices:', error.message);
+    console.error('[TelegramBroadcast] Error fetching DexScreener:', error.message);
     return [];
   }
 }
 
-function formatSignalMessage(signals: SignalData[]): string {
+function formatPrice(price: number): string {
+  if (price === 0) return '$0.00';
+  if (price < 0.000001) return `$${price.toExponential(2)}`;
+  if (price < 0.01) return `$${price.toFixed(6)}`;
+  if (price < 1) return `$${price.toFixed(4)}`;
+  return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function formatMarketCap(mc: number): string {
+  if (mc >= 1000000) return `$${(mc / 1000000).toFixed(1)}M`;
+  if (mc >= 1000) return `$${(mc / 1000).toFixed(0)}K`;
+  return `$${mc.toFixed(0)}`;
+}
+
+function formatStrikeAgentMessage(signals: StrikeSignalData[]): string {
   if (signals.length === 0) {
     return '';
   }
 
-  let message = `<b>DarkWave Studios</b>\n📊 <b>Latest Trading Signals</b>\n\n`;
+  let message = `<b>StrikeAgent</b>\n🎯 <b>Top Token Signals</b>\n\n`;
 
-  for (const signal of signals) {
-    const emoji = signal.signal === 'BUY' ? '🟢' : signal.signal === 'SELL' ? '🔴' : '🟡';
-    const priceFormatted = signal.price < 1 
-      ? `$${signal.price.toFixed(4)}` 
-      : `$${signal.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-    message += `${emoji} <b>${signal.ticker}</b>\n`;
-    message += `Signal: ${signal.signal} (${signal.confidence} confidence)\n`;
-    message += `Price: ${priceFormatted}\n`;
-    message += `Reason: ${signal.reason}\n\n`;
+  for (const sig of signals) {
+    const emoji = sig.signal === 'SNIPE' ? '🎯' : sig.signal === 'WATCH' ? '👀' : '⚠️';
+    const safetyEmoji = sig.safetyScore >= 70 ? '🟢' : sig.safetyScore >= 40 ? '🟡' : '🔴';
+    
+    message += `${emoji} <b>${sig.symbol}</b> (${sig.name})\n`;
+    message += `Signal: <b>${sig.signal}</b>\n`;
+    message += `Price: ${formatPrice(sig.price)} | MC: ${formatMarketCap(sig.marketCap)}\n`;
+    message += `${safetyEmoji} Safety: ${sig.safetyScore}% | Score: ${sig.compositeScore}%\n`;
+    message += `<i>${sig.reasoning}</i>\n\n`;
   }
 
+  message += `<i>🔒 Full access: Pulse Pro subscription</i>\n`;
   message += `<i>Signals update every 4 hours. Not financial advice.</i>`;
 
   return message;
@@ -178,7 +192,7 @@ export const telegramSignalBroadcast = inngest.createFunction(
     { event: "telegram/broadcast-signals" },
   ],
   async ({ event, step }) => {
-    console.log("📢 [TelegramBroadcast] Starting signal broadcast...");
+    console.log("📢 [TelegramBroadcast] Starting StrikeAgent signal broadcast...");
 
     if (!TELEGRAM_CHANNEL_ID) {
       console.warn("⚠️ [TelegramBroadcast] TELEGRAM_CHANNEL_ID not configured - skipping broadcast");
@@ -189,16 +203,18 @@ export const telegramSignalBroadcast = inngest.createFunction(
       };
     }
 
-    let signals = await step.run("get-signals", async () => {
-      const dbSignals = await getTopSignals();
+    let signals = await step.run("get-strikeagent-signals", async () => {
+      const dbSignals = await getStrikeAgentSignals();
       if (dbSignals.length >= 2) {
+        console.log(`[TelegramBroadcast] Found ${dbSignals.length} StrikeAgent signals from database`);
         return dbSignals;
       }
-      return await fetchLivePrices();
+      console.log('[TelegramBroadcast] Not enough DB signals, fetching from DexScreener...');
+      return await fetchDexScreenerTrending();
     });
 
     if (signals.length === 0) {
-      console.warn("⚠️ [TelegramBroadcast] No signals available");
+      console.warn("⚠️ [TelegramBroadcast] No StrikeAgent signals available");
       return { 
         success: false, 
         error: "No signals available",
@@ -206,7 +222,7 @@ export const telegramSignalBroadcast = inngest.createFunction(
       };
     }
 
-    const message = formatSignalMessage(signals);
+    const message = formatStrikeAgentMessage(signals);
 
     const sent = await step.run("send-broadcast", async () => {
       return await sendChannelMessage(message);
@@ -217,7 +233,7 @@ export const telegramSignalBroadcast = inngest.createFunction(
     return {
       success: sent,
       signalsCount: signals.length,
-      signals: signals.map(s => ({ ticker: s.ticker, signal: s.signal })),
+      signals: signals.map(s => ({ symbol: s.symbol, signal: s.signal, score: s.compositeScore })),
       timestamp: new Date().toISOString()
     };
   }
