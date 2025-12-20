@@ -628,6 +628,158 @@ function AdvancedSettingsSection({ children, expanded, onToggle }) {
   )
 }
 
+function ActiveTradesPanel({ positions, expanded, onToggle, onStopAll, livePrices, modeSettings, selectedChain }) {
+  const calculatePnl = (position, currentPrice) => {
+    const entry = position.entryPriceUsd || position.entryPrice || 0
+    const current = currentPrice || position.currentPriceUsd || entry
+    if (entry === 0) return 0
+    return ((current - entry) / entry) * 100
+  }
+
+  const getProgressToTarget = (position, currentPrice) => {
+    const entry = parseFloat(position.entryPriceUsd || position.entryPrice) || 0
+    const current = parseFloat(currentPrice || position.currentPriceUsd) || entry
+    const rawTP = parseFloat(modeSettings?.['full-auto']?.takeProfit)
+    const rawSL = parseFloat(modeSettings?.['full-auto']?.stopLoss)
+    const takeProfit = isNaN(rawTP) || rawTP <= 0 ? 50 : rawTP
+    const stopLoss = isNaN(rawSL) || rawSL <= 0 ? 20 : rawSL
+    
+    if (entry === 0 || isNaN(entry)) return 0
+    
+    const pnlPercent = ((current - entry) / entry) * 100
+    if (isNaN(pnlPercent)) return 0
+    
+    if (pnlPercent >= 0) {
+      return Math.min(100, Math.max(0, (pnlPercent / takeProfit) * 100))
+    } else {
+      return Math.max(-100, Math.min(0, (pnlPercent / stopLoss) * 100))
+    }
+  }
+
+  const getChainBadge = (chain) => {
+    const chains = {
+      solana: { icon: '◎', color: '#9945FF' },
+      ethereum: { icon: '⬡', color: '#627EEA' },
+      base: { icon: '🔵', color: '#0052FF' },
+      polygon: { icon: '⬢', color: '#8247E5' },
+      arbitrum: { icon: '🔷', color: '#28A0F0' },
+      bsc: { icon: '⚫', color: '#F0B90B' }
+    }
+    return chains[chain] || chains.solana
+  }
+
+  return (
+    <div className={`active-trades-panel section-box ${expanded ? 'expanded' : 'collapsed'}`}>
+      <div className="active-trades-header" onClick={onToggle}>
+        <div className="active-trades-title">
+          <span className="active-trades-icon">📊</span>
+          <span>Active Trades</span>
+          <span className="active-trades-count">{positions?.length || 0}</span>
+        </div>
+        <div className="active-trades-actions">
+          <button 
+            className="kill-switch-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (window.confirm('Stop all active trades? This will immediately close all positions.')) {
+                onStopAll()
+              }
+            }}
+            disabled={!positions || positions.length === 0}
+          >
+            ⛔ STOP ALL
+          </button>
+          <span className="active-trades-toggle">
+            {expanded ? '▲' : '▼'}
+          </span>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="active-trades-content">
+          {(!positions || positions.length === 0) ? (
+            <div className="active-trades-empty">
+              <span className="empty-icon">📭</span>
+              <span>No active trades</span>
+            </div>
+          ) : (
+            <>
+              <div className="active-trades-list">
+                {positions.map((position, index) => {
+                  const currentPrice = livePrices?.[position.tokenAddress] || position.currentPriceUsd
+                  const pnl = calculatePnl(position, currentPrice)
+                  const progress = getProgressToTarget(position, currentPrice)
+                  const chainBadge = getChainBadge(position.chain || selectedChain)
+                  
+                  return (
+                    <div key={position.id || index} className="active-trade-item">
+                      <div className="trade-token-info">
+                        <span 
+                          className="trade-chain-badge" 
+                          style={{ backgroundColor: chainBadge.color }}
+                        >
+                          {chainBadge.icon}
+                        </span>
+                        <span className="trade-token-symbol">{position.tokenSymbol || position.symbol || '???'}</span>
+                      </div>
+                      <div className="trade-prices">
+                        <div className="trade-price-row">
+                          <span className="trade-price-label">Entry:</span>
+                          <span className="trade-price-value">${(position.entryPriceUsd || position.entryPrice || 0).toFixed(6)}</span>
+                        </div>
+                        <div className="trade-price-row">
+                          <span className="trade-price-label">Current:</span>
+                          <span className="trade-price-value">${(currentPrice || 0).toFixed(6)}</span>
+                        </div>
+                      </div>
+                      <div className={`trade-pnl ${pnl >= 0 ? 'positive' : 'negative'}`}>
+                        {pnl >= 0 ? '+' : ''}{pnl.toFixed(2)}%
+                      </div>
+                      <div className="trade-progress-container">
+                        <div className="trade-progress-bar">
+                          <div 
+                            className={`trade-progress-fill ${progress >= 0 ? 'profit' : 'loss'}`}
+                            style={{ 
+                              width: `${Math.abs(progress)}%`,
+                              marginLeft: progress < 0 ? 'auto' : 0
+                            }}
+                          />
+                        </div>
+                        <div className="trade-progress-labels">
+                          <span className="progress-label loss">SL</span>
+                          <span className="progress-label profit">TP</span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              
+              {positions.length > 0 && (
+                <div className="active-trades-chart">
+                  <div className="mini-chart-placeholder">
+                    <span className="chart-icon">📈</span>
+                    <span className="chart-label">{positions[0]?.tokenSymbol || 'Token'} Mini Chart</span>
+                    <div className="mini-candles">
+                      {[...Array(20)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`mini-candle ${Math.random() > 0.5 ? 'green' : 'red'}`}
+                          style={{ height: `${20 + Math.random() * 60}%` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function AIInsightsCard({ stats, isActive }) {
   const confidenceLevel = stats?.winRate >= 60 ? 'high' : stats?.winRate >= 40 ? 'medium' : 'low'
   const riskLevel = stats?.totalPnl >= 0 ? 'low' : stats?.totalPnl >= -1 ? 'medium' : 'high'
@@ -978,6 +1130,105 @@ function ModeSettingsModal({ mode, isOpen, onClose, settings, onSave }) {
                   >
                     {localSettings.autoCompound ? 'ON' : 'OFF'}
                   </button>
+                </div>
+              </div>
+              
+              <div className="notification-settings">
+                <div className="notification-settings-header">
+                  <span className="notification-settings-title">🔔 Notifications</span>
+                </div>
+                
+                <div className="mode-setting-group">
+                  <label className="mode-setting-label">Enable Telegram Notifications</label>
+                  <div className="mode-setting-toggle-row">
+                    <span className="mode-setting-desc">Receive alerts via Telegram</span>
+                    <button 
+                      className={`mode-setting-toggle ${localSettings.notifications?.telegram ? 'active' : ''}`}
+                      onClick={() => handleChange('notifications', { 
+                        ...localSettings.notifications, 
+                        telegram: !localSettings.notifications?.telegram 
+                      })}
+                    >
+                      {localSettings.notifications?.telegram ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="mode-setting-group">
+                  <label className="mode-setting-label">Enable In-App Notifications</label>
+                  <div className="mode-setting-toggle-row">
+                    <span className="mode-setting-desc">Show in-app alerts and sounds</span>
+                    <button 
+                      className={`mode-setting-toggle ${localSettings.notifications?.inApp ? 'active' : ''}`}
+                      onClick={() => handleChange('notifications', { 
+                        ...localSettings.notifications, 
+                        inApp: !localSettings.notifications?.inApp 
+                      })}
+                    >
+                      {localSettings.notifications?.inApp ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="notification-triggers">
+                  <label className="mode-setting-label">Notification Triggers</label>
+                  <div className="notification-triggers-grid">
+                    <label className="notification-checkbox-item">
+                      <input 
+                        type="checkbox" 
+                        checked={localSettings.notifications?.triggers?.everyTrade ?? true}
+                        onChange={(e) => handleChange('notifications', { 
+                          ...localSettings.notifications, 
+                          triggers: { ...localSettings.notifications?.triggers, everyTrade: e.target.checked }
+                        })}
+                      />
+                      <span>On every trade</span>
+                    </label>
+                    <label className="notification-checkbox-item">
+                      <input 
+                        type="checkbox" 
+                        checked={localSettings.notifications?.triggers?.takeProfit ?? true}
+                        onChange={(e) => handleChange('notifications', { 
+                          ...localSettings.notifications, 
+                          triggers: { ...localSettings.notifications?.triggers, takeProfit: e.target.checked }
+                        })}
+                      />
+                      <span>On take profit hit</span>
+                    </label>
+                    <label className="notification-checkbox-item">
+                      <input 
+                        type="checkbox" 
+                        checked={localSettings.notifications?.triggers?.stopLoss ?? true}
+                        onChange={(e) => handleChange('notifications', { 
+                          ...localSettings.notifications, 
+                          triggers: { ...localSettings.notifications?.triggers, stopLoss: e.target.checked }
+                        })}
+                      />
+                      <span>On stop loss triggered</span>
+                    </label>
+                    <label className="notification-checkbox-item">
+                      <input 
+                        type="checkbox" 
+                        checked={localSettings.notifications?.triggers?.sessionPaused ?? true}
+                        onChange={(e) => handleChange('notifications', { 
+                          ...localSettings.notifications, 
+                          triggers: { ...localSettings.notifications?.triggers, sessionPaused: e.target.checked }
+                        })}
+                      />
+                      <span>On session paused</span>
+                    </label>
+                    <label className="notification-checkbox-item">
+                      <input 
+                        type="checkbox" 
+                        checked={localSettings.notifications?.triggers?.dailySummary ?? false}
+                        onChange={(e) => handleChange('notifications', { 
+                          ...localSettings.notifications, 
+                          triggers: { ...localSettings.notifications?.triggers, dailySummary: e.target.checked }
+                        })}
+                      />
+                      <span>Daily P&L summary</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </>
@@ -1570,8 +1821,27 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
   const [modeSettings, setModeSettings] = useState({
     manual: { buyAmount: 0.1, slippage: 5, takeProfit: 50, stopLoss: 20, tokenAddress: '' },
     'semi-auto': { autoDetect: true, approvalTimeout: 30, maxTrades: 10, riskLevel: 'Moderate', buyAmount: 0.1, takeProfit: 50, stopLoss: 20 },
-    'full-auto': { maxSol: 5, maxTrades: 10, minSafetyScore: 60, cooldown: 60, maxLosses: 3, autoCompound: false }
+    'full-auto': { 
+      maxSol: 5, 
+      maxTrades: 10, 
+      minSafetyScore: 60, 
+      cooldown: 60, 
+      maxLosses: 3, 
+      autoCompound: false,
+      notifications: {
+        telegram: true,
+        inApp: true,
+        triggers: {
+          everyTrade: true,
+          takeProfit: true,
+          stopLoss: true,
+          sessionPaused: true,
+          dailySummary: false
+        }
+      }
+    }
   })
+  const [activeTradesPanelExpanded, setActiveTradesPanelExpanded] = useState(true)
   
   const handleModeSettingsSave = useCallback((mode, settings) => {
     const validated = { ...settings }
@@ -2096,6 +2366,30 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
         disabled={!wallet.connected && !isDemoMode}
         modeSettings={modeSettings}
         onModeSettingsSave={handleModeSettingsSave}
+      />
+
+      <ActiveTradesPanel
+        positions={isDemoMode ? demoPositions : activePositions}
+        expanded={activeTradesPanelExpanded}
+        onToggle={() => setActiveTradesPanelExpanded(!activeTradesPanelExpanded)}
+        onStopAll={async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/sniper/pause`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            })
+            const data = await res.json()
+            if (data.success) {
+              setAutoModeActive(false)
+              console.log('[StrikeAgent] All trades stopped via kill switch')
+            }
+          } catch (err) {
+            console.error('Failed to stop all trades:', err)
+          }
+        }}
+        livePrices={livePrices}
+        modeSettings={modeSettings}
+        selectedChain={selectedChain}
       />
 
       <div className="sniper-chain-selector section-box">
