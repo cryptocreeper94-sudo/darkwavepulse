@@ -64,6 +64,7 @@ import { autonomousTradingRoutes } from "./routes/autonomousTradingRoutes";
 import { moonpayRoutes } from "./routes/moonpayRoutes";
 import { transakRoutes } from "./routes/transakRoutes";
 import { webauthnRoutes } from "./routes/webauthnRoutes";
+import { ecosystemRoutes } from "./routes/ecosystemRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6270,6 +6271,9 @@ export const mastra = new Mastra({
       
       // WebAuthn Biometric Authentication Routes
       ...webauthnRoutes,
+      
+      // Ecosystem Integration Routes (Dev Hub handoff protocol)
+      ...ecosystemRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {
