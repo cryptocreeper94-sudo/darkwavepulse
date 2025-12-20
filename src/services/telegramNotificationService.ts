@@ -340,6 +340,60 @@ export async function sendTradingPausedAlert(chatId: string | number, reason: st
   return sendTelegramMessage(chatId, message);
 }
 
+export async function sendTakeProfitHit(chatId: string | number, data: {
+  symbol: string;
+  entryPrice: number;
+  exitPrice: number;
+  profitPercent: number;
+  profitUSD: number;
+}): Promise<boolean> {
+  const message = `
+🎯 <b>TAKE PROFIT HIT!</b> 💰
+
+📍 <b>Token:</b> ${data.symbol}
+━━━━━━━━━━━━━━━━━━
+
+📥 <b>Entry:</b> $${formatNumber(data.entryPrice)}
+📤 <b>Exit:</b> $${formatNumber(data.exitPrice)}
+
+📈 <b>Profit:</b>
+🟢 +${data.profitPercent.toFixed(2)}% (+$${formatNumber(data.profitUSD)})
+
+<i>Position closed at target profit level</i>
+
+🚀 <a href="https://pulse.darkwavestudios.io">View Details</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
+export async function sendStopLossTriggered(chatId: string | number, data: {
+  symbol: string;
+  entryPrice: number;
+  exitPrice: number;
+  lossPercent: number;
+  lossUSD: number;
+}): Promise<boolean> {
+  const message = `
+🛑 <b>STOP LOSS TRIGGERED</b>
+
+📍 <b>Token:</b> ${data.symbol}
+━━━━━━━━━━━━━━━━━━
+
+📥 <b>Entry:</b> $${formatNumber(data.entryPrice)}
+📤 <b>Exit:</b> $${formatNumber(data.exitPrice)}
+
+📉 <b>Loss:</b>
+🔴 -${Math.abs(data.lossPercent).toFixed(2)}% (-$${formatNumber(Math.abs(data.lossUSD))})
+
+<i>Position closed to limit losses</i>
+
+🚀 <a href="https://pulse.darkwavestudios.io">Review Strategy</a>
+`.trim();
+
+  return sendTelegramMessage(chatId, message);
+}
+
 export const telegramNotificationService = {
   sendHotTokenAlert,
   sendTradeConfirmation,
@@ -349,5 +403,7 @@ export const telegramNotificationService = {
   sendAutoTradeRecommendation,
   sendAutoTradeExecuted,
   sendAutoTradeResult,
-  sendTradingPausedAlert
+  sendTradingPausedAlert,
+  sendTakeProfitHit,
+  sendStopLossTriggered
 };
