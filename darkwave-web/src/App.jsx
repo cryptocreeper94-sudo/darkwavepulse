@@ -182,8 +182,8 @@ function App() {
   const isStrikeAgentDomain = window.location.hostname.includes('strikeagent')
   const isDemoPath = window.location.pathname.startsWith('/demo')
   const isWhitepaperPage = window.location.pathname === '/whitepaper'
-  const isStrikeAgentLive = window.location.pathname === '/strikeagent/live' || window.location.pathname === '/live'
-  const isDemoMode = isStrikeAgentDomain || isDemoPath
+  const isStrikeAgentLive = window.location.pathname === '/strikeagent/live' || window.location.pathname === '/live' || isStrikeAgentDomain
+  const isDemoMode = isDemoPath
   
   const [activeTab, setActiveTab] = useState('dashboard')
   const [userId, setUserId] = useState(isDemoMode ? 'demo-user' : null)
