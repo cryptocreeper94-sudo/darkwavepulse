@@ -1,4 +1,4 @@
-# DWAV Token Whitepaper
+# DWT Token Whitepaper
 
 **DarkWave Studios, LLC**  
 **Version 1.0 | December 2024**
@@ -7,9 +7,9 @@
 
 ## Disclaimer
 
-This whitepaper is for informational purposes only and does not constitute financial, investment, or legal advice. Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWAV tokens may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
+This whitepaper is for informational purposes only and does not constitute financial, investment, or legal advice. Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWT tokens may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
 
-Nothing in this document should be construed as a solicitation of investment or an offer to sell securities. DWAV tokens are utility tokens intended for use within the DarkWave ecosystem and should not be purchased as investments or with any expectation of profit.
+Nothing in this document should be construed as a solicitation of investment or an offer to sell securities. DWT tokens are utility tokens intended for use within the DarkWave ecosystem and should not be purchased as investments or with any expectation of profit.
 
 ---
 
@@ -33,7 +33,7 @@ Nothing in this document should be construed as a solicitation of investment or 
 
 DarkWave Studios is building the future of AI-powered trading intelligence. Our flagship platform, **PULSE**, combines advanced artificial intelligence, real-time market data, and blockchain technology to deliver institutional-grade analytics to retail traders worldwide.
 
-**DWAV** is the native utility token powering this ecosystem, providing holders with staking rewards, premium access discounts, governance rights, and exclusive benefits across all DarkWave products.
+**DWT** is the native utility token powering this ecosystem, providing holders with staking rewards, premium access discounts, governance rights, and exclusive benefits across all DarkWave products.
 
 ### Key Highlights
 
@@ -141,10 +141,10 @@ Intelligent sniper bot with:
 
 | Property | Value |
 |----------|-------|
-| **Name** | DWAV Token |
-| **Symbol** | DWAV |
+| **Name** | DWT Token |
+| **Symbol** | DWT |
 | **Network** | Solana (SPL Token) |
-| **Total Supply** | 100,000,000 DWAV |
+| **Total Supply** | 100,000,000 DWT |
 | **Decimals** | 9 |
 | **Launch Date** | February 14, 2026 |
 
@@ -186,7 +186,7 @@ We chose a professional supply of 100 million tokens—not billions or trillions
 
 ### 1. Staking Rewards (12-24% APY)
 
-DWAV holders can stake tokens to earn rewards distributed from platform revenue:
+DWT holders can stake tokens to earn rewards distributed from platform revenue:
 
 - **Flexible Staking**: Unstake anytime, lower APY
 - **Locked Staking**: Higher APY for commitment
@@ -198,14 +198,14 @@ Token holders receive tiered benefits:
 
 | Holding | Discount |
 |---------|----------|
-| 1,000 DWAV | 5% off subscription |
-| 10,000 DWAV | 15% off subscription |
-| 50,000 DWAV | 25% off subscription |
-| 100,000 DWAV | 50% off subscription |
+| 1,000 DWT | 5% off subscription |
+| 10,000 DWT | 15% off subscription |
+| 50,000 DWT | 25% off subscription |
+| 100,000 DWT | 50% off subscription |
 
 ### 3. Governance Rights
 
-As the community grows, DWAV holders will vote on:
+As the community grows, DWT holders will vote on:
 
 - Platform development priorities
 - Treasury allocation decisions
@@ -222,7 +222,7 @@ Each AI agent has a collectible NFT Trading Card:
 
 ### 5. Cross-App Benefits
 
-DWAV utility extends across the DarkWave ecosystem:
+DWT utility extends across the DarkWave ecosystem:
 
 - Benefits on all DarkWave products
 - Future partner platform integrations
@@ -278,7 +278,7 @@ DWAV utility extends across the DarkWave ecosystem:
 
 ### Compliance Approach
 
-- **Utility Token Classification**: DWAV is designed for use, not investment
+- **Utility Token Classification**: DWT is designed for use, not investment
 - **US Entity**: DarkWave Studios, LLC
 - **Transparent Operations**: Blockchain-verified predictions
 - **Clear Disclaimers**: Risk warnings throughout platform
@@ -302,7 +302,7 @@ DWAV utility extends across the DarkWave ecosystem:
 - [ ] StrikeAgent beta
 
 ### Q1 2026: Token Launch
-- [ ] DWAV token launch (February 14, 2026)
+- [ ] DWT token launch (February 14, 2026)
 - [ ] DEX liquidity (Raydium, Jupiter)
 - [ ] Staking platform launch
 - [ ] NFT Trading Card collection
@@ -346,7 +346,7 @@ Revenue will fund:
 
 Cryptocurrency trading represents a multi-trillion dollar market, yet retail traders remain at a significant disadvantage. DarkWave Studios addresses this gap by providing institutional-grade AI analytics at accessible prices.
 
-### Why DWAV?
+### Why DWT?
 
 1. **Real Product**: Not vaporware—PULSE is live and functional
 2. **Real Utility**: Staking, discounts, governance, NFTs
@@ -367,7 +367,7 @@ Cryptocurrency trading represents a multi-trillion dollar market, yet retail tra
 **Website**: [pulse.darkwavestudios.io](https://pulse.darkwavestudios.io)
 
 **Documents**:
-- Token Info: `/docs/DWAV_TOKEN_INFO.md`
+- Token Info: `/docs/DWT_TOKEN_INFO.md`
 - Roadmap: `/business-docs/DARKWAVE_ROADMAP.md`
 
 ---

@@ -1102,6 +1102,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   const quickActions = [
     { image: '/assets/generated_images/ai_trading_strikeagent_icon.png', title: 'StrikeAgent', subtitle: 'AI Predictive Trading', color: '#00D4FF', tab: 'sniper' },
     { image: '/assets/generated_images/multi-chain_wallet_icon.png', title: 'Wallet', subtitle: 'Multi-chain', color: '#9D4EDD', tab: 'wallet' },
+    { image: '/assets/generated_images/dust_buster_cleanup_icon.png', title: 'Dust Buster', subtitle: '12.5% Fee - Beat Competition!', color: '#39FF14', tab: 'dust-buster' },
     { image: '/assets/generated_images/watchlist_limit_orders_icon.png', title: 'Watchlist', subtitle: 'Limit orders', color: 'var(--neon-green)', tab: 'watchlist' },
   ]
 
