@@ -2,6 +2,7 @@ import { useAvatar } from '../../context/AvatarContext'
 import { useWalletState, WalletMultiButton } from '../../context/WalletContext'
 import MiniAvatar from '../ui/MiniAvatar'
 import VerificationBadge from '../ui/VerificationBadge'
+import DarkWaveVerificationBadge from '../ui/DarkWaveVerificationBadge'
 import { useState, useEffect } from 'react'
 
 export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, activeTab, onBackClick }) {
@@ -83,6 +84,10 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
           {!isScreenMobile && <span>Whitepaper</span>}
         </a>
         <VerificationBadge 
+          hallmarkId={hallmarkId}
+          walletAddress={walletAddress}
+        />
+        <DarkWaveVerificationBadge 
           hallmarkId={hallmarkId}
           walletAddress={walletAddress}
         />
