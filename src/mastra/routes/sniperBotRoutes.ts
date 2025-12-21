@@ -1212,32 +1212,52 @@ export const sniperBotRoutes = [
   {
     path: "/api/public/strikeagent/stats",
     method: "GET",
-    createHandler: async ({ mastra }: any) => async (c: any) => {
-      const logger = mastra.getLogger();
-      try {
-        logger?.info('[PublicAPI] Fetching public stats');
-        
-        // Get aggregate stats - no user-specific data
-        const stats = await strikeAgentTrackingService.getAggregateStats();
-        
-        return c.json({
-          success: true,
-          stats: {
-            totalSignals: stats.totalPredictions || 0,
-            winRate: stats.outcomesByHorizon?.['24h']?.winRate || stats.outcomesByHorizon?.['1h']?.winRate || 0,
-            activeToday: stats.recentActivity || 0,
-            tradesExecuted: stats.totalTrades || 0,
-          },
-          lastUpdated: new Date().toISOString()
-        });
-      } catch (error: any) {
-        logger?.error('[PublicAPI] Stats error', { error: error.message });
-        return c.json({ 
-          success: true, 
-          stats: { totalSignals: 0, winRate: 0, activeToday: 0, tradesExecuted: 0 },
-          lastUpdated: new Date().toISOString() 
-        });
-      }
+    createHandler: async ({ mastra }: any) => {
+      // In-memory cache for stats (1 minute TTL)
+      let cachedStats: any = null;
+      let cacheExpiry = 0;
+      const CACHE_TTL_MS = 60000; // 1 minute
+      
+      return async (c: any) => {
+        const logger = mastra.getLogger();
+        try {
+          // Return cached response if valid
+          const now = Date.now();
+          if (cachedStats && now < cacheExpiry) {
+            logger?.info('[PublicAPI] Returning cached stats');
+            return c.json(cachedStats);
+          }
+          
+          logger?.info('[PublicAPI] Fetching public stats');
+          
+          // Get aggregate stats - no user-specific data
+          const stats = await strikeAgentTrackingService.getAggregateStats();
+          
+          const response = {
+            success: true,
+            stats: {
+              totalSignals: stats.totalPredictions || 0,
+              winRate: stats.outcomesByHorizon?.['24h']?.winRate || stats.outcomesByHorizon?.['1h']?.winRate || 0,
+              activeToday: stats.recentActivity || 0,
+              tradesExecuted: stats.totalTrades || 0,
+            },
+            lastUpdated: new Date().toISOString()
+          };
+          
+          // Cache the response
+          cachedStats = response;
+          cacheExpiry = now + CACHE_TTL_MS;
+          
+          return c.json(response);
+        } catch (error: any) {
+          logger?.error('[PublicAPI] Stats error', { error: error.message });
+          return c.json({ 
+            success: true, 
+            stats: { totalSignals: 0, winRate: 0, activeToday: 0, tradesExecuted: 0 },
+            lastUpdated: new Date().toISOString() 
+          });
+        }
+      };
     }
   },
 ];

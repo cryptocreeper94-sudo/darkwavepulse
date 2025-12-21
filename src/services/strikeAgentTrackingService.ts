@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import { db } from '../db/client.js';
 import { strikeagentPredictions, strikeagentOutcomes } from '../db/schema.js';
-import { eq, desc, and, isNull } from 'drizzle-orm';
+import { eq, desc, and, isNull, sql, count, gte } from 'drizzle-orm';
 import { tokenScannerService } from './tokenScannerService.js';
 
 interface TokenSafetyMetrics {
@@ -280,28 +280,50 @@ class StrikeAgentTrackingService {
     outcomesByHorizon: Record<string, { total: number; correct: number; winRate: string }>;
   }> {
     try {
-      const predictions = await db.select().from(strikeagentPredictions);
-      const outcomes = await db.select().from(strikeagentOutcomes);
+      // Use SQL COUNT for efficient aggregation instead of fetching all records
+      const [totalResult] = await db.select({ count: count() }).from(strikeagentPredictions);
+      const totalPredictions = totalResult?.count || 0;
 
-      const snipe = predictions.filter(p => p.aiRecommendation === 'snipe').length;
-      const watch = predictions.filter(p => p.aiRecommendation === 'watch').length;
-      const avoid = predictions.filter(p => p.aiRecommendation === 'avoid').length;
+      // Count by recommendation type using SQL
+      const [snipeResult] = await db.select({ count: count() })
+        .from(strikeagentPredictions)
+        .where(eq(strikeagentPredictions.aiRecommendation, 'snipe'));
+      const snipe = snipeResult?.count || 0;
 
+      const [watchResult] = await db.select({ count: count() })
+        .from(strikeagentPredictions)
+        .where(eq(strikeagentPredictions.aiRecommendation, 'watch'));
+      const watch = watchResult?.count || 0;
+
+      const [avoidResult] = await db.select({ count: count() })
+        .from(strikeagentPredictions)
+        .where(eq(strikeagentPredictions.aiRecommendation, 'avoid'));
+      const avoid = avoidResult?.count || 0;
+
+      // Get outcome stats by horizon using SQL aggregation
       const horizons = ['1h', '4h', '24h', '7d'];
       const outcomesByHorizon: Record<string, { total: number; correct: number; winRate: string }> = {};
 
       for (const h of horizons) {
-        const hOutcomes = outcomes.filter(o => o.horizon === h);
-        const correct = hOutcomes.filter(o => o.isCorrect).length;
+        const [totalOutcomes] = await db.select({ count: count() })
+          .from(strikeagentOutcomes)
+          .where(eq(strikeagentOutcomes.horizon, h));
+        
+        const [correctOutcomes] = await db.select({ count: count() })
+          .from(strikeagentOutcomes)
+          .where(and(eq(strikeagentOutcomes.horizon, h), eq(strikeagentOutcomes.isCorrect, true)));
+        
+        const total = totalOutcomes?.count || 0;
+        const correct = correctOutcomes?.count || 0;
         outcomesByHorizon[h] = {
-          total: hOutcomes.length,
+          total,
           correct,
-          winRate: hOutcomes.length > 0 ? ((correct / hOutcomes.length) * 100).toFixed(1) : '0',
+          winRate: total > 0 ? ((correct / total) * 100).toFixed(1) : '0',
         };
       }
 
       return {
-        totalPredictions: predictions.length,
+        totalPredictions,
         snipeRecommendations: snipe,
         watchRecommendations: watch,
         avoidRecommendations: avoid,
@@ -330,16 +352,16 @@ class StrikeAgentTrackingService {
   }> {
     const baseStats = await this.getStats();
     
-    // Get today's predictions count
+    // Get today's predictions count using SQL instead of fetching all records
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     let recentActivity = 0;
     try {
-      const predictions = await db.select().from(strikeagentPredictions);
-      recentActivity = predictions.filter(p => 
-        new Date(p.createdAt || '') >= today
-      ).length;
+      const [todayResult] = await db.select({ count: count() })
+        .from(strikeagentPredictions)
+        .where(gte(strikeagentPredictions.createdAt, today));
+      recentActivity = todayResult?.count || 0;
     } catch (e) {
       recentActivity = 0;
     }

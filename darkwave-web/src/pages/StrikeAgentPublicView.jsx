@@ -21,16 +21,19 @@ export default function StrikeAgentPublicView({ onSubscribe }) {
         const executionsData = await executionsRes.json()
         const statsData = await statsRes.json()
         
-        if (signalsData.success) setSignals(signalsData.signals || [])
-        if (executionsData.success) setExecutions(executionsData.executions || [])
-        if (statsData.success) {
-          setStats({
-            totalSignals: statsData.stats?.totalSignals || 0,
-            winRate: statsData.stats?.winRate || 0,
-            activeToday: statsData.stats?.activeToday || 0,
-            tradesExecuted: statsData.stats?.tradesExecuted || 0
-          })
-        }
+        const signalsList = signalsData.signals || signalsData.data || []
+        if (signalsList.length > 0) setSignals(signalsList)
+        
+        const executionsList = executionsData.executions || executionsData.data || []
+        if (executionsList.length > 0) setExecutions(executionsList)
+        
+        const statsObj = statsData.stats || statsData
+        setStats({
+          totalSignals: Number(statsObj.totalSignals) || 0,
+          winRate: Number(statsObj.winRate) || 0,
+          activeToday: Number(statsObj.activeToday) || 0,
+          tradesExecuted: Number(statsObj.tradesExecuted) || 0
+        })
       } catch (err) {
         console.error('Failed to fetch public data:', err)
       } finally {
