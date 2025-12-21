@@ -4,6 +4,7 @@ import { predictionEvents, predictionOutcomes, predictionAccuracyStats } from '.
 import { eq, desc, and, sql, isNull } from 'drizzle-orm';
 import { auditTrailService, AUDIT_EVENT_TYPES, EVENT_CATEGORIES } from './auditTrailService.js';
 import { predictionLearningService } from './predictionLearningService.js';
+import { darkwaveChainClient } from './darkwaveChainClient.js';
 
 /**
  * Prediction Tracking Service
@@ -153,7 +154,7 @@ class PredictionTrackingService {
   }
 
   /**
-   * Stamp prediction to Solana blockchain via audit trail
+   * Stamp prediction to Solana blockchain via audit trail + DarkWave Chain L1
    */
   private async stampToBlockchain(predictionId: string, payload: object): Promise<void> {
     try {
@@ -180,8 +181,42 @@ class PredictionTrackingService {
 
         console.log(`⛓️ [PredictionTracking] Prediction ${predictionId} stamped to Solana: ${result.onchainSignature.substring(0, 20)}...`);
       }
+
+      // Also submit to DarkWave Chain L1 for dual verification
+      this.stampToDarkWaveChain(predictionId, payload as any).catch(err => {
+        console.warn('⚠️ [PredictionTracking] DarkWave Chain stamp failed (non-critical):', err.message);
+      });
     } catch (error) {
       console.error('❌ [PredictionTracking] Blockchain stamp error:', error);
+    }
+  }
+
+  /**
+   * Submit prediction hash to DarkWave Chain L1 for additional verification
+   */
+  private async stampToDarkWaveChain(predictionId: string, payload: {
+    id: string;
+    ticker: string;
+    signal: string;
+    indicators?: any;
+    priceAtPrediction?: number;
+    timestamp: string;
+  }): Promise<void> {
+    try {
+      const result = await darkwaveChainClient.submitPredictionForVerification({
+        id: predictionId,
+        ticker: payload.ticker,
+        signal: payload.signal,
+        confidence: payload.indicators?.rsi ? Math.abs(50 - payload.indicators.rsi) : 50,
+        timestamp: payload.timestamp,
+        agentId: 'darkwave-v2',
+      });
+
+      if (result.success) {
+        console.log(`🔗 [PredictionTracking] Prediction ${predictionId} verified on DarkWave Chain: ${result.verificationId?.substring(0, 16)}...`);
+      }
+    } catch (error: any) {
+      console.warn('⚠️ [PredictionTracking] DarkWave Chain not configured or unavailable:', error.message);
     }
   }
 
