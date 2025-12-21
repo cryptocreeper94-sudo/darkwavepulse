@@ -3,6 +3,7 @@ import { db } from '../db/client.js';
 import { hallmarkProfiles, hallmarkMints, auditEvents } from '../db/schema.js';
 import { eq, desc, and, sql } from 'drizzle-orm';
 import { auditTrailService, AUDIT_EVENT_TYPES, EVENT_CATEGORIES } from './auditTrailService.js';
+import { darkwaveChainClient } from './darkwaveChainClient.js';
 
 interface HallmarkProfile {
   userId: string;
@@ -251,11 +252,65 @@ class HallmarkService {
   }
   
   /**
-   * Process the actual NFT minting
+   * Process the actual NFT minting via DarkWave Chain
    */
   private async processHallmarkMint(hallmarkId: string): Promise<void> {
-    // This will be fully implemented when wallet is configured
-    console.log(`🎨 [Hallmark] Would mint NFT for ${hallmarkId}`);
+    try {
+      const hallmark = await this.getHallmark(hallmarkId);
+      if (!hallmark) {
+        console.error(`❌ [Hallmark] Hallmark not found: ${hallmarkId}`);
+        return;
+      }
+
+      // Submit to DarkWave Chain for on-chain hallmark generation
+      const result = await darkwaveChainClient.generateHallmark({
+        productType: 'pulse_hallmark',
+        productId: hallmarkId,
+        metadata: {
+          serialNumber: hallmark.serialNumber,
+          template: hallmark.templateUsed,
+          payloadHash: hallmark.payloadHash,
+          userId: hallmark.userId,
+        },
+      });
+
+      if (result.id) {
+        await db.update(hallmarkMints)
+          .set({
+            memoSignature: result.txHash || result.id,
+            metadataUri: result.verificationUrl,
+            status: 'minted',
+            mintedAt: new Date(),
+          })
+          .where(eq(hallmarkMints.id, hallmarkId));
+
+        console.log(`🎨 [Hallmark] ${hallmarkId} minted on DarkWave Chain: ${result.id}`);
+      }
+    } catch (error: any) {
+      console.warn(`⚠️ [Hallmark] DarkWave Chain minting unavailable: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Verify a hallmark on DarkWave Chain
+   */
+  async verifyOnChain(hallmarkId: string): Promise<{
+    valid: boolean;
+    onChain: boolean;
+    blockNumber?: number;
+    verificationUrl?: string;
+  }> {
+    try {
+      const result = await darkwaveChainClient.verifyHallmark(hallmarkId);
+      return {
+        valid: result.valid,
+        onChain: result.onChain,
+        blockNumber: result.blockNumber,
+        verificationUrl: result.hallmark?.verificationUrl,
+      };
+    } catch (error: any) {
+      return { valid: false, onChain: false };
+    }
   }
   
   /**
