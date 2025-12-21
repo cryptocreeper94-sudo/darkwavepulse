@@ -65,6 +65,7 @@ import { moonpayRoutes } from "./routes/moonpayRoutes";
 import { transakRoutes } from "./routes/transakRoutes";
 import { webauthnRoutes } from "./routes/webauthnRoutes";
 import { ecosystemRoutes } from "./routes/ecosystemRoutes";
+import { darkwaveChainRoutes } from "./routes/darkwaveChainRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6274,6 +6275,9 @@ export const mastra = new Mastra({
       
       // Ecosystem Integration Routes (Dev Hub handoff protocol)
       ...ecosystemRoutes,
+      
+      // DarkWave Chain L1 Integration Routes (Hash verification, Hallmarks)
+      ...darkwaveChainRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {
