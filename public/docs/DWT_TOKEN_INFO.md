@@ -1,8 +1,8 @@
-# DWAV Token Information
+# DWT Token Information
 
 ## Overview
 
-**DWAV** is the native utility token powering the DarkWave Studios ecosystem. Built on Solana as an SPL token, DWAV provides holders with premium access, staking rewards, governance rights, and exclusive benefits across all DarkWave products.
+**DWT** is the native utility token powering the DarkWave Studios ecosystem. Built on Solana as an SPL token, DWT provides holders with premium access, staking rewards, governance rights, and exclusive benefits across all DarkWave products.
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Property | Value |
 |----------|-------|
-| **Token Name** | DWAV Token |
-| **Symbol** | DWAV |
+| **Token Name** | DWT Token |
+| **Symbol** | DWT |
 | **Network** | Solana (SPL Token) |
-| **Total Supply** | 100,000,000 DWAV |
+| **Total Supply** | 100,000,000 DWT |
 | **Decimals** | 9 |
 | **Launch Date** | February 14, 2026 |
 
@@ -22,7 +22,7 @@
 ## Token Utility
 
 ### 1. Staking Rewards
-- **12-24% APY** on staked DWAV tokens
+- **12-24% APY** on staked DWT tokens
 - Rewards distributed from platform revenue
 - Flexible and locked staking options
 
@@ -88,7 +88,7 @@
 
 ## Smart Contract
 
-The DWAV token smart contract is built using the Anchor framework on Solana, providing:
+The DWT token smart contract is built using the Anchor framework on Solana, providing:
 
 - Industry-standard security practices
 - Efficient on-chain operations
@@ -99,7 +99,7 @@ The DWAV token smart contract is built using the Anchor framework on Solana, pro
 
 ---
 
-## How to Acquire DWAV
+## How to Acquire DWT
 
 ### Pre-Launch (Now)
 - Join the Legacy Founders program for early access
@@ -123,7 +123,7 @@ The DWAV token smart contract is built using the Anchor framework on Solana, pro
 
 ## Risk Disclaimer
 
-**This is NOT financial advice.** Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWAV tokens may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
+**This is NOT financial advice.** Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWT tokens may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
 
 ---
 

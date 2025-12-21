@@ -1,7 +1,7 @@
 # Pulse - AI Trading Analysis Platform
 
 ## Overview
-Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages the Mastra AI framework to deliver predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its core purpose is to provide users with a competitive edge by identifying market trends early and offering sophisticated, risk-adjusted analytics. The platform integrates with the broader DarkWave Studios ecosystem, powered by the DWAV token, aiming to empower traders with advanced AI capabilities and significant market potential.
+Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages the Mastra AI framework to deliver predictive signals and institutional-grade technical analysis for cryptocurrency and stocks. Its core purpose is to provide users with a competitive edge by identifying market trends early and offering sophisticated, risk-adjusted analytics. The platform integrates with the broader DarkWave Studios ecosystem, powered by the DWT token, aiming to empower traders with advanced AI capabilities and significant market potential.
 
 ## User Preferences
 - Preferred communication style: Simple, everyday language

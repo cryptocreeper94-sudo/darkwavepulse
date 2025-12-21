@@ -4,6 +4,7 @@ import SkinsSelector from './SkinsSelector';
 const allMenuItems = [
   { id: 'dashboard', icon: '🏠', label: 'My Dashboard' },
   { id: 'wallet', icon: '💼', label: 'Wallet', highlight: true },
+  { id: 'dust-buster', icon: '🧹', label: 'Dust Buster', highlight: true, badge: '12.5% Fee' },
   { id: 'sniper', icon: '🎯', label: 'StrikeAgent', highlight: true },
   { id: 'accuracy', icon: '📊', label: 'AI Accuracy', highlight: true },
   { id: 'auto-trade', icon: '🤖', label: 'Auto-Trade', highlight: true },
@@ -117,7 +118,7 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
           <div className="menu-section">
             <div className="menu-section-title">Official Documents</div>
             <a
-              href="/docs/DWAV_WHITEPAPER.md"
+              href="/docs/DWT_WHITEPAPER.md"
               target="_blank"
               rel="noopener noreferrer"
               className="menu-item"
@@ -137,7 +138,7 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
               Roadmap
             </a>
             <a
-              href="/docs/DWAV_TOKEN_INFO.md"
+              href="/docs/DWT_TOKEN_INFO.md"
               target="_blank"
               rel="noopener noreferrer"
               className="menu-item"

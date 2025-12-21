@@ -1,8 +1,8 @@
-# DWAV Token Smart Contract
+# DWT Token Smart Contract
 
 ## Overview
 
-DWAV is a Solana SPL token built with the Anchor framework, designed to power the DarkWave Studios ecosystem with real utility.
+DWT is a Solana SPL token built with the Anchor framework, designed to power the DarkWave Studios ecosystem with real utility.
 
 ## Token Specifications
 
@@ -10,7 +10,7 @@ DWAV is a Solana SPL token built with the Anchor framework, designed to power th
 |----------|-------|
 | **Network** | Solana Mainnet |
 | **Standard** | SPL Token |
-| **Total Supply** | 100,000,000 DWAV |
+| **Total Supply** | 100,000,000 DWT |
 | **Decimals** | 9 |
 | **Buy Tax** | 0% |
 | **Sell Tax** | 5% |
@@ -79,7 +79,7 @@ anchor deploy --provider.cluster mainnet
 
 ## Integration
 
-The DWAV token integrates with:
+The DWT token integrates with:
 
 - **Pulse Platform** - Premium feature access
 - **StrikeAgent** - Trading fee discounts
@@ -89,8 +89,8 @@ The DWAV token integrates with:
 
 ## Resources
 
-- [Whitepaper](/docs/DWAV_WHITEPAPER.md)
-- [Token Info](/docs/DWAV_TOKEN_INFO.md)
+- [Whitepaper](/docs/DWT_WHITEPAPER.md)
+- [Token Info](/docs/DWT_TOKEN_INFO.md)
 - [Anchor Documentation](https://www.anchor-lang.com/)
 - [Solana SPL Token](https://spl.solana.com/token)
 
