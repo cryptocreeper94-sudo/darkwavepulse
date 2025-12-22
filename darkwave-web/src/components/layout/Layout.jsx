@@ -3,7 +3,6 @@ import Header from './Header'
 import HamburgerMenu from './HamburgerMenu'
 import BugReportModal from '../modals/BugReportModal'
 import DisclaimerModal from '../modals/DisclaimerModal'
-import AvatarCreator from '../ui/AvatarCreator'
 import DisclaimerBanner from '../ui/DisclaimerBanner'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -12,7 +11,6 @@ export default function Layout({ children, activeTab, onTabChange, userTier, acc
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isBugModalOpen, setIsBugModalOpen] = useState(false)
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false)
-  const [isAvatarCreatorOpen, setIsAvatarCreatorOpen] = useState(false)
   
   useEffect(() => {
     const handleOpenDisclaimer = () => setIsDisclaimerOpen(true)
@@ -60,7 +58,6 @@ export default function Layout({ children, activeTab, onTabChange, userTier, acc
       <Header 
         onMenuToggle={handleMenuToggle}
         isMenuOpen={isMenuOpen}
-        onAvatarClick={() => setIsAvatarCreatorOpen(true)}
         activeTab={activeTab}
         onBackClick={handleHomeClick}
       />
@@ -90,11 +87,6 @@ export default function Layout({ children, activeTab, onTabChange, userTier, acc
       <DisclaimerModal 
         isOpen={isDisclaimerOpen} 
         onClose={() => setIsDisclaimerOpen(false)} 
-      />
-      
-      <AvatarCreator 
-        isOpen={isAvatarCreatorOpen}
-        onClose={() => setIsAvatarCreatorOpen(false)}
       />
     </div>
   )

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useFavorites } from '../../context/FavoritesContext'
-import { useAvatar } from '../../context/AvatarContext'
 import BitcoinChart from '../charts/BitcoinChart'
 import Gauge from '../ui/Gauge'
 import FlipCarousel from '../ui/FlipCarousel'
