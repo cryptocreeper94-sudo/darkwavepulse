@@ -18,20 +18,12 @@ const MIME_TYPES = {
     '.html': 'text/html'
 };
 let mastraReady = false;
-const publicDir = path.join(process.cwd(), 'public');
-const indexPath = path.join(publicDir, 'index.html');
 let realHtml = FALLBACK_HTML;
-try {
-    if (fs.existsSync(indexPath)) {
-        realHtml = fs.readFileSync(indexPath, 'utf8');
-        console.log('Loaded real HTML');
-    }
-}
-catch (e) {
-    console.log('Using embedded HTML');
-}
+let publicDir = '';
 const staticCache = new Map();
 function getStaticFile(urlPath) {
+    if (!publicDir)
+        return null;
     if (staticCache.has(urlPath)) {
         return staticCache.get(urlPath);
     }
@@ -49,15 +41,18 @@ function getStaticFile(urlPath) {
             return cached;
         }
     }
-    catch (e) {
-        // File not found or read error
-    }
+    catch (e) { }
     return null;
 }
 const server = http.createServer((req, res) => {
     const url = req.url || '/';
-    if (url === '/' || url === '/healthz' || url === '/health' || url === '/index.html') {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
+    if (url === '/healthz' || url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', mastraReady, timestamp: Date.now() }));
+        return;
+    }
+    if (url === '/' || url === '/index.html') {
+        res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
         res.end(realHtml);
         return;
     }
@@ -90,12 +85,30 @@ const server = http.createServer((req, res) => {
         res.end(staticFile.data);
         return;
     }
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
     res.end(realHtml);
 });
+server.on('error', (err) => {
+    console.error('Server error:', err.message);
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use`);
+    }
+    process.exit(1);
+});
 server.listen(PORT, '0.0.0.0', () => {
-    console.log('Server ready on port ' + PORT);
-    setTimeout(() => {
+    console.log(`Server ready on port ${PORT}`);
+    setImmediate(() => {
+        publicDir = path.join(process.cwd(), 'public');
+        const indexPath = path.join(publicDir, 'index.html');
+        try {
+            if (fs.existsSync(indexPath)) {
+                realHtml = fs.readFileSync(indexPath, 'utf8');
+                console.log('Loaded index.html');
+            }
+        }
+        catch (e) {
+            console.log('Using fallback HTML');
+        }
         const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
         if (fs.existsSync(workerPath)) {
             console.log('Starting Mastra worker...');
@@ -126,5 +139,5 @@ server.listen(PORT, '0.0.0.0', () => {
                 mastraReady = true;
             });
         }
-    }, 50);
+    });
 });
