@@ -5,9 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "mastra dev",
-    "start": "node dist/bootstrap.js",
-    "start:dev": "tsx src/bootstrap.ts",
-    "start:mastra": "mastra start",
+    "start": "mastra start",
+    "start:bootstrap": "node dist/bootstrap.js",
     "build": "rm -rf .mastra/output .mastra/.build && NODE_OPTIONS='--max-old-space-size=4096' MASTRA_DEV_NO_CACHE=1 mastra build && npm install --prefix darkwave-web && cd darkwave-web && npm run build && cp -r dist/* ../public/ && cd .. && npx tsc src/bootstrap.ts --outDir dist --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022",
     "check": "tsc",
     "check:format": "prettier --check '**/*.ts'",
@@ -73,11 +72,11 @@
     "ts-jest": "^29.4.6",
     "tsx": "^4.20.3",
     "uuid": "^8.3.2",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "mastra": "^0.14.0"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
-    "mastra": "^0.14.0",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.9.3"
