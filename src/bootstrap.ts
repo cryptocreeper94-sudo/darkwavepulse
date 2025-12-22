@@ -10,7 +10,7 @@ let mastraReady = false;
 let mastraProcess: ChildProcess | null = null;
 let cachedIndexHtml: Buffer | null = null;
 
-const publicDir = path.join(process.cwd(), 'darkwave-web', 'dist');
+const publicDir = path.join(process.cwd(), 'public');
 const indexPath = path.join(publicDir, 'index.html');
 try {
   if (fs.existsSync(indexPath)) {

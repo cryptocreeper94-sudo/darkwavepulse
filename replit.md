@@ -9,7 +9,11 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages
 - Agent diversity: Equal distribution across age groups, gender, race, and hair color
 - Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is ALLOWED for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements.
 
-## Recent Updates (December 18, 2025)
+## Recent Updates (December 22, 2025)
+- **Production Deployment Fix**: Changed `npm run start` to use bootstrap server that properly handles static file serving from `public/` AND proxies API requests to Mastra. This fixes StrikeAgent API endpoints (`/api/public/strikeagent/*`) not working in production.
+- **Bootstrap Server Update**: Updated `bootstrap.ts` to serve static files from `public/` directory where the build process copies the compiled frontend assets.
+
+## Previous Updates (December 18, 2025)
 - **Dashboard Carousel Cleanup (Mobile Only)**: Hidden "Latest News" carousel on mobile screens only (already exists in mobile news section below). Desktop still shows all 3 carousels; mobile displays 2 carousels (Market Metrics, Quick Actions) side-by-side.
 - **Dark Mode Only**: Removed light theme toggle - platform is dark theme only ("DarkWave = dark"). Removed theme toggle button from header.
 - **Header Cleanup**: Fixed PULSE title truncation on mobile by adjusting responsive breakpoints and removing unnecessary header elements
