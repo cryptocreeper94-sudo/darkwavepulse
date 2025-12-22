@@ -1,39 +1,21 @@
 import http from 'http';
-import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
 const PORT = Number(process.env.PORT ?? 5000);
 const MASTRA_PORT = 4111;
-const INNGEST_PORT = 3000;
 
 let mastraReady = false;
-let mastraProcess: ChildProcess | null = null;
-let inngestProcess: ChildProcess | null = null;
 let cachedIndexHtml: Buffer | null = null;
 
 const publicDir = path.join(process.cwd(), 'public');
 const indexPath = path.join(publicDir, 'index.html');
-try {
-  if (fs.existsSync(indexPath)) {
-    cachedIndexHtml = fs.readFileSync(indexPath);
-    console.log('Cached index.html on boot');
-  }
-} catch (e) {
-  console.log('Could not cache index.html');
-}
 
 const server = http.createServer((req, res) => {
   const url = req.url || '/';
   
-  if (url === '/healthz' || url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
-    return;
-  }
-  
-  if (url === '/') {
-    if (cachedIndexHtml) {
+  if (url === '/healthz' || url === '/health' || url === '/') {
+    if (url === '/' && cachedIndexHtml) {
       res.writeHead(200, { 
         'Content-Type': 'text/html',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -54,7 +36,7 @@ const server = http.createServer((req, res) => {
     }
     
     const options = {
-      hostname: 'localhost',
+      hostname: '127.0.0.1',
       port: MASTRA_PORT,
       path: url,
       method: req.method,
@@ -129,86 +111,52 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', async () => {
   console.log(`Bootstrap server running on port ${PORT}`);
-  console.log('Starting Mastra backend...');
   
-  mastraProcess = spawn('npx', ['mastra', 'start'], {
-    cwd: process.cwd(),
-    env: { ...process.env, PORT: String(MASTRA_PORT) },
-    stdio: ['inherit', 'pipe', 'pipe']
-  });
-  
-  mastraProcess.stdout?.on('data', (data) => {
-    const output = data.toString();
-    console.log('[Mastra]', output);
-    if (output.includes('Server started') || output.includes('listening') || output.includes('ready')) {
-      mastraReady = true;
-      console.log('Mastra backend is ready!');
+  try {
+    if (fs.existsSync(indexPath)) {
+      cachedIndexHtml = fs.readFileSync(indexPath);
+      console.log('Cached index.html');
     }
-  });
-  
-  mastraProcess.stderr?.on('data', (data) => {
-    console.error('[Mastra Error]', data.toString());
-  });
-  
-  mastraProcess.on('error', (err) => {
-    console.error('Failed to start Mastra:', err);
-  });
-  
-  setTimeout(() => {
-    if (!mastraReady) {
-      console.log('Assuming Mastra is ready after timeout');
-      mastraReady = true;
-    }
-  }, 5000);
-  
-  // Start Inngest worker for StrikeAgent data ingestion
-  console.log('Starting Inngest worker for StrikeAgent...');
-  
-  // Setup Inngest config
-  const inngestConfigDir = path.join(process.cwd(), '.config', 'inngest');
-  const inngestConfigPath = path.join(inngestConfigDir, 'inngest.yaml');
-  
-  if (!fs.existsSync(inngestConfigPath)) {
-    fs.mkdirSync(inngestConfigDir, { recursive: true });
-    const dbUrl = process.env.DATABASE_URL;
-    if (dbUrl) {
-      fs.writeFileSync(inngestConfigPath, `postgres-uri: "${dbUrl}"`);
-    } else {
-      fs.writeFileSync(inngestConfigPath, 'sqlite-dir: "/home/runner/workspace/.local/share/inngest"');
-    }
+  } catch (e) {
+    console.log('Could not cache index.html');
   }
   
-  inngestProcess = spawn('npx', [
-    'inngest-cli', 'dev',
-    '-u', `http://localhost:${MASTRA_PORT}/api/inngest`,
-    '--host', '0.0.0.0',
-    '--port', String(INNGEST_PORT),
-    '--config', inngestConfigPath
-  ], {
-    cwd: process.cwd(),
-    env: process.env,
-    stdio: ['inherit', 'pipe', 'pipe']
-  });
+  console.log('Starting Mastra backend via dynamic import...');
   
-  inngestProcess.stdout?.on('data', (data) => {
-    console.log('[Inngest]', data.toString().trim());
-  });
+  process.env.PORT = String(MASTRA_PORT);
   
-  inngestProcess.stderr?.on('data', (data) => {
-    console.error('[Inngest Error]', data.toString().trim());
-  });
-  
-  inngestProcess.on('error', (err) => {
-    console.error('Failed to start Inngest:', err);
-  });
+  try {
+    await import('../.mastra/output/index.mjs');
+    console.log('Mastra module imported successfully');
+    
+    const pollMastra = async () => {
+      for (let i = 0; i < 30; i++) {
+        try {
+          const response = await fetch(`http://127.0.0.1:${MASTRA_PORT}/api/healthz`);
+          if (response.ok) {
+            mastraReady = true;
+            console.log('Mastra backend is ready!');
+            return;
+          }
+        } catch (e) {
+        }
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      console.log('Mastra readiness timeout - enabling proxy anyway');
+      mastraReady = true;
+    };
+    
+    pollMastra();
+  } catch (err) {
+    console.error('Failed to import Mastra:', err);
+    mastraReady = true;
+  }
 });
 
 process.on('SIGTERM', () => {
   console.log('Shutting down...');
-  mastraProcess?.kill();
-  inngestProcess?.kill();
   server.close();
   process.exit(0);
 });
