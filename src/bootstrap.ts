@@ -1,6 +1,7 @@
 import http from 'http';
 import path from 'path';
 import fs from 'fs';
+import { Worker } from 'worker_threads';
 
 const PORT = Number(process.env.PORT ?? 5000);
 const MASTRA_PORT = 4111;
@@ -20,30 +21,45 @@ try {
   console.log('Could not cache index.html');
 }
 
-async function startMastra(): Promise<void> {
-  console.log('Starting Mastra backend via dynamic import...');
-  process.env.PORT = String(MASTRA_PORT);
+function startMastraWorker(): void {
+  const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
   
+  if (!fs.existsSync(workerPath)) {
+    console.log('Worker not found, falling back to direct import');
+    startMastraDirect();
+    return;
+  }
+  
+  console.log('Starting Mastra in worker thread...');
+  const worker = new Worker(workerPath);
+  
+  worker.on('message', (msg: { type: string }) => {
+    if (msg.type === 'ready') {
+      mastraReady = true;
+      console.log('Mastra backend is ready (from worker)');
+    }
+  });
+  
+  worker.on('error', (err) => {
+    console.error('Worker error:', err);
+    mastraReady = true;
+  });
+  
+  worker.on('exit', (code) => {
+    if (code !== 0) {
+      console.log(`Worker exited with code ${code}`);
+    }
+  });
+}
+
+async function startMastraDirect(): Promise<void> {
+  process.env.PORT = String(MASTRA_PORT);
   try {
     await import('../.mastra/output/index.mjs');
-    console.log('Mastra module imported successfully');
-    
-    for (let i = 0; i < 60; i++) {
-      try {
-        const response = await fetch(`http://127.0.0.1:${MASTRA_PORT}/api/healthz`);
-        if (response.ok) {
-          mastraReady = true;
-          console.log('Mastra backend is ready!');
-          return;
-        }
-      } catch (e) {
-      }
-      await new Promise(r => setTimeout(r, 1000));
-    }
-    console.log('Mastra readiness timeout - enabling proxy anyway');
     mastraReady = true;
+    console.log('Mastra started directly');
   } catch (err) {
-    console.error('Failed to import Mastra:', err);
+    console.error('Failed to start Mastra:', err);
     mastraReady = true;
   }
 }
@@ -156,12 +172,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Bootstrap server running on port ${PORT}`);
-  
-  setImmediate(() => {
-    startMastra().catch(err => {
-      console.error('Mastra startup failed:', err);
-    });
-  });
+  setImmediate(startMastraWorker);
 });
 
 process.on('SIGTERM', () => {
