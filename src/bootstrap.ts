@@ -15,82 +15,30 @@ const indexPath = path.join(publicDir, 'index.html');
 try {
   if (fs.existsSync(indexPath)) {
     cachedIndexHtml = fs.readFileSync(indexPath);
-    console.log('Cached index.html on boot');
   }
-} catch (e) {
-  console.log('Could not cache index.html');
-}
-
-function startMastraWorker(): void {
-  const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
-  
-  if (!fs.existsSync(workerPath)) {
-    console.log('Worker not found, falling back to direct import');
-    startMastraDirect();
-    return;
-  }
-  
-  console.log('Starting Mastra in worker thread...');
-  const worker = new Worker(workerPath);
-  
-  worker.on('message', (msg: { type: string }) => {
-    if (msg.type === 'ready') {
-      mastraReady = true;
-      console.log('Mastra backend is ready (from worker)');
-    }
-  });
-  
-  worker.on('error', (err) => {
-    console.error('Worker error:', err);
-    mastraReady = true;
-  });
-  
-  worker.on('exit', (code) => {
-    if (code !== 0) {
-      console.log(`Worker exited with code ${code}`);
-    }
-  });
-}
-
-async function startMastraDirect(): Promise<void> {
-  process.env.PORT = String(MASTRA_PORT);
-  try {
-    await import('../.mastra/output/index.mjs');
-    mastraReady = true;
-    console.log('Mastra started directly');
-  } catch (err) {
-    console.error('Failed to start Mastra:', err);
-    mastraReady = true;
-  }
-}
+} catch (e) {}
 
 const server = http.createServer((req, res) => {
   const url = req.url || '/';
   
-  if (url === '/healthz' || url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
-    return;
-  }
-  
-  if (url === '/') {
-    if (cachedIndexHtml) {
+  if (url === '/healthz' || url === '/health' || url === '/') {
+    if (url === '/' && cachedIndexHtml) {
       res.writeHead(200, { 
         'Content-Type': 'text/html',
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
+        'Cache-Control': 'no-cache'
       });
       res.end(cachedIndexHtml);
-      return;
+    } else {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('OK');
     }
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
     return;
   }
   
   if (url.startsWith('/api/')) {
     if (!mastraReady) {
       res.writeHead(503, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Server starting up, please wait...' }));
+      res.end(JSON.stringify({ error: 'Starting up...' }));
       return;
     }
     
@@ -107,8 +55,7 @@ const server = http.createServer((req, res) => {
       proxyRes.pipe(res);
     });
     
-    proxyReq.on('error', (err) => {
-      console.error('Proxy error:', err.message);
+    proxyReq.on('error', () => {
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Backend unavailable' }));
     });
@@ -117,32 +64,17 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  let filePath = path.join(publicDir, url);
-  
-  if (!path.extname(filePath)) {
-    if (cachedIndexHtml) {
-      res.writeHead(200, { 
-        'Content-Type': 'text/html',
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
-      });
-      res.end(cachedIndexHtml);
-      return;
-    }
-    filePath = path.join(publicDir, 'index.html');
-  }
+  const filePath = path.join(publicDir, url);
   
   fs.readFile(filePath, (err, data) => {
     if (err) {
       if (cachedIndexHtml) {
-        res.writeHead(200, { 
-          'Content-Type': 'text/html',
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
-        });
+        res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(cachedIndexHtml);
-        return;
+      } else {
+        res.writeHead(404);
+        res.end('Not found');
       }
-      res.writeHead(404);
-      res.end('Not found');
       return;
     }
     
@@ -158,25 +90,26 @@ const server = http.createServer((req, res) => {
       '.svg': 'image/svg+xml',
       '.ico': 'image/x-icon',
       '.woff': 'font/woff',
-      '.woff2': 'font/woff2',
-      '.ttf': 'font/ttf'
+      '.woff2': 'font/woff2'
     };
     
-    res.writeHead(200, { 
-      'Content-Type': mimeTypes[ext] || 'application/octet-stream',
-      'Cache-Control': ext === '.html' ? 'no-cache' : 'max-age=31536000'
-    });
+    res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
     res.end(data);
   });
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Bootstrap server running on port ${PORT}`);
-  setImmediate(startMastraWorker);
-});
-
-process.on('SIGTERM', () => {
-  console.log('Shutting down...');
-  server.close();
-  process.exit(0);
+  console.log(`Server on port ${PORT}`);
+  
+  const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
+  
+  if (fs.existsSync(workerPath)) {
+    const worker = new Worker(workerPath);
+    worker.on('message', (msg: { type: string }) => {
+      if (msg.type === 'ready') mastraReady = true;
+    });
+    worker.on('error', () => { mastraReady = true; });
+  } else {
+    import('../.mastra/output/index.mjs').then(() => { mastraReady = true; }).catch(() => { mastraReady = true; });
+  }
 });
