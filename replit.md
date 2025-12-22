@@ -44,7 +44,7 @@ The platform features a solid dark theme with free-floating elements and glow ef
 - **Dust Buster**: Solana wallet cleanup utility for recovering locked SOL rent.
 - **Automatic Versioning System**: Manages `version.json` for frontend and backend.
 - **ORBIT Ecosystem Integration**: Cross-app communication for activity logging, code snippet sharing, metrics reporting, and alerts.
-- **Feature Specifications**: Includes user authentication, real-time crypto price tracking, AI prediction/analysis modals, admin dashboard, Telegram bot integration, 54 diverse AI Agent personas, Knowledge Base, custom Avatar Creator, and a Skins System.
+- **Feature Specifications**: Includes user authentication, real-time crypto price tracking, AI prediction/analysis modals, admin dashboard, Telegram bot integration, 54 diverse AI Agent personas, Knowledge Base, and a Skins System.
 - **Stripe Integration**: 3 pricing tiers (Pulse Pro, StrikeAgent Elite, DarkWave Complete) with free trials.
 - **Developer API System**: Public REST API for external developers to access Pulse's AI signals, market data, and predictions. Features API key management with rate limiting, scoped permissions, environment separation (live/test keys), and Stripe-integrated API billing tiers (Free, Pro, Enterprise).
 - **AI Autonomous Trading System Roadmap**: A self-learning AI system to autonomously trigger StrikeAgent trades based on proven prediction accuracy, developed through phases of data collection, model training & accuracy tracking, StrikeAgent integration, and autonomous trading with safety layers and configurable trading modes (Observer, Approval, Semi-Auto, Full Auto).

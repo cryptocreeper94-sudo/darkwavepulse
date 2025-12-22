@@ -1,12 +1,9 @@
-import { useAvatar } from '../../context/AvatarContext'
 import { useWalletState, WalletMultiButton } from '../../context/WalletContext'
-import MiniAvatar from '../ui/MiniAvatar'
 import VerificationBadge from '../ui/VerificationBadge'
 import DarkWaveVerificationBadge from '../ui/DarkWaveVerificationBadge'
 import { useState, useEffect } from 'react'
 
-export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, activeTab, onBackClick }) {
-  const { avatar, isCustomMode } = useAvatar()
+export default function Header({ onMenuToggle, isMenuOpen, activeTab, onBackClick }) {
   const wallet = useWalletState()
   const showBackButton = activeTab && activeTab !== 'dashboard' && activeTab !== 'markets'
   const [isScreenMobile, setIsScreenMobile] = useState(window.innerWidth < 640)
@@ -22,7 +19,7 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
   
   return (
     <header className="header">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {showBackButton ? (
           <button 
             className="header-back-btn"
@@ -92,10 +89,6 @@ export default function Header({ onMenuToggle, isMenuOpen, onAvatarClick, active
           walletAddress={walletAddress}
         />
         <WalletMultiButton />
-        <MiniAvatar 
-          size={32} 
-          onClick={onAvatarClick}
-        />
       </div>
     </header>
   )

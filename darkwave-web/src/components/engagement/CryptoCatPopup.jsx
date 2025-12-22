@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useGlossary } from '../../context/GlossaryContext'
-import { useAvatar } from '../../context/AvatarContext'
-import MiniAvatar from '../ui/MiniAvatar'
 
 const SASS_MODE_KEY = 'pulse-sass-mode'
 
@@ -34,7 +32,6 @@ export default function CryptoCatPopup({ enabled = true, interval = 120000 }) {
   const [visible, setVisible] = useState(false)
   const [message, setMessage] = useState(null)
   const { sassMode, onTermShow } = useGlossary()
-  const { avatar, isCustomMode } = useAvatar()
   
   const timerRef = useRef(null)
   const intervalRef = useRef(null)
@@ -182,23 +179,19 @@ export default function CryptoCatPopup({ enabled = true, interval = 120000 }) {
         </div>
       </div>
       
-      {isCustomMode ? (
-        <MiniAvatar size={60} showFallback={false} />
-      ) : (
-        <img 
-          src={catPoses[message.pose] || catPoses.neutral}
-          alt="CryptoCat"
-          style={{
-            width: 60,
-            height: 60,
-            objectFit: 'contain',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
-          }}
-          onError={(e) => {
-            e.target.style.display = 'none'
-          }}
-        />
-      )}
+      <img 
+        src={catPoses[message.pose] || catPoses.neutral}
+        alt="CryptoCat"
+        style={{
+          width: 60,
+          height: 60,
+          objectFit: 'contain',
+          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+        }}
+        onError={(e) => {
+          e.target.style.display = 'none'
+        }}
+      />
       
       <style>{`
         @keyframes catSlideIn {

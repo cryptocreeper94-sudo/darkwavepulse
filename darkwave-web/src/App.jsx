@@ -24,7 +24,6 @@ import AccuracyDashboard from './components/ml/AccuracyDashboard'
 import AutoTradeConfig from './components/ml/AutoTradeConfig'
 import { GlossaryPopup } from './components/ui'
 import { GlossaryProvider } from './context/GlossaryContext'
-import { AvatarProvider } from './context/AvatarContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -329,7 +328,6 @@ function App() {
   return (
     <ThemeProvider>
       <SkinsProvider>
-        <AvatarProvider>
           <BuiltInWalletProvider>
             <FavoritesProvider userId={userId}>
               <GlossaryProvider>
@@ -342,7 +340,6 @@ function App() {
               </GlossaryProvider>
             </FavoritesProvider>
           </BuiltInWalletProvider>
-        </AvatarProvider>
       </SkinsProvider>
     </ThemeProvider>
   )
