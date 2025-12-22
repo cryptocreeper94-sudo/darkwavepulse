@@ -191,6 +191,22 @@ export const mastra = new Mastra({
       },
     ],
     apiRoutes: [
+      // Health check endpoint for deployment health checks (must be at / for Replit health checks)
+      {
+        path: "/",
+        method: "GET",
+        createHandler: async () => async (c: any) => {
+          return c.json({ status: "ok", timestamp: Date.now() });
+        }
+      },
+      // Alternate health check path
+      {
+        path: "/healthz",
+        method: "GET",
+        createHandler: async () => async (c: any) => {
+          return c.json({ status: "ok", timestamp: Date.now() });
+        }
+      },
       // This API route is used to register the Mastra workflow (inngest function) on the inngest server
       {
         path: "/api/inngest",
