@@ -1,9 +1,9 @@
 {
-  "version": "1.20.19",
+  "version": "1.20.21",
   "major": 1,
   "minor": 20,
-  "patch": 19,
+  "patch": 21,
   "releaseGate": false,
-  "lastUpdated": "2025-12-20T06:26:03.431Z",
-  "notes": "Pre-token launch version. v2.0.0 reserved for DWAV token launch on Feb 14, 2026."
+  "lastUpdated": "2025-12-22T09:55:00.000Z",
+  "notes": "StrikeAgent API optimization - SQL aggregation queries for faster stats loading."
 }
