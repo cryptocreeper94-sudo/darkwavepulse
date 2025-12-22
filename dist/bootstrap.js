@@ -1,20 +1,66 @@
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { Worker } from 'worker_threads';
 const PORT = 5000;
 const MASTRA_PORT = 4111;
-// Minimal HTML embedded directly - NO filesystem reads at startup
-const HTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pulse</title><meta http-equiv="refresh" content="3"><style>body{background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui}div{text-align:center}h1{color:#00D4FF;margin-bottom:10px}.loader{width:40px;height:40px;border:3px solid #333;border-top:3px solid #00D4FF;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div><h1>PULSE</h1><div class="loader"></div><p>Loading AI Trading Platform...</p></div></body></html>`;
+const FALLBACK_HTML = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pulse</title><meta http-equiv="refresh" content="3"><style>body{background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui}div{text-align:center}h1{color:#00D4FF;margin-bottom:10px}.loader{width:40px;height:40px;border:3px solid #333;border-top:3px solid #00D4FF;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div><h1>PULSE</h1><div class="loader"></div><p>Loading AI Trading Platform...</p></div></body></html>`;
+const MIME_TYPES = {
+    '.js': 'application/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.html': 'text/html'
+};
 let mastraReady = false;
-let realHtml = HTML;
-// Create server immediately - responds to ALL requests instantly
+const publicDir = path.join(process.cwd(), 'public');
+const indexPath = path.join(publicDir, 'index.html');
+let realHtml = FALLBACK_HTML;
+try {
+    if (fs.existsSync(indexPath)) {
+        realHtml = fs.readFileSync(indexPath, 'utf8');
+        console.log('Loaded real HTML');
+    }
+}
+catch (e) {
+    console.log('Using embedded HTML');
+}
+const staticCache = new Map();
+function getStaticFile(urlPath) {
+    if (staticCache.has(urlPath)) {
+        return staticCache.get(urlPath);
+    }
+    try {
+        const filePath = path.join(publicDir, urlPath);
+        if (!filePath.startsWith(publicDir)) {
+            return null;
+        }
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const data = fs.readFileSync(filePath);
+            const ext = path.extname(filePath).toLowerCase();
+            const type = MIME_TYPES[ext] || 'application/octet-stream';
+            const cached = { data, type };
+            staticCache.set(urlPath, cached);
+            return cached;
+        }
+    }
+    catch (e) {
+        // File not found or read error
+    }
+    return null;
+}
 const server = http.createServer((req, res) => {
     const url = req.url || '/';
-    // Root and health - instant response
     if (url === '/' || url === '/healthz' || url === '/health' || url === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(realHtml);
         return;
     }
-    // API proxy
     if (url.startsWith('/api/')) {
         if (!mastraReady) {
             res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -32,73 +78,53 @@ const server = http.createServer((req, res) => {
             proxyRes.pipe(res);
         });
         proxyReq.on('error', () => {
-            res.writeHead(502);
+            res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end('{"error":"Backend unavailable"}');
         });
         req.pipe(proxyReq);
         return;
     }
-    // Static files - async load, fallback to HTML
-    import('fs').then(fs => {
-        import('path').then(path => {
-            const filePath = path.join(process.cwd(), 'public', url);
-            fs.readFile(filePath, (err, data) => {
-                if (err) {
-                    res.writeHead(200, { 'Content-Type': 'text/html' });
-                    res.end(realHtml);
-                    return;
-                }
-                const ext = path.extname(filePath).toLowerCase();
-                const types = {
-                    '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json',
-                    '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
-                    '.woff': 'font/woff', '.woff2': 'font/woff2'
-                };
-                res.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream' });
-                res.end(data);
-            });
-        });
-    });
+    const staticFile = getStaticFile(url);
+    if (staticFile) {
+        res.writeHead(200, { 'Content-Type': staticFile.type });
+        res.end(staticFile.data);
+        return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(realHtml);
 });
-// Start listening IMMEDIATELY
 server.listen(PORT, '0.0.0.0', () => {
     console.log('Server ready on port ' + PORT);
-    // Load real HTML and start Mastra AFTER server is listening
     setTimeout(() => {
-        import('fs').then(fs => {
-            import('path').then(path => {
-                try {
-                    realHtml = fs.readFileSync(path.join(process.cwd(), 'public', 'index.html'), 'utf8');
-                    console.log('Loaded real HTML');
-                }
-                catch (e) {
-                    console.log('Using embedded HTML');
+        const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
+        if (fs.existsSync(workerPath)) {
+            console.log('Starting Mastra worker...');
+            const worker = new Worker(workerPath);
+            worker.on('message', (msg) => {
+                if (msg?.type === 'ready') {
+                    mastraReady = true;
+                    console.log('Mastra ready');
                 }
             });
-        });
-        import('worker_threads').then(({ Worker }) => {
-            import('path').then(path => {
-                import('fs').then(fs => {
-                    const workerPath = path.join(process.cwd(), 'dist', 'mastra-worker.js');
-                    if (fs.existsSync(workerPath)) {
-                        console.log('Starting Mastra worker...');
-                        const worker = new Worker(workerPath);
-                        worker.on('message', (msg) => {
-                            if (msg?.type === 'ready') {
-                                mastraReady = true;
-                                console.log('Mastra ready');
-                            }
-                        });
-                        worker.on('error', () => { mastraReady = true; });
-                        worker.on('exit', () => { mastraReady = true; });
-                    }
-                    else {
-                        import('../.mastra/output/index.mjs')
-                            .then(() => { mastraReady = true; console.log('Mastra ready'); })
-                            .catch(() => { mastraReady = true; });
-                    }
-                });
+            worker.on('error', (err) => {
+                console.error('Worker error:', err);
+                mastraReady = true;
             });
-        });
+            worker.on('exit', (code) => {
+                console.log('Worker exited with code:', code);
+                mastraReady = true;
+            });
+        }
+        else {
+            import('../.mastra/output/index.mjs')
+                .then(() => {
+                mastraReady = true;
+                console.log('Mastra ready (direct import)');
+            })
+                .catch((err) => {
+                console.error('Mastra import error:', err);
+                mastraReady = true;
+            });
+        }
     }, 50);
 });
