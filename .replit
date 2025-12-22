@@ -31,10 +31,6 @@ author = "agent"
 task = "workflow.run"
 args = "Start application"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start inngest server"
-
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -46,18 +42,6 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
-
-[[workflows.workflow]]
-name = "Start inngest server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "./scripts/inngest.sh"
-waitForPort = 3000
-
-[workflows.workflow.metadata]
-outputType = "automations"
 
 [userenv]
 
@@ -100,10 +84,6 @@ externalPort = 6000
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 5001
-externalPort = 3000
 
 [[ports]]
 localPort = 5173
