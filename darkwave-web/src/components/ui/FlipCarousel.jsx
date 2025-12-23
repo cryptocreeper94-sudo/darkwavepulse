@@ -171,23 +171,55 @@ export default function FlipCarousel({
                 display: 'flex',
                 gap: 6,
               }}>
-                {items.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
-                    disabled={isFlipping}
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: idx === currentIndex ? '#00D4FF' : '#444',
-                      border: 'none',
-                      cursor: isFlipping ? 'default' : 'pointer',
-                      padding: 0,
-                      transition: 'background 0.2s',
-                    }}
-                  />
-                ))}
+                {(() => {
+                  const maxDots = 5;
+                  const total = items.length;
+                  if (total <= maxDots) {
+                    return items.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
+                        disabled={isFlipping}
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background: idx === currentIndex ? '#00D4FF' : '#444',
+                          border: 'none',
+                          cursor: isFlipping ? 'default' : 'pointer',
+                          padding: 0,
+                          transition: 'background 0.2s',
+                        }}
+                      />
+                    ));
+                  }
+                  let start = Math.max(0, currentIndex - 2);
+                  let end = start + maxDots;
+                  if (end > total) {
+                    end = total;
+                    start = Math.max(0, end - maxDots);
+                  }
+                  return Array.from({ length: maxDots }, (_, i) => {
+                    const idx = start + i;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
+                        disabled={isFlipping}
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          background: idx === currentIndex ? '#00D4FF' : '#444',
+                          border: 'none',
+                          cursor: isFlipping ? 'default' : 'pointer',
+                          padding: 0,
+                          transition: 'background 0.2s',
+                        }}
+                      />
+                    );
+                  });
+                })()}
               </div>
             )}
             {showCounter && (

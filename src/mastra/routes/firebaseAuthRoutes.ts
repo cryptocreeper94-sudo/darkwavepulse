@@ -1,8 +1,7 @@
-import * as admin from "firebase-admin";
+let firebaseAdmin: any = null;
+let adminModule: any = null;
 
-let firebaseAdmin: admin.app.App | null = null;
-
-function getFirebaseAdmin() {
+async function getFirebaseAdmin() {
   if (!firebaseAdmin) {
     const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
     
@@ -12,27 +11,35 @@ function getFirebaseAdmin() {
     }
 
     try {
-      firebaseAdmin = admin.initializeApp({
-        projectId,
-      });
-      console.log("[Firebase Admin] Initialized for project:", projectId);
-    } catch (error: any) {
-      if (error.code === "app/duplicate-app") {
-        firebaseAdmin = admin.app();
-      } else {
-        console.error("[Firebase Admin] Initialization error:", error);
-        return null;
+      // Dynamic import to handle ESM bundling issues
+      if (!adminModule) {
+        adminModule = await import("firebase-admin");
       }
+      
+      const admin = adminModule.default || adminModule;
+      
+      if (!admin.apps?.length) {
+        firebaseAdmin = admin.initializeApp({
+          projectId,
+        });
+        console.log("[Firebase Admin] Initialized for project:", projectId);
+      } else {
+        firebaseAdmin = admin.app();
+      }
+    } catch (error: any) {
+      console.error("[Firebase Admin] Initialization error:", error);
+      return null;
     }
   }
   return firebaseAdmin;
 }
 
-async function verifyFirebaseToken(token: string): Promise<admin.auth.DecodedIdToken | null> {
-  const app = getFirebaseAdmin();
-  if (!app) return null;
+async function verifyFirebaseToken(token: string): Promise<any | null> {
+  const app = await getFirebaseAdmin();
+  if (!app || !adminModule) return null;
 
   try {
+    const admin = adminModule.default || adminModule;
     const decodedToken = await admin.auth().verifyIdToken(token);
     return decodedToken;
   } catch (error) {
