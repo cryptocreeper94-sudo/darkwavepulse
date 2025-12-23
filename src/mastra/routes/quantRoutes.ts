@@ -1,6 +1,6 @@
 import { db } from '../../db/client.js';
-import { quantScanConfig, quantTradeSessions, quantTradeActions, quantLearningMetrics, strikeAgentSignals } from '../../db/schema';
-import { desc, eq, and, gte, sql, inArray } from 'drizzle-orm';
+import { quantScanConfig, quantTradeSessions, quantTradeActions, quantLearningMetrics, strikeAgentSignals, strikeagentOutcomes } from '../../db/schema';
+import { desc, eq, and, gte, sql, inArray, count } from 'drizzle-orm';
 import { SUPPORTED_CHAINS } from '../../services/topSignalsService.js';
 import { ChainId } from '../../services/multiChainProvider.js';
 
@@ -26,9 +26,31 @@ export const quantRoutes = [
           winningTrades: acc.winningTrades + (m.winningTrades || 0),
         }), { totalScans: 0, totalTokens: 0, signalsGenerated: 0, totalTrades: 0, winningTrades: 0 });
 
+        // Get real prediction accuracy from strikeagent_outcomes table
+        let realAccuracy = '0';
+        try {
+          const outcomeStats = await db.execute(sql`
+            SELECT 
+              COUNT(*) as total_outcomes,
+              COUNT(CASE WHEN is_correct = true THEN 1 END) as correct_count
+            FROM strikeagent_outcomes
+          `) as any;
+          const stats = outcomeStats.rows?.[0] || (Array.isArray(outcomeStats) ? outcomeStats[0] : null);
+          if (stats) {
+            const total = parseInt(String(stats.total_outcomes)) || 0;
+            const correct = parseInt(String(stats.correct_count)) || 0;
+            if (total > 0) {
+              realAccuracy = ((correct / total) * 100).toFixed(1);
+            }
+          }
+        } catch (e) {
+          // Fall back to stored model accuracy
+          realAccuracy = metrics[0]?.modelAccuracy || '0';
+        }
+
         const winRate = totals.totalTrades > 0 
           ? ((totals.winningTrades / totals.totalTrades) * 100).toFixed(1)
-          : '0';
+          : realAccuracy; // Use prediction accuracy if no trades
 
         return c.json({
           totalScans: totals.totalScans,
@@ -36,7 +58,7 @@ export const quantRoutes = [
           signalsGenerated: totals.signalsGenerated,
           tradesExecuted: totals.totalTrades,
           winRate,
-          modelAccuracy: metrics[0]?.modelAccuracy || '0',
+          modelAccuracy: realAccuracy,
           recentMetrics: metrics.slice(0, 7).map(m => ({
             date: m.periodStart,
             scans: m.totalScans,
@@ -197,29 +219,25 @@ export const quantRoutes = [
         const category = c.req.query('category') as string | undefined;
         const limit = parseInt(c.req.query('limit') || '20');
 
-        let query = db.select()
-          .from(strikeAgentSignals)
-          .orderBy(desc(strikeAgentSignals.compositeScore));
-        
-        // Build conditions
-        if (chain && chain !== 'all' && category) {
-          query = db.select()
-            .from(strikeAgentSignals)
-            .where(and(eq(strikeAgentSignals.chain, chain), eq(strikeAgentSignals.category, category)))
-            .orderBy(desc(strikeAgentSignals.compositeScore));
-        } else if (chain && chain !== 'all') {
-          query = db.select()
-            .from(strikeAgentSignals)
-            .where(eq(strikeAgentSignals.chain, chain))
-            .orderBy(desc(strikeAgentSignals.compositeScore));
-        } else if (category) {
-          query = db.select()
-            .from(strikeAgentSignals)
-            .where(eq(strikeAgentSignals.category, category))
-            .orderBy(desc(strikeAgentSignals.compositeScore));
+        // Build conditions based on filters
+        const conditions = [];
+        if (chain && chain !== 'all') {
+          conditions.push(eq(strikeAgentSignals.chain, chain));
+        }
+        if (category) {
+          conditions.push(eq(strikeAgentSignals.category, category));
         }
 
-        const signals = await query.limit(Math.min(limit, 100));
+        const signals = conditions.length > 0
+          ? await db.select()
+              .from(strikeAgentSignals)
+              .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+              .orderBy(desc(strikeAgentSignals.compositeScore))
+              .limit(Math.min(limit, 100))
+          : await db.select()
+              .from(strikeAgentSignals)
+              .orderBy(desc(strikeAgentSignals.compositeScore))
+              .limit(Math.min(limit, 100));
 
         // Get chain distribution
         const chainCounts = await db.select({
@@ -280,7 +298,7 @@ export const quantRoutes = [
                   chain === 'base' ? 'ETH' :
                   chain === 'polygon' ? 'MATIC' :
                   chain === 'arbitrum' ? 'ETH' :
-                  chain === 'bsc' ? 'BNB' : chain.toUpperCase(),
+                  chain === 'bsc' ? 'BNB' : String(chain).toUpperCase(),
         })),
       });
     }
