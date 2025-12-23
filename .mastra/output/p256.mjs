@@ -36,6 +36,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 /**
  * Hex, bytes and number utilities.

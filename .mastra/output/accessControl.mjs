@@ -36,6 +36,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 const FREE_TIER_DURATION_MS = 2 * 24 * 60 * 60 * 1e3;
 const PREMIUM_DURATION_MS = 30 * 24 * 60 * 60 * 1e3;

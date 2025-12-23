@@ -21,6 +21,7 @@
     "bcrypt": "6.0.0",
     "@solana/spl-token": "0.4.14",
     "@sqds/multisig": "2.1.4",
+    "rss-parser": "3.13.0",
     "@simplewebauthn/server": "latest",
     "@inngest/realtime": "0.3.1",
     "@solana/web3.js": "1.98.4",

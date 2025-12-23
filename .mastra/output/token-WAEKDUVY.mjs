@@ -38,6 +38,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 import 'path/posix';
 import 'hono';
 import 'hono/streaming';
