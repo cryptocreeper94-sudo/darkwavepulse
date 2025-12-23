@@ -4,27 +4,81 @@ import path from 'path';
 import { spawn } from 'child_process';
 
 const PORT = Number(process.env.PORT || 5000);
+const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
-let html = '<!DOCTYPE html><html><head><title>Pulse</title><meta http-equiv="refresh" content="2"></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
+const MIME_TYPES: Record<string, string> = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.mjs': 'application/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.webp': 'image/webp',
+  '.webm': 'video/webm',
+  '.mp4': 'video/mp4',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav'
+};
+
+let indexHtml = '';
+
+function serveStatic(req: http.IncomingMessage, res: http.ServerResponse, urlPath: string): boolean {
+  const filePath = path.join(PUBLIC_DIR, urlPath);
+  
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    return false;
+  }
+  
+  try {
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+      return false;
+    }
+    
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    const content = fs.readFileSync(filePath);
+    
+    res.writeHead(200, { 
+      'Content-Type': contentType,
+      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000'
+    });
+    res.end(content);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/' || req.url === '/healthz' || req.url === '/health') {
-    const accept = req.headers['accept'] || '';
-    if (accept.includes('text/html') && req.url === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-      res.end(html);
-      return;
-    }
+  const urlPath = req.url?.split('?')[0] || '/';
+  
+  if (urlPath === '/healthz' || urlPath === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end('{"status":"ok"}');
     return;
   }
-  if (req.url === '/app') {
+  
+  if (urlPath === '/') {
+    const accept = req.headers['accept'] || '';
+    if (!accept.includes('text/html')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end('{"status":"ok"}');
+      return;
+    }
     res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-    res.end(html);
+    res.end(indexHtml);
     return;
   }
-  if (req.url?.startsWith('/api/')) {
+  
+  if (urlPath.startsWith('/api/')) {
     const proxyReq = http.request({
       hostname: '127.0.0.1',
       port: 4111,
@@ -42,22 +96,28 @@ const server = http.createServer((req, res) => {
     req.pipe(proxyReq);
     return;
   }
+  
+  if (serveStatic(req, res, urlPath)) {
+    return;
+  }
+  
   res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-  res.end(html);
+  res.end(indexHtml);
 });
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('Server ready on port ' + PORT);
   
-  setImmediate(() => {
-    try {
-      const publicDir = path.join(process.cwd(), 'public');
-      const indexPath = path.join(publicDir, 'index.html');
-      if (fs.existsSync(indexPath)) {
-        html = fs.readFileSync(indexPath, 'utf8');
-      }
-    } catch (e) {}
-  });
+  try {
+    const indexPath = path.join(PUBLIC_DIR, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      indexHtml = fs.readFileSync(indexPath, 'utf8');
+    } else {
+      indexHtml = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
+    }
+  } catch (e) {
+    indexHtml = '<!DOCTYPE html><html><head><title>Pulse</title></head><body>Loading...</body></html>';
+  }
   
   setTimeout(() => {
     try {
