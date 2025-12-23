@@ -36,6 +36,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1e3) {
   let lastError = null;

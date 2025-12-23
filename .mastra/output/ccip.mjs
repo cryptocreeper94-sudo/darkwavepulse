@@ -36,6 +36,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 class OffchainLookupError extends BaseError$1 {
     constructor({ callbackSelector, cause, data, extraData, sender, urls, }) {

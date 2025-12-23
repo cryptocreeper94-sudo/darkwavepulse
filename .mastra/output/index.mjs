@@ -41,6 +41,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 // src/eval/evaluation.ts
 async function evaluate({

@@ -36,6 +36,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 z.object({
   to: z.union([z.string().email(), z.array(z.string().email())]).describe("Recipient email address(es)"),

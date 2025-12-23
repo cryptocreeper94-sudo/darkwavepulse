@@ -37,6 +37,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 function _mergeNamespaces(n, m) {
   m.forEach(function (e) {

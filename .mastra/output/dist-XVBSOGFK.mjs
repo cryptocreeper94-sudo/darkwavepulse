@@ -42,6 +42,7 @@ import '@solana/spl-token';
 import '@sqds/multisig';
 import 'bcrypt';
 import '@simplewebauthn/server';
+import 'rss-parser';
 
 function convertToGroqChatMessages(prompt) {
   const messages = [];
