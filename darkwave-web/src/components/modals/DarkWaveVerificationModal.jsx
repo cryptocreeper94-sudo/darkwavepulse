@@ -23,7 +23,7 @@ export default function DarkWaveVerificationModal({
           <div className="darkwave-badge">
             <span className="darkwave-wave-large">🌊</span>
           </div>
-          <h2 className="darkwave-modal-title">DarkWave Verified</h2>
+          <h2 className="darkwave-modal-title">Verified on DarkWave Chain</h2>
         </div>
 
         <div className="darkwave-hallmark-display">
@@ -85,11 +85,14 @@ export default function DarkWaveVerificationModal({
           align-items: center;
           justify-content: center;
           padding: 20px;
+          overflow: hidden;
         }
 
         .darkwave-modal-container {
           width: 100%;
           max-width: 380px;
+          max-height: 85vh;
+          overflow-y: auto;
           background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
           border: 1px solid rgba(79, 195, 247, 0.3);
           border-radius: 20px;

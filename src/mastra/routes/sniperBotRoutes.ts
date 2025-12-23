@@ -1336,6 +1336,97 @@ export const sniperBotRoutes = [
   },
 
   {
+    path: "/api/internal/trigger-telegram",
+    method: "GET" as const,
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        if (!process.env.CRON_SECRET) {
+          logger?.error('[TelegramTrigger] CRON_SECRET not configured');
+          return c.json({ error: 'CRON_SECRET not configured' }, 503);
+        }
+        
+        const secret = c.req.query('secret');
+        if (secret !== process.env.CRON_SECRET) {
+          logger?.warn('[TelegramTrigger] Unauthorized attempt');
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+
+        logger?.info('[TelegramTrigger] Triggering Telegram signal broadcast...');
+        
+        const axios = await import('axios');
+        const { db } = await import('../../db/client.js');
+        const { strikeAgentSignals } = await import('../../db/schema.js');
+        const { desc, gte } = await import('drizzle-orm');
+        
+        const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_MINIAPP_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+        const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID;
+        
+        if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID) {
+          logger?.warn('[TelegramTrigger] Missing bot token or channel ID');
+          return c.json({ error: 'Telegram not configured', missing: { token: !TELEGRAM_BOT_TOKEN, channel: !TELEGRAM_CHANNEL_ID } }, 503);
+        }
+        
+        const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
+        const recentSignals = await db.select()
+          .from(strikeAgentSignals)
+          .where(gte(strikeAgentSignals.createdAt, fourHoursAgo))
+          .orderBy(desc(strikeAgentSignals.compositeScore))
+          .limit(3);
+        
+        if (recentSignals.length === 0) {
+          logger?.info('[TelegramTrigger] No recent signals to broadcast');
+          return c.json({ success: true, message: 'No signals to broadcast', signalsFound: 0 });
+        }
+        
+        const signalLines = recentSignals.map((sig: any, i: number) => {
+          const composite = sig.compositeScore || 0;
+          const safety = sig.safetyScore || 0;
+          let signalType = 'WATCH';
+          if (composite >= 75 && safety >= 60) signalType = 'SNIPE';
+          else if (composite < 40 || safety < 30) signalType = 'AVOID';
+          
+          const emoji = signalType === 'SNIPE' ? '🎯' : signalType === 'AVOID' ? '⛔' : '👀';
+          const price = parseFloat(sig.priceUsd?.toString() || '0');
+          const mcap = parseFloat(sig.marketCapUsd?.toString() || '0');
+          
+          return `${i + 1}. ${emoji} <b>${sig.tokenSymbol}</b> - ${signalType}
+   💰 $${price < 0.01 ? price.toExponential(2) : price.toFixed(4)}
+   📊 MCap: $${mcap >= 1000000 ? (mcap / 1000000).toFixed(2) + 'M' : (mcap / 1000).toFixed(0) + 'K'}
+   🛡️ Safety: ${safety}% | 📈 Score: ${composite}%`;
+        }).join('\n\n');
+        
+        const message = `🔥 <b>STRIKEAGENT TOP SIGNALS</b> 🔥
+
+${signalLines}
+
+━━━━━━━━━━━━━━━━━━
+<i>Powered by StrikeAgent AI</i>
+🚀 <a href="https://pulse.darkwave.io">Open Pulse Dashboard</a>`;
+
+        const response = await axios.default.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          chat_id: TELEGRAM_CHANNEL_ID,
+          text: message,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true
+        });
+        
+        logger?.info(`[TelegramTrigger] Broadcast sent: ${recentSignals.length} signals`);
+        
+        return c.json({
+          success: true,
+          message: 'Telegram broadcast sent',
+          signalsIncluded: recentSignals.length,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('[TelegramTrigger] Broadcast failed', { error: error.message });
+        return c.json({ error: 'Telegram broadcast failed', message: error.message }, 500);
+      }
+    }
+  },
+
+  {
     path: "/api/internal/import-predictions",
     method: "POST" as const,
     createHandler: async ({ mastra }: any) => async (c: any) => {
@@ -1419,6 +1510,61 @@ export const sniperBotRoutes = [
       } catch (error: any) {
         logger?.error('[Import] Failed', { error: error.message });
         return c.json({ error: 'Import failed', message: error.message }, 500);
+      }
+    }
+  },
+
+  {
+    path: "/api/internal/backfill-7d-outcomes",
+    method: "GET" as const,
+    createHandler: async ({ mastra }: any) => async (c: any) => {
+      const logger = mastra.getLogger();
+      try {
+        if (!process.env.CRON_SECRET) {
+          logger?.error('[Backfill7d] CRON_SECRET not configured');
+          return c.json({ error: 'CRON_SECRET not configured' }, 503);
+        }
+        
+        const secret = c.req.query('secret');
+        if (secret !== process.env.CRON_SECRET) {
+          logger?.warn('[Backfill7d] Unauthorized backfill attempt');
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+
+        logger?.info('[Backfill7d] Starting 7d outcome backfill...');
+        
+        const pendingPredictions = await strikeAgentTrackingService.getPendingOutcomeChecks('7d', 100);
+        logger?.info(`[Backfill7d] Found ${pendingPredictions.length} predictions needing 7d outcomes`);
+        
+        let processed = 0;
+        let failed = 0;
+        
+        for (const pred of pendingPredictions) {
+          try {
+            await strikeAgentTrackingService.checkOutcomeForPrediction(pred.id, '7d');
+            processed++;
+          } catch (e: any) {
+            failed++;
+            logger?.warn(`[Backfill7d] Failed for ${pred.id}: ${e.message}`);
+          }
+          
+          if (processed % 10 === 0) {
+            await new Promise(r => setTimeout(r, 1000));
+          }
+        }
+        
+        logger?.info(`[Backfill7d] Complete: ${processed} processed, ${failed} failed`);
+        
+        return c.json({
+          success: true,
+          processed,
+          failed,
+          total: pendingPredictions.length,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error: any) {
+        logger?.error('[Backfill7d] Failed', { error: error.message });
+        return c.json({ error: 'Backfill failed', message: error.message }, 500);
       }
     }
   },

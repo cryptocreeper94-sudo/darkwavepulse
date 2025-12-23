@@ -39046,6 +39046,10 @@ async function createNodeServer(mastra, options = { tools: {} }) {
       }
     });
 
+var firebaseAdmin = /*#__PURE__*/Object.freeze({
+  __proto__: null
+});
+
 var distYREX2TJT = /*#__PURE__*/Object.freeze({
   __proto__: null,
   createOpenAI: createOpenAI,
@@ -39056,5 +39060,5 @@ var typescript = /*#__PURE__*/Object.freeze({
   __proto__: null
 });
 
-export { InvalidResponseDataError as I, NoSuchModelError$1 as N, TooManyEmbeddingValuesForCallError as T, UnsupportedFunctionalityError as U, __commonJS as _, __require as a, resolve$1 as b, combineHeaders$1 as c, postJsonToApi$1 as d, createJsonResponseHandler$1 as e, createEventSourceResponseHandler$1 as f, convertUint8ArrayToBase64 as g, createJsonErrorResponseHandler$1 as h, generateId as i, isParsableJson as j, convertBase64ToUint8Array as k, loadApiKey as l, postFormDataToApi as m, index as n, parseProviderOptions as p, require_token_error as r, withoutTrailingSlash$1 as w };
+export { InvalidResponseDataError as I, NoSuchModelError$1 as N, TooManyEmbeddingValuesForCallError as T, UnsupportedFunctionalityError as U, __commonJS as _, __require as a, resolve$1 as b, combineHeaders$1 as c, postJsonToApi$1 as d, createJsonResponseHandler$1 as e, createEventSourceResponseHandler$1 as f, convertUint8ArrayToBase64 as g, createJsonErrorResponseHandler$1 as h, generateId as i, isParsableJson as j, convertBase64ToUint8Array as k, loadApiKey as l, postFormDataToApi as m, index as n, firebaseAdmin as o, parseProviderOptions as p, require_token_error as r, withoutTrailingSlash$1 as w };
 //# sourceMappingURL=index.mjs.map

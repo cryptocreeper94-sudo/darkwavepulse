@@ -118,6 +118,12 @@ export const mlRoutes = [
       try {
         const predictions = await db.select().from(predictionEvents);
         const outcomes = await db.select().from(predictionOutcomes);
+        
+        const strikeAgentCount = await db.select({ count: sql<number>`count(*)` })
+          .from(strikeagentPredictions);
+        const saCount = Number(strikeAgentCount[0]?.count || 0);
+        
+        const saOutcomes = await db.select().from(strikeagentOutcomes);
 
         const buySignals = predictions.filter((p: any) => 
           p.signal === 'BUY' || p.signal === 'STRONG_BUY'
@@ -134,11 +140,14 @@ export const mlRoutes = [
 
         for (const h of horizons) {
           const hOutcomes = outcomes.filter((o: any) => o.horizon === h);
-          const correct = hOutcomes.filter((o: any) => o.isCorrect).length;
+          const saHOutcomes = saOutcomes.filter((o: any) => o.horizon === h);
+          const totalOutcomes = hOutcomes.length + saHOutcomes.length;
+          const correct = hOutcomes.filter((o: any) => o.isCorrect).length + 
+                         saHOutcomes.filter((o: any) => o.isCorrect).length;
           outcomesByHorizon[h] = {
-            total: hOutcomes.length,
+            total: totalOutcomes,
             correct,
-            winRate: hOutcomes.length > 0 ? ((correct / hOutcomes.length) * 100).toFixed(1) : '0',
+            winRate: totalOutcomes > 0 ? ((correct / totalOutcomes) * 100).toFixed(1) : '0',
           };
         }
 
@@ -147,8 +156,10 @@ export const mlRoutes = [
           .orderBy(desc(predictionEvents.createdAt))
           .limit(10);
 
+        const totalPredictions = predictions.length + saCount;
+
         return c.json({
-          totalPredictions: predictions.length,
+          totalPredictions,
           buySignals,
           sellSignals,
           holdSignals,

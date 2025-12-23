@@ -969,15 +969,32 @@ export const mastra = new Mastra({
           }
           
           try {
-            const [globalData, fearGreedData] = await Promise.all([
+            const [globalData, fearGreedData, topCoinsData] = await Promise.all([
               coinGeckoClient.getGlobal(),
-              fetch('https://api.alternative.me/fng/?limit=1').then(r => r.json()).catch(() => null)
+              fetch('https://api.alternative.me/fng/?limit=1').then(r => r.json()).catch(() => null),
+              coinGeckoClient.getMarkets({ per_page: 51, price_change_percentage: '30d' }).catch(() => null)
             ]);
             const data = globalData?.data || {};
             
             const fearGreedValue = fearGreedData?.data?.[0]?.value ? parseInt(fearGreedData.data[0].value) : 50;
             const btcDom = data.market_cap_percentage?.btc || 54;
-            const altcoinSeasonValue = Math.min(100, Math.max(0, Math.round((100 - btcDom) * 2)));
+            
+            let altcoinSeasonValue = Math.min(100, Math.max(0, Math.round((100 - btcDom) * 2)));
+            if (topCoinsData && Array.isArray(topCoinsData) && topCoinsData.length > 1) {
+              const btc = topCoinsData.find((c: any) => c.id === 'bitcoin');
+              const btcChange = btc?.price_change_percentage_30d_in_currency || 0;
+              const stablecoins = ['tether', 'usd-coin', 'dai', 'binance-usd', 'true-usd', 'paxos-standard', 'usdd', 'frax', 'first-digital-usd'];
+              const altcoins = topCoinsData.filter((c: any) => 
+                c.id !== 'bitcoin' && !stablecoins.includes(c.id)
+              ).slice(0, 50);
+              if (altcoins.length > 0) {
+                const outperformers = altcoins.filter((c: any) => 
+                  (c.price_change_percentage_30d_in_currency || 0) > btcChange
+                ).length;
+                altcoinSeasonValue = Math.round((outperformers / altcoins.length) * 100);
+                logger?.info('📊 [AltcoinSeason] Calculated', { btcChange: btcChange.toFixed(1), outperformers, total: altcoins.length, index: altcoinSeasonValue });
+              }
+            }
             
             const result = {
               totalMarketCap: data.total_market_cap?.usd || 0,
@@ -1406,27 +1423,63 @@ export const mastra = new Mastra({
               const { Pool } = await import('pg');
               const pool = new Pool({ connectionString: process.env.DATABASE_URL });
               
-              // Get latest predictions for each symbol
+              // Get latest predictions for each symbol from strikeagent_predictions
               const symbols = coins.map((c: any) => c.symbol.toUpperCase());
-              const predictionsResult = await pool.query(`
-                SELECT DISTINCT ON (UPPER(token_symbol))
-                  UPPER(token_symbol) as symbol,
-                  ai_recommendation,
-                  ai_score,
-                  created_at
-                FROM strikeagent_predictions
-                WHERE UPPER(token_symbol) = ANY($1)
-                ORDER BY UPPER(token_symbol), created_at DESC
-              `, [symbols]);
+              const names = coins.map((c: any) => c.name.toUpperCase().replace(/\s+/g, '-'));
+              
+              const [strikeResult, predEventsResult] = await Promise.all([
+                pool.query(`
+                  SELECT DISTINCT ON (UPPER(token_symbol))
+                    UPPER(token_symbol) as symbol,
+                    ai_recommendation as signal,
+                    ai_score as score,
+                    created_at
+                  FROM strikeagent_predictions
+                  WHERE UPPER(token_symbol) = ANY($1)
+                  ORDER BY UPPER(token_symbol), created_at DESC
+                `, [symbols]),
+                pool.query(`
+                  SELECT DISTINCT ON (UPPER(ticker))
+                    UPPER(ticker) as name,
+                    signal,
+                    CASE confidence 
+                      WHEN 'HIGH' THEN 85 
+                      WHEN 'MEDIUM' THEN 65 
+                      WHEN 'LOW' THEN 45 
+                      ELSE 50 
+                    END as score,
+                    created_at
+                  FROM prediction_events
+                  WHERE UPPER(ticker) = ANY($1)
+                  ORDER BY UPPER(ticker), created_at DESC
+                `, [names])
+              ]);
               
               await pool.end();
               
-              // Create lookup map
+              // Create lookup maps
               const predictionsMap = new Map<string, { signal: string; score: number }>();
-              for (const pred of predictionsResult.rows) {
+              
+              // Add prediction_events first (by name)
+              const nameToSymbol: Record<string, string> = {};
+              coins.forEach((c: any) => {
+                nameToSymbol[c.name.toUpperCase().replace(/\s+/g, '-')] = c.symbol.toUpperCase();
+              });
+              for (const pred of predEventsResult.rows) {
+                const sym = nameToSymbol[pred.name];
+                if (sym) {
+                  predictionsMap.set(sym, {
+                    signal: pred.signal?.toUpperCase() || 'HOLD',
+                    score: pred.score || 50
+                  });
+                }
+              }
+              
+              // Override with strikeagent_predictions (by symbol) - more recent
+              for (const pred of strikeResult.rows) {
                 predictionsMap.set(pred.symbol, {
-                  signal: pred.ai_recommendation?.toUpperCase() || 'WATCH',
-                  score: pred.ai_score || 50
+                  signal: pred.signal?.toUpperCase() || 'WATCH',
+                  score: pred.score || 50
                 });
               }
               
