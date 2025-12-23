@@ -28,6 +28,8 @@ import { FavoritesProvider } from './context/FavoritesContext'
 import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { SkinsProvider } from './context/SkinsContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import LoginScreen from './components/auth/LoginScreen'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
 
@@ -177,7 +179,9 @@ const hasStrikeAgentAccess = (userConfig) => {
   return paidTiers.includes(tier)
 }
 
-function App() {
+function AppContent() {
+  const { user, userConfig, setUserConfig, loading, isAuthenticated } = useAuth()
+  
   const isStrikeAgentDomain = window.location.hostname.includes('strikeagent')
   const isDemoPath = window.location.pathname.startsWith('/demo')
   const isWhitepaperPage = window.location.pathname === '/whitepaper'
@@ -185,9 +189,9 @@ function App() {
   const isDemoMode = isDemoPath
   
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [userId, setUserId] = useState(isDemoMode ? 'demo-user' : null)
-  const [userConfig, setUserConfig] = useState(isDemoMode ? { isDemoMode: true, demoBalance: 10000 } : null)
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
+  
+  const userId = user?.email || (isDemoMode ? 'demo-user' : null)
   
   const { trackPageView } = useAnalytics('pulse')
   
@@ -196,66 +200,12 @@ function App() {
   }, [activeTab, trackPageView])
   
   useEffect(() => {
-    if (!isDemoMode) {
-      const existingUser = localStorage.getItem('dwp_user')
-      if (existingUser) {
-        try {
-          const parsed = JSON.parse(existingUser)
-          if (parsed.isDemoMode || parsed.accessLevel === 'demo') {
-            console.log('🧹 Clearing stale demo session')
-            localStorage.removeItem('dwp_user')
-            localStorage.removeItem('dwp_demo_mode')
-          } else if (parsed.accessLevel) {
-            // Restore user session from localStorage
-            console.log('🔐 Restoring session from localStorage:', parsed.accessLevel)
-            setUserId(parsed.email || parsed.id || 'user')
-            setUserConfig(prev => ({ ...prev, accessLevel: parsed.accessLevel, ...parsed }))
-          }
-        } catch (e) {}
-      }
-    }
-    
     if (isDemoMode) {
       console.log('🎯 StrikeAgent Demo Mode - bypassing login')
       sessionStorage.setItem('dwp_demo_mode', 'true')
       sessionStorage.setItem('dwp_demo_balance', '10000')
-      
       setTimeout(() => setActiveTab('sniper'), 500)
-      return
     }
-    
-    const fetchUserSession = async () => {
-      try {
-        const storedToken = localStorage.getItem('sessionToken')
-        const headers = storedToken ? { 'X-Session-Token': storedToken } : {}
-        
-        const response = await fetch('/api/session', { headers })
-        if (response.ok) {
-          const wasRotated = response.headers.get('X-Session-Token-Rotated') === 'true'
-          const data = await response.json()
-          if (data.user?.email) {
-            setUserId(data.user.email)
-            if (data.sessionToken) {
-              localStorage.setItem('sessionToken', data.sessionToken)
-              if (wasRotated) {
-                console.log('🔄 Session token rotated for security')
-              }
-            }
-            const configRes = await fetch(`/api/users/${data.user.email}/dashboard`)
-            if (configRes.ok) {
-              const config = await configRes.json()
-              setUserConfig(prev => ({ ...prev, ...config, sessionToken: data.sessionToken }))
-              if (config.defaultLandingTab && !isStrikeAgentDomain) {
-                setActiveTab(config.defaultLandingTab)
-              }
-            }
-          }
-        }
-      } catch (err) {
-        console.log('Session check failed, using defaults')
-      }
-    }
-    fetchUserSession()
   }, [isDemoMode])
   
   const handleAnalyzeCoin = (coin) => {
@@ -308,39 +258,63 @@ function App() {
   }
 
   if (isWhitepaperPage) {
-    return (
-      <ThemeProvider>
-        <WhitepaperPage />
-      </ThemeProvider>
-    )
+    return <WhitepaperPage />
   }
 
   if (isStrikeAgentLive) {
     return (
-      <ThemeProvider>
-        <StrikeAgentPublicView 
-          onSubscribe={() => window.location.href = '/?tab=pricing'} 
-        />
-      </ThemeProvider>
+      <StrikeAgentPublicView 
+        onSubscribe={() => window.location.href = '/?tab=pricing'} 
+      />
     )
+  }
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#0f0f0f',
+        color: '#fff'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '36px', marginBottom: '16px' }}>🔄</div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated && !isDemoMode) {
+    return <LoginScreen />
   }
   
   return (
+    <SkinsProvider>
+      <BuiltInWalletProvider>
+        <FavoritesProvider userId={userId}>
+          <GlossaryProvider>
+            <Layout activeTab={activeTab} onTabChange={setActiveTab} userTier={userConfig?.subscriptionTier} accessLevel={userConfig?.accessLevel}>
+              <div style={{ padding: '0 12px' }}>
+                {renderTab()}
+              </div>
+            </Layout>
+            <GlossaryPopup />
+          </GlossaryProvider>
+        </FavoritesProvider>
+      </BuiltInWalletProvider>
+    </SkinsProvider>
+  )
+}
+
+function App() {
+  return (
     <ThemeProvider>
-      <SkinsProvider>
-          <BuiltInWalletProvider>
-            <FavoritesProvider userId={userId}>
-              <GlossaryProvider>
-                <Layout activeTab={activeTab} onTabChange={setActiveTab} userTier={userConfig?.subscriptionTier} accessLevel={userConfig?.accessLevel}>
-                  <div style={{ padding: '0 12px' }}>
-                    {renderTab()}
-                  </div>
-                </Layout>
-                <GlossaryPopup />
-              </GlossaryProvider>
-            </FavoritesProvider>
-          </BuiltInWalletProvider>
-      </SkinsProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   )
 }
