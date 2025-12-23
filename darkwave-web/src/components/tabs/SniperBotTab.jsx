@@ -1287,10 +1287,30 @@ function QuantSystemSection() {
     const fetchQuantData = async () => {
       try {
         const cacheBust = `?_t=${Date.now()}`
-        const [metricsRes, feedRes] = await Promise.all([
+        const [metricsRes, feedRes, mlStatsRes] = await Promise.all([
           fetch(`/api/quant/metrics${cacheBust}`, { cache: 'no-store' }).catch(() => null),
-          fetch(`/api/quant/trade-feed${cacheBust}`, { cache: 'no-store' }).catch(() => null)
+          fetch(`/api/quant/trade-feed${cacheBust}`, { cache: 'no-store' }).catch(() => null),
+          fetch(`/api/ml/stats${cacheBust}`, { cache: 'no-store' }).catch(() => null)
         ])
+        
+        // Get real accuracy from ML stats endpoint
+        let realAccuracy = 0
+        if (mlStatsRes?.ok) {
+          const mlData = await mlStatsRes.json()
+          // Calculate overall accuracy from outcome horizons
+          if (mlData.outcomesByHorizon) {
+            let totalCorrect = 0
+            let totalOutcomes = 0
+            Object.values(mlData.outcomesByHorizon).forEach((h) => {
+              totalCorrect += h.correct || 0
+              totalOutcomes += h.total || 0
+            })
+            if (totalOutcomes > 0) {
+              realAccuracy = parseFloat(((totalCorrect / totalOutcomes) * 100).toFixed(1))
+            }
+          }
+        }
+        
         if (metricsRes?.ok) {
           const data = await metricsRes.json()
           if (data.totalScans !== undefined) {
@@ -1298,13 +1318,13 @@ function QuantSystemSection() {
               totalScans: data.totalScans || 0,
               tokensAnalyzed: data.totalTokensAnalyzed || 0,
               signalsGenerated: data.signalsGenerated || 0,
-              modelAccuracy: parseFloat(data.modelAccuracy) || 0
+              modelAccuracy: realAccuracy > 0 ? realAccuracy : (parseFloat(data.modelAccuracy) || 0)
             })
           }
-          if (data.winRate !== undefined) {
+          if (data.winRate !== undefined || realAccuracy > 0) {
             setAccuracyStats(prev => ({
               ...prev,
-              winRate: parseFloat(data.winRate) || prev.winRate,
+              winRate: realAccuracy > 0 ? realAccuracy : (parseFloat(data.winRate) || prev.winRate),
               totalPredictions: data.tradesExecuted || prev.totalPredictions
             }))
           }
