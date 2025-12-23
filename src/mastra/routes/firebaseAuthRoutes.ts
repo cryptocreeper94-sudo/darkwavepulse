@@ -1,33 +1,68 @@
 let firebaseAdmin: any = null;
 let adminModule: any = null;
+let initAttempted = false;
 
 async function getFirebaseAdmin() {
+  if (initAttempted && !firebaseAdmin) return null;
+  
   if (!firebaseAdmin) {
+    initAttempted = true;
     const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
     
     if (!projectId) {
-      console.error("[Firebase Admin] No project ID configured");
+      console.warn("[Firebase Admin] No project ID configured - token verification disabled");
       return null;
     }
 
     try {
-      // Dynamic import to handle ESM bundling issues
       if (!adminModule) {
-        adminModule = await import("firebase-admin");
+        const imported = await import("firebase-admin");
+        adminModule = imported.default || imported;
       }
       
-      const admin = adminModule.default || adminModule;
+      const getApps = adminModule.getApps || (adminModule.default?.getApps);
+      const initializeApp = adminModule.initializeApp || (adminModule.default?.initializeApp);
+      const getApp = adminModule.getApp || (adminModule.default?.getApp);
+      const cert = adminModule.credential?.cert || (adminModule.default?.credential?.cert);
+      const applicationDefault = adminModule.credential?.applicationDefault || (adminModule.default?.credential?.applicationDefault);
       
-      if (!admin.apps?.length) {
-        firebaseAdmin = admin.initializeApp({
-          projectId,
-        });
-        console.log("[Firebase Admin] Initialized for project:", projectId);
+      if (!initializeApp) {
+        console.error("[Firebase Admin] initializeApp function not found in module");
+        return null;
+      }
+      
+      const apps = getApps ? getApps() : [];
+      
+      if (!apps.length) {
+        const credentialsJson = process.env.FIREBASE_ADMIN_CREDENTIALS;
+        
+        if (credentialsJson && cert) {
+          try {
+            const serviceAccount = JSON.parse(credentialsJson);
+            firebaseAdmin = initializeApp({
+              credential: cert(serviceAccount),
+              projectId,
+            });
+            console.log("[Firebase Admin] Initialized with service account for project:", projectId);
+          } catch (parseError) {
+            console.error("[Firebase Admin] Failed to parse credentials JSON:", parseError);
+            return null;
+          }
+        } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS && applicationDefault) {
+          firebaseAdmin = initializeApp({
+            credential: applicationDefault(),
+            projectId,
+          });
+          console.log("[Firebase Admin] Initialized with ADC for project:", projectId);
+        } else {
+          console.warn("[Firebase Admin] No credentials configured - using project ID only (limited functionality)");
+          firebaseAdmin = initializeApp({ projectId });
+        }
       } else {
-        firebaseAdmin = admin.app();
+        firebaseAdmin = getApp ? getApp() : apps[0];
       }
     } catch (error: any) {
-      console.error("[Firebase Admin] Initialization error:", error);
+      console.error("[Firebase Admin] Initialization error:", error.message);
       return null;
     }
   }
@@ -39,8 +74,13 @@ async function verifyFirebaseToken(token: string): Promise<any | null> {
   if (!app || !adminModule) return null;
 
   try {
-    const admin = adminModule.default || adminModule;
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    const getAuth = adminModule.getAuth || (adminModule.default?.getAuth);
+    if (!getAuth) {
+      console.error("[Firebase Admin] getAuth function not found");
+      return null;
+    }
+    const auth = getAuth(app);
+    const decodedToken = await auth.verifyIdToken(token);
     return decodedToken;
   } catch (error) {
     console.error("[Firebase Auth] Token verification failed:", error);

@@ -10,12 +10,16 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages
 - Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is ALLOWED for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements.
 
 ## Recent Updates (December 23, 2025)
+- **Pre-Publish Sweep Completed**: Comprehensive platform audit verifying all critical systems are operational.
+- **Firebase Admin Fix**: Resolved ESM bundling issue with dynamic imports for Firebase Admin SDK.
+- **Direct Staking Route**: `/staking` URL now accessible as direct link for DarkWave Chain integration.
+- **Version**: 1.20.49 - Frontend and backend versions aligned.
 - **DarkWave Chain Verification Modal**: Fixed title to "Verified on DarkWave Chain" and added viewport-aware sizing (max-height: 85vh, overflow-y: auto) to prevent background scrolling.
 - **Telegram Broadcast Trigger**: Added `/api/internal/trigger-telegram` endpoint for external cron services to broadcast StrikeAgent signals to Telegram channel. Use GET with `?secret=YOUR_SECRET`. Returns top 3 signals from last 4 hours.
 - **7-Day Outcome Backfill**: Added `/api/internal/backfill-7d-outcomes` endpoint to manually populate 7d prediction outcomes. 430+ outcomes now tracked with 52.8% win rate.
 - **AI Status Widget**: Now displays combined prediction count of 76,483 (from both predictionEvents and strikeagentPredictions tables).
 - **Live Fear & Greed Index**: Now fetching real-time data from Alternative.me API instead of hardcoded values. Shows current market sentiment (0-100 scale with labels like "Extreme Fear", "Greed", etc.)
-- **Dynamic Altcoin Season**: Calculated from BTC dominance - higher values when altcoins are outperforming Bitcoin.
+- **Dynamic Altcoin Season**: Calculated from top 50 altcoin 30-day performance vs BTC (currently 32%).
 - **Live Crypto News RSS**: Added `/api/crypto/news` endpoint that aggregates real-time headlines from CoinDesk, CoinTelegraph, Decrypt, and The Block RSS feeds with 5-minute caching.
 - **Verification Badge Fix**: Fixed black screen issue when clicking blockchain verification badges by adding missing `qrcode.react` dependency to frontend.
 - **Firebase Authentication**: Replaced Replit auth with Firebase Authentication using Google and GitHub sign-in providers. New login screen with both options. Backend syncs Firebase users with existing user database.
@@ -24,8 +28,15 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven trading platform that leverages
   - `*.replit.app`
   - `*.replit.dev`
   - Your production domain
+- **Firebase Admin Credentials (Optional)**: For server-side token verification, add `FIREBASE_ADMIN_CREDENTIALS` secret with the full JSON service account key from Firebase Console > Project Settings > Service Accounts. Without this, the backend will sync users by email/UID without cryptographic verification.
 - **Automatic Token Scan Trigger**: Added `/api/internal/trigger-scan` endpoint for external cron services to refresh StrikeAgent token data. Requires `CRON_SECRET` environment variable for authentication. Use GET with `?secret=YOUR_SECRET` or POST with `x-cron-secret` header.
 - **Production Cron Setup**: Since Autoscale deployments go idle between requests, use an external cron service (like cron-job.org, EasyCron, or UptimeRobot) to call the trigger endpoints every 5-15 minutes to keep token data and Telegram broadcasts fresh.
+
+## Access Code Reference
+- **777**: User access (default, configurable via `USER_ACCESS_CODE` env var)
+- **888**: Admin access (configurable via `ADMIN_ACCESS_CODE` env var)
+- **999**: Owner access (configurable via `OWNER_ACCESS_CODE` env var)
+- **0424**: Quant access (for special quant features)
 
 ## Future Roadmap
 - **Extended Prediction Horizons**: Add 30-day, 6-month, and 1-year prediction timeframes as the platform matures and accumulates more historical data. These longer horizons will be enabled progressively as predictions age past each threshold.
