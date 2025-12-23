@@ -1,5 +1,14 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics'
+import { 
+  getAuth, 
+  signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
+  GoogleAuthProvider, 
+  signOut as firebaseSignOut,
+  onAuthStateChanged
+} from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,6 +22,7 @@ const firebaseConfig = {
 
 let app = null
 let analytics = null
+let auth = null
 
 export function initFirebase() {
   if (typeof window === 'undefined') return null
@@ -21,13 +31,100 @@ export function initFirebase() {
     try {
       app = initializeApp(firebaseConfig)
       analytics = getAnalytics(app)
-      console.log('[Firebase] Analytics initialized')
+      auth = getAuth(app)
+      console.log('[Firebase] Initialized with Auth')
     } catch (error) {
       console.error('[Firebase] Initialization error:', error)
     }
   }
   
-  return { app, analytics }
+  return { app, analytics, auth }
+}
+
+export function getFirebaseAuth() {
+  if (!auth) {
+    initFirebase()
+  }
+  return auth
+}
+
+export async function signInWithGoogle() {
+  const auth = getFirebaseAuth()
+  if (!auth) throw new Error('Firebase not initialized')
+  
+  const provider = new GoogleAuthProvider()
+  provider.addScope('email')
+  provider.addScope('profile')
+  
+  try {
+    const result = await signInWithPopup(auth, provider)
+    console.log('[Firebase] Google sign-in successful:', result.user.email)
+    return result.user
+  } catch (error) {
+    if (error.code === 'auth/popup-blocked') {
+      console.log('[Firebase] Popup blocked, trying redirect...')
+      await signInWithRedirect(auth, provider)
+      return null
+    }
+    console.error('[Firebase] Google sign-in error:', error)
+    throw error
+  }
+}
+
+export async function handleRedirectResult() {
+  const auth = getFirebaseAuth()
+  if (!auth) return null
+  
+  try {
+    const result = await getRedirectResult(auth)
+    if (result) {
+      console.log('[Firebase] Redirect sign-in successful:', result.user.email)
+      return result.user
+    }
+    return null
+  } catch (error) {
+    console.error('[Firebase] Redirect result error:', error)
+    return null
+  }
+}
+
+export async function signOut() {
+  const auth = getFirebaseAuth()
+  if (!auth) return
+  
+  try {
+    await firebaseSignOut(auth)
+    localStorage.removeItem('dwp_user')
+    localStorage.removeItem('sessionToken')
+    console.log('[Firebase] Signed out')
+  } catch (error) {
+    console.error('[Firebase] Sign out error:', error)
+    throw error
+  }
+}
+
+export function onAuthChange(callback) {
+  const auth = getFirebaseAuth()
+  if (!auth) return () => {}
+  
+  return onAuthStateChanged(auth, callback)
+}
+
+export async function getIdToken() {
+  const auth = getFirebaseAuth()
+  if (!auth || !auth.currentUser) return null
+  
+  try {
+    return await auth.currentUser.getIdToken()
+  } catch (error) {
+    console.error('[Firebase] Get ID token error:', error)
+    return null
+  }
+}
+
+export function getCurrentUser() {
+  const auth = getFirebaseAuth()
+  return auth?.currentUser || null
 }
 
 export function trackEvent(eventName, params = {}) {
@@ -76,4 +173,4 @@ export function setAnalyticsUserProperties(properties) {
   }
 }
 
-export { app, analytics }
+export { app, analytics, auth }
