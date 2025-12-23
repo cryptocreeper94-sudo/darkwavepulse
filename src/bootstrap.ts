@@ -48,17 +48,5 @@ server.listen(PORT, '0.0.0.0', () => {
     } catch (e) {}
   });
   
-  setTimeout(() => {
-    try {
-      const mastraPath = path.join(process.cwd(), '.mastra', 'output', 'index.mjs');
-      if (fs.existsSync(mastraPath)) {
-        spawn('node', [mastraPath], {
-          env: { ...process.env, PORT: '4111', HOST: '127.0.0.1' },
-          stdio: 'inherit'
-        });
-      }
-    } catch (e) {
-      console.error('Mastra init error:', e);
-    }
-  }, 30000);
+  // Mastra will be started separately after deployment succeeds
 });
