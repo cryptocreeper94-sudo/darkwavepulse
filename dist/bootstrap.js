@@ -53,8 +53,7 @@ const server = http.createServer((req, res) => {
         return;
     }
     if (url === '/' || url === '/index.html') {
-        const isBrowser = acceptHeader.includes('text/html');
-        if (!isBrowser) {
+        if (!mastraReady) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end('{"status":"ok"}');
             return;
