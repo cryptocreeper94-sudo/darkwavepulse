@@ -10,6 +10,14 @@ Pulse, by DarkWave Studios, LLC, is an AI-driven cryptocurrency trading platform
 - Design aesthetic: Solid black/dark gray backgrounds (#0f0f0f, #1a1a1a, #141414) with free-floating elements featuring glow effects. Glassmorphism (backdrop-filter blur + semi-transparent backgrounds) is ALLOWED for cards site-wide, but NOT for backgrounds, buttons, or other non-card elements.
 
 ## Recent Updates (December 24, 2025)
+- **DarkWave Chain Integration**: Full API integration with DarkWave Chain L1 blockchain:
+  - `src/services/darkwave-chain-client.ts` - Complete API client for swaps, staking, portfolio, arbitrage
+  - `POST /api/chain-events` - Webhook endpoint for real-time blockchain events (HMAC-SHA256 verified)
+  - AI signals can trigger automated DWT swaps on DarkWave DEX
+  - Staking optimization based on market predictions
+  - Portfolio sync across 9 chains (DarkWave, Solana, Ethereum, Base, Polygon, Arbitrum, BSC, Optimism, Avalanche)
+  - Same wallet seed works on both platforms (bip39, ed25519-hd-key)
+- **Legacy Founder Rewards**: Updated all pricing pages to show 35,000 DWT token rewards for founders
 - **Platform Focus Shift**: Pulse is now crypto-only (removed all stock references). DWT token and staking moved to DarkWave Chain (darkwavechain.com).
 - **Removed Pages**: Projects page and Staking page removed from navigation.
 - **DarkWave Chain References**: All DWAV token references updated to DWT and redirect to darkwavechain.com.
