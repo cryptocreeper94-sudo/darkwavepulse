@@ -1,33 +1,33 @@
-# DWT Token Information
+# DWC Coin Information
 
 ## Overview
 
-**DWT** is the native utility token powering the DarkWave Studios ecosystem. Built on Solana as an SPL token, DWT provides holders with premium access, staking rewards, governance rights, and exclusive benefits across all DarkWave products.
+**DWC** is the native coin powering the DarkWave Studios ecosystem. Built on DarkWave Smart Chain (DSC), DWC provides holders with premium access, staking rewards, governance rights, and exclusive benefits across all DarkWave products.
 
 ---
 
-## Token Specifications
+## Coin Specifications
 
 | Property | Value |
 |----------|-------|
-| **Token Name** | DWT Token |
-| **Symbol** | DWT |
-| **Network** | Solana (SPL Token) |
-| **Total Supply** | 100,000,000 DWT |
-| **Decimals** | 9 |
+| **Coin Name** | DarkWave Coin |
+| **Symbol** | DWC |
+| **Network** | DarkWave Smart Chain (DSC) |
+| **Total Supply** | 100,000,000 DWC |
+| **Decimals** | 18 |
 | **Launch Date** | February 14, 2026 |
 
 ---
 
-## Token Utility
+## Coin Utility
 
 ### 1. Staking Rewards
-- **12-24% APY** on staked DWT tokens
+- **12-24% APY** on staked DWC coins
 - Rewards distributed from platform revenue
 - Flexible and locked staking options
 
 ### 2. Premium Access Discounts
-- Token holders receive discounts on subscription plans
+- Coin holders receive discounts on subscription plans
 - Tiered benefits based on holdings
 - Early access to new features
 
@@ -43,7 +43,7 @@
 
 ### 5. Cross-App Benefits
 - Benefits extend across all DarkWave products
-- Unified ecosystem token
+- Unified ecosystem coin
 - Future integrations with partner platforms
 
 ---
@@ -63,7 +63,7 @@
 
 ---
 
-## Token Allocation
+## Coin Allocation
 
 | Category | Amount | Percentage | Vesting |
 |----------|--------|------------|---------|
@@ -78,28 +78,28 @@
 
 ## Security Features
 
-- **No Freeze Authority** - Tokens cannot be frozen by anyone
+- **No Freeze Authority** - Coins cannot be frozen by anyone
 - **Mint Authority** - Retained initially for distribution, revoked after vesting complete
 - **Max Tax Cap** - Hardcoded 10% maximum, cannot be exceeded
-- **Audited Contract** - Built using Anchor framework (industry standard)
-- **Immutable Metadata** - Token metadata locked at launch
+- **Audited Contract** - Built on DarkWave Smart Chain with industry-standard security
+- **Immutable Metadata** - Coin metadata locked at launch
 
 ---
 
 ## Smart Contract
 
-The DWT token smart contract is built using the Anchor framework on Solana, providing:
+The DWC coin smart contract is built on DarkWave Smart Chain (DSC), providing:
 
 - Industry-standard security practices
 - Efficient on-chain operations
 - Low transaction costs
-- Fast settlement times
+- Fast settlement times (400ms block time)
 
 **Contract Source:** Available in our GitHub repository (post-launch)
 
 ---
 
-## How to Acquire DWT
+## How to Acquire DWC
 
 ### Pre-Launch (Now)
 - Join the Legacy Founders program for early access
@@ -107,23 +107,34 @@ The DWT token smart contract is built using the Anchor framework on Solana, prov
 - Follow announcements on official channels
 
 ### Post-Launch (February 2026)
-- Purchase on Raydium DEX
-- Trade on Jupiter aggregator
+- Purchase on DarkWave DEX
+- Trade on partner aggregators
 - Centralized exchange listings (planned)
+
+---
+
+## Wrapped DWC (wDWC)
+
+DWC can be bridged to other networks as wDWC (Wrapped DarkWave Coin):
+
+- **Ethereum**: wDWC on Uniswap
+- **Solana**: wDWC on Raydium
+- **Base**: wDWC on Aerodrome
 
 ---
 
 ## Official Links
 
 - **Website:** [pulse.darkwavestudios.io](https://pulse.darkwavestudios.io)
-- **Telegram:** Coming Soon
+- **DarkWave Smart Chain:** [darkwavechain.com](https://darkwavechain.com)
 - **X (Twitter):** @DarkWaveStudios
+- **Telegram:** Coming Soon
 
 ---
 
 ## Risk Disclaimer
 
-**This is NOT financial advice.** Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWT tokens may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
+**This is NOT financial advice.** Cryptocurrency investments are highly speculative and involve substantial risk of loss. The value of DWC coins may fluctuate significantly. Only invest what you can afford to lose. Past performance does not guarantee future results. Do your own research before making any investment decisions.
 
 ---
 

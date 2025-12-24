@@ -61,11 +61,11 @@ const PLANS = [
     badge: 'LIMITED TIME',
     price: '$24',
     period: 'one-time',
-    savings: '6 months + 35K DWT tokens',
+    savings: '6 months + 35K DWC coins',
     description: 'Early supporter exclusive offer',
     features: [
       '6 months full access',
-      '35,000 DWT tokens (Feb 14, 2026)',
+      '35,000 DWC coins (Feb 14, 2026)',
       'Founder badge',
       'No recurring billing',
       'Launch celebration access'

@@ -1,24 +1,24 @@
-# DWT Token Smart Contract
+# DWC Coin Smart Contract
 
 ## Overview
 
-DWT is a Solana SPL token built with the Anchor framework, designed to power the DarkWave Studios ecosystem with real utility.
+DWC is the native coin of DarkWave Smart Chain (DSC), designed to power the DarkWave Studios ecosystem with real utility.
 
-## Token Specifications
+## Coin Specifications
 
 | Property | Value |
 |----------|-------|
-| **Network** | Solana Mainnet |
-| **Standard** | SPL Token |
-| **Total Supply** | 100,000,000 DWT |
-| **Decimals** | 9 |
+| **Network** | DarkWave Smart Chain (DSC) |
+| **Standard** | Native Coin |
+| **Total Supply** | 100,000,000 DWC |
+| **Decimals** | 18 |
 | **Buy Tax** | 0% |
 | **Sell Tax** | 5% |
 | **Transfer Tax** | 5% |
 
 ## Tax Distribution
 
-When tokens are sold or transferred, the 5% tax is distributed:
+When coins are sold or transferred, the 5% tax is distributed:
 
 - **2% Treasury** - Platform development and operations
 - **2% Liquidity** - Automated liquidity provision
@@ -27,12 +27,12 @@ When tokens are sold or transferred, the 5% tax is distributed:
 ## Architecture
 
 ```
-contracts/dwav-token/
-├── programs/
-│   └── dwav-token/
+darkwave-chain/
+├── contracts/
+│   └── dwc-coin/
 │       └── src/
 │           └── lib.rs          # Main program logic
-├── Anchor.toml                  # Anchor configuration
+├── config.toml                  # Chain configuration
 ├── Cargo.toml                   # Rust dependencies
 └── README.md                    # This file
 ```
@@ -54,20 +54,20 @@ Configurable treasury, liquidity, and marketing wallets.
 ## Building
 
 ```bash
-cd contracts/dwav-token
-anchor build
+cd darkwave-chain/contracts/dwc-coin
+cargo build --release
 ```
 
 ## Testing
 
 ```bash
-anchor test
+cargo test
 ```
 
 ## Deployment
 
 ```bash
-anchor deploy --provider.cluster mainnet
+dwc deploy --network mainnet
 ```
 
 ## Security Considerations
@@ -79,7 +79,7 @@ anchor deploy --provider.cluster mainnet
 
 ## Integration
 
-The DWT token integrates with:
+The DWC coin integrates with:
 
 - **Pulse Platform** - Premium feature access
 - **StrikeAgent** - Trading fee discounts
@@ -89,10 +89,9 @@ The DWT token integrates with:
 
 ## Resources
 
-- [Whitepaper](/docs/DWT_WHITEPAPER.md)
-- [Token Info](/docs/DWT_TOKEN_INFO.md)
-- [Anchor Documentation](https://www.anchor-lang.com/)
-- [Solana SPL Token](https://spl.solana.com/token)
+- [Whitepaper](/docs/DWC_WHITEPAPER.md)
+- [Coin Info](/docs/DWC_COIN_INFO.md)
+- [DarkWave Smart Chain](https://darkwavechain.com)
 
 ---
 

@@ -6349,7 +6349,7 @@ export const mastra = new Mastra({
       // Ecosystem Integration Routes (Dev Hub handoff protocol)
       ...ecosystemRoutes,
       
-      // DarkWave Chain L1 Integration Routes (Hash verification, Hallmarks)
+      // DarkWave Smart Chain L1 Integration Routes (Hash verification, Hallmarks)
       ...darkwaveChainRoutes,
       
       // Firebase Authentication Routes

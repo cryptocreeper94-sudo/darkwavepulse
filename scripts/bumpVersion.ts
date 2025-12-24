@@ -63,14 +63,14 @@ async function hashToDarkWaveChain(version: string): Promise<string | null> {
     
     if (response.ok) {
       const data = await response.json()
-      console.log(`✅ DarkWave Chain hash created: ${data.txHash || data.blockHeight || 'success'}`)
+      console.log(`✅ DarkWave Smart Chain hash created: ${data.txHash || data.blockHeight || 'success'}`)
       return data.txHash || null
     } else {
-      console.log('⚠️ DarkWave Chain hash skipped (API unavailable)')
+      console.log('⚠️ DarkWave Smart Chain hash skipped (API unavailable)')
       return null
     }
   } catch (error) {
-    console.log('⚠️ DarkWave Chain hash skipped (server not running)')
+    console.log('⚠️ DarkWave Smart Chain hash skipped (server not running)')
     return null
   }
 }
@@ -87,12 +87,12 @@ async function bumpVersion(type: 'patch' | 'minor' | 'major' | 'v2launch' = 'pat
   
   if (type === 'v2launch') {
     if (!data.releaseGate) {
-      console.log('🚀 LAUNCHING v2.0.0 - DWAV Token Release!')
+      console.log('🚀 LAUNCHING v2.0.0 - DWC Coin Release!')
       data.major = 2
       data.minor = 0
       data.patch = 0
       data.releaseGate = true
-      data.notes = 'DWAV Token Launch - February 14, 2026'
+      data.notes = 'DWC Coin Launch - February 14, 2026'
     } else {
       console.error('❌ v2.0.0 has already been launched!')
       process.exit(1)
@@ -111,7 +111,7 @@ async function bumpVersion(type: 'patch' | 'minor' | 'major' | 'v2launch' = 'pat
   } else {
     if (type === 'major') {
       console.error('❌ Cannot bump major version before token launch!')
-      console.error('   Use "v2launch" on Feb 14, 2026 to release v2.0.0')
+      console.error('   Use "v2launch" on Feb 14, 2026 to release v2.0.0 with DWC coin')
       process.exit(1)
     } else if (type === 'minor') {
       if (data.minor >= 99) {

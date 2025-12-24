@@ -252,7 +252,7 @@ class HallmarkService {
   }
   
   /**
-   * Process the actual NFT minting via DarkWave Chain
+   * Process the actual NFT minting via DarkWave Smart Chain
    */
   private async processHallmarkMint(hallmarkId: string): Promise<void> {
     try {
@@ -262,7 +262,7 @@ class HallmarkService {
         return;
       }
 
-      // Submit to DarkWave Chain for on-chain hallmark generation
+      // Submit to DarkWave Smart Chain for on-chain hallmark generation
       const result = await darkwaveChainClient.generateHallmark({
         productType: 'pulse_hallmark',
         productId: hallmarkId,
@@ -284,15 +284,15 @@ class HallmarkService {
           })
           .where(eq(hallmarkMints.id, hallmarkId));
 
-        console.log(`🎨 [Hallmark] ${hallmarkId} minted on DarkWave Chain: ${result.id}`);
+        console.log(`🎨 [Hallmark] ${hallmarkId} minted on DarkWave Smart Chain: ${result.id}`);
       }
     } catch (error: any) {
-      console.warn(`⚠️ [Hallmark] DarkWave Chain minting unavailable: ${error.message}`);
+      console.warn(`⚠️ [Hallmark] DarkWave Smart Chain minting unavailable: ${error.message}`);
     }
   }
   
   /**
-   * Verify a hallmark on DarkWave Chain
+   * Verify a hallmark on DarkWave Smart Chain
    */
   async verifyOnChain(hallmarkId: string): Promise<{
     valid: boolean;
