@@ -225,18 +225,109 @@ export default function LoginScreen() {
           margin: 0;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+          .login-screen {
+            padding: 16px;
+          }
+
           .login-container {
-            padding: 24px;
+            max-width: 100%;
+            padding: 32px 24px;
+            border-radius: 20px;
           }
 
           .logo-pulse {
-            font-size: 28px;
+            font-size: 32px;
             letter-spacing: 6px;
           }
 
           .login-title {
+            font-size: 22px;
+          }
+
+          .login-description {
+            font-size: 15px;
+          }
+
+          .google-signin-btn,
+          .github-signin-btn {
+            padding: 16px 24px;
+            font-size: 17px;
+          }
+
+          .feature-item {
+            font-size: 15px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .login-screen {
+            padding: 12px;
+          }
+
+          .login-container {
+            padding: 28px 20px;
+            border-radius: 16px;
+          }
+
+          .login-logo {
+            margin-bottom: 24px;
+          }
+
+          .logo-pulse {
+            font-size: 28px;
+            letter-spacing: 5px;
+          }
+
+          .login-title {
             font-size: 20px;
+          }
+
+          .login-description {
+            font-size: 14px;
+            margin-bottom: 24px;
+          }
+
+          .google-signin-btn,
+          .github-signin-btn {
+            padding: 14px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+          }
+
+          .login-features {
+            margin-top: 32px;
+            gap: 12px;
+          }
+
+          .feature-item {
+            font-size: 14px;
+          }
+
+          .login-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .login-container {
+            padding: 24px 16px;
+          }
+
+          .logo-pulse {
+            font-size: 24px;
+            letter-spacing: 4px;
+          }
+
+          .login-title {
+            font-size: 18px;
+          }
+
+          .google-signin-btn,
+          .github-signin-btn {
+            padding: 12px 16px;
+            font-size: 15px;
           }
         }
       `}</style>
