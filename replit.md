@@ -112,3 +112,22 @@ The platform features a solid dark theme with free-floating elements and glow ef
 
 ### Supporting Libraries
 - `axios`, `zod`, React 19, Vite 7
+
+## Agent Team Hub - Shared Documentation
+
+These root-level markdown files contain complete code snippets and implementation guides for other agents to reference:
+
+| File | Description |
+|------|-------------|
+| `DARKWAVE-WALLET-HANDOFF.md` | **Complete Multi-Chain Wallet System** - 23 chains (Solana + 22 EVM), HD wallet, BIP39 mnemonic, AES-256-GCM encryption. Full backend + frontend code ready to copy. |
+| `SLIDESHOW_PACKAGE_FOR_OTHER_AGENT.md` | Slideshow component package |
+| `MASTER-PROJECT-TRACKER.md` | Project status and feature tracking |
+| `PRIORITIZED-ROADMAP.md` | Development roadmap and priorities |
+
+### Wallet System Quick Reference (from DARKWAVE-WALLET-HANDOFF.md)
+- **Backend Core**: `src/wallet/walletService.ts` - Multi-chain wallet operations
+- **Encryption**: `src/mastra/tools/walletEncryption.ts` - AES-256-GCM
+- **API Routes**: `src/mastra/routes/walletRoutes.ts` - REST endpoints
+- **Frontend Service**: `darkwave-web/src/services/clientWalletService.js`
+- **React Context**: `darkwave-web/src/context/BuiltInWalletContext.jsx`
+- **Required Env Vars**: `HELIUS_API_KEY`, `WALLET_ENCRYPTION_KEY`
