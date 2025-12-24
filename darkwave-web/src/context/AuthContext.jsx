@@ -21,11 +21,26 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     initFirebase()
     
-    handleRedirectResult().then((redirectUser) => {
-      if (redirectUser) {
-        console.log('[Auth] User from redirect:', redirectUser.email)
+    // Handle redirect result from OAuth
+    handleRedirectResult()
+      .then((redirectUser) => {
+        if (redirectUser) {
+          console.log('[Auth] User from redirect:', redirectUser.email)
+        }
+      })
+      .catch((err) => {
+        console.error('[Auth] Redirect error:', err.message)
+        setError(err.message)
+        setLoading(false)
+      })
+
+    // Safety timeout - if loading takes more than 10 seconds, something is wrong
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('[Auth] Loading timeout - resetting state')
+        setLoading(false)
       }
-    })
+    }, 10000)
 
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (firebaseUser) {
@@ -57,7 +72,10 @@ export function AuthProvider({ children }) {
       setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribe()
+      clearTimeout(loadingTimeout)
+    }
   }, [])
 
   async function syncUserWithBackend(firebaseUser, token) {
@@ -92,9 +110,18 @@ export function AuthProvider({ children }) {
     setError(null)
     setLoading(true)
     try {
-      await signInWithGoogle()
+      const result = await signInWithGoogle()
+      // If popup succeeded, result will have a user - onAuthChange will handle the rest
+      // If redirect was used, result will be null - page will reload
+      if (!result) {
+        // Redirect flow - page will reload, keep loading true
+        console.log('[Auth] Google redirect initiated...')
+      } else {
+        console.log('[Auth] Google popup sign-in completed')
+      }
     } catch (err) {
-      setError(err.message)
+      console.error('[Auth] Google sign-in error:', err)
+      setError(err.message || 'Sign-in failed. Please try again.')
       setLoading(false)
     }
   }

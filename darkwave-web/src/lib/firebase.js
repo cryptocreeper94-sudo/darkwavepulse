@@ -64,17 +64,30 @@ export async function signInWithGoogle() {
   provider.addScope('email')
   provider.addScope('profile')
   
+  // Check if we're on mobile - prefer redirect for better UX
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  
+  if (isMobile) {
+    // Mobile: use redirect flow directly (popups often fail)
+    console.log('[Firebase] Mobile detected, using redirect flow')
+    await signInWithRedirect(auth, provider)
+    return null
+  }
+  
   try {
     const result = await signInWithPopup(auth, provider)
     console.log('[Firebase] Google sign-in successful:', result.user.email)
     return result.user
   } catch (error) {
-    if (error.code === 'auth/popup-blocked') {
-      console.log('[Firebase] Popup blocked, trying redirect...')
+    // Handle various popup failure scenarios
+    if (error.code === 'auth/popup-blocked' || 
+        error.code === 'auth/popup-closed-by-user' ||
+        error.code === 'auth/cancelled-popup-request') {
+      console.log('[Firebase] Popup issue, trying redirect...', error.code)
       await signInWithRedirect(auth, provider)
       return null
     }
-    console.error('[Firebase] Google sign-in error:', error)
+    console.error('[Firebase] Google sign-in error:', error.code, error.message)
     throw error
   }
 }
@@ -107,13 +120,26 @@ export async function handleRedirectResult() {
   
   try {
     const result = await getRedirectResult(auth)
-    if (result) {
+    if (result && result.user) {
       console.log('[Firebase] Redirect sign-in successful:', result.user.email)
       return result.user
     }
     return null
   } catch (error) {
-    console.error('[Firebase] Redirect result error:', error)
+    // Log specific error types for debugging
+    console.error('[Firebase] Redirect result error:', error.code, error.message)
+    
+    // Common redirect errors that users should know about
+    if (error.code === 'auth/unauthorized-domain') {
+      console.error('[Firebase] Domain not authorized in Firebase Console!')
+      throw new Error('This domain is not authorized. Please add it to Firebase Console > Authentication > Settings > Authorized domains.')
+    }
+    
+    if (error.code === 'auth/operation-not-allowed') {
+      throw new Error('Google sign-in is not enabled. Please enable it in Firebase Console.')
+    }
+    
+    // Return null for other errors - let the user retry
     return null
   }
 }
