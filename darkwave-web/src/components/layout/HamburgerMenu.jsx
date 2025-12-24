@@ -115,7 +115,7 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
           <div className="menu-section">
             <div className="menu-section-title">Official Documents</div>
             <a
-              href="/docs/DWT_WHITEPAPER.md"
+              href="/docs/DWC_WHITEPAPER.md"
               target="_blank"
               rel="noopener noreferrer"
               className="menu-item"
@@ -135,14 +135,14 @@ export default function HamburgerMenu({ isOpen, activeTab, onTabChange, onClose,
               Roadmap
             </a>
             <a
-              href="/docs/DWT_TOKEN_INFO.md"
+              href="/docs/DWC_COIN_INFO.md"
               target="_blank"
               rel="noopener noreferrer"
               className="menu-item"
               onClick={onClose}
             >
               <span className="menu-icon">🪙</span>
-              Token Info
+              Coin Info
             </a>
             <button
               className="menu-item"

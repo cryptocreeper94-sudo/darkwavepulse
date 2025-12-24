@@ -1,6 +1,6 @@
 /**
- * DarkWave Chain Integration Client
- * Connects Pulse predictive/quant systems to DarkWave Chain L1 blockchain
+ * DarkWave Smart Chain Integration Client
+ * Connects Pulse predictive/quant systems to DarkWave Smart Chain (DSC) L1 blockchain
  * 
  * API: https://darkwave-studios.replit.app
  * Launch: February 14, 2026
@@ -64,11 +64,11 @@ export interface SwapQuote {
 /**
  * Execute a trading signal on DarkWave DEX
  * Only executes if confidence >= 0.75
- * Available pairs: DWT/USDC, DWT/wETH, DWT/wSOL, DWT/USDT, USDC/wETH
+ * Available pairs: DWC/USDC, DWC/wETH, DWC/wSOL, DWC/USDT, USDC/wETH
  */
 export async function executeSignal(signal: TradingSignal, userWalletAddress: string): Promise<SwapResult | null> {
   if (signal.confidence < 0.75) {
-    console.log(`[DarkWave Chain] Signal confidence ${signal.confidence} below threshold 0.75, skipping`);
+    console.log(`[DarkWave Smart Chain] Signal confidence ${signal.confidence} below threshold 0.75, skipping`);
     return null;
   }
 
@@ -77,8 +77,8 @@ export async function executeSignal(signal: TradingSignal, userWalletAddress: st
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fromToken: signal.action === 'BUY' ? 'USDC' : 'DWT',
-        toToken: signal.action === 'BUY' ? 'DWT' : 'USDC',
+        fromToken: signal.action === 'BUY' ? 'USDC' : 'DWC',
+        toToken: signal.action === 'BUY' ? 'DWC' : 'USDC',
         amount: signal.amount,
         walletAddress: userWalletAddress,
         slippage: 0.5
@@ -86,10 +86,10 @@ export async function executeSignal(signal: TradingSignal, userWalletAddress: st
     });
 
     const result = await response.json();
-    console.log(`[DarkWave Chain] Swap executed:`, result);
+    console.log(`[DarkWave Smart Chain] Swap executed:`, result);
     return result;
   } catch (error) {
-    console.error('[DarkWave Chain] Swap execution failed:', error);
+    console.error('[DarkWave Smart Chain] Swap execution failed:', error);
     return { success: false, error: String(error) };
   }
 }
@@ -104,7 +104,7 @@ export async function getSwapQuote(fromToken: string, toToken: string, amount: s
     );
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Quote fetch failed:', error);
+    console.error('[DarkWave Smart Chain] Quote fetch failed:', error);
     return null;
   }
 }
@@ -114,7 +114,7 @@ export async function getSwapQuote(fromToken: string, toToken: string, amount: s
 // ============================================================================
 
 /**
- * Stake DWT tokens
+ * Stake DWC coins
  * @param amount Amount to stake
  * @param walletAddress User's wallet address
  * @param lockPeriod Lock period in days (default 30)
@@ -128,7 +128,7 @@ export async function stakeTokens(amount: string, walletAddress: string, lockPer
     });
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Stake failed:', error);
+    console.error('[DarkWave Smart Chain] Stake failed:', error);
     return { success: false, error: String(error) };
   }
 }
@@ -145,13 +145,13 @@ export async function unstakeTokens(positionId: string, walletAddress: string) {
     });
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Unstake failed:', error);
+    console.error('[DarkWave Smart Chain] Unstake failed:', error);
     return { success: false, error: String(error) };
   }
 }
 
 /**
- * Liquid stake for 12% APY - tokens remain liquid as stDWT
+ * Liquid stake for 12% APY - coins remain liquid as stDWC
  */
 export async function liquidStake(amount: string, walletAddress: string) {
   try {
@@ -162,7 +162,7 @@ export async function liquidStake(amount: string, walletAddress: string) {
     });
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Liquid stake failed:', error);
+    console.error('[DarkWave Smart Chain] Liquid stake failed:', error);
     return { success: false, error: String(error) };
   }
 }
@@ -175,7 +175,7 @@ export async function getStakingPositions(walletAddress: string): Promise<{ posi
     const response = await fetch(`${DARKWAVE_CHAIN_API}/api/staking/positions/${walletAddress}`);
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Get staking positions failed:', error);
+    console.error('[DarkWave Smart Chain] Get staking positions failed:', error);
     return null;
   }
 }
@@ -204,7 +204,7 @@ export async function registerWebhooks(pulseWebhookUrl: string) {
   const webhookSecret = process.env.WEBHOOK_SECRET;
   
   if (!webhookSecret) {
-    console.warn('[DarkWave Chain] WEBHOOK_SECRET not set, skipping webhook registration');
+    console.warn('[DarkWave Smart Chain] WEBHOOK_SECRET not set, skipping webhook registration');
     return { success: false, error: 'WEBHOOK_SECRET not configured' };
   }
 
@@ -220,10 +220,10 @@ export async function registerWebhooks(pulseWebhookUrl: string) {
     });
     
     const result = await response.json();
-    console.log('[DarkWave Chain] Webhooks registered:', result);
+    console.log('[DarkWave Smart Chain] Webhooks registered:', result);
     return result;
   } catch (error) {
-    console.error('[DarkWave Chain] Webhook registration failed:', error);
+    console.error('[DarkWave Smart Chain] Webhook registration failed:', error);
     return { success: false, error: String(error) };
   }
 }
@@ -273,7 +273,7 @@ export async function syncPortfolio(walletAddress: string): Promise<PortfolioDat
 
     return { balances, staking, transactions };
   } catch (error) {
-    console.error('[DarkWave Chain] Portfolio sync failed:', error);
+    console.error('[DarkWave Smart Chain] Portfolio sync failed:', error);
     return null;
   }
 }
@@ -292,7 +292,7 @@ export async function getMultiChainBalances(walletAddress: string) {
 
     return balances;
   } catch (error) {
-    console.error('[DarkWave Chain] Multi-chain balance fetch failed:', error);
+    console.error('[DarkWave Smart Chain] Multi-chain balance fetch failed:', error);
     return null;
   }
 }
@@ -309,7 +309,7 @@ export async function getChainStats(): Promise<ChainStats | null> {
     const response = await fetch(`${DARKWAVE_CHAIN_API}/api/chain/stats`);
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Chain stats fetch failed:', error);
+    console.error('[DarkWave Smart Chain] Chain stats fetch failed:', error);
     return null;
   }
 }
@@ -317,12 +317,12 @@ export async function getChainStats(): Promise<ChainStats | null> {
 /**
  * Get price history for charts
  */
-export async function getPriceHistory(token: string = 'DWT', timeframe: string = '24h') {
+export async function getPriceHistory(token: string = 'DWC', timeframe: string = '24h') {
   try {
     const response = await fetch(`${DARKWAVE_CHAIN_API}/api/charts/price-history?token=${token}&timeframe=${timeframe}`);
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Price history fetch failed:', error);
+    console.error('[DarkWave Smart Chain] Price history fetch failed:', error);
     return null;
   }
 }
@@ -335,7 +335,7 @@ export async function getTransactionHistory(walletAddress: string, limit: number
     const response = await fetch(`${DARKWAVE_CHAIN_API}/api/transactions/${walletAddress}?limit=${limit}`);
     return response.json();
   } catch (error) {
-    console.error('[DarkWave Chain] Transaction history fetch failed:', error);
+    console.error('[DarkWave Smart Chain] Transaction history fetch failed:', error);
     return null;
   }
 }
@@ -347,28 +347,28 @@ export async function getTransactionHistory(walletAddress: string, limit: number
 export interface ArbitrageOpportunity {
   opportunity: 'ETH' | 'SOL' | null;
   spread: number;
-  dwtPrice: number;
+  dwcPrice: number;
   targetPrice: number;
 }
 
 /**
  * Check for arbitrage opportunities between DarkWave DEX and external chains
- * @param getExternalPrice Function to fetch wDWT price from external DEX (Uniswap, Raydium, etc.)
+ * @param getExternalPrice Function to fetch wDWC price from external DEX (Uniswap, Raydium, etc.)
  */
 export async function checkArbitrage(
   walletAddress: string,
   getExternalPrice: (chain: 'ethereum' | 'solana') => Promise<number>
 ): Promise<ArbitrageOpportunity | null> {
   try {
-    const dwtQuote = await getSwapQuote('DWT', 'USDC', '1000');
-    if (!dwtQuote) return null;
+    const dwcQuote = await getSwapQuote('DWC', 'USDC', '1000');
+    if (!dwcQuote) return null;
 
-    const dwtPrice = parseFloat(dwtQuote.toAmount) / 1000;
+    const dwcPrice = parseFloat(dwcQuote.toAmount) / 1000;
 
-    const wdwtEthPrice = await getExternalPrice('ethereum');
-    const wdwtSolPrice = await getExternalPrice('solana');
+    const wdwcEthPrice = await getExternalPrice('ethereum');
+    const wdwcSolPrice = await getExternalPrice('solana');
 
-    if (wdwtEthPrice > dwtPrice * 1.02) {
+    if (wdwcEthPrice > dwcPrice * 1.02) {
       await fetch(`${DARKWAVE_CHAIN_API}/api/bridge/lock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -380,13 +380,13 @@ export async function checkArbitrage(
       });
       return {
         opportunity: 'ETH',
-        spread: ((wdwtEthPrice / dwtPrice) - 1) * 100,
-        dwtPrice,
-        targetPrice: wdwtEthPrice
+        spread: ((wdwcEthPrice / dwcPrice) - 1) * 100,
+        dwcPrice,
+        targetPrice: wdwcEthPrice
       };
     }
 
-    if (wdwtSolPrice > dwtPrice * 1.02) {
+    if (wdwcSolPrice > dwcPrice * 1.02) {
       await fetch(`${DARKWAVE_CHAIN_API}/api/bridge/lock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -398,15 +398,15 @@ export async function checkArbitrage(
       });
       return {
         opportunity: 'SOL',
-        spread: ((wdwtSolPrice / dwtPrice) - 1) * 100,
-        dwtPrice,
-        targetPrice: wdwtSolPrice
+        spread: ((wdwcSolPrice / dwcPrice) - 1) * 100,
+        dwcPrice,
+        targetPrice: wdwcSolPrice
       };
     }
 
     return null;
   } catch (error) {
-    console.error('[DarkWave Chain] Arbitrage check failed:', error);
+    console.error('[DarkWave Smart Chain] Arbitrage check failed:', error);
     return null;
   }
 }

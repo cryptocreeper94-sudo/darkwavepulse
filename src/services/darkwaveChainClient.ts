@@ -76,7 +76,7 @@ export class DarkWaveChainClient {
     });
 
     if (!response.ok) {
-      throw new Error(`DarkWave Chain auth failed: ${response.status}`);
+      throw new Error(`DarkWave Smart Chain auth failed: ${response.status}`);
     }
 
     const data = await response.json();
@@ -90,7 +90,7 @@ export class DarkWaveChainClient {
     body?: any
   ): Promise<T> {
     if (!this.isConfigured()) {
-      throw new Error('DarkWave Chain not configured. Set DARKWAVE_API_KEY and DARKWAVE_API_SECRET.');
+      throw new Error('DarkWave Smart Chain not configured. Set DARKWAVE_API_KEY and DARKWAVE_API_SECRET.');
     }
 
     await this.ensureSession();
@@ -119,7 +119,7 @@ export class DarkWaveChainClient {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`DarkWave Chain error: ${response.status} - ${error}`);
+      throw new Error(`DarkWave Smart Chain error: ${response.status} - ${error}`);
     }
 
     return response.json() as T;

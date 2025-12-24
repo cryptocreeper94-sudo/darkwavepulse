@@ -16,11 +16,11 @@ const faqs = [
   },
   {
     question: 'How much does it cost?',
-    answer: 'During our Beta V1 phase, Founders can lock in lifetime pricing at just $4/month. This includes access to all AI agents, trading signals, and 35,000 DWT tokens on DarkWave Chain.'
+    answer: 'During our Beta V1 phase, Founders can lock in lifetime pricing at just $4/month. This includes access to all AI agents, trading signals, and 35,000 DWC coins on DarkWave Smart Chain.'
   },
   {
-    question: 'What is DarkWave Chain?',
-    answer: 'DarkWave Chain is our upcoming Layer 1 blockchain. It will host the DWT token, staking rewards, and governance features. Visit darkwavechain.com for more information. Launch: February 14, 2026.'
+    question: 'What is DarkWave Smart Chain?',
+    answer: 'DarkWave Smart Chain (DSC) is our upcoming Layer 1 blockchain. It will host the DWC coin, staking rewards, and governance features. Visit darkwavechain.com for more information. Launch: February 14, 2026.'
   },
   {
     question: 'How accurate are the predictions?',

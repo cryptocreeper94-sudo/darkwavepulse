@@ -87,10 +87,10 @@ const PLANS = [
     badge: 'GRANDFATHERED',
     price: '$24',
     period: 'one-time',
-    description: '6 months access + 35K DWT tokens',
+    description: '6 months access + 35K DWC coins',
     features: [
       'Full access for 6 months',
-      '35,000 DWT tokens (Feb 14, 2026)',
+      '35,000 DWC coins (Feb 14, 2026)',
       'StrikeAgent access',
       'Founding member badge',
       'No recurring billing'
@@ -250,7 +250,7 @@ export default function PricingTab({ userId, currentTier }) {
             <span>🏆 Legacy Founder (Grandfathered - No longer available)</span>
           </summary>
           <div className="legacy-card">
-            <p>The Legacy Founder plan was available during our early launch. Existing Founders retain their 6-month access and 35,000 DWT tokens on DarkWave Chain.</p>
+            <p>The Legacy Founder plan was available during our early launch. Existing Founders retain their 6-month access and 35,000 DWC coins on DarkWave Smart Chain.</p>
           </div>
         </details>
       </div>

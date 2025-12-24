@@ -23,7 +23,7 @@ export default function DarkWaveVerificationModal({
           <div className="darkwave-badge">
             <span className="darkwave-wave-large">🌊</span>
           </div>
-          <h2 className="darkwave-modal-title">Verified on DarkWave Chain</h2>
+          <h2 className="darkwave-modal-title">Verified on DarkWave Smart Chain</h2>
         </div>
 
         <div className="darkwave-hallmark-display">

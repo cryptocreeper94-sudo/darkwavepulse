@@ -15,11 +15,11 @@ const DOC_CATEGORIES = [
   },
   {
     id: 'token',
-    title: 'DarkWave Chain',
+    title: 'DarkWave Smart Chain',
     icon: '⛓️',
     color: '#39FF14',
     docs: [
-      { id: 'dwc', title: 'DarkWave Chain', icon: '⛓️', file: 'https://darkwavechain.com', description: 'Visit darkwavechain.com for DWT token info', external: true },
+      { id: 'dwc', title: 'DarkWave Smart Chain', icon: '⛓️', file: 'https://darkwavechain.com', description: 'Visit darkwavechain.com for DWC coin info', external: true },
     ],
   },
   {

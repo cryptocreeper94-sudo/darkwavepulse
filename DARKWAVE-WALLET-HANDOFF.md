@@ -1,7 +1,7 @@
 # DarkWave Multi-Chain Wallet System - Complete Handoff
 
 **From:** Pulse Development Team  
-**To:** DarkWave Chain Development Team  
+**To:** DarkWave Smart Chain Development Team  
 **Date:** December 24, 2025  
 **Purpose:** Complete wallet system code and integration instructions
 

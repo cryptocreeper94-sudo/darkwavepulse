@@ -48,7 +48,7 @@ export default function LegacyFoundersBanner({ onUpgrade }) {
         
         <p style={{ color: '#ccc', fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>
           Lock in <strong style={{ color: '#39FF14' }}>$4/month</strong> pricing FOREVER + earn{' '}
-          <strong style={{ color: '#FFA500' }}>35,000 DWT tokens</strong> on DarkWave Chain (Feb 14, 2026)
+          <strong style={{ color: '#FFA500' }}>35,000 DWC coins</strong> on DarkWave Smart Chain (Feb 14, 2026)
         </p>
         
         <div style={{ 
@@ -75,7 +75,7 @@ export default function LegacyFoundersBanner({ onUpgrade }) {
           }}>
             <div style={{ fontSize: 10, color: '#888' }}>TOKEN REWARD</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: '#FFA500' }}>35K</div>
-            <div style={{ fontSize: 9, color: '#666' }}>DWT tokens</div>
+            <div style={{ fontSize: 9, color: '#666' }}>DWC coins</div>
           </div>
         </div>
         
@@ -97,7 +97,7 @@ export default function LegacyFoundersBanner({ onUpgrade }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ color: '#39FF14' }}>✓</span>
-            <span>Priority access to DarkWave Chain</span>
+            <span>Priority access to DarkWave Smart Chain</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ color: '#39FF14' }}>✓</span>
