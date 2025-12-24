@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app'
-import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics'
 import { 
   getAuth, 
   signInWithPopup,
@@ -17,12 +16,10 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
 let app = null
-let analytics = null
 let auth = null
 
 export function initFirebase() {
@@ -33,20 +30,12 @@ export function initFirebase() {
       app = initializeApp(firebaseConfig)
       auth = getAuth(app)
       console.log('[Firebase] Initialized with Auth')
-      
-      // Analytics is optional - don't let it block auth
-      try {
-        analytics = getAnalytics(app)
-      } catch (analyticsError) {
-        // Analytics may fail on unauthorized domains - that's OK
-        console.log('[Firebase] Analytics not available (domain not authorized)')
-      }
     } catch (error) {
       console.error('[Firebase] Initialization error:', error)
     }
   }
   
-  return { app, analytics, auth }
+  return { app, auth }
 }
 
 export function getFirebaseAuth() {
@@ -169,49 +158,19 @@ export function getCurrentUser() {
 }
 
 export function trackEvent(eventName, params = {}) {
-  if (!analytics) {
-    initFirebase()
-  }
-  
-  if (analytics) {
-    try {
-      logEvent(analytics, eventName, params)
-    } catch (error) {
-      console.error('[Firebase] Event tracking error:', error)
-    }
-  }
+  // Analytics disabled - no-op
 }
 
 export function trackPageView(pageName) {
-  trackEvent('page_view', { page_title: pageName })
+  // Analytics disabled - no-op
 }
 
 export function setAnalyticsUserId(userId) {
-  if (!analytics) {
-    initFirebase()
-  }
-  
-  if (analytics && userId) {
-    try {
-      setUserId(analytics, userId)
-    } catch (error) {
-      console.error('[Firebase] Set user ID error:', error)
-    }
-  }
+  // Analytics disabled - no-op
 }
 
 export function setAnalyticsUserProperties(properties) {
-  if (!analytics) {
-    initFirebase()
-  }
-  
-  if (analytics && properties) {
-    try {
-      setUserProperties(analytics, properties)
-    } catch (error) {
-      console.error('[Firebase] Set user properties error:', error)
-    }
-  }
+  // Analytics disabled - no-op
 }
 
-export { app, analytics, auth }
+export { app, auth }
