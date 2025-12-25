@@ -1257,7 +1257,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         </div>
       </BentoTile>
 
-      <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, minHeight: 300 }}>
+      <div className="strikeagent-widget-container" style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, minHeight: 300 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <StrikeAgentLiveWidget isLocked={true} onUnlock={() => onNavigate?.('pricing')} />
         </div>

@@ -362,7 +362,7 @@
     padding: 12px;
     padding-top: 0;
   }
-  .bento-ai-status, .bento-predict, .bento-quick { 
+  .bento-ai-status, .bento-predict, .bento-quick, .strikeagent-widget-container { 
     display: none !important;
   }
   .bento-table { 
