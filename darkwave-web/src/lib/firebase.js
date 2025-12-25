@@ -62,13 +62,21 @@ export async function signInWithGoogle() {
     console.warn('[Firebase] Could not set persistence:', e)
   }
   
+  // Check if we're in an iframe (like Replit developer preview)
+  const isInIframe = window !== window.top
+  
   // Check if mobile - use redirect for mobile (popups don't work well on mobile Safari)
+  // BUT not if we're in an iframe (redirect doesn't work in iframes)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
   
-  if (isMobile) {
+  if (isMobile && !isInIframe) {
     console.log('[Firebase] Using redirect flow for mobile...')
     await signInWithRedirect(auth, provider)
     return null // Page will redirect
+  }
+  
+  if (isMobile && isInIframe) {
+    console.log('[Firebase] Mobile in iframe - trying popup (may not work)...')
   }
   
   // Desktop: use popup
