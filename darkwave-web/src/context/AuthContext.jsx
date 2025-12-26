@@ -12,6 +12,27 @@ import {
 
 const AuthContext = createContext(null)
 
+const isDevPreview = () => {
+  const hostname = window.location.hostname
+  return hostname.includes('.replit.dev') || 
+         hostname.includes('.kirk.replit.dev') ||
+         hostname.includes('localhost') ||
+         hostname === '127.0.0.1'
+}
+
+const DEV_USER = {
+  uid: 'dev-preview-user',
+  email: 'dev@darkwavepulse.com',
+  displayName: 'Dev Preview',
+  photoURL: null
+}
+
+const DEV_CONFIG = {
+  accessLevel: 'admin',
+  plan: 'pro',
+  hallmarkId: 'DEV-PREVIEW'
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [userConfig, setUserConfig] = useState(null)
@@ -19,6 +40,14 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (isDevPreview()) {
+      console.log('[Auth] Dev preview detected - bypassing authentication')
+      setUser(DEV_USER)
+      setUserConfig(DEV_CONFIG)
+      setLoading(false)
+      return
+    }
+
     initFirebase()
     console.log('[Auth] Initializing...')
     
