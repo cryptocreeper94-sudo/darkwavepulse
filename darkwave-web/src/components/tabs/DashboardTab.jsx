@@ -234,8 +234,7 @@ function MetricContent({ title, value, change }) {
 }
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
-  const gaugeSize = isMobile ? 100 : 160
-  const extraGaugeMargin = type === 'fearGreed' ? (isMobile ? 0 : 0) : 0
+  const gaugeSize = isMobile ? 70 : 160
   return (
     <div style={{ 
       display: 'flex', 
@@ -243,23 +242,22 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      minHeight: isMobile ? 130 : 180,
-      paddingLeft: 12,
-      paddingRight: 12,
-      paddingBottom: 12,
-      paddingTop: 12,
+      minHeight: isMobile ? 100 : 180,
+      padding: isMobile ? 6 : 12,
+      overflow: 'hidden',
     }}>
       <div style={{ 
         color: accentColor, 
-        fontSize: isMobile ? 10 : 12, 
+        fontSize: isMobile ? 9 : 12, 
         fontWeight: 700, 
         textTransform: 'uppercase', 
-        letterSpacing: 1,
-        marginBottom: (isMobile ? 8 : 12) + extraGaugeMargin,
+        letterSpacing: isMobile ? 0.5 : 1,
+        marginBottom: isMobile ? 4 : 12,
         textAlign: 'center',
         width: '100%',
-        paddingRight: 16,
-        paddingLeft: 16,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
       }}>
         {title}
       </div>
@@ -1145,7 +1143,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                   {item.type === 'metric' ? (
                     <MetricContent title={item.title} value={item.value} change={item.change} />
                   ) : (
-                    <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={false} />
+                    <GaugeContent title={item.title} value={item.value} type={item.gaugeType} accentColor={item.color} isMobile={isMobile} />
                   )}
                   <div className="metric-info-hint">
                     <span>ℹ️</span>
