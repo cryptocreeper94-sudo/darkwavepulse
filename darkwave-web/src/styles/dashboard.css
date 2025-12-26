@@ -240,27 +240,32 @@
     font-size: 16px !important;
   }
   
-  /* CRITICAL: Single column layout for mobile */
+  /* CRITICAL: Two-column Bento grid for mobile - Market Metrics + Quick Actions side by side */
   .top-carousels-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
     padding-top: 60px;
-    overflow: visible;
-    max-width: 100%;
+    overflow: hidden;
+    max-width: 100vw;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .news-carousel-section {
-    display: none;
+    grid-column: 1 / -1;
+    display: block;
   }
   
   .carousel-section {
     min-height: 280px;
     width: 100%;
-    padding: 16px;
+    max-width: 100%;
+    padding: 12px;
     border-radius: 12px;
     overflow: hidden;
+    box-sizing: border-box;
   }
   
   /* MUCH larger labels on mobile */
