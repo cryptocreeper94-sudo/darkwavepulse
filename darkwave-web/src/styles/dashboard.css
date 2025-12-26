@@ -268,64 +268,83 @@
     box-sizing: border-box;
   }
   
-  /* MUCH larger labels on mobile */
+  /* Mobile labels - compact for two-column layout */
   .carousel-label {
-    font-size: 14px;
+    font-size: 10px;
     font-weight: 700;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
   }
   
-  /* Scale up ALL text on mobile for readability */
+  /* Scale DOWN text for compact mobile cards */
   .carousel-section span,
   .carousel-section div,
   .market-overview-card span,
   .market-overview-card div {
-    font-size: max(14px, 1em) !important;
+    font-size: 11px !important;
   }
   
-  /* Mobile tile label sizing */
+  /* Mobile tile label sizing - compact */
   .tile-label {
-    font-size: 14px !important;
+    font-size: 10px !important;
     font-weight: 600 !important;
   }
   
-  /* Mobile metric values - make numbers BIG and readable */
+  /* Mobile metric values - readable but compact */
   .carousel-section .metric-value,
   .carousel-section [class*="value"],
   .market-overview-card .metric-value,
   .market-overview-card [class*="value"] {
-    font-size: 24px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
   }
   
-  /* Bento dashboard text scaling */
+  /* Gauge specific sizing for mobile */
+  .carousel-section svg,
+  .market-overview-card svg {
+    max-width: 100% !important;
+    max-height: 120px !important;
+  }
+  
+  /* Carousel navigation dots - smaller */
+  .carousel-section .carousel-dots,
+  .carousel-section [class*="dots"] {
+    transform: scale(0.7);
+  }
+  
+  /* Quick action cards - compact */
+  .carousel-section img {
+    max-height: 80px !important;
+    object-fit: contain;
+  }
+  
+  /* Bento dashboard text scaling - compact */
   .bento-dashboard span,
   .bento-dashboard div {
     min-height: auto;
-    font-size: max(14px, inherit) !important;
+    font-size: 12px !important;
   }
   
-  /* Table header and content scaling - BIGGER */
+  /* Table header and content scaling - compact */
   .bento-table span,
   .bento-table div {
-    font-size: max(14px, inherit) !important;
+    font-size: 11px !important;
   }
   
-  /* Table rows need more padding */
+  /* Table rows - compact padding */
   .bento-table tr,
   .bento-table td,
   .bento-table th {
-    padding: 12px 8px !important;
-    font-size: 14px !important;
+    padding: 8px 4px !important;
+    font-size: 11px !important;
   }
   
-  /* Chart section text - BIGGER */
+  /* Chart section text - compact */
   .bento-chart-section span,
   .bento-chart-section div,
   .chart-metrics span,
   .chart-metrics div {
-    font-size: max(14px, inherit) !important;
+    font-size: 11px !important;
   }
   
   .market-overview-strip {
