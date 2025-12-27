@@ -3,26 +3,53 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
 const USE_PRO_API = COINGECKO_API_KEY.startsWith('CG-') || process.env.COINGECKO_PRO === 'true';
 
-const BASE_URL = USE_PRO_API 
-  ? 'https://pro-api.coingecko.com/api/v3'
-  : 'https://api.coingecko.com/api/v3';
+const COINGECKO_PRO_URL = 'https://pro-api.coingecko.com/api/v3';
+const COINGECKO_FREE_URL = 'https://api.coingecko.com/api/v3';
 
-console.log(`[CoinGecko] Using ${USE_PRO_API ? 'PRO' : 'Demo'} API at ${BASE_URL}`);
+const FALLBACK_APIS = [
+  { name: 'CoinCap', baseUrl: 'https://api.coincap.io/v2', rateLimit: 200 },
+  { name: 'CryptoCompare', baseUrl: 'https://min-api.cryptocompare.com', rateLimit: 100 },
+  { name: 'Binance', baseUrl: 'https://api.binance.com/api/v3', rateLimit: 1200 },
+];
+
+interface FallbackState {
+  currentIndex: number;
+  lastRotation: number;
+  failureCount: Record<string, number>;
+  cooldowns: Record<string, number>;
+}
+
+console.log(`[CoinGecko] Using ${USE_PRO_API ? 'PRO' : 'Demo'} API at ${USE_PRO_API ? COINGECKO_PRO_URL : COINGECKO_FREE_URL}`);
 
 class CoinGeckoClient {
   private client: AxiosInstance;
+  private freeClient: AxiosInstance;
   private requestQueue: Array<() => Promise<any>> = [];
   private isProcessingQueue = false;
   private lastRequestTime = 0;
-  private minRequestInterval = USE_PRO_API ? 250 : 2100; // Pro: 240/min, Demo: ~28/min
+  private minRequestInterval = USE_PRO_API ? 250 : 2100;
+  private fallbackState: FallbackState = {
+    currentIndex: 0,
+    lastRotation: Date.now(),
+    failureCount: {},
+    cooldowns: {}
+  };
+  private usingFallback = false;
+  private coinGeckoFailures = 0;
+  private readonly MAX_COINGECKO_FAILURES = 3;
+  private readonly COOLDOWN_DURATION = 60000;
 
   constructor() {
     this.client = axios.create({
-      baseURL: BASE_URL,
+      baseURL: USE_PRO_API ? COINGECKO_PRO_URL : COINGECKO_FREE_URL,
       timeout: 15000,
-      headers: {
-        'Accept': 'application/json',
-      }
+      headers: { 'Accept': 'application/json' }
+    });
+
+    this.freeClient = axios.create({
+      baseURL: COINGECKO_FREE_URL,
+      timeout: 15000,
+      headers: { 'Accept': 'application/json' }
     });
 
     this.client.interceptors.request.use((config) => {
@@ -30,22 +57,26 @@ class CoinGeckoClient {
         if (USE_PRO_API) {
           config.headers['x-cg-pro-api-key'] = COINGECKO_API_KEY;
         } else {
-          config.params = {
-            ...config.params,
-            x_cg_demo_api_key: COINGECKO_API_KEY
-          };
+          config.params = { ...config.params, x_cg_demo_api_key: COINGECKO_API_KEY };
         }
       }
       return config;
     });
 
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        this.coinGeckoFailures = 0;
+        return response;
+      },
       async (error) => {
-        if (error.response?.status === 429) {
-          console.warn('[CoinGecko] Rate limited - waiting 60s before retry');
-          await new Promise(resolve => setTimeout(resolve, 60000));
-          return this.client.request(error.config);
+        if (error.response?.status === 429 || error.response?.status === 503 || error.response?.status >= 500) {
+          this.coinGeckoFailures++;
+          console.warn(`[CoinGecko] API error (${error.response?.status}) - failure count: ${this.coinGeckoFailures}/${this.MAX_COINGECKO_FAILURES}`);
+          
+          if (this.coinGeckoFailures >= this.MAX_COINGECKO_FAILURES) {
+            console.warn('[CoinGecko] Max failures reached - switching to fallback APIs');
+            this.usingFallback = true;
+          }
         }
         throw error;
       }
@@ -66,10 +97,220 @@ class CoinGeckoClient {
     return requestFn();
   }
 
+  private getNextFallbackApi(): typeof FALLBACK_APIS[0] | null {
+    const now = Date.now();
+    
+    for (let i = 0; i < FALLBACK_APIS.length; i++) {
+      const idx = (this.fallbackState.currentIndex + i) % FALLBACK_APIS.length;
+      const api = FALLBACK_APIS[idx];
+      const cooldownEnd = this.fallbackState.cooldowns[api.name] || 0;
+      
+      if (now > cooldownEnd) {
+        this.fallbackState.currentIndex = (idx + 1) % FALLBACK_APIS.length;
+        return api;
+      }
+    }
+    
+    return null;
+  }
+
+  private setCooldown(apiName: string): void {
+    this.fallbackState.cooldowns[apiName] = Date.now() + this.COOLDOWN_DURATION;
+    this.fallbackState.failureCount[apiName] = (this.fallbackState.failureCount[apiName] || 0) + 1;
+    console.warn(`[Fallback] ${apiName} on cooldown for ${this.COOLDOWN_DURATION / 1000}s`);
+  }
+
+  private async fetchFromCoinCap(endpoint: string, params: any): Promise<any> {
+    const api = FALLBACK_APIS[0];
+    
+    if (endpoint.includes('/coins/markets') || endpoint.includes('/simple/price')) {
+      const response = await axios.get(`${api.baseUrl}/assets`, {
+        timeout: 10000,
+        params: { limit: params.per_page || 50 }
+      });
+      
+      return response.data.data.map((coin: any) => ({
+        id: coin.id,
+        symbol: coin.symbol.toLowerCase(),
+        name: coin.name,
+        current_price: parseFloat(coin.priceUsd),
+        market_cap: parseFloat(coin.marketCapUsd),
+        market_cap_rank: parseInt(coin.rank),
+        total_volume: parseFloat(coin.volumeUsd24Hr),
+        price_change_percentage_24h: parseFloat(coin.changePercent24Hr),
+        image: `https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`
+      }));
+    }
+    
+    if (endpoint.includes('/global')) {
+      const response = await axios.get(`${api.baseUrl}/global`, { timeout: 10000 });
+      return {
+        data: {
+          total_market_cap: { usd: parseFloat(response.data.data.totalMarketCapUsd) },
+          market_cap_change_percentage_24h_usd: parseFloat(response.data.data.marketCapChangePercent24Hr)
+        }
+      };
+    }
+    
+    throw new Error('Endpoint not supported by CoinCap fallback');
+  }
+
+  private async fetchFromCryptoCompare(endpoint: string, params: any): Promise<any> {
+    const api = FALLBACK_APIS[1];
+    
+    if (endpoint.includes('/coins/markets') || endpoint.includes('/simple/price')) {
+      const response = await axios.get(`${api.baseUrl}/data/top/mktcapfull`, {
+        timeout: 10000,
+        params: { limit: params.per_page || 50, tsym: 'USD' }
+      });
+      
+      return response.data.Data.map((item: any, index: number) => ({
+        id: item.CoinInfo.Name.toLowerCase(),
+        symbol: item.CoinInfo.Name.toLowerCase(),
+        name: item.CoinInfo.FullName,
+        current_price: item.RAW?.USD?.PRICE || 0,
+        market_cap: item.RAW?.USD?.MKTCAP || 0,
+        market_cap_rank: index + 1,
+        total_volume: item.RAW?.USD?.VOLUME24HOUR || 0,
+        price_change_percentage_24h: item.RAW?.USD?.CHANGEPCT24HOUR || 0,
+        image: `https://www.cryptocompare.com${item.CoinInfo.ImageUrl}`
+      }));
+    }
+    
+    throw new Error('Endpoint not supported by CryptoCompare fallback');
+  }
+
+  private async fetchFromBinance(endpoint: string, params: any): Promise<any> {
+    const api = FALLBACK_APIS[2];
+    
+    if (endpoint.includes('/simple/price')) {
+      const ids = params.ids?.split(',') || [];
+      const results: Record<string, any> = {};
+      
+      for (const id of ids.slice(0, 10)) {
+        const symbol = this.coinIdToSymbol(id);
+        if (!symbol) continue;
+        
+        try {
+          const response = await axios.get(`${api.baseUrl}/ticker/24hr`, {
+            timeout: 5000,
+            params: { symbol: `${symbol}USDT` }
+          });
+          
+          results[id] = {
+            usd: parseFloat(response.data.lastPrice),
+            usd_24h_change: parseFloat(response.data.priceChangePercent),
+            usd_24h_vol: parseFloat(response.data.volume)
+          };
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      return results;
+    }
+    
+    throw new Error('Endpoint not supported by Binance fallback');
+  }
+
+  private coinIdToSymbol(coinId: string): string | null {
+    const mapping: Record<string, string> = {
+      'bitcoin': 'BTC', 'ethereum': 'ETH', 'solana': 'SOL',
+      'binancecoin': 'BNB', 'ripple': 'XRP', 'cardano': 'ADA',
+      'dogecoin': 'DOGE', 'polkadot': 'DOT', 'avalanche-2': 'AVAX',
+      'chainlink': 'LINK', 'polygon': 'MATIC', 'litecoin': 'LTC',
+      'uniswap': 'UNI', 'stellar': 'XLM', 'cosmos': 'ATOM'
+    };
+    return mapping[coinId] || null;
+  }
+
+  private async tryFallbackApis(endpoint: string, params: any): Promise<any> {
+    const errors: string[] = [];
+    
+    for (let attempt = 0; attempt < FALLBACK_APIS.length; attempt++) {
+      const api = this.getNextFallbackApi();
+      if (!api) {
+        console.warn('[Fallback] All APIs on cooldown - waiting...');
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        continue;
+      }
+      
+      try {
+        console.log(`[Fallback] Trying ${api.name}...`);
+        
+        let result;
+        switch (api.name) {
+          case 'CoinCap':
+            result = await this.fetchFromCoinCap(endpoint, params);
+            break;
+          case 'CryptoCompare':
+            result = await this.fetchFromCryptoCompare(endpoint, params);
+            break;
+          case 'Binance':
+            result = await this.fetchFromBinance(endpoint, params);
+            break;
+          default:
+            throw new Error(`Unknown API: ${api.name}`);
+        }
+        
+        console.log(`[Fallback] ${api.name} succeeded`);
+        this.fallbackState.failureCount[api.name] = 0;
+        return result;
+        
+      } catch (error: any) {
+        errors.push(`${api.name}: ${error.message}`);
+        this.setCooldown(api.name);
+      }
+    }
+    
+    throw new Error(`All fallback APIs failed: ${errors.join('; ')}`);
+  }
+
   async get<T = any>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
     return this.throttledRequest(async () => {
-      const response = await this.client.get<T>(endpoint, config);
-      return response.data;
+      if (!this.usingFallback) {
+        try {
+          const response = await this.client.get<T>(endpoint, config);
+          return response.data;
+        } catch (error: any) {
+          if (error.response?.status === 429 || error.response?.status >= 500) {
+            console.warn(`[CoinGecko] Pro API failed, trying free API...`);
+            
+            if (USE_PRO_API) {
+              try {
+                const freeResponse = await this.freeClient.get<T>(endpoint, config);
+                return freeResponse.data;
+              } catch (freeError: any) {
+                console.warn(`[CoinGecko] Free API also failed, using fallbacks...`);
+              }
+            }
+            
+            if (this.coinGeckoFailures >= this.MAX_COINGECKO_FAILURES) {
+              return this.tryFallbackApis(endpoint, config?.params || {});
+            }
+          }
+          throw error;
+        }
+      } else {
+        const now = Date.now();
+        if (now - this.fallbackState.lastRotation > 300000) {
+          console.log('[CoinGecko] Attempting to restore primary API...');
+          this.usingFallback = false;
+          this.coinGeckoFailures = 0;
+          this.fallbackState.lastRotation = now;
+          
+          try {
+            const response = await this.client.get<T>(endpoint, config);
+            console.log('[CoinGecko] Primary API restored successfully');
+            return response.data;
+          } catch (error) {
+            console.warn('[CoinGecko] Primary API still failing, continuing with fallbacks');
+            this.usingFallback = true;
+          }
+        }
+        
+        return this.tryFallbackApis(endpoint, config?.params || {});
+      }
     });
   }
 
@@ -139,12 +380,26 @@ class CoinGeckoClient {
     return !!COINGECKO_API_KEY;
   }
 
-  getApiStatus(): { hasKey: boolean; isPro: boolean; baseUrl: string } {
+  getApiStatus(): { hasKey: boolean; isPro: boolean; baseUrl: string; usingFallback: boolean; failureCount: number } {
     return {
       hasKey: !!COINGECKO_API_KEY,
       isPro: USE_PRO_API,
-      baseUrl: BASE_URL
+      baseUrl: USE_PRO_API ? COINGECKO_PRO_URL : COINGECKO_FREE_URL,
+      usingFallback: this.usingFallback,
+      failureCount: this.coinGeckoFailures
     };
+  }
+
+  resetFallbackState(): void {
+    this.usingFallback = false;
+    this.coinGeckoFailures = 0;
+    this.fallbackState = {
+      currentIndex: 0,
+      lastRotation: Date.now(),
+      failureCount: {},
+      cooldowns: {}
+    };
+    console.log('[CoinGecko] Fallback state reset');
   }
 }
 
