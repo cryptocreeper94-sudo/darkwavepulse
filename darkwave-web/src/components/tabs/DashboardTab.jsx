@@ -234,7 +234,8 @@ function MetricContent({ title, value, change, isMobile = false }) {
 }
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
-  const gaugeSize = isMobile ? 140 : 160
+  const isMobileScreen = typeof window !== 'undefined' && window.innerWidth <= 1024
+  const gaugeSize = (isMobile || isMobileScreen) ? 140 : 160
   return (
     <div style={{ 
       display: 'flex', 
