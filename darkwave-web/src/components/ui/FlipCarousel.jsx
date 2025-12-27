@@ -1,5 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+function useIsMobileView() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
+
 export default function FlipCarousel({ 
   items, 
   renderItem, 
@@ -16,6 +27,7 @@ export default function FlipCarousel({
   const [isFlipping, setIsFlipping] = useState(false)
   const [flipDirection, setFlipDirection] = useState('next')
   const touchStartRef = useRef({ x: 0, y: 0 })
+  const isMobileView = useIsMobileView()
 
   const goTo = useCallback((index, direction = 'next') => {
     if (isFlipping || items.length <= 1) return
@@ -139,13 +151,13 @@ export default function FlipCarousel({
               onClick={prev}
               disabled={isFlipping}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: '#141414',
-                border: '1px solid #00D4FF',
-                color: '#00D4FF',
-                fontSize: 18,
+                width: isMobileView ? 24 : 32,
+                height: isMobileView ? 24 : 32,
+                borderRadius: isMobileView ? 6 : '50%',
+                background: isMobileView ? '#1a1a1a' : '#141414',
+                border: isMobileView ? '1px solid #333' : '1px solid #00D4FF',
+                color: isMobileView ? '#fff' : '#00D4FF',
+                fontSize: isMobileView ? 12 : 18,
                 fontWeight: 'bold',
                 cursor: isFlipping ? 'default' : 'pointer',
                 display: 'flex',
@@ -153,7 +165,7 @@ export default function FlipCarousel({
                 justifyContent: 'center',
                 opacity: isFlipping ? 0.5 : 1,
                 transition: 'all 0.2s',
-                boxShadow: '0 0 8px rgba(0, 212, 255, 0.4)',
+                boxShadow: isMobileView ? 'none' : '0 0 8px rgba(0, 212, 255, 0.4)',
               }}
             >
               ‹
@@ -169,11 +181,12 @@ export default function FlipCarousel({
             {showDots && (
               <div style={{
                 display: 'flex',
-                gap: 6,
+                gap: isMobileView ? 4 : 6,
               }}>
                 {(() => {
                   const maxDots = 5;
                   const total = items.length;
+                  const dotSize = isMobileView ? 6 : 8;
                   if (total <= maxDots) {
                     return items.map((_, idx) => (
                       <button
@@ -181,14 +194,15 @@ export default function FlipCarousel({
                         onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
                         disabled={isFlipping}
                         style={{
-                          width: 8,
-                          height: 8,
+                          width: dotSize,
+                          height: dotSize,
                           borderRadius: '50%',
                           background: idx === currentIndex ? '#00D4FF' : '#444',
                           border: 'none',
                           cursor: isFlipping ? 'default' : 'pointer',
                           padding: 0,
                           transition: 'background 0.2s',
+                          boxShadow: idx === currentIndex && isMobileView ? '0 0 4px rgba(0, 212, 255, 0.5)' : 'none',
                         }}
                       />
                     ));
@@ -207,14 +221,15 @@ export default function FlipCarousel({
                         onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
                         disabled={isFlipping}
                         style={{
-                          width: 8,
-                          height: 8,
+                          width: dotSize,
+                          height: dotSize,
                           borderRadius: '50%',
                           background: idx === currentIndex ? '#00D4FF' : '#444',
                           border: 'none',
                           cursor: isFlipping ? 'default' : 'pointer',
                           padding: 0,
                           transition: 'background 0.2s',
+                          boxShadow: idx === currentIndex && isMobileView ? '0 0 4px rgba(0, 212, 255, 0.5)' : 'none',
                         }}
                       />
                     );
@@ -237,13 +252,13 @@ export default function FlipCarousel({
               onClick={next}
               disabled={isFlipping}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: '#141414',
-                border: '1px solid #00D4FF',
-                color: '#00D4FF',
-                fontSize: 18,
+                width: isMobileView ? 24 : 32,
+                height: isMobileView ? 24 : 32,
+                borderRadius: isMobileView ? 6 : '50%',
+                background: isMobileView ? '#1a1a1a' : '#141414',
+                border: isMobileView ? '1px solid #333' : '1px solid #00D4FF',
+                color: isMobileView ? '#fff' : '#00D4FF',
+                fontSize: isMobileView ? 12 : 18,
                 fontWeight: 'bold',
                 cursor: isFlipping ? 'default' : 'pointer',
                 display: 'flex',
@@ -251,7 +266,7 @@ export default function FlipCarousel({
                 justifyContent: 'center',
                 opacity: isFlipping ? 0.5 : 1,
                 transition: 'all 0.2s',
-                boxShadow: '0 0 8px rgba(0, 212, 255, 0.4)',
+                boxShadow: isMobileView ? 'none' : '0 0 8px rgba(0, 212, 255, 0.4)',
               }}
             >
               ›
