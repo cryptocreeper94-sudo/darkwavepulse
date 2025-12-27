@@ -234,7 +234,7 @@ function MetricContent({ title, value, change, isMobile = false }) {
 }
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
-  const gaugeSize = isMobile ? 70 : 160
+  const gaugeSize = isMobile ? 140 : 160
   return (
     <div style={{ 
       display: 'flex', 
@@ -242,24 +242,24 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      minHeight: isMobile ? 90 : 180,
-      padding: isMobile ? 4 : 12,
+      minHeight: isMobile ? 160 : 180,
+      padding: isMobile ? 8 : 12,
       overflow: 'hidden',
     }}>
       <div style={{ 
         color: accentColor, 
-        fontSize: isMobile ? 8 : 12, 
+        fontSize: isMobile ? 11 : 12, 
         fontWeight: 700, 
         textTransform: 'uppercase', 
-        letterSpacing: isMobile ? 0.3 : 1,
-        marginBottom: isMobile ? 4 : 12,
+        letterSpacing: isMobile ? 0.5 : 1,
+        marginBottom: isMobile ? 8 : 12,
         textAlign: 'center',
         width: '100%',
       }}>
         {title}
       </div>
       <div style={{ width: '100%', maxWidth: gaugeSize, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
-        <Gauge value={value} type={type} size={gaugeSize} showLabels={false} />
+        <Gauge value={value} type={type} size={gaugeSize} showLabels={!isMobile} />
       </div>
     </div>
   )
@@ -1128,7 +1128,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         {/* Metrics Carousel - 1/3 width on desktop, 1/2 on mobile */}
         <div className="carousel-section metrics-carousel-section">
           <div className="carousel-label">Market Metrics</div>
-          <div style={{ height: isMobileLayout ? 180 : 220, width: '100%', flex: 1 }}>
+          <div style={{ height: isMobileLayout ? 260 : 220, width: '100%', flex: 1 }}>
             {isMobileLayout ? (
               <MobileCardCarousel
                 items={marketOverviewItems}
@@ -1177,7 +1177,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
         {/* Quick Actions Carousel - 1/3 width on desktop, 1/2 on mobile */}
         <div className="carousel-section quick-actions-carousel-section">
           <div className="carousel-label">Quick Actions</div>
-          <div style={{ height: isMobileLayout ? 180 : 220, width: '100%', flex: 1 }}>
+          <div style={{ height: isMobileLayout ? 260 : 220, width: '100%', flex: 1 }}>
             {isMobileLayout ? (
               <MobileCardCarousel
                 items={quickActions}
