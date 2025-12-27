@@ -172,64 +172,7 @@
   min-height: 300px;
 }
 
-/* Tablet breakpoint - 600px (hide news, 2-col for remaining) */
-@media (max-width: 600px) {
-  .top-carousels-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 8px;
-    padding-top: 56px;
-    overflow: visible;
-  }
-  
-  .news-carousel-section {
-    display: none;
-  }
-  
-  .carousel-section {
-    min-height: 320px;
-    height: 320px;
-    width: 100%;
-    padding: 10px;
-    overflow: hidden;
-  }
-  
-  .carousel-label {
-    font-size: 10px;
-    margin-bottom: 6px;
-    font-weight: 700;
-  }
-  
-  .market-overview-card {
-    min-height: 180px;
-    padding: 12px;
-  }
-  
-  .bento-dashboard {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto auto auto auto;
-    grid-auto-rows: minmax(140px, auto);
-    gap: 8px;
-    padding: 10px;
-    padding-top: 0;
-  }
-  .bento-ai-status, .bento-quick, .bento-predict {
-    grid-area: auto;
-  }
-  .bento-ai-status { min-height: 100px !important; }
-  .bento-predict { min-height: 140px !important; }
-  .bento-quick { min-height: 160px !important; }
-  .bento-table { min-height: 350px !important; grid-column: 1 / -1; }
-  .desktop-news-grid { display: none; }
-  .bento-chart-section { 
-    min-height: 400px !important; 
-    grid-column: 1 / -1;
-    grid-template-columns: 1fr 2fr;
-  }
-}
-
-/* Mobile breakpoint - 1024px */
+/* Mobile/Tablet breakpoint - 1024px (MUST come before 600px for proper cascade) */
 @media (max-width: 1024px) {
   /* Prevent horizontal overflow */
   body, html, #root {
@@ -267,7 +210,7 @@
     box-sizing: border-box;
   }
   
-  /* Only adjust carousel label - nothing else */
+  /* Carousel label styling */
   .carousel-label {
     font-size: 10px;
     margin-bottom: 6px;
@@ -361,6 +304,44 @@
     display: block !important;
     width: 100%;
     margin-bottom: 20px;
+  }
+}
+
+/* Small phone breakpoint - 600px (overrides 1024px for smaller screens) */
+@media (max-width: 600px) {
+  .top-carousels-container {
+    gap: 6px;
+    padding: 6px;
+    padding-top: 54px;
+  }
+  
+  .carousel-section {
+    min-height: 300px;
+    height: 300px;
+    padding: 8px;
+  }
+  
+  .carousel-label {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+  
+  .market-overview-card {
+    min-height: 160px;
+    padding: 10px;
+  }
+  
+  .bento-dashboard {
+    gap: 10px;
+    padding: 8px;
+  }
+  
+  .bento-table { 
+    min-height: 320px !important;
+  }
+  
+  .bento-chart-section { 
+    min-height: 380px !important;
   }
 }
 
