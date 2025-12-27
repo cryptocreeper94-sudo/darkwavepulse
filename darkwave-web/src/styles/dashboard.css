@@ -177,9 +177,9 @@
   .top-carousels-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 6px;
-    padding-top: 60px;
+    gap: 8px;
+    padding: 8px;
+    padding-top: 56px;
     overflow: visible;
   }
   
@@ -188,20 +188,22 @@
   }
   
   .carousel-section {
-    min-height: 180px;
+    min-height: 320px;
+    height: 320px;
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     overflow: hidden;
   }
   
   .carousel-label {
-    font-size: 8px;
-    margin-bottom: 4px;
+    font-size: 10px;
+    margin-bottom: 6px;
+    font-weight: 700;
   }
   
   .market-overview-card {
-    min-height: 80px;
-    padding: 8px;
+    min-height: 180px;
+    padding: 12px;
   }
   
   .bento-dashboard {
@@ -241,7 +243,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     padding: 8px;
-    padding-top: 60px;
+    padding-top: 56px;
     overflow: hidden;
     max-width: 100vw;
     width: 100%;
@@ -253,12 +255,13 @@
     display: none;
   }
   
-  /* Carousel sections - let components handle internal sizing */
+  /* Carousel sections - consistent heights for both cards */
   .carousel-section {
-    min-height: 200px;
+    min-height: 320px;
+    height: 320px;
     width: 100%;
     max-width: 100%;
-    padding: 8px;
+    padding: 10px;
     border-radius: 12px;
     overflow: hidden;
     box-sizing: border-box;
@@ -266,8 +269,9 @@
   
   /* Only adjust carousel label - nothing else */
   .carousel-label {
-    font-size: 9px;
+    font-size: 10px;
     margin-bottom: 6px;
+    font-weight: 700;
   }
   
   .market-overview-strip {
