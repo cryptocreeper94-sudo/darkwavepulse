@@ -29,11 +29,14 @@ export function useResponsiveValue(mobileValue, desktopValue) {
 
 export function useViewportBreakpoint() {
   const isMobile = useIsMobile()
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1024
+  const isVerySmall = screenWidth < 400
   return {
     isMobile,
+    isVerySmall,
     breakpoint: isMobile ? 'mobile' : 'desktop',
-    gaugeSize: isMobile ? 140 : 160,
-    arrowSize: isMobile ? 24 : 32,
-    dotSize: isMobile ? 6 : 8,
+    gaugeSize: isVerySmall ? 110 : (isMobile ? 130 : 160),
+    arrowSize: isVerySmall ? 20 : (isMobile ? 24 : 32),
+    dotSize: isVerySmall ? 5 : (isMobile ? 6 : 8),
   }
 }

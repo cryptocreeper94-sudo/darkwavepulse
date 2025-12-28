@@ -225,9 +225,9 @@ function MetricContent({ title, value, change, isMobile = false }) {
 }
 
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
-  const { gaugeSize: hookGaugeSize, isMobile: hookIsMobile } = useViewportBreakpoint()
+  const { gaugeSize: hookGaugeSize, isMobile: hookIsMobile, isVerySmall } = useViewportBreakpoint()
   const effectiveIsMobile = isMobile || hookIsMobile
-  const gaugeSize = effectiveIsMobile ? 140 : 160
+  const gaugeSize = hookGaugeSize
   return (
     <div style={{ 
       display: 'flex', 
