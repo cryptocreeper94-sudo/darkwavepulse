@@ -181,11 +181,16 @@ export default function FlipCarousel({
                     return items.map((_, idx) => (
                       <button
                         key={idx}
+                        className="flip-carousel-dot"
                         onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
                         disabled={isFlipping}
                         style={{
                           width: dotSizeVal,
                           height: dotSizeVal,
+                          minWidth: dotSizeVal,
+                          minHeight: dotSizeVal,
+                          maxWidth: dotSizeVal,
+                          maxHeight: dotSizeVal,
                           borderRadius: '50%',
                           background: idx === currentIndex ? '#00D4FF' : '#444',
                           border: 'none',
@@ -208,11 +213,16 @@ export default function FlipCarousel({
                     return (
                       <button
                         key={idx}
+                        className="flip-carousel-dot"
                         onClick={() => goTo(idx, idx > currentIndex ? 'next' : 'prev')}
                         disabled={isFlipping}
                         style={{
                           width: dotSizeVal,
                           height: dotSizeVal,
+                          minWidth: dotSizeVal,
+                          minHeight: dotSizeVal,
+                          maxWidth: dotSizeVal,
+                          maxHeight: dotSizeVal,
                           borderRadius: '50%',
                           background: idx === currentIndex ? '#00D4FF' : '#444',
                           border: 'none',
