@@ -91,10 +91,22 @@ body {
     line-height: 1.5;
   }
   
-  /* Touch-friendly tap targets */
-  button, a, [role="button"] {
+  /* Touch-friendly tap targets - but exclude small carousel dots */
+  button:not([class*="mcc-"]):not([style*="borderRadius: '50%'"]):not([style*="border-radius"]), 
+  a, 
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
+  }
+  
+  /* FlipCarousel and MobileCardCarousel dots should stay small */
+  .mcc-dot,
+  .flip-carousel-dot,
+  button[style*="borderRadius: '50%'"] {
+    min-height: auto !important;
+    min-width: auto !important;
+    max-height: 10px !important;
+    max-width: 10px !important;
   }
 }
 
