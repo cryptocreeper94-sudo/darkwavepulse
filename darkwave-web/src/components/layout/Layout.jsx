@@ -4,6 +4,7 @@ import HamburgerMenu from './HamburgerMenu'
 import BugReportModal from '../modals/BugReportModal'
 import DisclaimerModal from '../modals/DisclaimerModal'
 import DisclaimerBanner from '../ui/DisclaimerBanner'
+import BetaBadge from '../ui/BetaBadge'
 export default function Layout({ children, activeTab, onTabChange, userTier, accessLevel }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isBugModalOpen, setIsBugModalOpen] = useState(false)
@@ -70,6 +71,8 @@ export default function Layout({ children, activeTab, onTabChange, userTier, acc
         <DisclaimerBanner />
         {children}
       </main>
+      
+      <BetaBadge />
 
 
       <BugReportModal 
