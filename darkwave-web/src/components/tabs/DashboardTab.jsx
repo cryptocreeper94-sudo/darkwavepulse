@@ -1147,7 +1147,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                     className="market-overview-card market-overview-card--clickable"
                     onClick={() => setSelectedMetric(item.title)}
                     title={`Click for info about ${item.title}`}
-                    style={{ height: '100%', cursor: 'pointer', margin: '0 8px' }}
+                    style={{ height: '100%', cursor: 'pointer' }}
                   >
                     {item.type === 'metric' ? (
                       <MetricContent title={item.title} value={item.value} change={item.change} />
@@ -1189,7 +1189,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
                 renderItem={(action) => (
                   <div 
                     onClick={() => onNavigate && onNavigate(action.tab)}
-                    style={{ height: '100%', cursor: 'pointer', margin: '0 8px' }}
+                    style={{ height: '100%', cursor: 'pointer' }}
                   >
                     <QuickActionContent action={action} fullCard={true} />
                   </div>
@@ -1211,7 +1211,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
               renderItem={(item) => (
                 <div 
                   onClick={() => item.url && item.url !== '#' && window.open(item.url, '_blank')}
-                  style={{ height: '100%', cursor: item.url && item.url !== '#' ? 'pointer' : 'default', margin: '0 8px' }}
+                  style={{ height: '100%', cursor: item.url && item.url !== '#' ? 'pointer' : 'default' }}
                 >
                   <MobileNewsCard news={item} />
                 </div>
