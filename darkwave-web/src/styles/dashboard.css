@@ -154,9 +154,19 @@
 /* Row 3: Chart full width */
 .bento-chart-section { 
   grid-area: 3 / 1 / 4 / 13;
-  display: grid;
-  grid-template-columns: 280px 1fr;
+  display: flex;
+  flex-direction: row;
   gap: 12px;
+}
+
+.bento-chart-section .chart-metrics {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.bento-chart-section .chart-container {
+  flex: 1;
+  min-width: 0;
 }
 .chart-metrics {
   background: #0f0f0f;
@@ -266,18 +276,18 @@
   }
   .bento-chart-section { 
     min-height: 350px;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    flex-direction: column;
     overflow: hidden;
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
   }
-  .chart-metrics {
+  .bento-chart-section .chart-metrics {
+    width: 100%;
     padding: 12px;
     overflow: hidden;
   }
-  .chart-container {
+  .bento-chart-section .chart-container {
     min-height: 200px;
     overflow: hidden;
     width: 100%;
