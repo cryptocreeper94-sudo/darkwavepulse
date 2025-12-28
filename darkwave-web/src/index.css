@@ -91,22 +91,31 @@ body {
     line-height: 1.5;
   }
   
-  /* Touch-friendly tap targets - but exclude small carousel dots */
-  button:not([class*="mcc-"]):not([style*="borderRadius: '50%'"]):not([style*="border-radius"]), 
+  /* Touch-friendly tap targets - exclude carousel dots */
+  button:not(.mcc-dot):not(.flip-carousel-dot):not(.mcc-arrow), 
   a, 
-  [role="button"] {
+  [role="button"]:not(.mcc-dot):not(.flip-carousel-dot) {
     min-height: 44px;
     min-width: 44px;
   }
   
-  /* FlipCarousel and MobileCardCarousel dots should stay small */
+  /* FlipCarousel and MobileCardCarousel dots MUST stay small */
   .mcc-dot,
-  .flip-carousel-dot,
-  button[style*="borderRadius: '50%'"] {
-    min-height: auto !important;
-    min-width: auto !important;
-    max-height: 10px !important;
-    max-width: 10px !important;
+  .flip-carousel-dot {
+    min-height: 8px !important;
+    max-height: 8px !important;
+    min-width: 8px !important;
+    max-width: 8px !important;
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  /* Carousel arrows stay medium size */
+  .mcc-arrow {
+    min-height: 24px !important;
+    max-height: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
   }
 }
 
