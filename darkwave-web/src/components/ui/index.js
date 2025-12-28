@@ -1,6 +1,7 @@
 export { default as Carousel } from './Carousel'
 export { default as Accordion, AccordionItem } from './Accordion'
 export { default as BentoGrid, BentoItem } from './BentoGrid'
+export { default as BetaBadge } from './BetaBadge'
 export { default as CategoryPills } from './CategoryPills'
 export { default as Gauge, GaugeCard } from './Gauge'
 export { default as GlossaryPopup } from './GlossaryPopup'
