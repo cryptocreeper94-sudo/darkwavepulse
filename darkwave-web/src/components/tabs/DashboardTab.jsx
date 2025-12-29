@@ -114,9 +114,10 @@ function QuickActionContent({ action, isMobile = false }) {
     <div style={{ 
       position: 'relative',
       width: '100%',
-      height: '100%',
+      height: 'calc(100% - 44px)',
       borderRadius: 12,
       overflow: 'hidden',
+      background: '#1a1a1a',
     }}>
       <img 
         src={action.image} 
