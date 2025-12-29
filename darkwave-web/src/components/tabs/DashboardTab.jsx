@@ -203,7 +203,7 @@ function MetricContent({ title, value, change, isMobile = false }) {
 function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
   const { gaugeSize: hookGaugeSize, isMobile: hookIsMobile, isVerySmall } = useViewportBreakpoint()
   const effectiveIsMobile = isMobile || hookIsMobile
-  const gaugeSize = hookGaugeSize
+  const gaugeSize = effectiveIsMobile ? Math.max(hookGaugeSize, 140) : Math.max(hookGaugeSize, 160)
   return (
     <div style={{ 
       display: 'flex', 
@@ -211,17 +211,17 @@ function GaugeContent({ title, value, type, accentColor, isMobile = false }) {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      minHeight: effectiveIsMobile ? 160 : 180,
-      padding: effectiveIsMobile ? 8 : 12,
+      minHeight: effectiveIsMobile ? 180 : 200,
+      padding: effectiveIsMobile ? 8 : 16,
       overflow: 'hidden',
     }}>
       <div style={{ 
         color: accentColor, 
-        fontSize: effectiveIsMobile ? 11 : 12, 
+        fontSize: effectiveIsMobile ? 14 : 16, 
         fontWeight: 700, 
         textTransform: 'uppercase', 
-        letterSpacing: effectiveIsMobile ? 0.5 : 1,
-        marginBottom: effectiveIsMobile ? 8 : 12,
+        letterSpacing: effectiveIsMobile ? 1 : 1.5,
+        marginBottom: effectiveIsMobile ? 10 : 14,
         textAlign: 'center',
         width: '100%',
       }}>
@@ -1095,11 +1095,11 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   const isFavorite = (symbol) => favorites?.some(f => f.symbol?.toUpperCase() === symbol?.toUpperCase())
 
   const quickActions = [
-    { image: '/assets/generated_images/ai_trading_strikeagent_icon.png', title: 'StrikeAgent', subtitle: 'AI Predictive Trading', color: '#00D4FF', tab: 'sniper' },
-    { image: '/assets/generated_images/multi-chain_wallet_icon.png', title: 'Wallet', subtitle: 'Multi-chain', color: '#9D4EDD', tab: 'wallet' },
-    { image: '/assets/generated_images/cyber_dust_buster_cleaning_coins.png', title: 'Dust Buster', subtitle: '12.5% Fee', color: '#39FF14', tab: 'dust-buster' },
-    { image: '/assets/generated_images/crypto_watchlist_trading_targets.png', title: 'Watchlist', subtitle: 'Limit orders', color: 'var(--neon-green)', tab: 'watchlist' },
-    { image: '/assets/dashboard/prediction_tracker.png', title: 'AI Signals', subtitle: '71.5% Accuracy', color: '#FF006E', tab: 'predictions' },
+    { image: '/assets/generated_images/ai_trading_terminal.png', title: 'StrikeAgent', subtitle: 'AI Predictive Trading', color: '#00D4FF', tab: 'sniper' },
+    { image: '/assets/generated_images/multi-chain_crypto_wallet.png', title: 'Wallet', subtitle: 'Multi-chain', color: '#9D4EDD', tab: 'wallet' },
+    { image: '/assets/generated_images/crypto_dust_cleaning.png', title: 'Dust Buster', subtitle: '12.5% Fee', color: '#39FF14', tab: 'dust-buster' },
+    { image: '/assets/generated_images/crypto_watchlist_display.png', title: 'Watchlist', subtitle: 'Limit orders', color: 'var(--neon-green)', tab: 'watchlist' },
+    { image: '/assets/generated_images/ai_prediction_signals.png', title: 'AI Signals', subtitle: '71.5% Accuracy', color: '#FF006E', tab: 'predictions' },
   ]
 
   const marketOverviewItems = [
