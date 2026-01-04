@@ -823,10 +823,44 @@ export default function DevelopersPortalTab() {
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [currentTier, setCurrentTier] = useState('free');
   const [regenerateConfirm, setRegenerateConfirm] = useState(null);
+  const [healthData, setHealthData] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(false);
   
   useEffect(() => {
     localStorage.setItem('adminTasks', JSON.stringify(tasks));
   }, [tasks]);
+  
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      if (activeTab !== 'health') return;
+      setHealthLoading(true);
+      try {
+        const [healthRes, aiStatusRes, predStatsRes] = await Promise.all([
+          fetch('/healthz'),
+          fetch('/api/system/ai/status'),
+          fetch('/api/strikeagent/ml/stats'),
+        ]);
+        const health = await healthRes.json();
+        const aiStatus = await aiStatusRes.json();
+        const predStats = await predStatsRes.json();
+        setHealthData({
+          server: health.status === 'ok' ? 'healthy' : 'unhealthy',
+          lastCheck: new Date().toISOString(),
+          aiStatus,
+          predStats,
+        });
+      } catch (e) {
+        console.error('Failed to load health data:', e);
+        setHealthData({ server: 'error', error: e.message });
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+    
+    fetchHealthData();
+    const interval = setInterval(fetchHealthData, 30000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
   
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -906,6 +940,7 @@ export default function DevelopersPortalTab() {
   
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'health', label: 'System Health', icon: '💚' },
     { id: 'api', label: 'API', icon: '🔑' },
     { id: 'documents', label: 'Documents', icon: '📁' },
     { id: 'tasks', label: 'Tasks', icon: '✅' },
@@ -1190,6 +1225,134 @@ export default function DevelopersPortalTab() {
               >
                 View All Docs →
               </button>
+            </div>
+          </SectionCard>
+        </div>
+      )}
+      
+      {activeTab === 'health' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          <SectionCard title="Server Status" icon="🖥️" glowColor={healthData?.server === 'healthy' ? '#39FF14' : '#FF4444'}>
+            {healthLoading ? (
+              <div style={{ color: '#888', fontSize: '14px' }}>Checking status...</div>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                  <div style={{
+                    width: '16px', height: '16px', borderRadius: '50%',
+                    background: healthData?.server === 'healthy' ? '#39FF14' : '#FF4444',
+                    boxShadow: `0 0 15px ${healthData?.server === 'healthy' ? '#39FF14' : '#FF4444'}`,
+                    animation: 'pulse 2s infinite',
+                  }} />
+                  <span style={{ color: healthData?.server === 'healthy' ? '#39FF14' : '#FF4444', fontWeight: '600', fontSize: '18px' }}>
+                    {healthData?.server === 'healthy' ? 'All Systems Operational' : 'System Issue Detected'}
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>
+                  Last check: {healthData?.lastCheck ? new Date(healthData.lastCheck).toLocaleString() : 'N/A'}
+                </div>
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard title="UptimeRobot Endpoint" icon="📡" glowColor="#00D4FF">
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ color: '#888', fontSize: '12px', marginBottom: '6px' }}>Health Check URL (ping every 5 min):</div>
+              <div style={{
+                background: 'rgba(15, 15, 15, 0.8)',
+                borderRadius: '8px',
+                padding: '12px',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                color: '#00D4FF',
+                wordBreak: 'break-all',
+              }}>
+                {window.location.origin}/healthz
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/healthz`);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #00D4FF, #0099CC)',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 16px',
+                color: '#fff',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              Copy URL
+            </button>
+          </SectionCard>
+
+          <SectionCard title="Prediction Generation" icon="🔮" glowColor="#8B5CF6">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '24px', fontWeight: '700', color: '#8B5CF6' }}>
+                  {healthData?.predStats?.totalPredictions?.toLocaleString() || '—'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#888' }}>Total Predictions</div>
+              </div>
+              <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(15, 15, 15, 0.6)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '24px', fontWeight: '700', color: '#39FF14' }}>
+                  {healthData?.aiStatus?.accuracy?.oneHour ? `${(healthData.aiStatus.accuracy.oneHour * 100).toFixed(1)}%` : '—'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#888' }}>1H Accuracy</div>
+              </div>
+            </div>
+            <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
+              Predictions run every 5 minutes via Inngest cron jobs
+            </div>
+          </SectionCard>
+
+          <SectionCard title="Background Jobs" icon="⚙️" glowColor="#FFB800">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                { name: 'Background Predictions', schedule: 'Every 5 min', status: 'active' },
+                { name: 'Top Signals Scanner', schedule: 'Every 3 min', status: 'active' },
+                { name: 'Quant Scanner', schedule: 'Every 5 min', status: 'active' },
+                { name: 'Limit Order Monitor', schedule: 'Every 1 min', status: 'active' },
+                { name: 'Auto Trade Executor', schedule: 'Every 1 min', status: 'active' },
+              ].map((job, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '8px 12px',
+                  background: 'rgba(15, 15, 15, 0.6)',
+                  borderRadius: '8px',
+                }}>
+                  <div>
+                    <div style={{ color: '#fff', fontSize: '13px' }}>{job.name}</div>
+                    <div style={{ color: '#666', fontSize: '11px' }}>{job.schedule}</div>
+                  </div>
+                  <div style={{
+                    width: '10px', height: '10px', borderRadius: '50%',
+                    background: job.status === 'active' ? '#39FF14' : '#FF4444',
+                    boxShadow: `0 0 8px ${job.status === 'active' ? '#39FF14' : '#FF4444'}`,
+                  }} />
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+
+          <SectionCard title="Keep-Alive Instructions" icon="💡" glowColor="#00D4FF" fullWidth>
+            <div style={{ color: '#ccc', fontSize: '13px', lineHeight: '1.6' }}>
+              <p style={{ margin: '0 0 12px' }}>
+                To ensure predictions generate 24/7, set up UptimeRobot to ping the health endpoint:
+              </p>
+              <ol style={{ margin: 0, paddingLeft: '20px' }}>
+                <li style={{ marginBottom: '8px' }}>Go to <a href="https://uptimerobot.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00D4FF' }}>uptimerobot.com</a> and create a free account</li>
+                <li style={{ marginBottom: '8px' }}>Click "Add New Monitor" → Select "HTTP(s)"</li>
+                <li style={{ marginBottom: '8px' }}>Enter the health check URL above</li>
+                <li style={{ marginBottom: '8px' }}>Set monitoring interval to 5 minutes</li>
+                <li>Save and activate the monitor</li>
+              </ol>
             </div>
           </SectionCard>
         </div>
