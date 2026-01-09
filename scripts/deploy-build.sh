@@ -4,13 +4,15 @@ set -e
 
 echo "📦 Deployment build starting..."
 
-# Install mastra output dependencies (required for runtime)
-if [ -d ".mastra/output" ]; then
+# Skip npm install if node_modules already exists (committed to git)
+if [ -d ".mastra/output/node_modules" ] && [ "$(ls -A .mastra/output/node_modules 2>/dev/null)" ]; then
+  echo "✅ Mastra dependencies already present, skipping install"
+else
   echo "📚 Installing Mastra dependencies..."
   npm install --prefix .mastra/output --legacy-peer-deps --omit=dev --ignore-scripts 2>/dev/null || npm install --prefix .mastra/output --legacy-peer-deps --omit=dev || true
 fi
 
-# Compile TypeScript
+# Compile TypeScript (fast - just 2 files)
 echo "📝 Compiling TypeScript..."
 npx tsc src/bootstrap.ts src/mastra-child.ts --outDir dist --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck
 
