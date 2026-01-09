@@ -33,6 +33,8 @@ const MIME_TYPES: Record<string, string> = {
 
 let indexHtml = LOADING_HTML; // Start with loading HTML, replace later
 let serverReady = false;
+let workersStarted = false;
+let healthChecksPassed = 0;
 
 function serveStatic(req: http.IncomingMessage, res: http.ServerResponse, urlPath: string): boolean {
   if (!serverReady) return false; // Don't serve static files until fully ready
@@ -71,6 +73,14 @@ const server = http.createServer((req, res) => {
   if (urlPath === '/healthz' || urlPath === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end('{"status":"ok"}');
+    
+    // Start workers only after health checks pass (for Autoscale compatibility)
+    healthChecksPassed++;
+    if (healthChecksPassed >= 2 && !workersStarted) {
+      workersStarted = true;
+      console.log('[Bootstrap] Health checks passed, starting workers...');
+      setImmediate(() => startWorkers());
+    }
     return;
   }
   
@@ -146,7 +156,7 @@ server.listen(PORT, '0.0.0.0', () => {
 });
 
 function initializeApp() {
-  // Load index.html asynchronously
+  // Load index.html - lightweight operation
   try {
     const indexPath = path.join(PUBLIC_DIR, 'index.html');
     if (fs.existsSync(indexPath)) {
@@ -159,21 +169,41 @@ function initializeApp() {
   serverReady = true;
   console.log('Static file serving ready');
   
-  // Start Mastra after a short delay
-  setTimeout(() => {
-    try {
-      const mastraPath = path.join(process.cwd(), '.mastra', 'output', 'index.mjs');
-      if (fs.existsSync(mastraPath)) {
-        spawn('node', [mastraPath], {
-          env: { ...process.env, PORT: '4111' },
-          stdio: 'inherit'
-        });
-        console.log('Mastra starting on 127.0.0.1:4111');
+  // In development, start workers immediately
+  // In production (Autoscale), wait for health checks to pass first
+  const isProduction = process.env.NODE_ENV === 'production' || 
+                       process.env.REPLIT_DEPLOYMENT === '1' ||
+                       process.env.REPLIT_DEV_DOMAIN === undefined;
+  
+  if (!isProduction) {
+    // Development: start workers after short delay
+    setTimeout(() => {
+      if (!workersStarted) {
+        workersStarted = true;
+        startWorkers();
       }
-    } catch (e) {
-      console.error('Mastra init error:', e);
+    }, 2000);
+  } else {
+    console.log('[Bootstrap] Production mode - workers will start after health checks pass');
+  }
+}
+
+function startWorkers() {
+  console.log('[Bootstrap] Starting Mastra and background workers...');
+  
+  // Start Mastra
+  try {
+    const mastraPath = path.join(process.cwd(), '.mastra', 'output', 'index.mjs');
+    if (fs.existsSync(mastraPath)) {
+      spawn('node', [mastraPath], {
+        env: { ...process.env, PORT: '4111' },
+        stdio: 'inherit'
+      });
+      console.log('Mastra starting on 127.0.0.1:4111');
     }
-  }, 1000);
+  } catch (e) {
+    console.error('Mastra init error:', e);
+  }
 
   // Only start Inngest dev server in development
   const isProduction = process.env.NODE_ENV === 'production' || 
@@ -183,7 +213,7 @@ function initializeApp() {
   if (!isProduction) {
     setTimeout(() => {
       startInngestDevServer();
-    }, 3000);
+    }, 1000);
   } else {
     console.log('[Inngest] Production mode - using Inngest Cloud directly');
   }
