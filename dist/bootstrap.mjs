@@ -4,6 +4,8 @@ import path from 'path';
 import { spawn } from 'child_process';
 const PORT = Number(process.env.PORT || 5000);
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
+// Minimal loading HTML - always available immediately
+const LOADING_HTML = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
 const MIME_TYPES = {
     '.html': 'text/html',
     '.js': 'application/javascript',
@@ -25,8 +27,11 @@ const MIME_TYPES = {
     '.mp3': 'audio/mpeg',
     '.wav': 'audio/wav'
 };
-let indexHtml = '';
+let indexHtml = LOADING_HTML; // Start with loading HTML, replace later
+let serverReady = false;
 function serveStatic(req, res, urlPath) {
+    if (!serverReady)
+        return false; // Don't serve static files until fully ready
     const filePath = path.join(PUBLIC_DIR, urlPath);
     if (!filePath.startsWith(PUBLIC_DIR)) {
         return false;
@@ -49,37 +54,39 @@ function serveStatic(req, res, urlPath) {
         return false;
     }
 }
-// Minimal loading HTML for instant response before index.html is loaded
-const LOADING_HTML = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
+// Create server with minimal handler - health checks respond INSTANTLY
 const server = http.createServer((req, res) => {
     const urlPath = req.url?.split('?')[0] || '/';
-    // Fast health check endpoints - respond immediately
+    // PRIORITY 1: Health checks - respond immediately, no conditions
     if (urlPath === '/healthz' || urlPath === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end('{"status":"ok"}');
         return;
     }
-    // Root endpoint - always respond fast for health checks
+    // PRIORITY 2: Root endpoint - always respond fast
     if (urlPath === '/') {
         const accept = req.headers['accept'] || '';
         const userAgent = req.headers['user-agent'] || '';
-        // Health check requests (no accept header, or JSON, or from Cloud Run/monitoring)
+        // Health check detection
         const isHealthCheck = !accept ||
             accept === '*/*' ||
             accept.includes('application/json') ||
             userAgent.includes('GoogleHC') ||
             userAgent.includes('kube-probe') ||
-            userAgent.includes('curl');
+            userAgent.includes('curl') ||
+            userAgent.includes('python') ||
+            userAgent.includes('Go-http');
         if (isHealthCheck) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end('{"status":"ok"}');
             return;
         }
-        // Browser request - serve HTML (use loading page if index not ready)
+        // Browser request - serve HTML
         res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-        res.end(indexHtml || LOADING_HTML);
+        res.end(indexHtml);
         return;
     }
+    // API proxy - only if server is ready
     if (urlPath.startsWith('/api/')) {
         const proxyReq = http.request({
             hostname: '127.0.0.1',
@@ -88,7 +95,6 @@ const server = http.createServer((req, res) => {
             method: req.method,
             headers: req.headers
         }, (proxyRes) => {
-            // Add no-cache headers to prevent CDN/edge caching of API responses
             const headers = { ...proxyRes.headers };
             headers['cache-control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate';
             headers['pragma'] = 'no-cache';
@@ -103,26 +109,36 @@ const server = http.createServer((req, res) => {
         req.pipe(proxyReq);
         return;
     }
+    // Static files
     if (serveStatic(req, res, urlPath)) {
         return;
     }
+    // Fallback to index.html for SPA routing
     res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
     res.end(indexHtml);
 });
+// START SERVER IMMEDIATELY - before any other initialization
 server.listen(PORT, '0.0.0.0', () => {
     console.log('Server ready on port ' + PORT);
+    // Use setImmediate to let event loop process health checks first
+    setImmediate(() => {
+        initializeApp();
+    });
+});
+function initializeApp() {
+    // Load index.html asynchronously
     try {
         const indexPath = path.join(PUBLIC_DIR, 'index.html');
         if (fs.existsSync(indexPath)) {
             indexHtml = fs.readFileSync(indexPath, 'utf8');
         }
-        else {
-            indexHtml = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
-        }
     }
     catch (e) {
-        indexHtml = '<!DOCTYPE html><html><head><title>Pulse</title></head><body>Loading...</body></html>';
+        console.error('Failed to load index.html:', e);
     }
+    serverReady = true;
+    console.log('Static file serving ready');
+    // Start Mastra after a short delay
     setTimeout(() => {
         try {
             const mastraPath = path.join(process.cwd(), '.mastra', 'output', 'index.mjs');
@@ -137,21 +153,20 @@ server.listen(PORT, '0.0.0.0', () => {
         catch (e) {
             console.error('Mastra init error:', e);
         }
-    }, 2000);
-    // Only start Inngest dev server in development, not in production
-    // In production, Inngest Cloud handles events directly
+    }, 1000);
+    // Only start Inngest dev server in development
     const isProduction = process.env.NODE_ENV === 'production' ||
         process.env.REPLIT_DEPLOYMENT === '1' ||
         process.env.REPLIT_DEV_DOMAIN === undefined;
     if (!isProduction) {
         setTimeout(() => {
             startInngestDevServer();
-        }, 5000);
+        }, 3000);
     }
     else {
         console.log('[Inngest] Production mode - using Inngest Cloud directly');
     }
-});
+}
 let inngestProcess = null;
 let inngestRestartCount = 0;
 const MAX_INNGEST_RESTARTS = 10;
