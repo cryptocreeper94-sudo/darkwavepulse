@@ -451,7 +451,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
     const fetchCategoryCoins = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/crypto/category/${category}?timeframe=${timeframe}`)
+        const response = await fetch(`/api/category/${category}?timeframe=${timeframe}`)
         if (response.ok) {
           const data = await response.json()
           if (data.coins && Array.isArray(data.coins)) {
@@ -505,7 +505,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
     if (caType) {
       setIsSearching(true)
       try {
-        const response = await fetch(`/api/crypto/token-lookup?address=${encodeURIComponent(value.trim())}`)
+        const response = await fetch(`/api/token-lookup?address=${encodeURIComponent(value.trim())}`)
         if (response.ok) {
           const data = await response.json()
           if (data && data.id) {
@@ -971,7 +971,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
-        const response = await fetch('/api/crypto/market-overview')
+        const response = await fetch('/api/global-overview')
         if (response.ok) {
           const data = await response.json()
           setMarketData(data)
@@ -1045,7 +1045,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
     ]
     const fetchNews = async () => {
       try {
-        const response = await fetch('/api/crypto/news')
+        const response = await fetch('/api/news')
         if (response.ok) {
           const data = await response.json()
           setNews(data.news || data || defaultNews)

@@ -124,7 +124,7 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
   const fetchLivePrice = useCallback(async () => {
     const symbol = coinSymbol?.toUpperCase() || 'BTC'
     try {
-      const endpoint = symbol === 'BTC' ? '/api/crypto/btc-price' : `/api/crypto/coin-price?symbol=${symbol}`
+      const endpoint = symbol === 'BTC' ? '/api/btc-price' : `/api/coin-price?symbol=${symbol}`
       const response = await fetch(endpoint)
       if (response.ok) {
         const priceData = await response.json()
@@ -196,7 +196,7 @@ export default function AnalysisChart({ coin, activeIndicators = {}, fullWidth =
       setIsLoading(true)
       
       try {
-        const response = await fetch(`/api/crypto/coin-history?symbol=${symbol}&days=${days}`)
+        const response = await fetch(`/api/coin-history?symbol=${symbol}&days=${days}`)
         if (response.ok && !cancelled) {
           const apiData = await response.json()
           if (apiData && apiData.length > 0) {
