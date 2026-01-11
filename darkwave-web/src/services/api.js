@@ -13,7 +13,7 @@ export async function fetchCoinAnalysis(symbol) {
                    symbol.toLowerCase() === 'avax' ? 'avalanche-2' :
                    symbol.toLowerCase();
     
-    const historyResponse = await fetch(`${API_BASE}/crypto/btc-history?days=30&coinId=${coinId}`);
+    const historyResponse = await fetch(`${API_BASE}/btc-history?days=30&coinId=${coinId}`);
     let prices = [];
     let currentPrice = 0;
     let priceChange24h = 0;
@@ -88,7 +88,7 @@ export async function fetchCoinAnalysis(symbol) {
 
 export async function fetchMarketData() {
   try {
-    const response = await fetch(`${API_BASE}/crypto/market-overview`);
+    const response = await fetch(`${API_BASE}/market-overview?assetClass=crypto&category=top`);
     
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -120,7 +120,7 @@ export async function fetchPredictions() {
 
 export async function fetchTopPredictions() {
   try {
-    const response = await fetch(`${API_BASE}/crypto/coin-prices`);
+    const response = await fetch(`${API_BASE}/market-overview?assetClass=crypto&category=top`);
     
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);

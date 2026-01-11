@@ -305,7 +305,7 @@ export default function MarketsTab() {
     
     const fetchMarketData = async () => {
       try {
-        const response = await fetch('/api/crypto/market-overview')
+        const response = await fetch('/api/global-overview')
         if (response.ok) {
           const data = await response.json()
           setMarketData({
@@ -327,7 +327,7 @@ export default function MarketsTab() {
     
     const fetchNews = async () => {
       try {
-        const response = await fetch('/api/crypto/news')
+        const response = await fetch('/api/news')
         if (response.ok) {
           const data = await response.json()
           if (data.articles && Array.isArray(data.articles)) {
@@ -382,7 +382,7 @@ export default function MarketsTab() {
     const fetchCoins = async () => {
       setCoinsLoading(true)
       try {
-        const response = await fetch(`/api/crypto/category/${activeCategory}?timeframe=${timeframe}`)
+        const response = await fetch(`/api/category/${activeCategory}?timeframe=${timeframe}`)
         if (response.ok) {
           const data = await response.json()
           if (data.coins && Array.isArray(data.coins)) {

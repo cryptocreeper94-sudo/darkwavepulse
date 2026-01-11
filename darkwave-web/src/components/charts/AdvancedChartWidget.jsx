@@ -53,8 +53,8 @@ export default function AdvancedChartWidget({
   const fetchPriceData = useCallback(async () => {
     try {
       const endpoint = symbol === 'BTC' 
-        ? '/api/crypto/btc-price' 
-        : `/api/crypto/coin-price?symbol=${symbol}`
+        ? '/api/btc-price' 
+        : `/api/coin-price?symbol=${symbol}`
       
       const response = await fetch(endpoint)
       if (response.ok) {
