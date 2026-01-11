@@ -149,10 +149,11 @@ function initializeApp() {
     console.log('Static file serving ready');
     // In development, start workers immediately
     // In production (Autoscale), wait for health checks to pass first
-    const isProduction = process.env.NODE_ENV === 'production' ||
-        process.env.REPLIT_DEPLOYMENT === '1' ||
-        process.env.REPLIT_DEV_DOMAIN === undefined;
-    if (!isProduction) {
+    // REPLIT_CONTEXT=deployment is set in Autoscale deployments
+    const isDeployment = process.env.REPLIT_CONTEXT === 'deployment' ||
+        process.env.REPLIT_ENVIRONMENT === 'production' ||
+        process.env.NODE_ENV === 'production';
+    if (!isDeployment) {
         // Development: start workers after short delay
         setTimeout(() => {
             if (!workersStarted) {
@@ -162,7 +163,7 @@ function initializeApp() {
         }, 2000);
     }
     else {
-        console.log('[Bootstrap] Production mode - workers will start after health checks pass');
+        console.log('[Bootstrap] Autoscale deployment - workers will start after health checks pass');
     }
 }
 function startWorkers() {
@@ -182,16 +183,16 @@ function startWorkers() {
         console.error('Mastra init error:', e);
     }
     // Only start Inngest dev server in development
-    const isProduction = process.env.NODE_ENV === 'production' ||
-        process.env.REPLIT_DEPLOYMENT === '1' ||
-        process.env.REPLIT_DEV_DOMAIN === undefined;
-    if (!isProduction) {
+    const isDeployment = process.env.REPLIT_CONTEXT === 'deployment' ||
+        process.env.REPLIT_ENVIRONMENT === 'production' ||
+        process.env.NODE_ENV === 'production';
+    if (!isDeployment) {
         setTimeout(() => {
             startInngestDevServer();
         }, 1000);
     }
     else {
-        console.log('[Inngest] Production mode - using Inngest Cloud directly');
+        console.log('[Inngest] Autoscale deployment - using Inngest Cloud directly');
     }
 }
 let inngestProcess = null;
