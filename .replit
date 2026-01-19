@@ -16,7 +16,7 @@ MASTRA_HIDE_CLOUD_CTA = "true"
 [deployment]
 build = ["bash", "scripts/deploy-build.sh"]
 run = ["node", "dist/bootstrap.mjs"]
-deploymentTarget = "vm"
+deploymentTarget = "autoscale"
 
 [workflows]
 runButton = "Project"
