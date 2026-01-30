@@ -149,24 +149,25 @@ export default function FlipCarousel({
               onClick={prev}
               disabled={isFlipping}
               style={{
-                width: arrowSize,
-                height: arrowSize,
-                borderRadius: isMobileView ? 6 : '50%',
-                background: isMobileView ? '#1a1a1a' : '#141414',
-                border: isMobileView ? '1px solid #333' : '1px solid #00D4FF',
-                color: isMobileView ? '#fff' : '#00D4FF',
-                fontSize: isMobileView ? 12 : 18,
-                fontWeight: 'bold',
+                width: Math.max(36, arrowSize),
+                height: Math.max(36, arrowSize),
+                borderRadius: '50%',
+                background: '#1a1a1a',
+                border: '2px solid #00D4FF',
+                color: '#00D4FF',
                 cursor: isFlipping ? 'default' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 opacity: isFlipping ? 0.5 : 1,
                 transition: 'all 0.2s',
-                boxShadow: isMobileView ? 'none' : '0 0 8px rgba(0, 212, 255, 0.4)',
+                boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+                padding: 0,
               }}
             >
-              ‹
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
             </button>
           )}
 
@@ -260,24 +261,25 @@ export default function FlipCarousel({
               onClick={next}
               disabled={isFlipping}
               style={{
-                width: arrowSize,
-                height: arrowSize,
-                borderRadius: isMobileView ? 6 : '50%',
-                background: isMobileView ? '#1a1a1a' : '#141414',
-                border: isMobileView ? '1px solid #333' : '1px solid #00D4FF',
-                color: isMobileView ? '#fff' : '#00D4FF',
-                fontSize: isMobileView ? 12 : 18,
-                fontWeight: 'bold',
+                width: Math.max(36, arrowSize),
+                height: Math.max(36, arrowSize),
+                borderRadius: '50%',
+                background: '#1a1a1a',
+                border: '2px solid #00D4FF',
+                color: '#00D4FF',
                 cursor: isFlipping ? 'default' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 opacity: isFlipping ? 0.5 : 1,
                 transition: 'all 0.2s',
-                boxShadow: isMobileView ? 'none' : '0 0 8px rgba(0, 212, 255, 0.4)',
+                boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+                padding: 0,
               }}
             >
-              ›
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
             </button>
           )}
         </div>
