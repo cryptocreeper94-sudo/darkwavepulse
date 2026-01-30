@@ -36,7 +36,7 @@ Include specific numbers, percentages, and actionable recommendations.`;
   try {
     const model = provider === 'claude' 
       ? anthropic("claude-sonnet-4-5")
-      : openai("gpt-4o");
+      : openai.responses("gpt-4o");
 
     const result = streamText({
       model: model as any,
@@ -51,7 +51,7 @@ Include specific numbers, percentages, and actionable recommendations.`;
     if (provider === 'claude') {
       try {
         const fallbackResult = streamText({
-          model: openai("gpt-4o") as any,
+          model: openai.responses("gpt-4o") as any,
           system: systemPrompt,
           prompt: userPrompt,
         });
@@ -86,7 +86,7 @@ Keep response under 200 words.`;
   const openaiPromise = (async () => {
     try {
       const result = streamText({
-        model: openai("gpt-4o") as any,
+        model: openai.responses("gpt-4o") as any,
         system: systemPrompt,
         prompt: `Analyze ${ticker}`,
       });
@@ -171,7 +171,7 @@ Provide real-time commentary on this data. Be concise and actionable.`;
 
   try {
     const result = streamText({
-      model: openai("gpt-4o-mini") as any,
+      model: openai.responses("gpt-4o-mini") as any,
       system: "You are a real-time market commentator. Provide brief, punchy analysis updates.",
       prompt,
     });

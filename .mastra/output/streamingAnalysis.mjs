@@ -13402,7 +13402,7 @@ Use markdown formatting with bold headers and bullet points.
 Include specific numbers, percentages, and actionable recommendations.`;
   const userPrompt = `Analyze ${ticker} with ${analysisType} analysis. Stream your insights in real-time.`;
   try {
-    const model = provider === "claude" ? anthropic("claude-sonnet-4-5") : openai("gpt-4o");
+    const model = provider === "claude" ? anthropic("claude-sonnet-4-5") : openai.responses("gpt-4o");
     const result = streamText({
       model,
       system: systemPrompt,
@@ -13415,7 +13415,7 @@ Include specific numbers, percentages, and actionable recommendations.`;
     if (provider === "claude") {
       try {
         const fallbackResult = streamText({
-          model: openai("gpt-4o"),
+          model: openai.responses("gpt-4o"),
           system: systemPrompt,
           prompt: userPrompt
         });
@@ -13443,7 +13443,7 @@ Keep response under 200 words.`;
   const openaiPromise = (async () => {
     try {
       const result = streamText({
-        model: openai("gpt-4o"),
+        model: openai.responses("gpt-4o"),
         system: systemPrompt,
         prompt: `Analyze ${ticker}`
       });
