@@ -337,6 +337,7 @@ Be helpful, accurate, and always provide the complete technical picture.
 
   memory: new Memory({
     storage: new PostgresStore({
+      id: "darkwave-agent-memory",
       connectionString: process.env.DATABASE_URL || "postgresql://localhost:5432/mastra",
     }),
   }),

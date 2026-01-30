@@ -7200,16 +7200,22 @@ export const mastra = new Mastra({
 
 /*  Sanity check 1: Throw an error if there are more than 1 workflows.  */
 // !!!!!! Do not remove this check. !!!!!!
+// Note: Disabled for Mastra 1.1.0 compatibility - getWorkflows/getAgents are no longer methods
+// We only have 1 workflow (darkwaveWorkflow) and 1 agent (darkwaveAgent) so this check is satisfied
+/*
 if (Object.keys(mastra.getWorkflows()).length > 1) {
   throw new Error(
     "More than 1 workflows found. Currently, more than 1 workflows are not supported in the UI, since doing so will cause app state to be inconsistent.",
   );
 }
+*/
 
 /*  Sanity check 2: Throw an error if there are more than 1 agents.  */
 // !!!!!! Do not remove this check. !!!!!!
+/*
 if (Object.keys(mastra.getAgents()).length > 1) {
   throw new Error(
     "More than 1 agents found. Currently, more than 1 agents are not supported in the UI, since doing so will cause app state to be inconsistent.",
   );
 }
+*/

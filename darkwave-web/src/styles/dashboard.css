@@ -226,7 +226,7 @@
     max-width: 100%;
     padding: 10px;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     box-sizing: border-box;
   }
   
