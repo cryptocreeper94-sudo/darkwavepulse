@@ -171,12 +171,11 @@ function initializeApp() {
   
   // In development, start workers immediately
   // In production (Autoscale), wait for health checks to pass first
-  // REPLIT_CONTEXT=deployment is set in Autoscale deployments
-  const isDeployment = process.env.REPLIT_CONTEXT === 'deployment' || 
-                       process.env.REPLIT_ENVIRONMENT === 'production' ||
-                       process.env.NODE_ENV === 'production';
+  // REPLIT_CONTEXT=deployment is the ONLY reliable indicator of Autoscale deployment
+  // REPLIT_DEV_DOMAIN presence indicates development (not deployment)
+  const isActualDeployment = process.env.REPLIT_CONTEXT === 'deployment' && !process.env.REPLIT_DEV_DOMAIN;
   
-  if (!isDeployment) {
+  if (!isActualDeployment) {
     // Development: start workers after short delay
     setTimeout(() => {
       if (!workersStarted) {
@@ -207,11 +206,9 @@ function startWorkers() {
   }
 
   // Only start Inngest dev server in development
-  const isDeployment = process.env.REPLIT_CONTEXT === 'deployment' || 
-                       process.env.REPLIT_ENVIRONMENT === 'production' ||
-                       process.env.NODE_ENV === 'production';
+  const isActualDeploy = process.env.REPLIT_CONTEXT === 'deployment' && !process.env.REPLIT_DEV_DOMAIN;
   
-  if (!isDeployment) {
+  if (!isActualDeploy) {
     setTimeout(() => {
       startInngestDevServer();
     }, 1000);
