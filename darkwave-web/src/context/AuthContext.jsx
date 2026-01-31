@@ -1,25 +1,24 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { 
-  initFirebase, 
-  onAuthChange, 
-  signInWithGoogle,
-  signInWithGithub,
-  signOut, 
-  getIdToken,
-  setAnalyticsUserId,
-  handleRedirectResult
-} from '../lib/firebase'
 
 const AuthContext = createContext(null)
 
-const isDevPreview = () => {
-  const hostname = window.location.hostname
-  return hostname.includes('.replit.dev') || 
-         hostname.includes('.kirk.replit.dev') ||
-         hostname.includes('localhost') ||
-         hostname === '127.0.0.1'
+// Guest user - allows everyone to access the site freely
+// Premium features (StrikeAgent, etc.) require subscription via Stripe
+const GUEST_USER = {
+  uid: 'guest-user',
+  email: 'guest@darkwavepulse.com',
+  displayName: 'Guest',
+  photoURL: null
 }
 
+const GUEST_CONFIG = {
+  accessLevel: 'guest',
+  plan: 'free',
+  subscriptionTier: 'free',
+  hallmarkId: null
+}
+
+// Dev preview gets admin access for testing
 const DEV_USER = {
   uid: 'dev-preview-user',
   email: 'dev@darkwavepulse.com',
@@ -30,7 +29,16 @@ const DEV_USER = {
 const DEV_CONFIG = {
   accessLevel: 'admin',
   plan: 'pro',
+  subscriptionTier: 'complete_bundle',
   hallmarkId: 'DEV-PREVIEW'
+}
+
+const isDevPreview = () => {
+  const hostname = window.location.hostname
+  return hostname.includes('.replit.dev') || 
+         hostname.includes('.kirk.replit.dev') ||
+         hostname.includes('localhost') ||
+         hostname === '127.0.0.1'
 }
 
 export function AuthProvider({ children }) {
@@ -40,161 +48,43 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    // BYPASS ALL AUTHENTICATION - Allow everyone in as guest
+    // Premium features require Stripe subscription, not Firebase login
+    
     if (isDevPreview()) {
-      console.log('[Auth] Dev preview detected - bypassing authentication')
+      console.log('[Auth] Dev preview - admin access')
       setUser(DEV_USER)
       setUserConfig(DEV_CONFIG)
-      setLoading(false)
-      return
+    } else {
+      console.log('[Auth] Public access - guest mode (no login required)')
+      setUser(GUEST_USER)
+      setUserConfig(GUEST_CONFIG)
     }
-
-    initFirebase()
-    console.log('[Auth] Initializing...')
     
-    // Handle redirect result from OAuth (for mobile)
-    handleRedirectResult()
-      .then((user) => {
-        if (user) {
-          console.log('[Auth] Got user from redirect:', user.email)
-        }
-      })
-      .catch((err) => {
-        console.error('[Auth] Redirect error:', err)
-      })
-
-    // Safety timeout - if loading takes more than 10 seconds, reset state
-    const loadingTimeout = setTimeout(() => {
-      console.warn('[Auth] Loading timeout - resetting state')
-      setLoading(false)
-    }, 10000)
-
-    const unsubscribe = onAuthChange(async (firebaseUser) => {
-      if (firebaseUser) {
-        console.log('[Auth] User signed in:', firebaseUser.email)
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL
-        })
-        
-        setAnalyticsUserId(firebaseUser.uid)
-        
-        try {
-          const token = await getIdToken()
-          if (token) {
-            localStorage.setItem('firebaseToken', token)
-            await syncUserWithBackend(firebaseUser, token)
-          }
-        } catch (err) {
-          console.error('[Auth] Token sync error:', err)
-        }
-      } else {
-        console.log('[Auth] User signed out')
-        setUser(null)
-        setUserConfig(null)
-        localStorage.removeItem('firebaseToken')
-      }
-      setLoading(false)
-    })
-
-    return () => {
-      unsubscribe()
-      clearTimeout(loadingTimeout)
-    }
+    setLoading(false)
   }, [])
 
-  async function syncUserWithBackend(firebaseUser, token) {
-    try {
-      const response = await fetch('/api/auth/firebase-sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL
-        })
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setUserConfig(data.userConfig || {})
-        console.log('[Auth] Backend sync successful')
-      } else {
-        console.error('[Auth] Backend sync failed:', response.status)
-      }
-    } catch (err) {
-      console.error('[Auth] Backend sync error:', err)
-    }
+  // Upgrade user config when they subscribe via Stripe
+  function upgradeUserConfig(newConfig) {
+    setUserConfig(prev => ({ ...prev, ...newConfig }))
   }
 
-  async function loginWithGoogle() {
-    setError(null)
-    setLoading(true)
-    console.log('[Auth] Starting Google login...')
-    try {
-      const result = await signInWithGoogle()
-      console.log('[Auth] signInWithGoogle returned:', result ? 'user object' : 'null (redirect)')
-      
-      if (!result) {
-        // Redirect flow - page will reload, keep loading true
-        console.log('[Auth] Google redirect initiated, page will reload...')
-      } else {
-        // Popup succeeded - onAuthChange will fire and handle the user
-        console.log('[Auth] Google popup sign-in completed for:', result.email)
-        // Note: Don't setLoading(false) here - onAuthChange will do it after syncing
-      }
-    } catch (err) {
-      console.error('[Auth] Google sign-in error:', err.code, err.message, err)
-      setError(err.message || 'Sign-in failed. Please try again.')
-      setLoading(false)
-    }
-  }
-
-  async function loginWithGithub() {
-    setError(null)
-    setLoading(true)
-    try {
-      await signInWithGithub()
-    } catch (err) {
-      setError(err.message)
-      setLoading(false)
-    }
-  }
-
+  // No login required - subscription handled via Stripe checkout
   async function logout() {
-    try {
-      await signOut()
-      setUser(null)
-      setUserConfig(null)
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-  async function refreshToken() {
-    const token = await getIdToken()
-    if (token) {
-      localStorage.setItem('firebaseToken', token)
-    }
-    return token
+    // Reset to guest mode
+    setUser(GUEST_USER)
+    setUserConfig(GUEST_CONFIG)
   }
 
   const value = {
     user,
     userConfig,
     setUserConfig,
+    upgradeUserConfig,
     loading,
     error,
-    loginWithGoogle,
-    loginWithGithub,
     logout,
-    refreshToken,
-    isAuthenticated: !!user
+    isAuthenticated: !!user  // Always true since we set guest user
   }
 
   return (
