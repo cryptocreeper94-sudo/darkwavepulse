@@ -28,7 +28,6 @@ import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { SkinsProvider } from './context/SkinsContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import LoginScreen from './components/auth/LoginScreen'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
 
@@ -287,9 +286,8 @@ function AppContent() {
     )
   }
 
-  if (!isAuthenticated && !isDemoMode) {
-    return <LoginScreen />
-  }
+  // No login required - all users can access the site
+  // Premium features check subscription tier instead
   
   return (
     <SkinsProvider>
