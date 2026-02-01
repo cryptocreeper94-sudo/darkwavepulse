@@ -40,6 +40,11 @@ The platform utilizes a dark theme exclusively, featuring solid black/dark gray 
 - **On-Chain Analytics**: Real-time gas tracker for all chains, DEX volume analysis, holder distribution lookup, token flow tracking (inflow/outflow by category).
 - **Referral Program**: 10% lifetime commission on referral subscriptions, unique referral codes, earnings tracking, $10 minimum payout in crypto.
 - **Social Trading Hub**: Trader leaderboards (daily/weekly/monthly/all-time), trading signal sharing with outcome tracking, follow/copy trading system, verified trader badges.
+- **Copy Trading System**: Auto-mirror trades from top performers with allocation controls, max trade size limits, and performance tracking per followed trader.
+- **Tax Reports**: Comprehensive tax reporting with FIFO/LIFO cost-basis calculation, long-term vs short-term gains classification (based on 365+ day holding period), CSV export, and TurboTax (.txf) format export.
+- **Arbitrage Scanner**: CEX arbitrage (Binance/KuCoin price comparison), DEX arbitrage opportunities (Uniswap/Sushiswap/PancakeSwap/Raydium/Orca), and triangular arbitrage detection.
+- **NFT Portfolio**: Multi-chain NFT tracking (Ethereum/Solana/Polygon) with Helius and Alchemy API integrations, floor price alerts, trending collections display, and collection analytics.
+- **Multi-language Support**: i18n infrastructure supporting 7 languages (English, Spanish, Chinese, Japanese, Korean, Russian, Portuguese) with user preference persistence.
 
 ## External Dependencies
 
