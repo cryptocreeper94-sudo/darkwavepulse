@@ -79,6 +79,8 @@ export function QuickTradePanel({ tokenAddress, tokenSymbol, tokenName, recommen
   const [quoteLoading, setQuoteLoading] = useState(false)
   const [error, setError] = useState(null)
   const [txResult, setTxResult] = useState(null)
+  const [countdown, setCountdown] = useState(0)
+  const [isCountingDown, setIsCountingDown] = useState(false)
 
   const solanaWallet = useSolanaWallet()
   const ethereumWallet = useEthereumWallet()
@@ -128,7 +130,34 @@ export function QuickTradePanel({ tokenAddress, tokenSymbol, tokenName, recommen
     }
   }, [wallet, amount, customAmount, selectedChain, tokenAddress, isSolana, currentChainInfo, solanaWallet.wallet, ethereumWallet.wallet])
 
-  const executeSwap = useCallback(async () => {
+  const startCountdown = useCallback(() => {
+    if (!quote || !wallet || isCountingDown) return
+    setIsCountingDown(true)
+    setCountdown(3)
+  }, [quote, wallet, isCountingDown])
+
+  const cancelCountdown = useCallback(() => {
+    setIsCountingDown(false)
+    setCountdown(0)
+  }, [])
+
+  useEffect(() => {
+    if (!isCountingDown || countdown <= 0) return
+    
+    const timer = setTimeout(() => {
+      if (countdown === 1) {
+        setIsCountingDown(false)
+        setCountdown(0)
+        executeSwapNow()
+      } else {
+        setCountdown(countdown - 1)
+      }
+    }, 1000)
+    
+    return () => clearTimeout(timer)
+  }, [countdown, isCountingDown])
+
+  const executeSwapNow = useCallback(async () => {
     if (!quote || !wallet) return
     setIsSwapping(true)
     setError(null)
@@ -291,13 +320,26 @@ export function QuickTradePanel({ tokenAddress, tokenSymbol, tokenName, recommen
               </div>
               <p className="qtp-min">Min: {parseFloat(quote.outputAmountMin).toLocaleString()} (with slippage)</p>
               
-              <button 
-                className={`qtp-execute-btn ${recommendation}`}
-                onClick={executeSwap}
-                disabled={isSwapping}
-              >
-                {isSwapping ? '⏳ Swapping...' : '⚡ Execute Swap'}
-              </button>
+              {isCountingDown ? (
+                <div className="qtp-countdown-container">
+                  <div className="qtp-countdown-number">{countdown}</div>
+                  <p className="qtp-countdown-text">Executing in {countdown}...</p>
+                  <button 
+                    className="qtp-cancel-btn"
+                    onClick={cancelCountdown}
+                  >
+                    ✕ Cancel
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className={`qtp-execute-btn ${recommendation}`}
+                  onClick={startCountdown}
+                  disabled={isSwapping}
+                >
+                  {isSwapping ? '⏳ Swapping...' : '⚡ Execute Swap (3s confirm)'}
+                </button>
+              )}
             </div>
           )}
 
