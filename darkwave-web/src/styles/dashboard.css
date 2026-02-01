@@ -16,10 +16,10 @@
 
 /* Individual Carousel Section */
 .carousel-section {
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(26, 58, 92, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
   border-radius: 16px;
   padding: 12px;
   display: flex;
@@ -30,6 +30,13 @@
   overflow: visible;
   width: 100%;
   min-width: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.carousel-section:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
 }
 
 /* Ensure both metric and quick action carousels are equal */
@@ -62,10 +69,10 @@
 }
 
 .market-overview-card {
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(26, 58, 92, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -80,7 +87,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Subtle corner glow */
@@ -179,17 +186,23 @@
   min-width: 0;
 }
 .chart-metrics {
-  background: #0f0f0f;
-  border: 1px solid #222;
+  background: rgba(26, 58, 92, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
   border-radius: 12px;
   padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .chart-container {
-  background: #0f0f0f;
-  border: 1px solid #222;
+  background: rgba(26, 58, 92, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
   border-radius: 12px;
   padding: 8px;
   min-height: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile/Tablet breakpoint - 1024px (MUST come before 600px for proper cascade) */
@@ -333,8 +346,10 @@
     overflow-x: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
+    background: rgba(26, 58, 92, 0.4) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(0, 212, 255, 0.15) !important;
     border-radius: 8px !important;
     padding: 8px !important;
     box-sizing: border-box !important;
@@ -492,18 +507,24 @@
 }
 
 .mobile-category-card {
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 58, 92, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
   border-radius: 16px;
   padding: 16px;
   min-height: 220px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.mobile-category-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
 }
 .mobile-category-card::before {
   content: '';
