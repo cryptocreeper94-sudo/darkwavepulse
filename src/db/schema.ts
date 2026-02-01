@@ -2063,31 +2063,9 @@ export const notificationLogs = pgTable('notification_logs', {
 });
 
 // ============================================
-// SOCIAL & COMMUNITY SYSTEM
-// Profiles, follows, leaderboards, signal sharing
+// SOCIAL & COMMUNITY SYSTEM (Extended)
+// Follows, signal sharing, leaderboards
 // ============================================
-
-export const traderProfiles = pgTable('trader_profiles', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  userId: varchar('user_id', { length: 255 }).notNull().unique(),
-  displayName: varchar('display_name', { length: 100 }),
-  username: varchar('username', { length: 50 }).unique(),
-  bio: text('bio'),
-  avatarUrl: text('avatar_url'),
-  isPublic: boolean('is_public').default(false),
-  showPnl: boolean('show_pnl').default(true),
-  showTrades: boolean('show_trades').default(true),
-  totalPnlUsd: decimal('total_pnl_usd', { precision: 18, scale: 2 }).default('0'),
-  winRate: decimal('win_rate', { precision: 5, scale: 2 }).default('0'),
-  tradesCount: integer('trades_count').default(0),
-  followersCount: integer('followers_count').default(0),
-  followingCount: integer('following_count').default(0),
-  rank: integer('rank'),
-  badges: text('badges'),
-  verifiedTrader: boolean('verified_trader').default(false),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
 
 export const traderFollows = pgTable('trader_follows', {
   id: varchar('id', { length: 255 }).primaryKey(),
