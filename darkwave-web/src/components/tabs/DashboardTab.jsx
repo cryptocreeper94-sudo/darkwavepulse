@@ -452,7 +452,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
     const fetchCategoryCoins = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/category/${category}?timeframe=${timeframe}`)
+        const response = await fetch(`/api/crypto/category/${category}?timeframe=${timeframe}`)
         if (response.ok) {
           const data = await response.json()
           if (data.coins && Array.isArray(data.coins)) {

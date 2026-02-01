@@ -64,40 +64,41 @@ body {
 }
 
 .hamburger-btn {
-  width: 40px;
-  height: 40px;
-  background: var(--bg-surface-2);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: all 0.2s ease;
+  gap: 4px;
+  transition: all 0.15s ease;
   margin-left: -4px;
 }
 
 .hamburger-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--neon-blue);
+  background: linear-gradient(135deg, #1f1f1f 0%, #181818 100%);
+  border-color: rgba(0, 212, 255, 0.3);
 }
 
 .hamburger-btn.active {
-  background: var(--neon-blue);
+  background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+  border-color: rgba(0, 212, 255, 0.5);
 }
 
 .hamburger-btn.active .hamburger-line {
-  background: #000;
+  background: #00D4FF;
 }
 
 .hamburger-line {
-  width: 20px;
+  width: 18px;
   height: 2px;
-  background: var(--text-primary);
+  background: #888;
   border-radius: 1px;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease;
 }
 
 .hamburger-btn.active .hamburger-line:nth-child(1) {
@@ -513,36 +514,36 @@ body {
 /* ============================================ */
 
 .category-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 0;
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: linear-gradient(135deg, #151515 0%, #0f0f0f 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .category-pill {
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #666;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
 .category-pill:hover {
-  background: rgba(0, 212, 255, 0.15);
-  border-color: rgba(0, 212, 255, 0.4);
-  color: var(--neon-blue);
+  background: rgba(255, 255, 255, 0.04);
+  color: #999;
 }
 
 .category-pill.active {
-  background: rgba(0, 212, 255, 0.2);
-  border-color: var(--neon-blue);
-  color: var(--neon-blue);
-  box-shadow: 0 0 10px var(--neon-blue-glow);
+  background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+  color: #00D4FF;
+  font-weight: 600;
 }
 
 /* ============================================ */
@@ -825,43 +826,108 @@ body {
 }
 
 /* ============================================ */
-/* BUTTONS                                     */
+/* BUTTONS - Tight Professional Style          */
 /* ============================================ */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   border: none;
 }
 
 .btn-primary {
-  background: rgba(0, 212, 255, 0.6);
-  border: 1px solid rgba(0, 212, 255, 0.8);
-  color: #fff;
+  background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+  border: 1px solid rgba(0, 150, 200, 0.3);
+  color: #00D4FF;
 }
 
 .btn-primary:hover {
-  background: rgba(0, 212, 255, 0.8);
-  box-shadow: 0 0 20px var(--neon-blue-glow);
+  background: linear-gradient(135deg, #1f4a6e 0%, #122d47 100%);
+  border-color: rgba(0, 212, 255, 0.5);
 }
 
 .btn-secondary {
-  background: var(--bg-surface-2);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #999;
 }
 
 .btn-secondary:hover {
-  background: var(--bg-hover);
-  border-color: var(--neon-blue);
+  background: linear-gradient(135deg, #252525 0%, #1a1a1a 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ccc;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.btn-xs {
+  padding: 3px 8px;
+  font-size: 10px;
+  border-radius: 3px;
+}
+
+/* ============================================ */
+/* BADGES - Tight Professional Style           */
+/* ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+  border: 1px solid rgba(0, 150, 200, 0.3);
+  color: #00D4FF;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #1a3c1a 0%, #0d210d 100%);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: #39FF14;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #3c3a1a 0%, #21200d 100%);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #FFD700;
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, #3c1a1a 0%, #210d0d 100%);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #FF4444;
+}
+
+.badge-neutral {
+  background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.badge-sm {
+  padding: 2px 6px;
+  font-size: 9px;
 }
 
 /* ============================================ */
@@ -1021,7 +1087,7 @@ body {
   }
   
   .category-pill {
-    padding: 6px 12px;
+    padding: 5px 10px;
     font-size: 11px;
   }
   
@@ -1039,8 +1105,8 @@ body {
   }
   
   .btn {
-    padding: 10px 18px;
-    font-size: 13px;
+    padding: 8px 14px;
+    font-size: 12px;
   }
   
   .hamburger-menu {
@@ -1120,9 +1186,9 @@ body {
   
   /* Category pills readable */
   .category-pill {
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
   }
   
   /* Coin info */
@@ -1134,11 +1200,11 @@ body {
     font-size: 12px !important;
   }
   
-  /* Buttons - bigger touch targets */
+  /* Buttons - reasonable touch targets */
   .btn {
-    padding: 14px 24px;
-    font-size: 15px;
-    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 38px;
   }
   
   /* Cards more spacious */

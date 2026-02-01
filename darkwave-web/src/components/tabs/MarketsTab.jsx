@@ -382,7 +382,7 @@ export default function MarketsTab() {
     const fetchCoins = async () => {
       setCoinsLoading(true)
       try {
-        const response = await fetch(`/api/category/${activeCategory}?timeframe=${timeframe}`)
+        const response = await fetch(`/api/crypto/category/${activeCategory}?timeframe=${timeframe}`)
         if (response.ok) {
           const data = await response.json()
           if (data.coins && Array.isArray(data.coins)) {
