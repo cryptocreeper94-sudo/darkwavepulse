@@ -138,6 +138,47 @@ const DEFAULT_CONFIG = {
   },
 }
 
+// Generate simulated live OHLC data based on entry and current price
+function generateLivePriceData(entryPrice, currentPrice) {
+  const data = []
+  const now = Math.floor(Date.now() / 1000)
+  const numCandles = 30
+  const candleInterval = 5 // 5 second candles for live view
+  
+  // Calculate the price range to simulate movement from entry to current
+  const priceDiff = currentPrice - entryPrice
+  const volatility = Math.abs(priceDiff) * 0.1 || entryPrice * 0.02
+  
+  let price = entryPrice
+  
+  for (let i = numCandles - 1; i >= 0; i--) {
+    const time = now - i * candleInterval
+    
+    // Gradually move from entry toward current price with some noise
+    const progress = 1 - (i / numCandles)
+    const targetPrice = entryPrice + (priceDiff * progress)
+    
+    // Add random walk
+    const noise = (Math.random() - 0.5) * volatility * 0.5
+    price = targetPrice + noise
+    
+    const open = price
+    const close = price + (Math.random() - 0.5) * volatility * 0.3
+    const high = Math.max(open, close) * (1 + Math.random() * 0.01)
+    const low = Math.min(open, close) * (1 - Math.random() * 0.01)
+    
+    data.push({
+      time,
+      open: Math.max(0.0000001, open),
+      high: Math.max(0.0000001, high),
+      low: Math.max(0.0000001, low),
+      close: Math.max(0.0000001, close)
+    })
+  }
+  
+  return data
+}
+
 function LiveCandleChart({ tokenSymbol, priceData, entryPrice, takeProfitPrice, stopLossPrice }) {
   const chartContainerRef = useRef(null)
   const chartRef = useRef(null)
@@ -775,19 +816,16 @@ function ActiveTradesPanel({ positions, expanded, onToggle, onStopAll, livePrice
               
               {positions.length > 0 && (
                 <div className="active-trades-chart">
-                  <div className="mini-chart-placeholder">
-                    <span className="chart-icon">📈</span>
-                    <span className="chart-label">{positions[0]?.tokenSymbol || 'Token'} Mini Chart</span>
-                    <div className="mini-candles">
-                      {[...Array(20)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`mini-candle ${Math.random() > 0.5 ? 'green' : 'red'}`}
-                          style={{ height: `${20 + Math.random() * 60}%` }}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <LiveCandleChart
+                    tokenSymbol={positions[0]?.tokenSymbol || positions[0]?.symbol || 'TOKEN'}
+                    priceData={generateLivePriceData(
+                      positions[0]?.entryPriceUsd || positions[0]?.entryPrice || 0.0001,
+                      livePrices?.[positions[0]?.tokenAddress] || positions[0]?.currentPriceUsd || positions[0]?.entryPriceUsd || 0.0001
+                    )}
+                    entryPrice={positions[0]?.entryPriceUsd || positions[0]?.entryPrice}
+                    takeProfitPrice={(positions[0]?.entryPriceUsd || positions[0]?.entryPrice || 0.0001) * (1 + (modeSettings?.['full-auto']?.takeProfit || 50) / 100)}
+                    stopLossPrice={(positions[0]?.entryPriceUsd || positions[0]?.entryPrice || 0.0001) * (1 - (modeSettings?.['full-auto']?.stopLoss || 20) / 100)}
+                  />
                 </div>
               )}
             </>
