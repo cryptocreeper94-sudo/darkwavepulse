@@ -6,6 +6,7 @@ import { useBuiltInWallet } from '../../context/BuiltInWalletContext'
 import ManualWatchlist from '../trading/ManualWatchlist'
 import SafetyReport from '../trading/SafetyReport'
 import PresetSelector from '../trading/PresetSelector'
+import QuickTradePanel from '../trading/QuickTradePanel'
 import { TRADING_PRESETS, getPresetConfig } from '../../config/tradingPresets'
 import DemoTradeHistory from './DemoTradeHistory'
 import DemoLeadCapture from './DemoLeadCapture'
@@ -360,7 +361,7 @@ function getChainInfo(chain) {
   return CHAIN_CONFIG[normalizedChain] || CHAIN_CONFIG.solana
 }
 
-function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, disabled, isDemoMode, onTermClick, isLocked = false }) {
+function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, onTrade, disabled, isDemoMode, onTermClick, isLocked = false }) {
   const gradeColor = getSafetyGradeColor(token.safetyGrade)
   const dexColor = token.dex === 'pumpfun' ? '#FF69B4' : token.dex === 'raydium' ? '#9D4EDD' : '#00D4FF'
   const chainInfo = getChainInfo(token.chain)
@@ -433,6 +434,14 @@ function DiscoveredTokenCard({ token, onSnipe, onWatch, onSafetyCheck, disabled,
           style={isLocked ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
         >
           {isLocked ? '🔒 Subscribe' : (disabled && !isDemoMode ? 'Connect Wallet' : '🎯 BUY')}
+        </button>
+        <button 
+          className="sniper-btn-trade"
+          onClick={() => onTrade && onTrade(token)}
+          title="Trade on DEX"
+          style={{ background: 'linear-gradient(135deg, #00D4FF, #9945FF)' }}
+        >
+          ⚡
         </button>
         <button 
           className="sniper-btn-watch" 
@@ -1942,6 +1951,7 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
   })
   const [activeTradesPanelExpanded, setActiveTradesPanelExpanded] = useState(true)
   const [toasts, setToasts] = useState([])
+  const [tradeModalToken, setTradeModalToken] = useState(null)
   
   const showToast = useCallback((type, title, message) => {
     const notifSettings = modeSettings?.['full-auto']?.notifications
@@ -2972,6 +2982,7 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
                         onSnipe={hasControlAccess ? handleSnipe : () => {}}
                         onWatch={hasControlAccess ? handleWatch : () => {}}
                         onSafetyCheck={(t) => setSafetyCheckToken(t.address)}
+                        onTrade={(t) => setTradeModalToken(t)}
                         disabled={!hasControlAccess || !wallet.connected}
                         isDemoMode={isDemoMode}
                         onTermClick={setSelectedGlossaryTerm}
@@ -3091,6 +3102,29 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
             position: relative;
           }
         `}</style>
+      )}
+
+      {tradeModalToken && (
+        <div className="trade-modal-overlay" onClick={() => setTradeModalToken(null)}>
+          <div className="trade-modal-content" onClick={(e) => e.stopPropagation()}>
+            <QuickTradePanel
+              tokenAddress={tradeModalToken.address || tradeModalToken.tokenAddress}
+              tokenSymbol={tradeModalToken.symbol}
+              tokenName={tradeModalToken.name}
+              recommendation={
+                (tradeModalToken.safetyScore || 0) >= 70 ? 'snipe' :
+                (tradeModalToken.safetyScore || 0) >= 40 ? 'watch' : 'avoid'
+              }
+              onClose={() => setTradeModalToken(null)}
+              onTradeComplete={(result) => {
+                if (result.success) {
+                  showToast('success', 'Trade Executed!', `Successfully swapped for ${tradeModalToken.symbol}`)
+                }
+                setTradeModalToken(null)
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   )
