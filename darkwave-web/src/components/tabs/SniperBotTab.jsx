@@ -9,6 +9,7 @@ import PresetSelector from '../trading/PresetSelector'
 import QuickTradePanel from '../trading/QuickTradePanel'
 import { TRADING_PRESETS, getPresetConfig } from '../../config/tradingPresets'
 import DemoTradeHistory from './DemoTradeHistory'
+import TradeHistory from '../trading/TradeHistory'
 import DemoLeadCapture from './DemoLeadCapture'
 import DemoUpgradeCTA from './DemoUpgradeCTA'
 import StrikeAgentPricing from './StrikeAgentPricing'
@@ -1990,6 +1991,7 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
   const [activeTradesPanelExpanded, setActiveTradesPanelExpanded] = useState(true)
   const [toasts, setToasts] = useState([])
   const [tradeModalToken, setTradeModalToken] = useState(null)
+  const [watchlistItems, setWatchlistItems] = useState([])
   
   const showToast = useCallback((type, title, message) => {
     const notifSettings = modeSettings?.['full-auto']?.notifications
@@ -2854,7 +2856,7 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
         {isDemoMode && (
           <BentoItem span={3} className="sniper-demo-tabs-section">
             <div className="section-box demo-section-tabs">
-              <div className="demo-tabs-header">
+              <div className="demo-tabs-header demo-tabs-6">
                 <button 
                   className={`demo-tab-btn ${activeSubTab === 'discovery' ? 'active' : ''}`}
                   onClick={() => setActiveSubTab('discovery')}
@@ -2865,13 +2867,31 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
                   className={`demo-tab-btn ${activeSubTab === 'positions' ? 'active' : ''}`}
                   onClick={() => setActiveSubTab('positions')}
                 >
-                  📊 Positions ({demoPositions.length})
+                  📊 Positions
                 </button>
                 <button 
                   className={`demo-tab-btn ${activeSubTab === 'history' ? 'active' : ''}`}
                   onClick={() => setActiveSubTab('history')}
                 >
                   📜 History
+                </button>
+                <button 
+                  className={`demo-tab-btn ${activeSubTab === 'presets' ? 'active' : ''}`}
+                  onClick={() => setActiveSubTab('presets')}
+                >
+                  ⚙️ Presets
+                </button>
+                <button 
+                  className={`demo-tab-btn ${activeSubTab === 'limits' ? 'active' : ''}`}
+                  onClick={() => setActiveSubTab('limits')}
+                >
+                  📈 Limits
+                </button>
+                <button 
+                  className={`demo-tab-btn ${activeSubTab === 'settings' ? 'active' : ''}`}
+                  onClick={() => setActiveSubTab('settings')}
+                >
+                  🔧 Settings
                 </button>
               </div>
             </div>
@@ -2934,7 +2954,134 @@ export default function SniperBotTab({ canTrade = true, onNavigate, isViewOnly: 
         {isDemoMode && activeSubTab === 'history' && (
           <BentoItem span={3} className="sniper-history-section">
             <div className="section-box">
-              <DemoTradeHistory sessionId={demoSessionId} refreshKey={historyRefreshKey} />
+              <TradeHistory sessionId={demoSessionId} refreshKey={historyRefreshKey} />
+            </div>
+          </BentoItem>
+        )}
+
+        {isDemoMode && activeSubTab === 'presets' && (
+          <BentoItem span={3} className="sniper-presets-section">
+            <div className="section-box">
+              <PresetSelector 
+                selectedPreset={selectedPreset}
+                onSelectPreset={setSelectedPreset}
+              />
+            </div>
+          </BentoItem>
+        )}
+
+        {isDemoMode && activeSubTab === 'limits' && (
+          <BentoItem span={3} className="sniper-limits-section">
+            <div className="section-box">
+              <div className="sniper-section-header">
+                <h3 className="sniper-section-title">Limit Orders & DCA</h3>
+              </div>
+              <ManualWatchlist 
+                watchlistItems={watchlistItems}
+                onAddItem={(item) => setWatchlistItems([...watchlistItems, item])}
+                onRemoveItem={(id) => setWatchlistItems(watchlistItems.filter(i => i.id !== id))}
+                onUpdateItem={(id, updates) => setWatchlistItems(watchlistItems.map(i => i.id === id ? {...i, ...updates} : i))}
+              />
+            </div>
+          </BentoItem>
+        )}
+
+        {isDemoMode && activeSubTab === 'settings' && (
+          <BentoItem span={3} className="sniper-settings-section">
+            <div className="section-box">
+              <div className="sniper-section-header">
+                <h3 className="sniper-section-title">Advanced Settings</h3>
+              </div>
+              <div className="settings-content">
+                <div className="settings-group">
+                  <div className="settings-group-title">Execution Settings</div>
+                  <div className="settings-row">
+                    <span className="settings-label">MEV Protection</span>
+                    <button 
+                      className={`settings-toggle ${config.executionSettings?.mevProtection ? 'active' : ''}`}
+                      onClick={() => setConfig({...config, executionSettings: {...config.executionSettings, mevProtection: !config.executionSettings?.mevProtection}})}
+                    >
+                      {config.executionSettings?.mevProtection ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-label">Priority Fee</span>
+                    <select 
+                      className="settings-select"
+                      value={config.tradeControls?.priorityFee || 'medium'}
+                      onChange={(e) => setConfig({...config, tradeControls: {...config.tradeControls, priorityFee: e.target.value}})}
+                    >
+                      <option value="low">Low (0.0001 SOL)</option>
+                      <option value="medium">Medium (0.0005 SOL)</option>
+                      <option value="high">High (0.001 SOL)</option>
+                      <option value="turbo">Turbo (0.005 SOL)</option>
+                    </select>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-label">Jito Tips</span>
+                    <input 
+                      type="number"
+                      className="settings-input"
+                      placeholder="Lamports"
+                      value={config.executionSettings?.jitoTips || 0}
+                      onChange={(e) => setConfig({...config, executionSettings: {...config.executionSettings, jitoTips: parseInt(e.target.value) || 0}})}
+                    />
+                  </div>
+                </div>
+                <div className="settings-group">
+                  <div className="settings-group-title">Safety Filters</div>
+                  <div className="settings-row">
+                    <span className="settings-label">Min Liquidity</span>
+                    <input 
+                      type="number"
+                      className="settings-input"
+                      placeholder="USD"
+                      value={config.safetyFilters?.minLiquidityUsd || 5000}
+                      onChange={(e) => setConfig({...config, safetyFilters: {...config.safetyFilters, minLiquidityUsd: parseInt(e.target.value) || 5000}})}
+                    />
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-label">Max Bot %</span>
+                    <input 
+                      type="number"
+                      className="settings-input"
+                      placeholder="%"
+                      value={config.safetyFilters?.maxBotPercent || 80}
+                      onChange={(e) => setConfig({...config, safetyFilters: {...config.safetyFilters, maxBotPercent: parseInt(e.target.value) || 80}})}
+                    />
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-label">Block Honeypots</span>
+                    <button 
+                      className={`settings-toggle ${config.safetyFilters?.blockHoneypots !== false ? 'active' : ''}`}
+                      onClick={() => setConfig({...config, safetyFilters: {...config.safetyFilters, blockHoneypots: config.safetyFilters?.blockHoneypots === false}})}
+                    >
+                      {config.safetyFilters?.blockHoneypots !== false ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+                </div>
+                <div className="settings-group">
+                  <div className="settings-group-title">Auto Mode Limits</div>
+                  <div className="settings-row">
+                    <span className="settings-label">Max Trades/Session</span>
+                    <input 
+                      type="number"
+                      className="settings-input"
+                      value={config.autoModeSettings?.maxTradesPerSession || 10}
+                      onChange={(e) => setConfig({...config, autoModeSettings: {...config.autoModeSettings, maxTradesPerSession: parseInt(e.target.value) || 10}})}
+                    />
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-label">Max SOL/Session</span>
+                    <input 
+                      type="number"
+                      className="settings-input"
+                      value={config.autoModeSettings?.maxSolPerSession || 5}
+                      onChange={(e) => setConfig({...config, autoModeSettings: {...config.autoModeSettings, maxSolPerSession: parseFloat(e.target.value) || 5}})}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </BentoItem>
         )}
