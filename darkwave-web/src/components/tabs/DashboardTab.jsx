@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useFavorites } from '../../context/FavoritesContext'
 import BitcoinChart from '../charts/BitcoinChart'
+import Sparkline from '../charts/Sparkline'
 import Gauge from '../ui/Gauge'
 import FlipCarousel from '../ui/FlipCarousel'
 import MobileCardCarousel from '../ui/MobileCardCarousel'
@@ -653,25 +654,33 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
               onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--bg-surface-2)' }}
               onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
             >
-              <div style={{ width: '10%', minWidth: 32, textAlign: 'center', fontSize: 12, color: '#00D4FF', fontWeight: 600 }}>
+              <div style={{ width: '8%', minWidth: 28, textAlign: 'center', fontSize: 11, color: '#00D4FF', fontWeight: 600 }}>
                 {i + 1}
               </div>
-              <div style={{ width: '30%', minWidth: 80, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: '22%', minWidth: 70, display: 'flex', alignItems: 'center', gap: 5 }}>
                 {coin.image && (
-                  <img src={coin.image} alt="" style={{ width: 20, height: 20, borderRadius: '50%' }} onError={(e) => e.target.style.display = 'none'} />
+                  <img src={coin.image} alt="" style={{ width: 18, height: 18, borderRadius: '50%' }} onError={(e) => e.target.style.display = 'none'} />
                 )}
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>
                   {coin.symbol?.toUpperCase()}
-                  {isFavorite(coin.symbol) && <span style={{ color: 'var(--neon-blue)', marginLeft: 3 }}>★</span>}
+                  {isFavorite(coin.symbol) && <span style={{ color: 'var(--neon-blue)', marginLeft: 2 }}>★</span>}
                 </span>
               </div>
-              <div style={{ width: '25%', minWidth: 70, textAlign: 'right', fontSize: 12, color: 'var(--text-primary)' }}>
+              <div style={{ width: '20%', minWidth: 60, textAlign: 'right', fontSize: 11, color: 'var(--text-primary)' }}>
                 {formatPrice(priceNum)}
               </div>
-              <div style={{ width: '15%', minWidth: 55, textAlign: 'right', fontSize: 11, fontWeight: 600, color: isPositive ? 'var(--neon-green)' : 'var(--accent-red)' }}>
+              <div style={{ width: '12%', minWidth: 48, textAlign: 'right', fontSize: 10, fontWeight: 600, color: isPositive ? 'var(--neon-green)' : 'var(--accent-red)' }}>
                 {isPositive ? '+' : ''}{changeNum.toFixed(1)}%
               </div>
-              <div style={{ width: '20%', minWidth: 60, textAlign: 'right', fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div style={{ width: '18%', minWidth: 70, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Sparkline 
+                  data={coin.sparkline_in_7d?.price || coin.sparkline || null}
+                  width={60}
+                  height={24}
+                  showPositive={true}
+                />
+              </div>
+              <div style={{ width: '18%', minWidth: 55, textAlign: 'right', fontSize: 10, color: 'var(--text-secondary)' }}>
                 {vol}
               </div>
             </div>

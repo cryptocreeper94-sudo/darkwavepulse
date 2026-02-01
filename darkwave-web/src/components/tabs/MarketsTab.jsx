@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Carousel, CategoryPills, GaugeCard } from '../ui'
 import BitcoinChart from '../charts/BitcoinChart'
+import Sparkline from '../charts/Sparkline'
 import CoinAnalysisModal from '../modals/CoinAnalysisModal'
 import { fetchTopPredictions } from '../../services/api'
 import { useFavorites } from '../../context/FavoritesContext'
@@ -155,6 +156,14 @@ function CoinRow({ coin, rank, onClick, isFavorite, onToggleFavorite }) {
       </td>
       <td style={{ color: isPositive ? '#00D4FF' : '#FF4444' }}>{formatPrice(coin.price)}</td>
       <td className={isPositive ? 'positive' : 'negative'}>{formatChange(coin.change)}</td>
+      <td style={{ padding: '6px 8px' }}>
+        <Sparkline 
+          data={coin.sparkline_in_7d?.price || coin.sparkline || null}
+          width={70}
+          height={28}
+          showPositive={true}
+        />
+      </td>
       <td>
         <div style={{ 
           display: 'inline-flex', 
@@ -451,6 +460,7 @@ export default function MarketsTab() {
                   <th>Coin</th>
                   <th>Price</th>
                   <th>{timeframe === '1h' ? '1h %' : '24h %'}</th>
+                  <th>7D</th>
                   <th>AI Signal</th>
                   <th>Market Cap</th>
                   <th>Volume</th>
@@ -459,7 +469,7 @@ export default function MarketsTab() {
               <tbody>
                 {coinsLoading ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                         <div className="loading-spinner" style={{ width: '20px', height: '20px' }}></div>
                         Loading coins...
@@ -468,7 +478,7 @@ export default function MarketsTab() {
                   </tr>
                 ) : coins.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
                       No coins found in this category
                     </td>
                   </tr>
