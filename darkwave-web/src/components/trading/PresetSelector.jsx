@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TRADING_PRESETS, PRESET_ORDER } from '../../config/tradingPresets'
+import { TRADING_PRESETS, PRESET_ORDER, PRIORITY_FEE_OPTIONS } from '../../config/tradingPresets'
 
 const styles = {
   container: {
@@ -24,7 +24,7 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '16px',
   },
   card: (preset, isSelected, isHovered, disabled) => ({
@@ -47,25 +47,6 @@ const styles = {
         : 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
     transform: isHovered && !disabled ? 'translateY(-2px)' : 'none',
   }),
-  lockedOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: '16px',
-    background: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backdropFilter: 'blur(2px)',
-    WebkitBackdropFilter: 'blur(2px)',
-    zIndex: 10,
-  },
-  lockedIcon: {
-    fontSize: '32px',
-    opacity: 0.8,
-  },
   cardHeader: {
     display: 'flex',
     alignItems: 'flex-start',
@@ -119,7 +100,7 @@ const styles = {
     margin: 0,
     lineHeight: '1.5',
   },
-  customizeBtn: {
+  expandBtn: {
     marginTop: '12px',
     padding: 0,
     background: 'transparent',
@@ -132,20 +113,29 @@ const styles = {
     gap: '4px',
     transition: 'color 0.2s ease',
   },
-  customizeArrow: (expanded) => ({
+  expandArrow: (expanded) => ({
     display: 'inline-block',
     transition: 'transform 0.2s ease',
     transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
   }),
-  valuesPanel: {
-    marginTop: '12px',
-    paddingTop: '12px',
-    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+  advancedPanel: {
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+  },
+  sectionTitle: {
+    fontSize: '10px',
+    fontWeight: '700',
+    color: '#888',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '8px',
   },
   valuesGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '10px',
+    gap: '8px',
+    marginBottom: '12px',
   },
   valueItem: {
     display: 'flex',
@@ -154,20 +144,46 @@ const styles = {
   },
   valueLabel: {
     fontSize: '9px',
-    color: '#666',
+    color: '#555',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   },
   valueNum: (color) => ({
-    fontSize: '14px',
+    fontSize: '13px',
     fontWeight: '700',
     color: color,
   }),
+  featureBadge: (enabled, color) => ({
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    fontSize: '9px',
+    fontWeight: '600',
+    background: enabled ? `rgba(${color}, 0.15)` : 'rgba(255, 68, 68, 0.1)',
+    color: enabled ? `rgb(${color})` : '#666',
+    border: `1px solid ${enabled ? `rgba(${color}, 0.3)` : 'rgba(255, 255, 255, 0.05)'}`,
+  }),
+  tpLevelRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '4px 8px',
+    background: 'rgba(57, 255, 20, 0.05)',
+    borderRadius: '4px',
+    marginBottom: '4px',
+  },
+  tpLevelText: {
+    fontSize: '10px',
+    color: '#39FF14',
+    fontWeight: '600',
+  },
 }
 
-function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
+function PresetCard({ preset, isSelected, onSelect, disabled }) {
   const [isHovered, setIsHovered] = useState(false)
-  const [showValues, setShowValues] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleClick = () => {
     if (!disabled) {
@@ -175,10 +191,12 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
     }
   }
 
-  const handleCustomize = (e) => {
+  const handleToggleAdvanced = (e) => {
     e.stopPropagation()
-    setShowValues(!showValues)
+    setShowAdvanced(!showAdvanced)
   }
+
+  const priorityFee = PRIORITY_FEE_OPTIONS[preset.executionConfig?.priorityFee] || PRIORITY_FEE_OPTIONS.medium
 
   return (
     <div
@@ -189,15 +207,7 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
       role="button"
       tabIndex={disabled ? -1 : 0}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
-      aria-pressed={isSelected}
-      aria-disabled={disabled}
     >
-      {disabled && (
-        <div style={styles.lockedOverlay}>
-          <span style={styles.lockedIcon}>🔒</span>
-        </div>
-      )}
-      
       <div style={styles.cardHeader}>
         <div style={styles.iconWrapper(preset.colorRgb)}>
           {preset.icon}
@@ -218,22 +228,29 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
 
       <button 
         style={{
-          ...styles.customizeBtn,
-          color: isHovered || showValues ? preset.color : '#888',
+          ...styles.expandBtn,
+          color: isHovered || showAdvanced ? preset.color : '#888',
         }}
-        onClick={handleCustomize}
+        onClick={handleToggleAdvanced}
       >
-        <span>View settings</span>
-        <span style={styles.customizeArrow(showValues)}>▼</span>
+        <span>{showAdvanced ? 'Hide' : 'View'} settings</span>
+        <span style={styles.expandArrow(showAdvanced)}>▼</span>
       </button>
 
-      {showValues && (
-        <div style={styles.valuesPanel}>
+      {showAdvanced && (
+        <div style={styles.advancedPanel}>
+          <div style={styles.sectionTitle}>Trade Config</div>
           <div style={styles.valuesGrid}>
             <div style={styles.valueItem}>
               <span style={styles.valueLabel}>Buy Amount</span>
               <span style={styles.valueNum(preset.color)}>
                 {preset.tradeConfig.buyAmountSol} SOL
+              </span>
+            </div>
+            <div style={styles.valueItem}>
+              <span style={styles.valueLabel}>Slippage</span>
+              <span style={styles.valueNum('#FFB800')}>
+                {preset.tradeConfig.slippagePercent}%
               </span>
             </div>
             <div style={styles.valueItem}>
@@ -248,6 +265,49 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
                 {preset.tradeConfig.takeProfitPercent}%
               </span>
             </div>
+          </div>
+
+          <div style={styles.sectionTitle}>Execution</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+            <span style={styles.featureBadge(true, preset.colorRgb)}>
+              ⚡ {priorityFee.label} Priority
+            </span>
+            <span style={styles.featureBadge(preset.executionConfig?.mevProtection, '57, 255, 20')}>
+              {preset.executionConfig?.mevProtection ? '🛡️ MEV Protected' : '⚠️ No MEV'}
+            </span>
+            {preset.executionConfig?.jitoTipsLamports > 0 && (
+              <span style={styles.featureBadge(true, '139, 92, 246')}>
+                💎 Jito {(preset.executionConfig.jitoTipsLamports / 1000).toFixed(0)}K
+              </span>
+            )}
+            {preset.executionConfig?.dcaEnabled && (
+              <span style={styles.featureBadge(true, '233, 30, 99')}>
+                📊 DCA {preset.executionConfig.dcaSplits}x
+              </span>
+            )}
+          </div>
+
+          <div style={styles.sectionTitle}>Trailing Stop</div>
+          <div style={{ marginBottom: '12px' }}>
+            <span style={styles.featureBadge(preset.trailingStop?.enabled, '0, 212, 255')}>
+              {preset.trailingStop?.enabled 
+                ? `✓ Enabled @ ${preset.trailingStop.trailPercent}%` 
+                : '✗ Disabled'}
+            </span>
+          </div>
+
+          <div style={styles.sectionTitle}>Take Profit Levels</div>
+          <div style={{ marginBottom: '12px' }}>
+            {preset.takeProfitLevels?.map((level, i) => (
+              <div key={i} style={styles.tpLevelRow}>
+                <span style={styles.tpLevelText}>+{level.percent}%</span>
+                <span style={styles.tpLevelText}>Sell {level.sellAmount}%</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={styles.sectionTitle}>Safety Filters</div>
+          <div style={styles.valuesGrid}>
             <div style={styles.valueItem}>
               <span style={styles.valueLabel}>Min Liquidity</span>
               <span style={styles.valueNum(preset.color)}>
@@ -267,11 +327,19 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
               </span>
             </div>
             <div style={styles.valueItem}>
-              <span style={styles.valueLabel}>Max Top10 %</span>
+              <span style={styles.valueLabel}>Max Age</span>
               <span style={styles.valueNum(preset.color)}>
-                {preset.safetyFilters.maxTop10HoldersPercent}%
+                {preset.safetyFilters.maxTokenAgeHours}h
               </span>
             </div>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            <span style={styles.featureBadge(preset.safetyFilters?.requireLiquidityLock, '57, 255, 20')}>
+              {preset.safetyFilters?.requireLiquidityLock ? '🔒 LP Lock Required' : '🔓 No LP Lock'}
+            </span>
+            <span style={styles.featureBadge(preset.safetyFilters?.blockHoneypots, '255, 68, 68')}>
+              {preset.safetyFilters?.blockHoneypots ? '🍯 Honeypot Block' : '⚠️ No HP Block'}
+            </span>
           </div>
         </div>
       )}
@@ -280,16 +348,16 @@ function PresetCard({ preset, isSelected, onSelect, disabled, onTermClick }) {
 }
 
 export default function PresetSelector({ 
-  selectedPreset = 'pathfinder', 
+  selectedPreset = 'balanced', 
   onSelectPreset, 
   disabled = false 
 }) {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.title}>Trading Preset</h2>
+        <h2 style={styles.title}>Trading Strategy</h2>
         <p style={styles.subtitle}>
-          Select a strategy that matches your risk tolerance
+          Select a preset that matches your risk tolerance
         </p>
       </div>
       
