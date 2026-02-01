@@ -13,7 +13,7 @@ const CHAIN_OPTIONS = [
 ]
 
 const CHART_COLORS = [
-  '#00D4FF', '#39FF14', '#FF6B35', '#9B59B6', '#F39C12',
+  '#00D4FF', '#00ff88', '#FF6B35', '#9B59B6', '#F39C12',
   '#E74C3C', '#1ABC9C', '#3498DB', '#E91E63', '#00BCD4'
 ]
 
@@ -26,7 +26,7 @@ function AllocationPieChart({ data }) {
     
     const ctx = canvas.getContext('2d')
     const dpr = window.devicePixelRatio || 1
-    const size = 180
+    const size = 160
     
     canvas.width = size * dpr
     canvas.height = size * dpr
@@ -36,8 +36,8 @@ function AllocationPieChart({ data }) {
     
     const cx = size / 2
     const cy = size / 2
-    const radius = 70
-    const innerRadius = 45
+    const radius = 65
+    const innerRadius = 42
     
     ctx.clearRect(0, 0, size, size)
     
@@ -59,7 +59,7 @@ function AllocationPieChart({ data }) {
     
     ctx.beginPath()
     ctx.arc(cx, cy, innerRadius - 2, 0, 2 * Math.PI)
-    ctx.fillStyle = '#0f0f0f'
+    ctx.fillStyle = '#0d2137'
     ctx.fill()
   }, [data])
   
@@ -76,7 +76,7 @@ function PortfolioValueChart({ snapshots }) {
     const ctx = canvas.getContext('2d')
     const dpr = window.devicePixelRatio || 1
     const width = canvas.parentElement.offsetWidth || 300
-    const height = 120
+    const height = 100
     
     canvas.width = width * dpr
     canvas.height = height * dpr
@@ -95,7 +95,7 @@ function PortfolioValueChart({ snapshots }) {
     }))
     
     const gradient = ctx.createLinearGradient(0, 0, 0, height)
-    gradient.addColorStop(0, 'rgba(0, 212, 255, 0.3)')
+    gradient.addColorStop(0, 'rgba(0, 212, 255, 0.25)')
     gradient.addColorStop(1, 'rgba(0, 212, 255, 0)')
     
     ctx.beginPath()
@@ -129,6 +129,8 @@ export default function PortfolioTab({ userId }) {
   const [newWallet, setNewWallet] = useState({ address: '', chain: 'solana', nickname: '' })
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('holdings')
+  const [holdingsOpen, setHoldingsOpen] = useState(true)
+  const [transactionsOpen, setTransactionsOpen] = useState(false)
 
   useEffect(() => {
     fetchPortfolioData()
@@ -222,267 +224,303 @@ export default function PortfolioTab({ userId }) {
   if (loading) {
     return (
       <div className="portfolio-tab">
-        <div style={{ textAlign: 'center', padding: 60 }}>
+        <div className="loading-container">
           <div className="loading-spinner" />
-          <p style={{ color: '#888', marginTop: 16 }}>Loading portfolio...</p>
+          <p className="loading-text">Loading portfolio...</p>
         </div>
       </div>
     )
   }
 
   const hasData = wallets.length > 0 || holdings.length > 0
+  const pnlValue = parseFloat(summary?.totalPnl || 0)
+  const pnlPercent = parseFloat(summary?.pnlPercent || 0)
 
   return (
     <div className="portfolio-tab">
       <div className="portfolio-header">
-        <div className="portfolio-value-card">
-          <div className="portfolio-value-label">Total Portfolio Value</div>
-          <div className="portfolio-value-amount">
-            {summary ? formatNumber(summary.totalValue) : '$0.00'}
-          </div>
-          <div className="portfolio-pnl">
-            <span className={`portfolio-pnl-value ${parseFloat(summary?.totalPnl || 0) >= 0 ? 'positive' : 'negative'}`}>
-              {parseFloat(summary?.totalPnl || 0) >= 0 ? '+' : ''}{formatNumber(summary?.totalPnl || 0)}
-            </span>
-            <span style={{ color: '#888' }}>
-              ({parseFloat(summary?.pnlPercent || 0) >= 0 ? '+' : ''}{summary?.pnlPercent || '0.00'}%)
-            </span>
-            <span style={{ color: '#666', fontSize: 12 }}>All Time</span>
-          </div>
-          {snapshots.length > 1 && (
-            <div style={{ marginTop: 16 }}>
-              <PortfolioValueChart snapshots={snapshots} />
-            </div>
-          )}
+        <div className="portfolio-title-section">
+          <h2>Portfolio Tracker</h2>
+          <p>Multi-wallet tracking with real-time P&L analysis</p>
         </div>
-        
         <div className="portfolio-actions">
-          <button className="btn btn-primary" onClick={() => setShowAddWallet(true)}>
-            + Add Wallet
+          <button className="portfolio-action-btn primary" onClick={() => setShowAddWallet(true)}>
+            <span>+</span> Add Wallet
           </button>
-          <button className="btn btn-secondary" onClick={fetchPortfolioData}>
+          <button className="portfolio-action-btn secondary" onClick={fetchPortfolioData}>
             ↻ Sync
           </button>
           {holdings.length > 0 && (
-            <button className="btn btn-secondary" onClick={handleExportTax}>
-              📊 Export Tax Report
+            <button className="portfolio-action-btn secondary" onClick={handleExportTax}>
+              📊 Tax Export
             </button>
           )}
-        </div>
-      </div>
-
-      <div className="portfolio-stats-grid">
-        <div className="portfolio-stat-card">
-          <div className="portfolio-stat-icon">💰</div>
-          <div className="portfolio-stat-label">Assets</div>
-          <div className="portfolio-stat-value">{summary?.holdingsCount || holdings.length || 0}</div>
-        </div>
-        <div className="portfolio-stat-card">
-          <div className="portfolio-stat-icon">🔗</div>
-          <div className="portfolio-stat-label">Wallets</div>
-          <div className="portfolio-stat-value">{wallets.length}</div>
-        </div>
-        <div className="portfolio-stat-card">
-          <div className="portfolio-stat-icon">📈</div>
-          <div className="portfolio-stat-label">Best Performer</div>
-          <div className="portfolio-stat-value" style={{ color: '#39FF14', fontSize: 16 }}>
-            {holdings[0]?.tokenSymbol || '-'}
-          </div>
-        </div>
-        <div className="portfolio-stat-card">
-          <div className="portfolio-stat-icon">💵</div>
-          <div className="portfolio-stat-label">Cost Basis</div>
-          <div className="portfolio-stat-value">{formatNumber(summary?.totalCostBasis || 0)}</div>
         </div>
       </div>
 
       {!hasData ? (
-        <div className="holdings-section">
-          <div className="empty-portfolio">
-            <div className="empty-portfolio-icon">📈</div>
-            <div className="empty-portfolio-title">Track Your Crypto Portfolio</div>
-            <div className="empty-portfolio-text">
-              Add your wallet addresses to see all your holdings, track P&L, and analyze your portfolio allocation.
-            </div>
-            <button className="btn btn-primary" onClick={() => setShowAddWallet(true)}>
-              + Add Your First Wallet
-            </button>
+        <div className="empty-portfolio">
+          <div className="empty-portfolio-icon">📈</div>
+          <div className="empty-portfolio-title">Track Your Crypto Portfolio</div>
+          <div className="empty-portfolio-text">
+            Add your wallet addresses to see all your holdings, track P&L, and analyze your portfolio allocation across multiple chains.
           </div>
+          <button className="portfolio-action-btn primary" onClick={() => setShowAddWallet(true)}>
+            + Add Your First Wallet
+          </button>
         </div>
       ) : (
-        <div className="portfolio-content">
-          <div>
-            <div className="holdings-section">
-              <div className="holdings-header">
-                <div style={{ display: 'flex', gap: 16 }}>
-                  <button 
-                    className={`btn ${activeTab === 'holdings' ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => setActiveTab('holdings')}
-                    style={{ padding: '6px 16px', fontSize: 13 }}
-                  >
-                    Holdings
-                  </button>
-                  <button 
-                    className={`btn ${activeTab === 'transactions' ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => setActiveTab('transactions')}
-                    style={{ padding: '6px 16px', fontSize: 13 }}
-                  >
-                    Transactions
-                  </button>
+        <>
+          <div className="portfolio-bento-summary">
+            <div className="bento-card primary featured">
+              <div className="bento-label">Total Portfolio Value</div>
+              <div className="bento-value">
+                {summary ? formatNumber(summary.totalValue) : '$0.00'}
+              </div>
+              <div className={`bento-change ${pnlValue >= 0 ? 'positive' : 'negative'}`}>
+                <span>{pnlValue >= 0 ? '▲' : '▼'}</span>
+                <span>{pnlValue >= 0 ? '+' : ''}{formatNumber(pnlValue)}</span>
+                <span style={{ opacity: 0.7 }}>({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)</span>
+              </div>
+              {snapshots.length > 1 && (
+                <div className="portfolio-chart-container">
+                  <PortfolioValueChart snapshots={snapshots} />
                 </div>
-                {activeTab === 'holdings' && (
-                  <input 
-                    type="text"
-                    className="holdings-search"
-                    placeholder="Search assets..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                )}
+              )}
+            </div>
+            <div className="bento-card">
+              <div className="bento-label">Cost Basis</div>
+              <div className="bento-value small">{formatNumber(summary?.totalCostBasis || 0)}</div>
+            </div>
+            <div className="bento-card">
+              <div className="bento-label">24h Change</div>
+              <div className={`bento-value small ${parseFloat(summary?.change24h || 0) >= 0 ? 'positive' : 'negative'}`} style={{ color: parseFloat(summary?.change24h || 0) >= 0 ? '#00ff88' : '#ff4466' }}>
+                {parseFloat(summary?.change24h || 0) >= 0 ? '+' : ''}{parseFloat(summary?.change24h || 0).toFixed(2)}%
+              </div>
+            </div>
+          </div>
+
+          <div className="portfolio-stats-bento">
+            <div className="stat-card">
+              <div className="stat-icon">💰</div>
+              <div className="stat-label">Assets</div>
+              <div className="stat-value">{summary?.holdingsCount || holdings.length || 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🔗</div>
+              <div className="stat-label">Wallets</div>
+              <div className="stat-value">{wallets.length}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">📈</div>
+              <div className="stat-label">Best Performer</div>
+              <div className="stat-value highlight">{holdings[0]?.tokenSymbol || '-'}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🔄</div>
+              <div className="stat-label">Transactions</div>
+              <div className="stat-value">{transactions.length}</div>
+            </div>
+          </div>
+
+          <div className="portfolio-main-content">
+            <div className="portfolio-accordions">
+              <div className="portfolio-accordion">
+                <div className="accordion-header" onClick={() => setHoldingsOpen(!holdingsOpen)}>
+                  <div className="accordion-title">
+                    <span className="accordion-title-icon">💼</span>
+                    Holdings
+                    <span className="accordion-badge">{holdings.length} Assets</span>
+                  </div>
+                  <span className={`accordion-toggle ${holdingsOpen ? 'open' : ''}`}>▼</span>
+                </div>
+                <div className={`accordion-content ${holdingsOpen ? 'open' : ''}`}>
+                  <div className="accordion-inner">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                      <div className="tab-buttons">
+                        <button className={`tab-btn ${activeTab === 'holdings' ? 'active' : ''}`} onClick={() => setActiveTab('holdings')}>
+                          Holdings
+                        </button>
+                        <button className={`tab-btn ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>
+                          Transactions
+                        </button>
+                      </div>
+                      {activeTab === 'holdings' && (
+                        <input 
+                          type="text"
+                          className="holdings-search"
+                          placeholder="Search assets..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      )}
+                    </div>
+
+                    {activeTab === 'holdings' ? (
+                      <div className="holdings-table-container">
+                        <table className="holdings-table">
+                          <thead>
+                            <tr>
+                              <th>Asset</th>
+                              <th>Balance</th>
+                              <th>Price</th>
+                              <th>24h</th>
+                              <th>P&L</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredHoldings.length === 0 ? (
+                              <tr>
+                                <td colSpan={5} style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+                                  No holdings found. Sync your wallets to import.
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredHoldings.map((h, i) => (
+                                <tr key={h.id || i}>
+                                  <td>
+                                    <div className="holding-asset">
+                                      <div className="holding-icon">
+                                        {h.tokenSymbol?.charAt(0) || '?'}
+                                      </div>
+                                      <div>
+                                        <div className="holding-name">{h.tokenSymbol}</div>
+                                        <div className="holding-chain">{h.chain}</div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="holding-balance">
+                                    <div className="holding-amount">
+                                      {parseFloat(h.balance || 0).toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                                    </div>
+                                    <div className="holding-usd">{formatNumber(h.balanceUsd)}</div>
+                                  </td>
+                                  <td className="holding-price">
+                                    ${parseFloat(h.price || 0).toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                                  </td>
+                                  <td className={`holding-change ${parseFloat(h.priceChange24h || 0) >= 0 ? 'positive' : 'negative'}`}>
+                                    {parseFloat(h.priceChange24h || 0) >= 0 ? '+' : ''}{parseFloat(h.priceChange24h || 0).toFixed(2)}%
+                                  </td>
+                                  <td className="holding-pnl">
+                                    <div className={`holding-pnl-value ${parseFloat(h.unrealizedPnlUsd || 0) >= 0 ? 'positive' : 'negative'}`}>
+                                      {parseFloat(h.unrealizedPnlUsd || 0) >= 0 ? '+' : ''}{formatNumber(h.unrealizedPnlUsd || 0)}
+                                    </div>
+                                    <div className="holding-pnl-percent">
+                                      {parseFloat(h.unrealizedPnlPercent || 0) >= 0 ? '+' : ''}{parseFloat(h.unrealizedPnlPercent || 0).toFixed(2)}%
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="tx-list">
+                        {transactions.length === 0 ? (
+                          <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+                            No transactions found.
+                          </div>
+                        ) : (
+                          transactions.map((tx, i) => (
+                            <div className="tx-row" key={tx.id || i}>
+                              <div className={`tx-type ${tx.txType?.toLowerCase()}`}>
+                                {tx.txType}
+                              </div>
+                              <div className="tx-details">
+                                <div className="tx-asset">{tx.tokenOut || tx.tokenIn}</div>
+                                <div className="tx-date">
+                                  {new Date(tx.txTimestamp).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <div className="tx-value">{formatNumber(tx.valueUsd)}</div>
+                              <div className={`tx-pnl ${parseFloat(tx.realizedPnlUsd || 0) >= 0 ? 'positive' : 'negative'}`}>
+                                {tx.realizedPnlUsd ? (
+                                  <>
+                                    {parseFloat(tx.realizedPnlUsd) >= 0 ? '+' : ''}{formatNumber(tx.realizedPnlUsd)}
+                                  </>
+                                ) : '-'}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {activeTab === 'holdings' ? (
-                <table className="holdings-table">
-                  <thead>
-                    <tr>
-                      <th>Asset</th>
-                      <th>Balance</th>
-                      <th>Price</th>
-                      <th>24h</th>
-                      <th>P&L</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredHoldings.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} style={{ textAlign: 'center', padding: 40, color: '#888' }}>
-                          No holdings found. Sync your wallets to import.
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredHoldings.map((h, i) => (
-                        <tr key={h.id || i}>
-                          <td>
-                            <div className="holding-asset">
-                              <div className="holding-icon">
-                                {h.tokenSymbol?.charAt(0) || '?'}
+              {wallets.length > 0 && (
+                <div className="portfolio-accordion">
+                  <div className="accordion-header" onClick={() => setTransactionsOpen(!transactionsOpen)}>
+                    <div className="accordion-title">
+                      <span className="accordion-title-icon">🔗</span>
+                      Connected Wallets
+                      <span className="accordion-badge">{wallets.length} Wallets</span>
+                    </div>
+                    <span className={`accordion-toggle ${transactionsOpen ? 'open' : ''}`}>▼</span>
+                  </div>
+                  <div className={`accordion-content ${transactionsOpen ? 'open' : ''}`}>
+                    <div className="accordion-inner">
+                      <div className="wallets-carousel">
+                        {wallets.map((w, i) => (
+                          <div className="wallet-card" key={w.id || i}>
+                            <div className="wallet-header">
+                              <div className="wallet-icon">
+                                {CHAIN_OPTIONS.find(c => c.id === w.chain)?.icon || '🔗'}
                               </div>
                               <div>
-                                <div className="holding-name">{h.tokenSymbol}</div>
-                                <div className="holding-chain">{h.chain}</div>
+                                <div className="wallet-name">{w.nickname || w.chain}</div>
+                                <div className="wallet-chain">{CHAIN_OPTIONS.find(c => c.id === w.chain)?.name || w.chain}</div>
                               </div>
                             </div>
-                          </td>
-                          <td className="holding-balance">
-                            <div className="holding-amount">
-                              {parseFloat(h.balance || 0).toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                            <div className="wallet-address">
+                              {w.address?.slice(0, 8)}...{w.address?.slice(-6)}
                             </div>
-                            <div className="holding-usd">{formatNumber(h.balanceUsd)}</div>
-                          </td>
-                          <td className="holding-price">
-                            ${parseFloat(h.price || 0).toLocaleString(undefined, { maximumFractionDigits: 6 })}
-                          </td>
-                          <td className={`holding-change ${parseFloat(h.priceChange24h || 0) >= 0 ? 'positive' : 'negative'}`}>
-                            {parseFloat(h.priceChange24h || 0) >= 0 ? '+' : ''}{parseFloat(h.priceChange24h || 0).toFixed(2)}%
-                          </td>
-                          <td className="holding-pnl">
-                            <div className={`holding-pnl-value ${parseFloat(h.unrealizedPnlUsd || 0) >= 0 ? 'positive' : 'negative'}`}>
-                              {parseFloat(h.unrealizedPnlUsd || 0) >= 0 ? '+' : ''}{formatNumber(h.unrealizedPnlUsd || 0)}
-                            </div>
-                            <div className="holding-pnl-percent">
-                              {parseFloat(h.unrealizedPnlPercent || 0) >= 0 ? '+' : ''}{parseFloat(h.unrealizedPnlPercent || 0).toFixed(2)}%
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              ) : (
-                <div>
-                  {transactions.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
-                      No transactions found.
-                    </div>
-                  ) : (
-                    transactions.map((tx, i) => (
-                      <div className="tx-row" key={tx.id || i}>
-                        <div className={`tx-type ${tx.txType?.toLowerCase()}`}>
-                          {tx.txType}
-                        </div>
-                        <div className="tx-details">
-                          <div className="tx-asset">{tx.tokenOut || tx.tokenIn}</div>
-                          <div className="tx-date">
-                            {new Date(tx.txTimestamp).toLocaleDateString()}
                           </div>
-                        </div>
-                        <div className="tx-value">{formatNumber(tx.valueUsd)}</div>
-                        <div className={`tx-pnl ${parseFloat(tx.realizedPnlUsd || 0) >= 0 ? 'positive' : 'negative'}`}>
-                          {tx.realizedPnlUsd ? (
-                            <>
-                              {parseFloat(tx.realizedPnlUsd) >= 0 ? '+' : ''}{formatNumber(tx.realizedPnlUsd)}
-                            </>
-                          ) : '-'}
-                        </div>
+                        ))}
                       </div>
-                    ))
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="portfolio-sidebar">
+              <div className="sidebar-panel">
+                <div className="sidebar-title">Allocation</div>
+                <div className="allocation-chart">
+                  {allocation.length > 0 ? (
+                    <AllocationPieChart data={allocation} />
+                  ) : (
+                    <div style={{ color: '#888', fontSize: 14 }}>No allocation data</div>
                   )}
                 </div>
-              )}
-            </div>
-
-            {wallets.length > 0 && (
-              <div className="wallets-list">
-                <div className="wallets-title">Connected Wallets</div>
-                {wallets.map((w, i) => (
-                  <div className="wallet-item" key={w.id || i}>
-                    <div className="wallet-icon">
-                      {CHAIN_OPTIONS.find(c => c.id === w.chain)?.icon || '🔗'}
+                <div className="allocation-legend">
+                  {allocation.slice(0, 6).map((item, i) => (
+                    <div className="allocation-item" key={i}>
+                      <div 
+                        className="allocation-color" 
+                        style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} 
+                      />
+                      <div className="allocation-label">{item.symbol}</div>
+                      <div className="allocation-percent">{item.percent.toFixed(1)}%</div>
                     </div>
-                    <div className="wallet-info">
-                      <div className="wallet-name">{w.nickname || w.chain}</div>
-                      <div className="wallet-address">
-                        {w.address?.slice(0, 8)}...{w.address?.slice(-6)}
+                  ))}
+                  {allocation.length > 6 && (
+                    <div className="allocation-item">
+                      <div className="allocation-color" style={{ background: '#666' }} />
+                      <div className="allocation-label">Others</div>
+                      <div className="allocation-percent">
+                        {allocation.slice(6).reduce((sum, a) => sum + a.percent, 0).toFixed(1)}%
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-
-          <div className="allocation-section">
-            <div className="allocation-title">Allocation</div>
-            <div className="allocation-chart">
-              {allocation.length > 0 ? (
-                <AllocationPieChart data={allocation} />
-              ) : (
-                <div style={{ color: '#888', fontSize: 14 }}>No allocation data</div>
-              )}
-            </div>
-            <div className="allocation-legend">
-              {allocation.slice(0, 8).map((item, i) => (
-                <div className="allocation-item" key={i}>
-                  <div 
-                    className="allocation-color" 
-                    style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} 
-                  />
-                  <div className="allocation-label">{item.symbol}</div>
-                  <div className="allocation-percent">{item.percent.toFixed(1)}%</div>
-                </div>
-              ))}
-              {allocation.length > 8 && (
-                <div className="allocation-item">
-                  <div className="allocation-color" style={{ background: '#666' }} />
-                  <div className="allocation-label">Others</div>
-                  <div className="allocation-percent">
-                    {allocation.slice(8).reduce((sum, a) => sum + a.percent, 0).toFixed(1)}%
-                  </div>
-                </div>
-              )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {showAddWallet && (
@@ -526,10 +564,10 @@ export default function PortfolioTab({ userId }) {
             </div>
             
             <div className="add-wallet-buttons">
-              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowAddWallet(false)}>
+              <button className="portfolio-action-btn secondary" style={{ flex: 1 }} onClick={() => setShowAddWallet(false)}>
                 Cancel
               </button>
-              <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleAddWallet}>
+              <button className="portfolio-action-btn primary" style={{ flex: 1 }} onClick={handleAddWallet}>
                 Add Wallet
               </button>
             </div>
