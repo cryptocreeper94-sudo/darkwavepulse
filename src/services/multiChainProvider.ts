@@ -58,6 +58,26 @@ const SOLANA_RPC_URL = HELIUS_API_KEY
   ? `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}` 
   : PUBLIC_SOLANA_RPC;
 
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
+
+const ETHEREUM_RPC_URL = ALCHEMY_API_KEY 
+  ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  : process.env.ETHEREUM_RPC_URL || 'https://eth.llamarpc.com';
+
+const BASE_RPC_URL = ALCHEMY_API_KEY
+  ? `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  : process.env.BASE_RPC_URL || 'https://mainnet.base.org';
+
+const POLYGON_RPC_URL = ALCHEMY_API_KEY
+  ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  : process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com';
+
+const ARBITRUM_RPC_URL = ALCHEMY_API_KEY
+  ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  : process.env.ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc';
+
+const BSC_RPC_URL = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org';
+
 export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
   solana: {
     id: 'solana',
@@ -75,7 +95,7 @@ export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
     name: 'Ethereum',
     symbol: 'ETH',
     chainId: 1,
-    rpcUrl: 'https://eth.llamarpc.com',
+    rpcUrl: ETHEREUM_RPC_URL,
     explorerUrl: 'https://etherscan.io',
     dexScreenerChainId: 'ethereum',
     coingeckoId: 'ethereum',
@@ -89,7 +109,7 @@ export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
     name: 'Base',
     symbol: 'ETH',
     chainId: 8453,
-    rpcUrl: 'https://mainnet.base.org',
+    rpcUrl: BASE_RPC_URL,
     explorerUrl: 'https://basescan.org',
     dexScreenerChainId: 'base',
     coingeckoId: 'base',
@@ -103,7 +123,7 @@ export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
     name: 'Polygon',
     symbol: 'MATIC',
     chainId: 137,
-    rpcUrl: 'https://polygon-rpc.com',
+    rpcUrl: POLYGON_RPC_URL,
     explorerUrl: 'https://polygonscan.com',
     dexScreenerChainId: 'polygon',
     coingeckoId: 'polygon-pos',
@@ -117,7 +137,7 @@ export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
     name: 'Arbitrum',
     symbol: 'ETH',
     chainId: 42161,
-    rpcUrl: 'https://arb1.arbitrum.io/rpc',
+    rpcUrl: ARBITRUM_RPC_URL,
     explorerUrl: 'https://arbiscan.io',
     dexScreenerChainId: 'arbitrum',
     coingeckoId: 'arbitrum-one',
@@ -131,7 +151,7 @@ export const CHAIN_CONFIGS: Record<ChainId, ChainConfig> = {
     name: 'BNB Chain',
     symbol: 'BNB',
     chainId: 56,
-    rpcUrl: 'https://bsc-dataseed.binance.org',
+    rpcUrl: BSC_RPC_URL,
     explorerUrl: 'https://bscscan.com',
     dexScreenerChainId: 'bsc',
     coingeckoId: 'binance-smart-chain',
