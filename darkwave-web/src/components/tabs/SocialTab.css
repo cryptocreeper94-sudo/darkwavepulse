@@ -1,0 +1,347 @@
+.social-tab {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.social-header {
+  margin-bottom: 24px;
+}
+
+.social-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.social-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.social-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.social-nav-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.social-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.social-nav-btn.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border-color: rgba(0, 212, 255, 0.4);
+  color: #00D4FF;
+}
+
+.leaderboard-section,
+.signals-section,
+.following-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.period-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.period-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.period-btn:hover { color: #fff; }
+.period-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00D4FF;
+}
+
+.leaderboard-table {
+  overflow-x: auto;
+}
+
+.leaderboard-header {
+  display: grid;
+  grid-template-columns: 60px 2fr 1fr 1.2fr 0.8fr 1fr 100px;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 60px 2fr 1fr 1.2fr 0.8fr 1fr 100px;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  align-items: center;
+}
+
+.leaderboard-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.trader-rank {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.trader-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trader-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.trader-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.verified-badge {
+  font-size: 11px;
+  color: #00D4FF;
+}
+
+.trader-winrate .winrate-value {
+  font-weight: 600;
+  color: #39FF14;
+}
+
+.trader-pnl {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.trader-pnl.positive { color: #39FF14; }
+.trader-pnl.negative { color: #FF4444; }
+
+.trader-trades,
+.trader-followers {
+  font-size: 14px;
+  color: #888;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: #00D4FF;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.follow-btn:hover {
+  background: rgba(0, 212, 255, 0.3);
+}
+
+.signals-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.signal-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.signal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.signal-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9B59B6 0%, #6C3483 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.author-name {
+  font-size: 13px;
+  color: #888;
+}
+
+.signal-type {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.signal-type.buy { background: rgba(57, 255, 20, 0.2); color: #39FF14; }
+.signal-type.sell { background: rgba(255, 68, 68, 0.2); color: #FF4444; }
+.signal-type.hold { background: rgba(255, 255, 255, 0.1); color: #888; }
+.signal-type.long { background: rgba(57, 255, 20, 0.2); color: #39FF14; }
+.signal-type.short { background: rgba(255, 68, 68, 0.2); color: #FF4444; }
+
+.signal-token {
+  margin-bottom: 12px;
+}
+
+.token-symbol {
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.token-chain {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00D4FF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.signal-details {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detail-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.detail-value.positive { color: #39FF14; }
+.detail-value.negative { color: #FF4444; }
+
+.signal-reasoning {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.signal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signal-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: #888;
+}
+
+.signal-outcome {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.signal-outcome.win { background: rgba(57, 255, 20, 0.2); color: #39FF14; }
+.signal-outcome.loss { background: rgba(255, 68, 68, 0.2); color: #FF4444; }
+.signal-outcome.open { background: rgba(255, 255, 255, 0.1); color: #888; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.empty-subtext {
+  font-size: 13px;
+  margin-top: 8px;
+}

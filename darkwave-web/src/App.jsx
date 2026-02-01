@@ -13,7 +13,13 @@ import {
   AnalysisTab,
   MLDashboardTab,
   RiskDashboardTab,
-  DevelopersPortalTab
+  DevelopersPortalTab,
+  AlertsTab,
+  CalendarTab,
+  DeFiTab,
+  OnChainTab,
+  ReferralTab,
+  SocialTab
 } from './components/tabs'
 import WhitepaperPage from './pages/WhitepaperPage'
 import StrikeAgentPublicView from './pages/StrikeAgentPublicView'
@@ -245,6 +251,18 @@ function AppContent() {
         return <RiskDashboardTab userId={userId} />
       case 'dev-portal':
         return <DevelopersPortalTab />
+      case 'alerts':
+        return <AlertsTab userId={userId} />
+      case 'calendar':
+        return <CalendarTab userId={userId} />
+      case 'defi':
+        return <DeFiTab userId={userId} />
+      case 'onchain':
+        return <OnChainTab />
+      case 'referral':
+        return <ReferralTab userId={userId} />
+      case 'social':
+        return <SocialTab userId={userId} />
       case 'whitepaper':
         return <WhitepaperPage />
       default:

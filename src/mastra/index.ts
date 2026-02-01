@@ -68,6 +68,13 @@ import { ecosystemRoutes } from "./routes/ecosystemRoutes";
 import { darkwaveChainRoutes } from "./routes/darkwaveChainRoutes";
 import { firebaseAuthRoutes } from "./routes/firebaseAuthRoutes";
 import { newsRoutes } from "./routes/newsRoutes";
+import { portfolioRoutes } from "./routes/portfolioRoutes";
+import { alertsRoutes } from "./routes/alertsRoutes";
+import { calendarRoutes } from "./routes/calendarRoutes";
+import { defiRoutes } from "./routes/defiRoutes";
+import { onchainRoutes } from "./routes/onchainRoutes";
+import { referralRoutes } from "./routes/referralRoutes";
+import { socialRoutes } from "./routes/socialRoutes";
 
 class ProductionPinoLogger extends MastraLogger {
   protected logger: pino.Logger;
@@ -6365,6 +6372,27 @@ export const mastra = new Mastra({
       
       // Crypto News Routes (RSS feed aggregation)
       ...newsRoutes,
+      
+      // Portfolio Tracker Routes
+      ...portfolioRoutes,
+      
+      // Alerts System Routes
+      ...alertsRoutes,
+      
+      // Calendar & Events Routes
+      ...calendarRoutes,
+      
+      // DeFi Dashboard Routes
+      ...defiRoutes,
+      
+      // On-Chain Analytics Routes
+      ...onchainRoutes,
+      
+      // Referral Program Routes
+      ...referralRoutes,
+      
+      // Social Trading Routes
+      ...socialRoutes,
       
       // Catch-all static file handler (MUST BE LAST) - serves all assets from public/
       {

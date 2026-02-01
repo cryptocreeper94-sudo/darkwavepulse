@@ -1,0 +1,486 @@
+.portfolio-tab {
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.portfolio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.portfolio-value-card {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.portfolio-value-label {
+  font-size: 12px;
+  color: #00D4FF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.portfolio-value-amount {
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.portfolio-pnl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.portfolio-pnl-value {
+  font-weight: 600;
+}
+
+.portfolio-pnl-value.positive { color: #39FF14; }
+.portfolio-pnl-value.negative { color: #FF4444; }
+
+.portfolio-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.portfolio-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.portfolio-stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.portfolio-stat-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.portfolio-stat-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.portfolio-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.portfolio-content {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .portfolio-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.holdings-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.holdings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.holdings-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.holdings-search {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 13px;
+  width: 200px;
+}
+
+.holdings-table {
+  width: 100%;
+}
+
+.holdings-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.holdings-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.holdings-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.holding-asset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.holding-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #333 0%, #222 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.holding-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 14px;
+}
+
+.holding-chain {
+  font-size: 11px;
+  color: #888;
+}
+
+.holding-balance {
+  text-align: right;
+}
+
+.holding-amount {
+  font-weight: 600;
+  color: #fff;
+}
+
+.holding-usd {
+  font-size: 12px;
+  color: #888;
+}
+
+.holding-price {
+  text-align: right;
+  font-weight: 500;
+}
+
+.holding-change {
+  text-align: right;
+  font-weight: 600;
+}
+
+.holding-change.positive { color: #39FF14; }
+.holding-change.negative { color: #FF4444; }
+
+.holding-pnl {
+  text-align: right;
+}
+
+.holding-pnl-value {
+  font-weight: 600;
+}
+
+.holding-pnl-value.positive { color: #39FF14; }
+.holding-pnl-value.negative { color: #FF4444; }
+
+.holding-pnl-percent {
+  font-size: 11px;
+  color: #888;
+}
+
+.allocation-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.allocation-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.allocation-chart {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.allocation-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.allocation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.allocation-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.allocation-label {
+  flex: 1;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.allocation-percent {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.add-wallet-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.add-wallet-content {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 480px;
+}
+
+.add-wallet-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.add-wallet-field {
+  margin-bottom: 16px;
+}
+
+.add-wallet-label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.add-wallet-input,
+.add-wallet-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.add-wallet-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.empty-portfolio {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-portfolio-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-portfolio-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-portfolio-text {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.wallets-list {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wallets-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #888;
+}
+
+.wallet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.wallet-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00D4FF22 0%, #00D4FF11 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.wallet-info {
+  flex: 1;
+}
+
+.wallet-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.wallet-address {
+  font-size: 12px;
+  color: #888;
+  font-family: monospace;
+}
+
+.wallet-balance {
+  text-align: right;
+  font-weight: 600;
+  color: #00D4FF;
+}
+
+.transactions-section {
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 16px;
+}
+
+.tx-type {
+  width: 80px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.tx-type.buy { background: rgba(57, 255, 20, 0.2); color: #39FF14; }
+.tx-type.sell { background: rgba(255, 68, 68, 0.2); color: #FF4444; }
+.tx-type.swap { background: rgba(0, 212, 255, 0.2); color: #00D4FF; }
+.tx-type.transfer { background: rgba(255, 255, 255, 0.1); color: #888; }
+
+.tx-details {
+  flex: 1;
+}
+
+.tx-asset {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tx-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.tx-value {
+  text-align: right;
+  font-weight: 600;
+}
+
+.tx-pnl {
+  width: 100px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.tx-pnl.positive { color: #39FF14; }
+.tx-pnl.negative { color: #FF4444; }
