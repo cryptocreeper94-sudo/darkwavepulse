@@ -68,25 +68,28 @@ function BentoTile({ children, className = '', style = {}, onClick }) {
       className={className}
       onClick={onClick}
       style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border-color)',
+        background: 'rgba(26, 58, 92, 0.4)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(0, 212, 255, 0.15)',
         borderRadius: 12,
         padding: 10,
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'border-color 0.2s, box-shadow 0.2s',
+        transition: 'all 0.3s ease',
         display: 'flex',
         flexDirection: 'column',
         overflow: isTable ? 'visible' : undefined,
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
         ...style,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--bg-surface-3)'
-        e.currentTarget.style.boxShadow = '0 0 20px rgba(0,212,255,0.1)'
+        e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.3)'
+        e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 212, 255, 0.15)'
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--border-color)'
-        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.15)'
+        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)'
       }}
     >
       {children}
