@@ -1,0 +1,396 @@
+.defi-tab {
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.defi-header {
+  margin-bottom: 24px;
+}
+
+.defi-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.defi-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.defi-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.summary-card.primary {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.summary-value.positive { color: #39FF14; }
+
+.defi-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.defi-nav-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.defi-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.defi-nav-btn.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border-color: rgba(0, 212, 255, 0.4);
+  color: #00D4FF;
+}
+
+.defi-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chain-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.position-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.position-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #888;
+}
+
+.position-chain {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00D4FF;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.position-protocol {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.position-pool {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.position-stats {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pos-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pos-stat-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.pos-stat-value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pos-stat-value.positive { color: #39FF14; }
+
+.position-rewards {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(57, 255, 20, 0.1);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.rewards-label { color: #888; }
+.rewards-value { color: #39FF14; font-weight: 600; }
+
+.yields-table {
+  overflow-x: auto;
+}
+
+.yields-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 1fr 1.2fr 0.8fr;
+  gap: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.yield-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 1fr 1.2fr 0.8fr;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  align-items: center;
+}
+
+.yield-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.yield-pool .pool-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.yield-pool .pool-tokens {
+  font-size: 12px;
+  color: #888;
+}
+
+.yield-protocol { font-size: 13px; }
+.yield-chain { font-size: 13px; color: #888; }
+.yield-tvl { font-size: 13px; }
+
+.yield-apy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apy-value {
+  font-weight: 700;
+  font-size: 16px;
+  color: #39FF14;
+}
+
+.apy-breakdown {
+  font-size: 10px;
+  color: #666;
+}
+
+.yield-risk {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.yield-risk.low {
+  background: rgba(57, 255, 20, 0.2);
+  color: #39FF14;
+}
+
+.yield-risk.medium {
+  background: rgba(255, 107, 53, 0.2);
+  color: #FF6B35;
+}
+
+.yield-risk.high {
+  background: rgba(255, 68, 68, 0.2);
+  color: #FF4444;
+}
+
+.protocols-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.protocol-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.protocol-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.protocol-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.protocol-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.protocol-chain {
+  font-size: 12px;
+  color: #888;
+}
+
+.protocol-stats {
+  display: flex;
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+}
+
+.protocol-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.protocol-stat .stat-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.protocol-stat .stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.protocol-stat .stat-value.positive { color: #39FF14; }
+
+.protocol-change {
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.protocol-change.positive { color: #39FF14; }
+.protocol-change.negative { color: #FF4444; }
+
+.protocol-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.badge.audit {
+  background: rgba(57, 255, 20, 0.2);
+  color: #39FF14;
+}
+
+.badge.risk-low { background: rgba(57, 255, 20, 0.15); color: #39FF14; }
+.badge.risk-medium { background: rgba(255, 107, 53, 0.15); color: #FF6B35; }
+.badge.risk-high { background: rgba(255, 68, 68, 0.15); color: #FF4444; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: #fff;
+}

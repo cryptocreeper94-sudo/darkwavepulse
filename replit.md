@@ -34,6 +34,12 @@ The platform utilizes a dark theme exclusively, featuring solid black/dark gray 
 - **Stripe Integration**: Supports 3 pricing tiers (Pulse Pro, StrikeAgent Elite, DarkWave Complete) with free trials.
 - **Developer API System**: Public REST API for external developers to access Pulse's AI signals, market data, and predictions, with API key management, rate limiting, and Stripe-integrated billing.
 - **AI Autonomous Trading System Roadmap**: Future development for a self-learning AI to autonomously trigger StrikeAgent trades, progressing through data collection, model training, and configurable trading modes (Observer, Approval, Semi-Auto, Full Auto).
+- **Alerts System**: Price alerts (above/below/percent change/volume spike), whale transaction tracking, smart money wallet monitoring, and multi-channel notifications (Telegram, email, push).
+- **Crypto Calendar**: Token unlock schedules, upcoming airdrops, IDOs, conferences, and crypto events with impact levels and reminders.
+- **DeFi Dashboard**: Multi-chain DeFi position tracking (staking, LPs, vaults), protocol TVL rankings, yield opportunity finder with risk levels.
+- **On-Chain Analytics**: Real-time gas tracker for all chains, DEX volume analysis, holder distribution lookup, token flow tracking (inflow/outflow by category).
+- **Referral Program**: 10% lifetime commission on referral subscriptions, unique referral codes, earnings tracking, $10 minimum payout in crypto.
+- **Social Trading Hub**: Trader leaderboards (daily/weekly/monthly/all-time), trading signal sharing with outcome tracking, follow/copy trading system, verified trader badges.
 
 ## External Dependencies
 

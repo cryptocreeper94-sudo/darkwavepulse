@@ -2449,3 +2449,74 @@ export const userLocalePrefs = pgTable('user_locale_prefs', {
   currency: varchar('currency', { length: 10 }).default('USD'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+
+// ============================================
+// SOCIAL TRADING SYSTEM
+// Profiles, follows, signals, leaderboards
+// ============================================
+
+export const socialProfiles = pgTable('social_profiles', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull().unique(),
+  displayName: varchar('display_name', { length: 100 }),
+  avatarUrl: text('avatar_url'),
+  bio: text('bio'),
+  isPublic: boolean('is_public').default(true),
+  verifiedTrader: boolean('verified_trader').default(false),
+  followersCount: integer('followers_count').default(0),
+  followingCount: integer('following_count').default(0),
+  totalTrades: integer('total_trades').default(0),
+  winRate: decimal('win_rate', { precision: 5, scale: 2 }).default('0'),
+  totalPnlUsd: decimal('total_pnl_usd', { precision: 18, scale: 2 }).default('0'),
+  avgTradeSize: decimal('avg_trade_size', { precision: 18, scale: 2 }),
+  bestTrade: text('best_trade'),
+  tradingStyle: varchar('trading_style', { length: 50 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const socialFollows = pgTable('social_follows', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  followerId: varchar('follower_id', { length: 255 }).notNull(),
+  followedId: varchar('followed_id', { length: 255 }).notNull(),
+  copyTrading: boolean('copy_trading').default(false),
+  copyPercent: decimal('copy_percent', { precision: 5, scale: 2 }),
+  maxCopyAmount: decimal('max_copy_amount', { precision: 18, scale: 2 }),
+  notifyOnSignals: boolean('notify_on_signals').default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const tradingSignals = pgTable('trading_signals', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  tokenSymbol: varchar('token_symbol', { length: 50 }).notNull(),
+  tokenAddress: varchar('token_address', { length: 255 }),
+  chain: varchar('chain', { length: 50 }).default('solana'),
+  signalType: varchar('signal_type', { length: 20 }).notNull(),
+  entryPrice: decimal('entry_price', { precision: 24, scale: 12 }),
+  targetPrice: decimal('target_price', { precision: 24, scale: 12 }),
+  stopLoss: decimal('stop_loss', { precision: 24, scale: 12 }),
+  reasoning: text('reasoning'),
+  isPublic: boolean('is_public').default(true),
+  outcome: varchar('outcome', { length: 20 }),
+  outcomePercent: decimal('outcome_percent', { precision: 10, scale: 4 }),
+  closedAt: timestamp('closed_at'),
+  likesCount: integer('likes_count').default(0),
+  commentsCount: integer('comments_count').default(0),
+  copiesCount: integer('copies_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const leaderboardHistory = pgTable('leaderboard_history', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  period: varchar('period', { length: 20 }).notNull(),
+  periodStart: timestamp('period_start').notNull(),
+  periodEnd: timestamp('period_end').notNull(),
+  rank: integer('rank').notNull(),
+  totalPnlUsd: decimal('total_pnl_usd', { precision: 18, scale: 2 }).notNull(),
+  winRate: decimal('win_rate', { precision: 5, scale: 2 }),
+  tradesCount: integer('trades_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
