@@ -198,7 +198,19 @@ function AppContent() {
   const isStrikeAgentLive = window.location.pathname === '/strikeagent/live' || window.location.pathname === '/live' || isStrikeAgentDomain
   const isDemoMode = isDemoPath
   
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const getInitialTab = () => {
+    const pathname = window.location.pathname
+    if (pathname.startsWith('/tab/')) {
+      return pathname.replace('/tab/', '')
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('tab')) {
+      return params.get('tab')
+    }
+    return 'dashboard'
+  }
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab)
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
   
   const userId = user?.email || (isDemoMode ? 'demo-user' : null)
