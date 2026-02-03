@@ -68,13 +68,9 @@ const BASE_RPC_URL = ALCHEMY_API_KEY
   ? `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
   : process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 
-const POLYGON_RPC_URL = ALCHEMY_API_KEY
-  ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-  : process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com';
+const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com';
 
-const ARBITRUM_RPC_URL = ALCHEMY_API_KEY
-  ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-  : process.env.ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc';
+const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc';
 
 const BSC_RPC_URL = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org';
 
