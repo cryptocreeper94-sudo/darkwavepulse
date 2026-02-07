@@ -39,8 +39,15 @@ import { BuiltInWalletProvider } from './context/BuiltInWalletContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { SkinsProvider } from './context/SkinsContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import SignUpPrompt from './components/auth/SignUpPrompt'
 import CryptoCatPopup from './components/engagement/CryptoCatPopup'
 import './styles/components.css'
+
+const PUBLIC_TABS = new Set([
+  'dashboard', 'markets', 'learn', 'whitepaper', 'pricing',
+  'v2-details', 'ml-dashboard', 'accuracy', 'analysis',
+  'dev-portal', 'guardian-ai', 'onchain'
+])
 
 class SniperBotErrorBoundary extends Component {
   constructor(props) {
@@ -189,7 +196,7 @@ const hasStrikeAgentAccess = (userConfig) => {
 }
 
 function AppContent() {
-  const { user, userConfig, setUserConfig, loading, isAuthenticated } = useAuth()
+  const { user, userConfig, setUserConfig, loading, isAuthenticated, isGuest, requireAuth } = useAuth()
   
   const isStrikeAgentDomain = window.location.hostname.includes('strikeagent')
   const isDemoPath = window.location.pathname.startsWith('/demo')
@@ -212,6 +219,32 @@ function AppContent() {
   
   const [activeTab, setActiveTab] = useState(getInitialTab)
   const [selectedCoinForAnalysis, setSelectedCoinForAnalysis] = useState(null)
+
+  const FEATURE_NAMES = {
+    portfolio: 'Portfolio Tracking',
+    sniper: 'StrikeAgent Trading',
+    wallet: 'Wallet Management',
+    settings: 'Account Settings',
+    'auto-trade': 'Auto Trading',
+    risk: 'Risk Dashboard',
+    alerts: 'Price Alerts',
+    calendar: 'Crypto Calendar',
+    defi: 'DeFi Dashboard',
+    referral: 'Referral Program',
+    social: 'Social Trading',
+    tax: 'Tax Reports',
+    'copy-trading': 'Copy Trading',
+    arbitrage: 'Arbitrage Scanner',
+    nft: 'NFT Portfolio'
+  }
+
+  const handleTabChange = (tab) => {
+    if (!PUBLIC_TABS.has(tab) && isGuest) {
+      requireAuth(FEATURE_NAMES[tab] || tab)
+      return
+    }
+    setActiveTab(tab)
+  }
   
   const userId = user?.email || (isDemoMode ? 'demo-user' : null)
   
@@ -223,22 +256,32 @@ function AppContent() {
   
   useEffect(() => {
     if (isDemoMode) {
-      console.log('🎯 StrikeAgent Demo Mode - bypassing login')
+      console.log('[StrikeAgent] Demo Mode - bypassing login')
       sessionStorage.setItem('dwp_demo_mode', 'true')
       sessionStorage.setItem('dwp_demo_balance', '10000')
       setTimeout(() => setActiveTab('sniper'), 500)
     }
   }, [isDemoMode])
+
+  useEffect(() => {
+    if (isGuest && !PUBLIC_TABS.has(activeTab)) {
+      setActiveTab('dashboard')
+    }
+  }, [isGuest, activeTab])
   
   const handleAnalyzeCoin = (coin) => {
     setSelectedCoinForAnalysis(coin)
-    setActiveTab('analysis')
+    handleTabChange('analysis')
   }
   
   const renderTab = () => {
+    if (isGuest && !PUBLIC_TABS.has(activeTab)) {
+      return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={handleTabChange} onAnalyzeCoin={handleAnalyzeCoin} />
+    }
+
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={handleTabChange} onAnalyzeCoin={handleAnalyzeCoin} />
       case 'markets':
         return <MarketsTab />
       case 'learn':
@@ -247,7 +290,7 @@ function AppContent() {
         return <PortfolioTab />
       case 'sniper':
         const canTrade = hasStrikeAgentAccess(userConfig)
-        return <SniperBotErrorBoundary><SniperBotTab canTrade={canTrade} onNavigate={setActiveTab} /></SniperBotErrorBoundary>
+        return <SniperBotErrorBoundary><SniperBotTab canTrade={canTrade} onNavigate={handleTabChange} /></SniperBotErrorBoundary>
       case 'wallet':
         return <WalletTab userId={userId} />
       case 'settings':
@@ -293,7 +336,7 @@ function AppContent() {
       case 'whitepaper':
         return <WhitepaperPage />
       default:
-        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={setActiveTab} onAnalyzeCoin={handleAnalyzeCoin} />
+        return <DashboardTab userId={userId} userConfig={userConfig} onNavigate={handleTabChange} onAnalyzeCoin={handleAnalyzeCoin} />
     }
   }
 
@@ -331,19 +374,17 @@ function AppContent() {
     )
   }
 
-  // No login required - all users can access the site
-  // Premium features check subscription tier instead
-  
   return (
     <SkinsProvider>
       <BuiltInWalletProvider>
         <FavoritesProvider userId={userId}>
           <GlossaryProvider>
-            <Layout activeTab={activeTab} onTabChange={setActiveTab} userTier={userConfig?.subscriptionTier} accessLevel={userConfig?.accessLevel}>
+            <Layout activeTab={activeTab} onTabChange={handleTabChange} userTier={userConfig?.subscriptionTier} accessLevel={userConfig?.accessLevel}>
               <div style={{ padding: '0 12px' }}>
                 {renderTab()}
               </div>
             </Layout>
+            <SignUpPrompt />
             <GlossaryPopup />
           </GlossaryProvider>
         </FavoritesProvider>

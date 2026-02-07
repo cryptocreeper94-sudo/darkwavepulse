@@ -1,9 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { initFirebase, signInWithGoogle, signInWithGithub, signOut, onAuthChange, handleRedirectResult } from '../lib/firebase'
 
 const AuthContext = createContext(null)
 
-// Guest user - allows everyone to access the site freely
-// Premium features (StrikeAgent, etc.) require subscription via Stripe
 const GUEST_USER = {
   uid: 'guest-user',
   email: 'guest@darkwavepulse.com',
@@ -18,7 +17,6 @@ const GUEST_CONFIG = {
   hallmarkId: null
 }
 
-// Dev preview gets admin access for testing
 const DEV_USER = {
   uid: 'dev-preview-user',
   email: 'dev@darkwavepulse.com',
@@ -46,32 +44,121 @@ export function AuthProvider({ children }) {
   const [userConfig, setUserConfig] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false)
+  const [signUpPromptFeature, setSignUpPromptFeature] = useState('')
 
   useEffect(() => {
-    // BYPASS ALL AUTHENTICATION - Allow everyone in as guest
-    // Premium features require Stripe subscription, not Firebase login
-    
     if (isDevPreview()) {
       console.log('[Auth] Dev preview - admin access')
       setUser(DEV_USER)
       setUserConfig(DEV_CONFIG)
-    } else {
-      console.log('[Auth] Public access - guest mode (no login required)')
-      setUser(GUEST_USER)
-      setUserConfig(GUEST_CONFIG)
+      setLoading(false)
+      return
     }
-    
-    setLoading(false)
+
+    initFirebase()
+
+    handleRedirectResult().catch(() => {})
+
+    const unsubscribe = onAuthChange((firebaseUser) => {
+      if (firebaseUser) {
+        console.log('[Auth] Signed in:', firebaseUser.email)
+        const authedUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
+          photoURL: firebaseUser.photoURL
+        }
+        setUser(authedUser)
+        setUserConfig({
+          accessLevel: 'user',
+          plan: 'free',
+          subscriptionTier: 'free',
+          hallmarkId: null
+        })
+        setShowSignUpPrompt(false)
+        localStorage.setItem('dwp_user', JSON.stringify(authedUser))
+
+        syncUserToBackend(authedUser)
+      } else {
+        console.log('[Auth] No user - guest browsing mode')
+        setUser(GUEST_USER)
+        setUserConfig(GUEST_CONFIG)
+        localStorage.removeItem('dwp_user')
+      }
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
   }, [])
 
-  // Upgrade user config when they subscribe via Stripe
+  async function syncUserToBackend(authedUser) {
+    try {
+      await fetch('/api/users/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: authedUser.uid,
+          email: authedUser.email,
+          displayName: authedUser.displayName,
+          photoURL: authedUser.photoURL
+        })
+      })
+    } catch (err) {
+      console.warn('[Auth] Backend sync failed (non-fatal):', err.message)
+    }
+  }
+
   function upgradeUserConfig(newConfig) {
     setUserConfig(prev => ({ ...prev, ...newConfig }))
   }
 
-  // No login required - subscription handled via Stripe checkout
+  const isGuest = user?.uid === 'guest-user'
+
+  const requireAuth = useCallback((featureName) => {
+    if (isGuest) {
+      setSignUpPromptFeature(featureName || 'this feature')
+      setShowSignUpPrompt(true)
+      return false
+    }
+    return true
+  }, [isGuest])
+
+  const dismissSignUpPrompt = useCallback(() => {
+    setShowSignUpPrompt(false)
+    setSignUpPromptFeature('')
+  }, [])
+
+  async function loginWithGoogle() {
+    setError(null)
+    setLoading(true)
+    try {
+      await signInWithGoogle()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function loginWithGithub() {
+    setError(null)
+    setLoading(true)
+    try {
+      await signInWithGithub()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function logout() {
-    // Reset to guest mode
+    try {
+      await signOut()
+    } catch (err) {
+      console.error('[Auth] Logout error:', err)
+    }
     setUser(GUEST_USER)
     setUserConfig(GUEST_CONFIG)
   }
@@ -84,7 +171,14 @@ export function AuthProvider({ children }) {
     loading,
     error,
     logout,
-    isAuthenticated: !!user  // Always true since we set guest user
+    loginWithGoogle,
+    loginWithGithub,
+    isAuthenticated: !!user && !isGuest,
+    isGuest,
+    requireAuth,
+    showSignUpPrompt,
+    signUpPromptFeature,
+    dismissSignUpPrompt
   }
 
   return (
