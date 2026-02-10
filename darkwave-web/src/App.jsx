@@ -290,7 +290,8 @@ function AppContent() {
         return <PortfolioTab />
       case 'sniper':
         const canTrade = hasStrikeAgentAccess(userConfig)
-        return <SniperBotErrorBoundary><SniperBotTab canTrade={canTrade} onNavigate={handleTabChange} /></SniperBotErrorBoundary>
+        const isAdminUser = userConfig?.accessLevel === 'admin' || userConfig?.accessLevel === 'owner'
+        return <SniperBotErrorBoundary><SniperBotTab canTrade={canTrade} onNavigate={handleTabChange} isAdmin={isAdminUser} userId={userId} userConfig={userConfig} /></SniperBotErrorBoundary>
       case 'wallet':
         return <WalletTab userId={userId} />
       case 'settings':
@@ -351,7 +352,7 @@ function AppContent() {
   if (isStrikeAgentLive) {
     return (
       <StrikeAgentPublicView 
-        onSubscribe={() => window.location.href = '/?tab=pricing'} 
+        onSubscribe={() => window.location.href = '/tab/pricing'} 
       />
     )
   }

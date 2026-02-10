@@ -1306,7 +1306,7 @@ export default function DashboardTab({ userId, userConfig, onNavigate, onAnalyze
 
       <div className="strikeagent-widget-container" style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, minHeight: 300 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <StrikeAgentLiveWidget isLocked={true} onUnlock={() => onNavigate?.('pricing')} />
+          <StrikeAgentLiveWidget isLocked={!(userConfig?.accessLevel === 'admin' || userConfig?.accessLevel === 'owner' || ['strike_agent', 'strike_agent_monthly', 'strike_agent_annual', 'complete_bundle', 'complete_bundle_monthly', 'complete_bundle_annual', 'founder', 'legacy_founder', 'annual', 'premium'].includes(userConfig?.subscriptionTier))} onUnlock={() => onNavigate?.('sniper')} />
         </div>
       </div>
 
