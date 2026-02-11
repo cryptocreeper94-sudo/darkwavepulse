@@ -1,6 +1,7 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import axios from "axios";
+import { coinGeckoClient } from "../../lib/coinGeckoClient.js";
 import { checkSubscriptionLimit } from "../middleware/subscriptionCheck.js";
 
 /**
@@ -87,19 +88,7 @@ export const sentimentTool = createTool({
     try {
       logger?.info('📊 [SentimentTool] Fetching CoinGecko data', { ticker, coinId });
 
-      // Fetch coin data with community metrics
-      const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId}`, {
-        params: {
-          localization: false,
-          tickers: false,
-          market_data: true,
-          community_data: true,
-          developer_data: true,
-        },
-        timeout: 10000,
-      });
-
-      const data = response.data;
+      const data = await coinGeckoClient.getCoinDetails(coinId);
       
       // Extract social metrics
       const socialMetrics = {

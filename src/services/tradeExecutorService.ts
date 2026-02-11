@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Connection, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { SnipePresetConfig } from './sniperBotService';
 import { rpcService } from './rpcService';
+import { coinGeckoClient } from '../lib/coinGeckoClient.js';
 
 const JUPITER_API = 'https://quote-api.jup.ag/v6';
 const SOL_MINT = 'So11111111111111111111111111111111111111112';
@@ -258,11 +259,8 @@ class TradeExecutorService {
 
   async getSolPrice(): Promise<number> {
     try {
-      const response = await axios.get(
-        'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
-        { timeout: 5000 }
-      );
-      return response.data?.solana?.usd || 0;
+      const data = await coinGeckoClient.getSimplePrice('solana', 'usd', false, false, false);
+      return data?.solana?.usd || 0;
     } catch {
       return 0;
     }

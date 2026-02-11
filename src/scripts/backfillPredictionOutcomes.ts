@@ -4,6 +4,7 @@ import { eq, and, sql, notInArray } from 'drizzle-orm';
 import { predictionTrackingService } from '../services/predictionTrackingService.js';
 import { predictionLearningService } from '../services/predictionLearningService.js';
 import axios from 'axios';
+import { coinGeckoClient } from '../lib/coinGeckoClient.js';
 
 type Horizon = '1h' | '4h' | '24h' | '7d';
 
@@ -162,21 +163,8 @@ function getCoingeckoId(ticker: string): string {
 async function fetchCurrentPrice(ticker: string): Promise<number | null> {
   try {
     const coinId = getCoingeckoId(ticker);
-    const response = await axios.get(
-      `https://api.coingecko.com/api/v3/simple/price`,
-      {
-        params: {
-          ids: coinId,
-          vs_currencies: 'usd',
-        },
-        timeout: 10000,
-        headers: process.env.COINGECKO_API_KEY ? {
-          'x-cg-pro-api-key': process.env.COINGECKO_API_KEY,
-        } : {},
-      }
-    );
-    
-    return response.data[coinId]?.usd || null;
+    const data = await coinGeckoClient.getSimplePrice(coinId, 'usd', false, false, false);
+    return data[coinId]?.usd || null;
   } catch (error: any) {
     console.error(`[Backfill] Failed to fetch price for ${ticker} (${getCoingeckoId(ticker)}):`, error.message);
     return null;

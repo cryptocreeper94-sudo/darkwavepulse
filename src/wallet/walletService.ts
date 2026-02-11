@@ -3,6 +3,7 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL, SystemProgram, Transaction, Ke
 import { ethers } from 'ethers';
 import bs58 from 'bs58';
 import crypto from 'crypto';
+import { coinGeckoClient } from '../lib/coinGeckoClient.js';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
 const PUBLIC_SOLANA_RPC = 'https://api.mainnet-beta.solana.com';
@@ -246,8 +247,7 @@ class MultiChainWalletService {
         
         let solPrice = 0;
         try {
-          const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-          const priceData = await priceResponse.json();
+          const priceData = await coinGeckoClient.getSimplePrice('solana', 'usd', false, false, false);
           solPrice = priceData.solana?.usd || 0;
         } catch {}
         
@@ -269,8 +269,7 @@ class MultiChainWalletService {
         
         let price = 0;
         try {
-          const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
-          const priceData = await priceResponse.json();
+          const priceData = await coinGeckoClient.getSimplePrice(coinId, 'usd', false, false, false);
           price = priceData[coinId]?.usd || 0;
         } catch {}
         
@@ -334,8 +333,7 @@ class MultiChainWalletService {
       
       let ethPrice = 2000;
       try {
-        const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-        const priceData = await priceResponse.json();
+        const priceData = await coinGeckoClient.getSimplePrice('ethereum', 'usd', false, false, false);
         ethPrice = priceData.ethereum?.usd || 2000;
       } catch {}
       

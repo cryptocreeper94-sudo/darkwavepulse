@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { coinGeckoClient } from '../../lib/coinGeckoClient.js';
 
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
@@ -122,25 +123,11 @@ export class DataIntegrationLayer {
     };
 
     try {
-      const cgResponse = await retryWithBackoff(async () => {
-        return axios.get(
-          `https://api.coingecko.com/api/v3/simple/price`,
-          {
-            params: {
-              ids: this.tickerToCoingeckoId(ticker),
-              vs_currencies: 'usd',
-              include_24hr_change: true,
-              include_24hr_vol: true,
-              include_market_cap: true
-            },
-            timeout: 5000
-          }
-        );
-      }, 3, 500);
-
       const coinId = this.tickerToCoingeckoId(ticker);
-      if (cgResponse.data[coinId]) {
-        const coinData = cgResponse.data[coinId];
+      const cgData = await coinGeckoClient.getSimplePrice(coinId, 'usd', true, true, true);
+
+      if (cgData[coinId]) {
+        const coinData = cgData[coinId];
         data.price = coinData.usd;
         data.change24h = coinData.usd_24h_change;
         data.volume24h = coinData.usd_24h_vol;

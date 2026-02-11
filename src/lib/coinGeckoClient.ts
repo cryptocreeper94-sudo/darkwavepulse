@@ -19,6 +19,29 @@ interface FallbackState {
   cooldowns: Record<string, number>;
 }
 
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+  ttl: number;
+}
+
+const CACHE_TTLS: Record<string, number> = {
+  '/simple/price': 60_000,
+  '/coins/markets': 120_000,
+  '/coins/': 300_000,
+  '/global': 300_000,
+  '/search/trending': 300_000,
+  '/coins/.*/ohlc': 120_000,
+  '/coins/.*/market_chart': 120_000,
+};
+
+function getCacheTTL(endpoint: string): number {
+  for (const [pattern, ttl] of Object.entries(CACHE_TTLS)) {
+    if (endpoint.match(new RegExp(pattern))) return ttl;
+  }
+  return 60_000;
+}
+
 console.log(`[CoinGecko] Using ${USE_PRO_API ? 'PRO' : 'Demo'} API at ${USE_PRO_API ? COINGECKO_PRO_URL : COINGECKO_FREE_URL}`);
 
 class CoinGeckoClient {
@@ -27,7 +50,7 @@ class CoinGeckoClient {
   private requestQueue: Array<() => Promise<any>> = [];
   private isProcessingQueue = false;
   private lastRequestTime = 0;
-  private minRequestInterval = USE_PRO_API ? 250 : 2100;
+  private minRequestInterval = USE_PRO_API ? 500 : 2100;
   private fallbackState: FallbackState = {
     currentIndex: 0,
     lastRotation: Date.now(),
@@ -38,6 +61,11 @@ class CoinGeckoClient {
   private coinGeckoFailures = 0;
   private readonly MAX_COINGECKO_FAILURES = 3;
   private readonly COOLDOWN_DURATION = 60000;
+
+  private responseCache = new Map<string, CacheEntry>();
+  private dailyCallCount = 0;
+  private dailyCallDate = new Date().toDateString();
+  private readonly DAILY_CALL_BUDGET = 8000;
 
   constructor() {
     this.client = axios.create({
@@ -81,6 +109,57 @@ class CoinGeckoClient {
         throw error;
       }
     );
+
+    setInterval(() => this.cleanCache(), 120_000);
+  }
+
+  private getCacheKey(endpoint: string, config?: AxiosRequestConfig): string {
+    const params = config?.params ? JSON.stringify(config.params, Object.keys(config.params).sort()) : '';
+    return `${endpoint}:${params}`;
+  }
+
+  private getFromCache(key: string): any | null {
+    const entry = this.responseCache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.responseCache.delete(key);
+      return null;
+    }
+    return entry.data;
+  }
+
+  private setCache(key: string, data: any, endpoint: string): void {
+    this.responseCache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl: getCacheTTL(endpoint)
+    });
+  }
+
+  private cleanCache(): void {
+    const now = Date.now();
+    for (const [key, entry] of this.responseCache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.responseCache.delete(key);
+      }
+    }
+  }
+
+  private trackDailyCall(): void {
+    const today = new Date().toDateString();
+    if (today !== this.dailyCallDate) {
+      console.log(`[CoinGecko] Daily reset - yesterday: ${this.dailyCallCount} calls`);
+      this.dailyCallCount = 0;
+      this.dailyCallDate = today;
+    }
+    this.dailyCallCount++;
+    if (this.dailyCallCount % 100 === 0) {
+      console.log(`[CoinGecko] Daily call count: ${this.dailyCallCount}/${this.DAILY_CALL_BUDGET}`);
+    }
+    if (this.dailyCallCount >= this.DAILY_CALL_BUDGET) {
+      console.warn(`[CoinGecko] DAILY BUDGET EXCEEDED (${this.dailyCallCount}) - switching to fallbacks`);
+      this.usingFallback = true;
+    }
   }
 
   private async throttledRequest<T>(requestFn: () => Promise<T>): Promise<T> {
@@ -323,26 +402,33 @@ class CoinGeckoClient {
   }
 
   async get<T = any>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
+    const cacheKey = this.getCacheKey(endpoint, config);
+    const cached = this.getFromCache(cacheKey);
+    if (cached !== null) {
+      return cached as T;
+    }
+
     return this.throttledRequest(async () => {
+      const cachedAgain = this.getFromCache(cacheKey);
+      if (cachedAgain !== null) return cachedAgain as T;
+
+      this.trackDailyCall();
+
       if (!this.usingFallback) {
         try {
           const response = await this.client.get<T>(endpoint, config);
+          this.setCache(cacheKey, response.data, endpoint);
           return response.data;
         } catch (error: any) {
           if (error.response?.status === 429 || error.response?.status >= 500) {
-            console.warn(`[CoinGecko] Pro API failed, trying free API...`);
-            
-            if (USE_PRO_API) {
-              try {
-                const freeResponse = await this.freeClient.get<T>(endpoint, config);
-                return freeResponse.data;
-              } catch (freeError: any) {
-                console.warn(`[CoinGecko] Free API also failed, using fallbacks...`);
-              }
-            }
-            
-            if (this.coinGeckoFailures >= this.MAX_COINGECKO_FAILURES) {
-              return this.tryFallbackApis(endpoint, config?.params || {});
+            console.warn(`[CoinGecko] Pro API failed (${error.response?.status}), trying fallback APIs...`);
+            try {
+              const result = await this.tryFallbackApis(endpoint, config?.params || {});
+              this.setCache(cacheKey, result, endpoint);
+              return result;
+            } catch (fallbackError: any) {
+              console.warn(`[CoinGecko] All fallbacks failed: ${fallbackError.message}`);
+              throw error;
             }
           }
           throw error;
@@ -358,6 +444,7 @@ class CoinGeckoClient {
           try {
             const response = await this.client.get<T>(endpoint, config);
             console.log('[CoinGecko] Primary API restored successfully');
+            this.setCache(cacheKey, response.data, endpoint);
             return response.data;
           } catch (error) {
             console.warn('[CoinGecko] Primary API still failing, continuing with fallbacks');
@@ -365,7 +452,9 @@ class CoinGeckoClient {
           }
         }
         
-        return this.tryFallbackApis(endpoint, config?.params || {});
+        const result = await this.tryFallbackApis(endpoint, config?.params || {});
+        this.setCache(cacheKey, result, endpoint);
+        return result;
       }
     });
   }
@@ -436,13 +525,15 @@ class CoinGeckoClient {
     return !!COINGECKO_API_KEY;
   }
 
-  getApiStatus(): { hasKey: boolean; isPro: boolean; baseUrl: string; usingFallback: boolean; failureCount: number } {
+  getApiStatus(): { hasKey: boolean; isPro: boolean; baseUrl: string; usingFallback: boolean; failureCount: number; dailyCalls: number; cacheSize: number } {
     return {
       hasKey: !!COINGECKO_API_KEY,
       isPro: USE_PRO_API,
       baseUrl: USE_PRO_API ? COINGECKO_PRO_URL : COINGECKO_FREE_URL,
       usingFallback: this.usingFallback,
-      failureCount: this.coinGeckoFailures
+      failureCount: this.coinGeckoFailures,
+      dailyCalls: this.dailyCallCount,
+      cacheSize: this.responseCache.size
     };
   }
 

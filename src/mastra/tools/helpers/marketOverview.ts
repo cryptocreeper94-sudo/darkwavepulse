@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { coinGeckoClient } from '../../../lib/coinGeckoClient.js';
 
 /**
  * Market Overview Helper
@@ -17,9 +18,8 @@ export const STOCK_TICKERS = {
   nft: [] // Stocks don't have NFT category
 };
 
-// Cache for market data (5 minutes TTL)
 const marketCache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 export interface MarketOverviewItem {
   rank: number;
@@ -174,27 +174,25 @@ export async function fetchCryptoOverview(category: string, logger?: any): Promi
   }
   
   try {
-    let url = '';
-    
-    // Build CoinGecko URL based on category
-    if (category === 'top') {
-      url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&sparkline=true&price_change_percentage=1h,24h,7d';
-    } else if (category === 'trending') {
-      url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=50&sparkline=true&price_change_percentage=1h,24h,7d';
+    let params: any = {
+      vs_currency: 'usd',
+      sparkline: true,
+      price_change_percentage: '1h,24h,7d',
+      per_page: 50,
+      order: 'market_cap_desc'
+    };
+
+    if (category === 'trending') {
+      params.order = 'volume_desc';
     } else if (category === 'gainers' || category === 'losers') {
-      url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&sparkline=true&price_change_percentage=1h,24h,7d';
+      params.per_page = 100;
     } else if (category === 'new') {
-      url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=gecko_desc&per_page=50&sparkline=true&price_change_percentage=1h,24h,7d';
+      params.order = 'gecko_desc';
     } else if (category === 'defi') {
-      const defiIds = 'uniswap,aave,maker,lido-dao,curve-dao-token,compound-governance-token,pancakeswap-token,synthetix-network-token,yearn-finance,sushi,thorchain,convex-finance,frax-share,rocket-pool,balancer,1inch,0x,raydium,gmx,ribbon-finance';
-      url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${defiIds}&order=market_cap_desc&per_page=50&sparkline=true&price_change_percentage=1h,24h,7d`;
-    } else {
-      // Default to top
-      url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&sparkline=true&price_change_percentage=1h,24h,7d';
+      params.ids = 'uniswap,aave,maker,lido-dao,curve-dao-token,compound-governance-token,pancakeswap-token,synthetix-network-token,yearn-finance,sushi,thorchain,convex-finance,frax-share,rocket-pool,balancer,1inch,0x,raydium,gmx,ribbon-finance';
     }
-    
-    const response = await axios.get(url, { timeout: 10000 });
-    let data = response.data;
+
+    let data = await coinGeckoClient.getMarkets(params);
     
     // Filter and sort for gainers/losers
     if (category === 'gainers') {

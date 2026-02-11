@@ -5534,17 +5534,13 @@ export const mastra = new Mastra({
           const coinId = c.req.param('coinId');
           
           try {
-            const axios = await import('axios');
-            const response = await axios.default.get(
-              `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_market_cap_change_percentage_24h_in=usd`
-            );
+            const priceData = await coinGeckoClient.getSimplePrice(coinId, 'usd', true, true, true);
             
-            const data = response.data[coinId];
+            const data = priceData[coinId];
             if (!data) {
               return c.json({ error: 'Coin not found' }, 404);
             }
             
-            // Format response for frontend
             const result = {
               name: coinId,
               symbol: coinId.toUpperCase(),
@@ -5572,9 +5568,6 @@ export const mastra = new Mastra({
           const limit = parseInt(c.req.query('limit') || '730');
           
           try {
-            const axios = await import('axios');
-            
-            // Map CoinGecko intervals
             const daysMap: Record<string, number> = {
               '1m': 1,
               '5m': 1,
@@ -5588,11 +5581,9 @@ export const mastra = new Mastra({
             };
             
             const days = daysMap[interval] || 365;
-            const response = await axios.default.get(
-              `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`
-            );
+            const chartData = await coinGeckoClient.getMarketChart(coinId, days);
             
-            const prices = response.data.prices || [];
+            const prices = chartData.prices || [];
             
             // Convert to candlestick format (OHLCV)
             const candles = prices.slice(-limit).map((price: any, index: number) => ({
@@ -5620,12 +5611,7 @@ export const mastra = new Mastra({
           const coinId = c.req.param('coinId');
           
           try {
-            const axios = await import('axios');
-            const response = await axios.default.get(
-              `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false`
-            );
-            
-            const data = response.data;
+            const data = await coinGeckoClient.getCoinDetails(coinId);
             const result = {
               ath: data.market_data?.ath?.usd || 0,
               athChangePercentage: data.market_data?.ath_change_percentage?.usd || 0,
@@ -5635,7 +5621,7 @@ export const mastra = new Mastra({
             return c.json(result);
           } catch (error: any) {
             logger?.error('Failed to fetch ATH data:', { coinId, error: error.message });
-            return c.json(null); // Return null on error
+            return c.json(null);
           }
         },
       },
@@ -6930,15 +6916,7 @@ export const mastra = new Mastra({
             };
             
             const coinId = symbolToId[symbol] || symbol.toLowerCase();
-            const response = await fetch(
-              `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`
-            );
-            
-            if (!response.ok) {
-              throw new Error('CoinGecko API error');
-            }
-            
-            const data = await response.json();
+            const data = await coinGeckoClient.getSimplePrice(coinId, 'usd', false, false, true);
             const coinData = data[coinId];
             
             if (!coinData) {
@@ -7022,16 +7000,7 @@ export const mastra = new Mastra({
             
             const coinId = symbolToId[symbol] || symbol.toLowerCase();
             
-            // Fetch market data from CoinGecko
-            const response = await fetch(
-              `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`
-            );
-            
-            if (!response.ok) {
-              throw new Error('Failed to fetch coin data');
-            }
-            
-            const data = await response.json();
+            const data = await coinGeckoClient.getCoinDetails(coinId);
             const marketData = data.market_data;
             
             // Generate simple signal based on price changes
