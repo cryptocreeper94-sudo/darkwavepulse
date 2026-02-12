@@ -131,7 +131,7 @@ export default function FlipCarousel({
       </div>
 
       {(showArrows || showDots) && items.length > 1 && (
-        <div style={{
+        <div className="flip-carousel-nav" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -142,6 +142,7 @@ export default function FlipCarousel({
         }}>
           {showArrows && (
             <button
+              className="flip-carousel-arrow"
               onClick={prev}
               disabled={isFlipping}
               style={{
@@ -167,14 +168,14 @@ export default function FlipCarousel({
             </button>
           )}
 
-          <div style={{
+          <div className="flip-carousel-center" style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 6,
           }}>
             {showDots && (
-              <div style={{
+              <div className="flip-carousel-dots" style={{
                 display: 'flex',
                 gap: isMobileView ? 4 : 6,
               }}>
@@ -254,6 +255,7 @@ export default function FlipCarousel({
 
           {showArrows && (
             <button
+              className="flip-carousel-arrow"
               onClick={next}
               disabled={isFlipping}
               style={{

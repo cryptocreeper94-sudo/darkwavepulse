@@ -1453,48 +1453,48 @@ export const mastra = new Mastra({
             
             switch (category) {
               case 'top':
-                rawData = await coinGeckoClient.getMarkets({ per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'meme':
-                rawData = await coinGeckoClient.getMarkets({ category: 'meme-token', per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'meme-token', per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'defi':
-                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-finance-defi', per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-finance-defi', per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'dex':
-                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-exchange', per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-exchange', per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'gainers':
                 const gainersData = await coinGeckoClient.getMarkets({
                   order: 'market_cap_desc',
-                  per_page: 100,
+                  per_page: 250,
                   price_change_percentage: priceChangeParam
                 });
                 coins = gainersData
                   .filter((coin: any) => (coin[priceChangeKey] || coin.price_change_percentage_24h || 0) > 0)
                   .sort((a: any, b: any) => (b[priceChangeKey] || b.price_change_percentage_24h || 0) - (a[priceChangeKey] || a.price_change_percentage_24h || 0))
-                  .slice(0, 20)
+                  .slice(0, 50)
                   .map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'losers':
                 const losersData = await coinGeckoClient.getMarkets({
                   order: 'market_cap_desc',
-                  per_page: 100,
+                  per_page: 250,
                   price_change_percentage: priceChangeParam
                 });
                 coins = losersData
                   .filter((coin: any) => (coin[priceChangeKey] || coin.price_change_percentage_24h || 0) < 0)
                   .sort((a: any, b: any) => (a[priceChangeKey] || a.price_change_percentage_24h || 0) - (b[priceChangeKey] || b.price_change_percentage_24h || 0))
-                  .slice(0, 20)
+                  .slice(0, 50)
                   .map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 

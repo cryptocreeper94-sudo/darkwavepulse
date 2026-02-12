@@ -323,6 +323,8 @@ var init_coinGeckoClient = __esm({
           return results;
         }
         if (endpoint.includes("/coins/markets")) {
+          const requestedCount = params.per_page || 50;
+          if (requestedCount > 10) throw new Error("Kraken limited to 10 pairs");
           const response = await axios.get(`${api.baseUrl}/Ticker`, {
             timeout: 1e4,
             params: { pair: "BTCUSD,ETHUSD,SOLUSD,XRPUSD,ADAUSD,DOGEUSD,DOTUSD,LINKUSD,LTCUSD,UNIUSD" }
@@ -34609,19 +34611,19 @@ var mastra = new Mastra({
             const priceChangeParam = timeframe === "1h" ? "1h,24h" : "24h";
             switch (category) {
               case "top":
-                rawData = await coinGeckoClient.getMarkets({ per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
               case "meme":
-                rawData = await coinGeckoClient.getMarkets({ category: "meme-token", per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: "meme-token", per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
               case "defi":
-                rawData = await coinGeckoClient.getMarkets({ category: "decentralized-finance-defi", per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: "decentralized-finance-defi", per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
               case "dex":
-                rawData = await coinGeckoClient.getMarkets({ category: "decentralized-exchange", per_page: 20, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: "decentralized-exchange", per_page: 50, price_change_percentage: priceChangeParam });
                 coins = rawData.map((coin) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
               case "gainers":

@@ -236,12 +236,16 @@ class CoinGeckoClient {
 
   private async fetchFromCryptoCompare(endpoint: string, params: any): Promise<any> {
     const api = FALLBACK_APIS[1];
+    console.log(`[CryptoCompare DEBUG] endpoint="${endpoint}", params.per_page=${params.per_page}, params keys=${Object.keys(params).join(',')}`);
     
     if (endpoint.includes('/coins/markets') || endpoint.includes('/simple/price')) {
+      const requestedLimit = params.per_page || 50;
+      console.log(`[CryptoCompare] Requesting ${requestedLimit} coins (per_page: ${params.per_page}, endpoint: ${endpoint})`);
       const response = await axios.get(`${api.baseUrl}/data/top/mktcapfull`, {
         timeout: 10000,
-        params: { limit: params.per_page || 50, tsym: 'USD' }
+        params: { limit: requestedLimit, tsym: 'USD' }
       });
+      console.log(`[CryptoCompare] API returned ${response.data.Data?.length} coins`);
       
       return response.data.Data.map((item: any, index: number) => ({
         id: item.CoinInfo.Name.toLowerCase(),
@@ -363,6 +367,10 @@ class CoinGeckoClient {
     }
     
     if (endpoint.includes('/coins/markets')) {
+      const requestedCount = params.per_page || 50;
+      if (requestedCount > 10) {
+        throw new Error('Kraken only supports up to 10 market pairs - use CryptoCompare for larger requests');
+      }
       const response = await axios.get(`${api.baseUrl}/Ticker`, {
         timeout: 10000,
         params: { pair: 'BTCUSD,ETHUSD,SOLUSD,XRPUSD,ADAUSD,DOGEUSD,DOTUSD,LINKUSD,LTCUSD,UNIUSD' }
@@ -553,7 +561,7 @@ class CoinGeckoClient {
       params: {
         vs_currency: 'usd',
         order: 'market_cap_desc',
-        per_page: 10,
+        per_page: 50,
         page: 1,
         sparkline: false,
         price_change_percentage: '24h',

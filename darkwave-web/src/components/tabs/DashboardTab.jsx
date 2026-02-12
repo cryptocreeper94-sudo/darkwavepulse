@@ -495,10 +495,10 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
       return categoryCoins.filter(c => 
         c.name?.toLowerCase().includes(query) || 
         c.symbol?.toLowerCase().includes(query)
-      ).slice(0, 20)
+      ).slice(0, 50)
     }
     
-    return categoryCoins.slice(0, 20)
+    return categoryCoins.slice(0, 50)
   }
   
   const handleSearchChange = async (e) => {
@@ -538,7 +538,7 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
   
   const isMobileView = window.matchMedia('(max-width: 1024px)').matches
   return (
-    <div style={{ height: isMobileView ? 380 : 600, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: isMobileView ? 'auto' : 600, minHeight: isMobileView ? 300 : 600, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobileView ? 6 : 8, flexWrap: 'wrap', gap: isMobileView ? 4 : 8 }}>
         <TileLabel>{category === 'top' ? 'Top Coins' : category === 'gainers' ? 'Top Gainers' : category === 'losers' ? 'Top Losers' : category === 'meme' ? 'Meme Coins' : category === 'defi' ? 'DeFi' : 'DEX Tokens'}</TileLabel>
         <div style={{ display: 'flex', gap: 4, background: 'var(--bg-surface-2)', borderRadius: 6, padding: 2 }}>
@@ -574,8 +574,8 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
           </button>
         </div>
       </div>
-      <div className="coin-filter-section">
-        <div className="coin-filter-buttons">
+      <div className="coin-filter-section" style={{ display: 'flex', flexWrap: 'wrap', gap: isMobileView ? 4 : 8, alignItems: 'center' }}>
+        <div className="coin-filter-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: isMobileView ? 3 : 4 }}>
           {coinCategories.map(cat => (
             <button
               key={cat.id}
@@ -586,23 +586,24 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
             </button>
           ))}
         </div>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', width: isMobileView ? '100%' : 'auto' }}>
           <input
             type="text"
-            placeholder="Search coin or paste contract address..."
+            placeholder={isMobileView ? "Search or paste address..." : "Search coin or paste contract address..."}
             value={searchQuery}
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
             style={{
-              width: 220,
-              padding: '8px 12px',
-              fontSize: 12,
+              width: isMobileView ? '100%' : 220,
+              padding: isMobileView ? '6px 10px' : '8px 12px',
+              fontSize: isMobileView ? 11 : 12,
               background: 'var(--bg-surface-2)',
               border: '1px solid var(--border-color)',
               borderRadius: 8,
               color: 'var(--text-primary)',
               outline: 'none',
               transition: 'border-color 0.2s',
+              boxSizing: 'border-box',
             }}
             onFocus={(e) => e.target.style.borderColor = '#00D4FF'}
             onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
@@ -614,13 +615,14 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
           )}
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
-        <div style={{ fontSize: 11, color: 'var(--text-dim)', display: 'flex', padding: '8px 4px', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, background: 'var(--bg-surface)', zIndex: 1, minWidth: 320, letterSpacing: '0.04em' }}>
-          <span style={{ width: '10%', minWidth: 32, textAlign: 'center' }}>#</span>
-          <span style={{ width: '30%', minWidth: 80 }}>Coin</span>
-          <span style={{ width: '25%', minWidth: 70, textAlign: 'right' }}>Price</span>
-          <span style={{ width: '15%', minWidth: 55, textAlign: 'right' }}>{timeframe === '1h' ? '1h' : '24h'}</span>
-          <span style={{ width: '20%', minWidth: 60, textAlign: 'right' }}>Volume</span>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: isMobileView ? 'hidden' : 'auto' }}>
+        <div style={{ fontSize: isMobileView ? 10 : 11, color: 'var(--text-dim)', display: 'flex', padding: isMobileView ? '6px 2px' : '8px 4px', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, background: 'var(--bg-surface)', zIndex: 1, letterSpacing: '0.04em' }}>
+          <span style={{ width: isMobileView ? '8%' : '10%', minWidth: isMobileView ? 24 : 32, textAlign: 'center' }}>#</span>
+          <span style={{ width: isMobileView ? '28%' : '30%', minWidth: isMobileView ? 60 : 80 }}>Coin</span>
+          <span style={{ width: isMobileView ? '28%' : '25%', minWidth: isMobileView ? 55 : 70, textAlign: 'right' }}>Price</span>
+          <span style={{ width: isMobileView ? '16%' : '15%', minWidth: isMobileView ? 40 : 55, textAlign: 'right' }}>{timeframe === '1h' ? '1h' : '24h'}</span>
+          {!isMobileView && <span style={{ width: '20%', minWidth: 60, textAlign: 'right' }}>Volume</span>}
+          {isMobileView && <span style={{ width: '20%', minWidth: 40, textAlign: 'right' }}>Vol</span>}
         </div>
         {loading ? (
           <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>
@@ -646,44 +648,45 @@ function MiniCoinTable({ coins: initialCoins, onCoinClick, favorites, selectedCo
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                padding: '10px 4px',
+                padding: isMobileView ? '8px 2px' : '10px 4px',
                 borderBottom: '1px solid var(--bg-surface-2)',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
                 background: isSelected ? 'rgba(0, 212, 255, 0.1)' : 'transparent',
                 borderLeft: isSelected ? '2px solid #00D4FF' : '2px solid transparent',
-                minWidth: 320,
               }}
               onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--bg-surface-2)' }}
               onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
             >
-              <div style={{ width: '8%', minWidth: 28, textAlign: 'center', fontSize: 11, color: '#00D4FF', fontWeight: 600 }}>
+              <div style={{ width: isMobileView ? '8%' : '8%', minWidth: isMobileView ? 20 : 28, textAlign: 'center', fontSize: isMobileView ? 10 : 11, color: '#00D4FF', fontWeight: 600 }}>
                 {i + 1}
               </div>
-              <div style={{ width: '22%', minWidth: 70, display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: isMobileView ? '28%' : '22%', minWidth: isMobileView ? 55 : 70, display: 'flex', alignItems: 'center', gap: isMobileView ? 3 : 5 }}>
                 {coin.image && (
-                  <img src={coin.image} alt="" style={{ width: 18, height: 18, borderRadius: '50%' }} onError={(e) => e.target.style.display = 'none'} />
+                  <img src={coin.image} alt="" style={{ width: isMobileView ? 14 : 18, height: isMobileView ? 14 : 18, borderRadius: '50%', flexShrink: 0 }} onError={(e) => e.target.style.display = 'none'} />
                 )}
-                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>
+                <span style={{ fontSize: isMobileView ? 10 : 11, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {coin.symbol?.toUpperCase()}
                   {isFavorite(coin.symbol) && <span style={{ color: 'var(--neon-blue)', marginLeft: 2 }}>★</span>}
                 </span>
               </div>
-              <div style={{ width: '20%', minWidth: 60, textAlign: 'right', fontSize: 11, color: 'var(--text-primary)' }}>
+              <div style={{ width: isMobileView ? '28%' : '20%', minWidth: isMobileView ? 50 : 60, textAlign: 'right', fontSize: isMobileView ? 10 : 11, color: 'var(--text-primary)' }}>
                 {formatPrice(priceNum)}
               </div>
-              <div style={{ width: '12%', minWidth: 48, textAlign: 'right', fontSize: 10, fontWeight: 600, color: isPositive ? 'var(--neon-green)' : 'var(--accent-red)' }}>
+              <div style={{ width: isMobileView ? '16%' : '12%', minWidth: isMobileView ? 36 : 48, textAlign: 'right', fontSize: isMobileView ? 9 : 10, fontWeight: 600, color: isPositive ? 'var(--neon-green)' : 'var(--accent-red)' }}>
                 {isPositive ? '+' : ''}{changeNum.toFixed(1)}%
               </div>
-              <div style={{ width: '18%', minWidth: 70, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Sparkline 
-                  data={coin.sparkline_in_7d?.price || coin.sparkline || null}
-                  width={60}
-                  height={24}
-                  showPositive={true}
-                />
-              </div>
-              <div style={{ width: '18%', minWidth: 55, textAlign: 'right', fontSize: 10, color: 'var(--text-secondary)' }}>
+              {!isMobileView && (
+                <div style={{ width: '18%', minWidth: 70, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <Sparkline 
+                    data={coin.sparkline_in_7d?.price || coin.sparkline || null}
+                    width={60}
+                    height={24}
+                    showPositive={true}
+                  />
+                </div>
+              )}
+              <div style={{ width: isMobileView ? '20%' : '18%', minWidth: isMobileView ? 40 : 55, textAlign: 'right', fontSize: isMobileView ? 9 : 10, color: 'var(--text-secondary)' }}>
                 {vol}
               </div>
             </div>
