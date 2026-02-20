@@ -93,6 +93,10 @@ var server = http.createServer((req, res) => {
     handleEcosystemWidgetRequest(req, res, urlPath);
     return;
   }
+  if (urlPath.startsWith("/api/ecosystem/shared/")) {
+    handleSharedComponentsRequest(req, res, urlPath, req.url || urlPath);
+    return;
+  }
   if (urlPath.startsWith("/api/")) {
     const proxyReq = http.request({
       hostname: "127.0.0.1",
@@ -638,6 +642,217 @@ async function handlePinRequest(req, res, urlPath) {
     return;
   }
   jsonResponse(res, 404, { success: false, error: "PIN endpoint not found" });
+}
+var SHARED_COMPONENT_SLUGS = ["footer", "announcement-bar", "trust-badge"];
+function renderSharedFooter(theme) {
+  const bg = theme === "light" ? "#f5f5f5" : "#0a0a0a";
+  const border = theme === "light" ? "#ddd" : "#1a1a1a";
+  const textPrimary = theme === "light" ? "#222" : "#ccc";
+  const textSecondary = theme === "light" ? "#666" : "#888";
+  const accent = "#00D4FF";
+  return `<footer id="dw-shared-footer" style="width:100%;padding:16px 24px;background:${bg};border-top:1px solid ${border};display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;box-sizing:border-box;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="https://x.com/DarkWaveStudios" target="_blank" rel="noopener noreferrer" style="opacity:0.5;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.5">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="${textPrimary}"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <a href="https://t.me/DarkWaveStudios" target="_blank" rel="noopener noreferrer" style="opacity:0.5;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.5">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="${textPrimary}"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    </a>
+    <a href="https://facebook.com/DarkWaveStudios" target="_blank" rel="noopener noreferrer" style="opacity:0.5;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.5">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="${textPrimary}"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </a>
+  </div>
+  <span style="color:${textSecondary};font-size:12px;">Powered by <a href="https://darkwavestudios.io" target="_blank" rel="noopener" style="color:${accent};text-decoration:none;font-weight:600;">DarkWave Studios, LLC</a> &copy; ${(/* @__PURE__ */ new Date()).getFullYear()}</span>
+</footer>`;
+}
+function renderSharedAnnouncementBar(theme) {
+  const bg = theme === "light" ? "#e8f4ff" : "linear-gradient(90deg, rgba(0,212,255,0.08), rgba(57,255,20,0.04))";
+  const border = theme === "light" ? "#b3d9ff" : "rgba(0,212,255,0.15)";
+  const text = theme === "light" ? "#1a4a6b" : "#ccc";
+  const accent = "#00D4FF";
+  return `<div id="dw-shared-announcement-bar" style="width:100%;padding:10px 20px;background:${bg};border-bottom:1px solid ${border};display:flex;justify-content:center;align-items:center;gap:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;box-sizing:border-box;">
+  <span style="width:6px;height:6px;border-radius:50%;background:#39FF14;box-shadow:0 0 6px rgba(57,255,20,0.5);flex-shrink:0;"></span>
+  <span style="color:${text};font-size:12px;">Part of the <a href="https://dwsc.io" target="_blank" rel="noopener" style="color:${accent};font-weight:700;text-decoration:none;">DarkWave Trust Layer</a> ecosystem &mdash; AI-verified &amp; blockchain-secured</span>
+  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:${text};cursor:pointer;font-size:16px;padding:0 4px;opacity:0.5;line-height:1;" aria-label="Dismiss">&times;</button>
+</div>`;
+}
+function renderSharedTrustBadge(theme) {
+  const bg = theme === "light" ? "#fff" : "#0f0f0f";
+  const border = theme === "light" ? "rgba(0,212,255,0.3)" : "rgba(0,212,255,0.3)";
+  const text = theme === "light" ? "#555" : "#ccc";
+  const label = "#00D4FF";
+  return `<div id="dw-shared-trust-badge" style="position:fixed;bottom:20px;right:20px;z-index:999998;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <a href="https://dwsc.io" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:${bg};border:1px solid ${border};border-radius:12px;text-decoration:none;box-shadow:0 4px 24px rgba(0,212,255,0.15);transition:all 0.3s ease;" onmouseenter="this.style.borderColor='rgba(0,212,255,0.6)';this.style.boxShadow='0 4px 32px rgba(0,212,255,0.3)'" onmouseleave="this.style.borderColor='${border}';this.style.boxShadow='0 4px 24px rgba(0,212,255,0.15)'">
+    <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#00D4FF,#39FF14);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#000;flex-shrink:0;">DW</div>
+    <div>
+      <div style="color:${label};font-weight:700;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;">DarkWave Trust Layer</div>
+      <div style="color:${text};font-size:11px;">Verified Ecosystem</div>
+    </div>
+    <div style="width:8px;height:8px;border-radius:50%;background:#39FF14;box-shadow:0 0 6px rgba(57,255,20,0.6);flex-shrink:0;animation:dw-shared-pulse 2s infinite;"></div>
+  </a>
+  <style>@keyframes dw-shared-pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>
+</div>`;
+}
+function getSharedComponentHTML(slug, theme) {
+  switch (slug) {
+    case "footer":
+      return renderSharedFooter(theme);
+    case "announcement-bar":
+      return renderSharedAnnouncementBar(theme);
+    case "trust-badge":
+      return renderSharedTrustBadge(theme);
+    default:
+      return null;
+  }
+}
+function buildLoaderScript() {
+  return `(function(){
+  "use strict";
+  var script = document.currentScript;
+  if (!script) return;
+
+  var BASE = new URL(script.src).origin;
+  var requested = (script.getAttribute("data-components") || "").trim();
+  var theme = script.getAttribute("data-theme") || "dark";
+
+  var ALL = ["footer","announcement-bar","trust-badge"];
+  var components = requested === "all" ? ALL : requested.split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+  if (!components.length) return;
+
+  var url = BASE + "/api/ecosystem/shared/bundle?components=" + encodeURIComponent(components.join(",")) + "&theme=" + encodeURIComponent(theme);
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data.success) return;
+      var items = data.components || {};
+
+      Object.keys(items).forEach(function(slug){
+        var html = items[slug];
+        if (!html) return;
+
+        var existing = document.getElementById("dw-shared-" + slug);
+        if (existing) {
+          existing.innerHTML = html;
+          return;
+        }
+
+        var wrapper = document.createElement("div");
+        wrapper.innerHTML = html;
+        var el = wrapper.firstElementChild || wrapper;
+
+        if (slug === "footer") {
+          document.body.appendChild(el);
+        } else if (slug === "announcement-bar") {
+          document.body.insertBefore(el, document.body.firstChild);
+        } else if (slug === "trust-badge") {
+          document.body.appendChild(el);
+        } else {
+          document.body.appendChild(el);
+        }
+      });
+    })
+    .catch(function(err){
+      console.warn("[DarkWave Shared] Failed to load components:", err);
+    });
+})();`;
+}
+async function handleSharedComponentsRequest(req, res, urlPath, fullUrl) {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, OPTIONS"
+  };
+  if (req.method === "OPTIONS") {
+    res.writeHead(204, corsHeaders);
+    res.end();
+    return;
+  }
+  const query = new URL(fullUrl, "http://localhost").searchParams;
+  const theme = query.get("theme") || "dark";
+  if (urlPath === "/api/ecosystem/shared/loader.js") {
+    res.writeHead(200, {
+      ...corsHeaders,
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "public, max-age=300"
+    });
+    res.end(buildLoaderScript());
+    return;
+  }
+  if (urlPath.startsWith("/api/ecosystem/shared/render/")) {
+    const slug = urlPath.replace("/api/ecosystem/shared/render/", "");
+    const html = getSharedComponentHTML(slug, theme);
+    if (!html) {
+      res.writeHead(404, { ...corsHeaders, "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: `Unknown component: ${slug}`, available: SHARED_COMPONENT_SLUGS }));
+      return;
+    }
+    res.writeHead(200, {
+      ...corsHeaders,
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=300"
+    });
+    res.end(html);
+    return;
+  }
+  if (urlPath === "/api/ecosystem/shared/bundle") {
+    const requested = (query.get("components") || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const all = requested.includes("all") ? [...SHARED_COMPONENT_SLUGS] : requested;
+    const components = {};
+    for (const slug of all) {
+      components[slug] = getSharedComponentHTML(slug, theme);
+    }
+    res.writeHead(200, {
+      ...corsHeaders,
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=300"
+    });
+    res.end(JSON.stringify({
+      success: true,
+      theme,
+      components,
+      available: [...SHARED_COMPONENT_SLUGS],
+      generatedAt: (/* @__PURE__ */ new Date()).toISOString()
+    }));
+    return;
+  }
+  if (urlPath === "/api/ecosystem/shared/manifest") {
+    res.writeHead(200, {
+      ...corsHeaders,
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=600"
+    });
+    res.end(JSON.stringify({
+      success: true,
+      name: "DarkWave Shared Components",
+      version: "1.0",
+      components: SHARED_COMPONENT_SLUGS.map((slug) => ({
+        slug,
+        placement: slug === "footer" ? "bottom" : slug === "announcement-bar" ? "top" : "fixed-bottom-right",
+        anchorId: `dw-shared-${slug}`,
+        renderUrl: `/api/ecosystem/shared/render/${slug}`
+      })),
+      loaderUrl: "/api/ecosystem/shared/loader.js",
+      bundleUrl: "/api/ecosystem/shared/bundle",
+      themes: ["dark", "light"],
+      usage: {
+        script: '<script src="https://dwsc.io/api/ecosystem/shared/loader.js" data-components="footer,announcement-bar,trust-badge" data-theme="dark"></script>',
+        anchor: '<div id="dw-shared-footer"></div>'
+      }
+    }));
+    return;
+  }
+  res.writeHead(404, { ...corsHeaders, "Content-Type": "application/json" });
+  res.end(JSON.stringify({
+    success: false,
+    error: "Shared component endpoint not found",
+    endpoints: {
+      loader: "/api/ecosystem/shared/loader.js",
+      render: "/api/ecosystem/shared/render/:slug",
+      bundle: "/api/ecosystem/shared/bundle?components=footer,trust-badge&theme=dark",
+      manifest: "/api/ecosystem/shared/manifest"
+    }
+  }));
 }
 async function handleEcosystemWidgetRequest(req, res, urlPath) {
   if (urlPath === "/api/ecosystem/widget.js" && req.method === "GET") {
