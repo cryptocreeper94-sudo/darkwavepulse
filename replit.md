@@ -29,7 +29,7 @@ The platform utilizes a dark theme exclusively, featuring solid black/dark gray 
 - **Multi-Chain Built-in Wallet**: Custom HD wallet supporting Solana and 22 EVM chains, with BIP39 mnemonic generation, AES-256-GCM encrypted storage, and biometric transaction confirmation.
 - **Dust Buster**: Solana wallet cleanup utility.
 - **Automatic Versioning System**: Manages `version.json` for frontend and backend.
-- **ORBIT Ecosystem Integration**: Facilitates cross-app communication for activity logging, code sharing, metrics, and alerts.
+- **ORBIT Ecosystem Integration**: Facilitates cross-app communication for activity logging, code sharing, metrics, and alerts. Auto-registers with ORBIT at `orbitstaffing.io` on startup. Bridge endpoints at `/api/orbit/*` (status, sso-login, register, verify) provide SSO login via ORBIT Trust Layer, user registration, and token verification. Handled directly in bootstrap.ts.
 - **Shared Components System**: Cross-app reusable UI components (footer, announcement-bar, trust-badge) served via `/api/ecosystem/shared/` endpoints. Includes loader.js for one-line integration, individual render endpoints, bundle endpoint for JSON, and manifest. Supports dark/light themes. Components auto-place (footer at bottom, announcement bar at top, trust badge fixed bottom-right). Handled directly in bootstrap.ts.
 - **Feature Specifications**: Includes user authentication, real-time crypto price tracking, AI prediction/analysis modals, admin dashboard, Telegram bot integration, 54 diverse AI Agent personas, Knowledge Base, and a Skins System.
 - **Stripe Integration**: Supports 3 pricing tiers (Pulse Pro, StrikeAgent Elite, DarkWave Complete) with free trials.

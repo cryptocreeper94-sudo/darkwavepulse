@@ -124,6 +124,12 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ORBIT Ecosystem bridge routes
+  if (urlPath.startsWith('/api/orbit/')) {
+    handleOrbitBridgeRequest(req, res, urlPath);
+    return;
+  }
+
   // Ecosystem Widget routes - handled directly (no Mastra dependency)
   if (urlPath === '/api/ecosystem/widget-data' || urlPath === '/api/ecosystem/widget.js') {
     handleEcosystemWidgetRequest(req, res, urlPath);
@@ -229,6 +235,14 @@ function startWorkers() {
   } catch (e) {
     console.error('Mastra init error:', e);
   }
+
+  // Register with ORBIT ecosystem
+  setTimeout(async () => {
+    await registerWithOrbit();
+    if (!orbitRegistered) {
+      setTimeout(() => registerWithOrbit(), 30000);
+    }
+  }, 5000);
 
   // Only start Inngest dev server in development
   const isActualDeploy = process.env.REPLIT_CONTEXT === 'deployment' && !process.env.REPLIT_DEV_DOMAIN;
@@ -1162,6 +1176,195 @@ async function handleEcosystemWidgetRequest(req: http.IncomingMessage, res: http
   }
 
   jsonResponse(res, 404, { success: false, error: 'Widget endpoint not found' });
+}
+
+// ============================================
+// ORBIT Ecosystem Integration
+// ============================================
+const ORBIT_BASE_URL = 'https://orbitstaffing.io';
+const ORBIT_REGISTER_URL = `${ORBIT_BASE_URL}/api/admin/ecosystem/register-app`;
+const ORBIT_SSO_LOGIN_URL = `${ORBIT_BASE_URL}/api/auth/ecosystem-login`;
+const ORBIT_AUTH_REGISTER_URL = `${ORBIT_BASE_URL}/api/chat/auth/register`;
+let orbitRegistered = false;
+let orbitRegistrationData: any = null;
+
+async function registerWithOrbit() {
+  try {
+    const payload = JSON.stringify({
+      appName: 'DarkWave Pulse',
+      appSlug: 'pulse',
+      category: 'DeFi',
+      description: 'AI-Powered Trading Intelligence for the Modern Trader',
+      hook: 'AI-driven crypto trading with blockchain-verified predictions',
+      websiteUrl: 'https://dwsc.io',
+      apiBaseUrl: 'https://dwsc.io/api',
+      ssoEndpoint: 'https://dwsc.io/api/sso/verify',
+      capabilities: ['ai-signals', 'predictions', 'trading', 'multi-chain-wallet', 'strike-agent'],
+      keyTags: ['Auto-Trading', 'AI Signals', 'Multi-Chain', 'StrikeAgent'],
+      sharedSecret: process.env.DARKWAVE_API_SECRET || '',
+    });
+
+    const response = await fetch(ORBIT_REGISTER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    });
+
+    const data = await response.json() as any;
+    
+    if (response.ok && (data.success !== false)) {
+      orbitRegistered = true;
+      orbitRegistrationData = data;
+      console.log('[ORBIT] Successfully registered with ORBIT ecosystem');
+    } else {
+      if (data.error?.includes('already registered') || data.error?.includes('already exists')) {
+        orbitRegistered = true;
+        console.log('[ORBIT] Already registered with ORBIT ecosystem');
+      } else {
+        console.warn('[ORBIT] Registration response:', data.error || data.message || 'Unknown response');
+      }
+    }
+  } catch (err: any) {
+    console.warn('[ORBIT] Registration failed (will retry):', err.message);
+  }
+}
+
+async function orbitSsoLogin(identifier: string, credential: string): Promise<any> {
+  try {
+    const response = await fetch(ORBIT_SSO_LOGIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, credential, sourceApp: 'pulse' }),
+    });
+    return await response.json();
+  } catch (err: any) {
+    return { success: false, error: 'ORBIT SSO unreachable: ' + err.message };
+  }
+}
+
+async function orbitAuthRegister(username: string, email: string, password: string, displayName: string): Promise<any> {
+  try {
+    const response = await fetch(ORBIT_AUTH_REGISTER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, displayName, sourceApp: 'pulse' }),
+    });
+    return await response.json();
+  } catch (err: any) {
+    return { success: false, error: 'ORBIT auth unreachable: ' + err.message };
+  }
+}
+
+function handleOrbitBridgeRequest(req: http.IncomingMessage, res: http.ServerResponse, urlPath: string) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, x-darkwave-secret');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  if (urlPath === '/api/orbit/status' && req.method === 'GET') {
+    jsonResponse(res, 200, {
+      success: true,
+      connected: orbitRegistered,
+      orbitUrl: ORBIT_BASE_URL,
+      appSlug: 'pulse',
+      endpoints: {
+        status: '/api/orbit/status',
+        ssoLogin: '/api/orbit/sso-login',
+        register: '/api/orbit/register',
+        verify: '/api/orbit/verify',
+      },
+      registrationData: orbitRegistrationData ? { registered: true } : { registered: false },
+    });
+    return;
+  }
+
+  if (urlPath === '/api/orbit/sso-login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => body += chunk);
+    req.on('end', async () => {
+      try {
+        const { identifier, credential } = JSON.parse(body);
+        if (!identifier || !credential) {
+          jsonResponse(res, 400, { success: false, error: 'identifier and credential are required' });
+          return;
+        }
+        const result = await orbitSsoLogin(identifier, credential);
+        
+        if (result.success && result.token) {
+          const localToken = mintJwt({
+            sub: result.userId || result.uid || identifier,
+            email: result.email || identifier,
+            displayName: result.displayName || result.username || identifier,
+            sourceApp: 'orbit',
+            orbitVerified: true,
+            type: 'cross_app',
+          }, SSO_TOKEN_TTL);
+          
+          jsonResponse(res, 200, {
+            success: true,
+            orbitToken: result.token,
+            pulseToken: localToken,
+            expiresIn: SSO_TOKEN_TTL,
+            user: result.user || { email: result.email || identifier },
+          });
+        } else {
+          jsonResponse(res, result.status || 401, result);
+        }
+      } catch (err: any) {
+        jsonResponse(res, 500, { success: false, error: 'Failed to process SSO login' });
+      }
+    });
+    return;
+  }
+
+  if (urlPath === '/api/orbit/register' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => body += chunk);
+    req.on('end', async () => {
+      try {
+        const { username, email, password, displayName } = JSON.parse(body);
+        if (!username || !email || !password || !displayName) {
+          jsonResponse(res, 400, { success: false, error: 'username, email, password, and displayName are required' });
+          return;
+        }
+        const result = await orbitAuthRegister(username, email, password, displayName);
+        jsonResponse(res, result.success === false ? (result.status || 400) : 200, result);
+      } catch (err: any) {
+        jsonResponse(res, 500, { success: false, error: 'Failed to process registration' });
+      }
+    });
+    return;
+  }
+
+  if (urlPath === '/api/orbit/verify' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => body += chunk);
+    req.on('end', async () => {
+      try {
+        const { token } = JSON.parse(body);
+        if (!token) {
+          jsonResponse(res, 400, { success: false, error: 'Token required' });
+          return;
+        }
+        const payload = verifyJwt(token);
+        if (payload) {
+          jsonResponse(res, 200, { success: true, valid: true, payload });
+        } else {
+          jsonResponse(res, 401, { success: false, valid: false, error: 'Invalid or expired token' });
+        }
+      } catch (err: any) {
+        jsonResponse(res, 500, { success: false, error: 'Verification failed' });
+      }
+    });
+    return;
+  }
+
+  jsonResponse(res, 404, { success: false, error: 'ORBIT endpoint not found' });
 }
 
 let inngestProcess: ReturnType<typeof spawn> | null = null;
