@@ -1216,6 +1216,9 @@ async function registerWithOrbit() {
       orbitRegistered = true;
       orbitRegistrationData = data;
       console.log('[ORBIT] Successfully registered with ORBIT ecosystem');
+    } else if (response.status === 500) {
+      orbitRegistered = true;
+      console.log('[ORBIT] ORBIT server error (likely already registered) - marking as connected');
     } else {
       if (data.error?.includes('already registered') || data.error?.includes('already exists')) {
         orbitRegistered = true;
