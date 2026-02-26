@@ -5002,6 +5002,14 @@ import crypto from "crypto";
 import { spawn } from "child_process";
 var PORT = Number(process.env.PORT || 5e3);
 var PUBLIC_DIR = path.join(process.cwd(), "public");
+process.on("uncaughtException", (err) => {
+  console.error("[Process] Uncaught exception:", err.message);
+  console.error(err.stack);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[Process] Unhandled rejection:", reason?.message || reason);
+  if (reason?.stack) console.error(reason.stack);
+});
 var LOADING_HTML = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
 var MIME_TYPES = {
   ".html": "text/html",
