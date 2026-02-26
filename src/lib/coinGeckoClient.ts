@@ -193,18 +193,21 @@ class CoinGeckoClient {
   private loadDiskCacheOnStartup(): void {
     try {
       const files = fs.readdirSync(DISK_CACHE_DIR);
+      let loaded = 0;
+      const maxCacheEntries = 10;
       for (const file of files) {
-        if (!file.endsWith('.json')) continue;
+        if (!file.endsWith('.json') || loaded >= maxCacheEntries) continue;
         try {
           const raw = fs.readFileSync(pathLib.join(DISK_CACHE_DIR, file), 'utf-8');
           const { data, timestamp } = JSON.parse(raw);
           if (Date.now() - timestamp < 3600_000) {
             const key = file.replace('.json', '');
             this.responseCache.set(key, { data, timestamp, ttl: 600_000 });
+            loaded++;
           }
         } catch {}
       }
-      console.log(`[Cache] Loaded ${this.responseCache.size} entries from disk`);
+      console.log(`[Cache] Loaded ${this.responseCache.size} entries from disk (max ${maxCacheEntries})`);
     } catch {}
   }
 

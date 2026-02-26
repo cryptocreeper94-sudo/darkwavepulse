@@ -5010,6 +5010,19 @@ process.on("unhandledRejection", (reason) => {
   console.error("[Process] Unhandled rejection:", reason?.message || reason);
   if (reason?.stack) console.error(reason.stack);
 });
+process.on("exit", (code) => {
+  console.error(`[Process] Exiting with code ${code}`);
+  console.trace("[Process] Exit stack trace");
+});
+process.on("SIGTERM", () => {
+  console.error("[Process] Received SIGTERM - ignoring to keep server alive");
+});
+process.on("SIGINT", () => {
+  console.error("[Process] Received SIGINT");
+});
+process.on("SIGHUP", () => {
+  console.error("[Process] Received SIGHUP");
+});
 var LOADING_HTML = '<!DOCTYPE html><html><head><title>Pulse</title></head><body style="background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui"><h1 style="color:#00D4FF">Loading Pulse...</h1></body></html>';
 var MIME_TYPES = {
   ".html": "text/html",
@@ -5167,9 +5180,12 @@ function startWorkers() {
   try {
     const mastraPath = path.join(process.cwd(), ".mastra", "output", "index.mjs");
     if (fs.existsSync(mastraPath)) {
-      spawn("node", [mastraPath], {
-        env: { ...process.env, PORT: "4111" },
+      const mastraChild = spawn("node", ["--max-old-space-size=512", mastraPath], {
+        env: { ...process.env, PORT: "4111", NODE_OPTIONS: "" },
         stdio: "inherit"
+      });
+      mastraChild.on("exit", (code) => {
+        console.error(`[Mastra] Child process exited with code ${code}`);
       });
       console.log("Mastra starting on 127.0.0.1:4111");
     }
@@ -5186,7 +5202,7 @@ function startWorkers() {
   if (!isActualDeploy) {
     setTimeout(() => {
       startInngestDevServer();
-    }, 1e3);
+    }, 5e3);
   } else {
     console.log("[Inngest] Autoscale deployment - using Inngest Cloud directly");
   }
