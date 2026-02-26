@@ -271,7 +271,7 @@ class CoinGeckoClient {
     if (endpoint.includes('/coins/markets') || endpoint.includes('/simple/price')) {
       const response = await axios.get(`${api.baseUrl}/assets`, {
         timeout: 10000,
-        params: { limit: params.per_page || 50 }
+        params: { limit: params.per_page || 10 }
       });
       
       return response.data.data.map((coin: any) => ({
@@ -305,7 +305,7 @@ class CoinGeckoClient {
     console.log(`[CryptoCompare DEBUG] endpoint="${endpoint}", params.per_page=${params.per_page}, params keys=${Object.keys(params).join(',')}`);
     
     if (endpoint.includes('/coins/markets') || endpoint.includes('/simple/price')) {
-      const requestedLimit = params.per_page || 50;
+      const requestedLimit = params.per_page || 10;
       console.log(`[CryptoCompare] Requesting ${requestedLimit} coins (per_page: ${params.per_page}, endpoint: ${endpoint})`);
       const response = await axios.get(`${api.baseUrl}/data/top/mktcapfull`, {
         timeout: 10000,
@@ -433,7 +433,7 @@ class CoinGeckoClient {
     }
     
     if (endpoint.includes('/coins/markets')) {
-      const requestedCount = params.per_page || 50;
+      const requestedCount = params.per_page || 10;
       if (requestedCount > 10) {
         throw new Error('Kraken only supports up to 10 market pairs - use CryptoCompare for larger requests');
       }
@@ -636,7 +636,7 @@ class CoinGeckoClient {
       params: {
         vs_currency: 'usd',
         order: 'market_cap_desc',
-        per_page: 50,
+        per_page: 10,
         page: 1,
         sparkline: false,
         price_change_percentage: '24h',

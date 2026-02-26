@@ -178,14 +178,14 @@ export async function fetchCryptoOverview(category: string, logger?: any): Promi
       vs_currency: 'usd',
       sparkline: true,
       price_change_percentage: '1h,24h,7d',
-      per_page: 50,
+      per_page: 10,
       order: 'market_cap_desc'
     };
 
     if (category === 'trending') {
       params.order = 'volume_desc';
     } else if (category === 'gainers' || category === 'losers') {
-      params.per_page = 100;
+      params.per_page = 25;
     } else if (category === 'new') {
       params.order = 'gecko_desc';
     } else if (category === 'defi') {
@@ -199,12 +199,12 @@ export async function fetchCryptoOverview(category: string, logger?: any): Promi
       data = data
         .filter((coin: any) => coin.price_change_percentage_24h > 0)
         .sort((a: any, b: any) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
-        .slice(0, 100);
+        .slice(0, 10);
     } else if (category === 'losers') {
       data = data
         .filter((coin: any) => coin.price_change_percentage_24h < 0)
         .sort((a: any, b: any) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
-        .slice(0, 100);
+        .slice(0, 10);
     }
     
     // Cache the result

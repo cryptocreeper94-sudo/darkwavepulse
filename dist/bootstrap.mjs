@@ -5178,7 +5178,9 @@ function initializeApp() {
 function startWorkers() {
   console.log("[Bootstrap] Starting Mastra and background workers...");
   try {
-    const mastraPath = path.join(process.cwd(), ".mastra", "output", "index.mjs");
+    const mastraOutputPath = path.join(process.cwd(), ".mastra", "output", "index.mjs");
+    const mastraBuildPath = path.join(process.cwd(), ".mastra", ".build", "entry-0.mjs");
+    const mastraPath = fs.existsSync(mastraOutputPath) ? mastraOutputPath : mastraBuildPath;
     if (fs.existsSync(mastraPath)) {
       const mastraChild = spawn("node", ["--max-old-space-size=512", mastraPath], {
         env: { ...process.env, PORT: "4111", NODE_OPTIONS: "" },
