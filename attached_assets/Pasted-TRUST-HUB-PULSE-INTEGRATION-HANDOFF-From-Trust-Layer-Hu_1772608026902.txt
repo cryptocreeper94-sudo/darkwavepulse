@@ -1,0 +1,96 @@
+TRUST HUB ↔ PULSE INTEGRATION HANDOFF
+From: Trust Layer Hub (trusthub.tlid.io)
+To: Pulse (darkwavepulse.com)
+Purpose: Connect Trust Hub's home dashboard to Pulse's market intelligence data via API
+
+WHO WE ARE
+Trust Layer Hub is the unified mobile command center for the 33-app DarkWave Studios / Trust Layer ecosystem. It's built with React Native / Expo SDK 54 on the frontend and Express 5 + PostgreSQL on the backend, deployed at trusthub.tlid.io. Every user in the ecosystem lands here first — it's the dashboard, wallet, and navigation hub.
+
+We want to surface Pulse's market intelligence directly on the Trust Hub home screen so users see live trading signals without leaving the Hub. When they want the full experience, we SSO them into Pulse.
+
+WHAT WE NEED FROM PULSE
+We need one or two public (unauthenticated) API endpoints that Trust Hub can poll. Here's what would be ideal:
+
+1. Market Summary Endpoint
+Something like GET /api/public/market-summary that returns a compact snapshot:
+
+{
+  "topSignals": [
+    {
+      "asset": "BTC",
+      "direction": "bullish",
+      "confidence": 78,
+      "timeframe": "4h",
+      "price": 98450.00,
+      "change24h": 2.3
+    },
+    {
+      "asset": "ETH",
+      "direction": "bearish",
+      "confidence": 65,
+      "timeframe": "1h",
+      "price": 3820.50,
+      "change24h": -1.1
+    }
+  ],
+  "marketSentiment": "bullish",
+  "sentimentScore": 72,
+  "activeSignals": 12,
+  "predictionAccuracy": 81.5,
+  "lastUpdated": "2026-03-04T05:30:00Z"
+}
+2. (Optional) Prediction Performance Endpoint
+Something like GET /api/public/stats showing Pulse's track record:
+
+{
+  "totalPredictions": 1247,
+  "accuracy": 81.5,
+  "profitableTrades": 78.2,
+  "avgReturnPerTrade": 3.4,
+  "last30dAccuracy": 84.1
+}
+WHAT WE'LL BUILD ON OUR SIDE
+Once we have live endpoints, Trust Hub will:
+
+Backend proxy — GET /api/pulse/summary on our Express server that fetches from Pulse's public endpoint, caches for 60 seconds, and serves to our mobile clients. This avoids CORS issues and adds resilience (if Pulse is cold-starting, we serve cached data).
+
+Home dashboard widget — A "Market Pulse" glassmorphic card on the Trust Hub home screen showing:
+
+Top 2-3 trading signals (asset, direction arrow, confidence %)
+Overall market sentiment indicator
+Prediction accuracy badge
+"View Full Analysis" button that deep-links to darkwavepulse.com
+Graceful fallback — If Pulse API is unavailable, the widget shows a clean "Market data loading..." state or hides entirely. No crashes, no fake data.
+
+TECHNICAL DETAILS FROM OUR SIDE
+Item	Detail
+Our backend	Express 5 + TypeScript, port 5000
+Our frontend	React Native 0.81.5 / Expo SDK 54
+How we'll call you	Server-side fetch() from our Express backend (no CORS needed)
+Cache strategy	60-second TTL in-memory cache
+Auth needed?	No — we need these endpoints to be public/unauthenticated
+Fallback behavior	Cached data or hidden widget if unavailable
+SSO	We can pass TLID via query param for deep-link into Pulse if you support it
+CURRENT ISSUE
+When we hit any /api/* route on darkwavepulse.com right now, every endpoint returns:
+
+{"error": "API starting..."}
+The frontend SPA loads fine, but the API layer appears stuck in initialization. Can you check what's blocking the backend from fully starting? Once the API is responsive, we can test the integration immediately.
+
+NEXT STEPS
+Pulse agent: Fix the API startup issue so endpoints respond
+Pulse agent: Expose one public endpoint (market summary) — even a simple one to start
+Pulse agent: Share the exact endpoint URL and response shape
+Trust Hub agent (me): Build the proxy, hook, and home screen widget
+Both: Test the live connection
+CONTACT
+Trust Hub domain: trusthub.tlid.io
+Trust Hub backend: Express on port 5000
+Developer: DarkWave Studios LLC
+Support: team@dwsc.io
+Hand this to the Pulse agent and they'll know exactly what to build on their side. Once they respond with a working endpoint, bring it back here and I'll wire it up on Trust Hub immediately.
+
+
+Scroll to latest
+
+Make, test, iterate…
