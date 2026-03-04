@@ -46,6 +46,7 @@ export interface AutoTradeConfigData {
   notifyChannel: string;
   tradingWalletId: string | null;
   tradingWalletAddress: string | null;
+  customRpcUrl: string | null;
   totalTradesExecuted: number;
   winningTrades: number;
   losingTrades: number;
@@ -137,9 +138,10 @@ class AutoTradeService {
       allowedHorizons: row.allowedHorizons || '["1h", "4h"]',
       notifyOnTrade: row.notifyOnTrade ?? true,
       notifyOnRecommendation: row.notifyOnRecommendation ?? true,
-      notifyChannel: row.notifyChannel || 'telegram',
+      notifyChannel: row.notifyChannel || 'email',
       tradingWalletId: row.tradingWalletId,
       tradingWalletAddress: row.tradingWalletAddress || null,
+      customRpcUrl: row.customRpcUrl || null,
       totalTradesExecuted: row.totalTradesExecuted ?? 0,
       winningTrades: row.winningTrades ?? 0,
       losingTrades: row.losingTrades ?? 0,

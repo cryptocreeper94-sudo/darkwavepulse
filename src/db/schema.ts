@@ -1027,12 +1027,15 @@ export const autoTradeConfig = pgTable('auto_trade_config', {
   // Notification Settings
   notifyOnTrade: boolean('notify_on_trade').default(true),
   notifyOnRecommendation: boolean('notify_on_recommendation').default(true),
-  notifyChannel: varchar('notify_channel', { length: 20 }).default('telegram'), // 'telegram' | 'email' | 'both'
+  notifyChannel: varchar('notify_channel', { length: 20 }).default('email'),
   
   // Wallet for trading (references built-in wallet)
   tradingWalletId: varchar('trading_wallet_id', { length: 255 }),
   tradingWalletAddress: varchar('trading_wallet_address', { length: 255 }),
   encryptedTradingKey: text('encrypted_trading_key'),
+
+  // Custom Solana RPC endpoint (user-provided)
+  customRpcUrl: text('custom_rpc_url'),
   
   // Stats
   totalTradesExecuted: integer('total_trades_executed').default(0),

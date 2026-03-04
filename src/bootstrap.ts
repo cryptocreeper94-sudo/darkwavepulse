@@ -2109,6 +2109,62 @@ async function handleAutoTradeWalletRequest(req: http.IncomingMessage, res: http
       return;
     }
 
+    if (urlPath === '/api/auto-trade/wallet/rpc' && req.method === 'GET') {
+      const userId = new URL(req.url || '', `http://${req.headers.host}`).searchParams.get('userId');
+      if (!userId) {
+        jsonResponse(res, 400, { error: 'userId is required' });
+        return;
+      }
+
+      const pool = await getDbPool();
+      const result = await pool.query('SELECT custom_rpc_url FROM auto_trade_config WHERE user_id = $1', [userId]);
+      await pool.end();
+
+      jsonResponse(res, 200, {
+        customRpcUrl: result.rows[0]?.custom_rpc_url || null,
+        usingDefault: !result.rows[0]?.custom_rpc_url,
+      });
+      return;
+    }
+
+    if (urlPath === '/api/auto-trade/wallet/rpc' && req.method === 'POST') {
+      const body = await readBody(req);
+      const { userId, rpcUrl } = body;
+
+      if (!userId) {
+        jsonResponse(res, 400, { error: 'userId is required' });
+        return;
+      }
+
+      if (rpcUrl && typeof rpcUrl === 'string') {
+        try {
+          const url = new URL(rpcUrl);
+          if (!['http:', 'https:'].includes(url.protocol)) {
+            jsonResponse(res, 400, { error: 'RPC URL must use http or https' });
+            return;
+          }
+        } catch {
+          jsonResponse(res, 400, { error: 'Invalid RPC URL format' });
+          return;
+        }
+      }
+
+      const pool = await getDbPool();
+      await pool.query(
+        `INSERT INTO auto_trade_config (user_id, custom_rpc_url, updated_at) VALUES ($1, $2, NOW())
+         ON CONFLICT (user_id) DO UPDATE SET custom_rpc_url = $2, updated_at = NOW()`,
+        [userId, rpcUrl || null]
+      );
+      await pool.end();
+
+      jsonResponse(res, 200, {
+        success: true,
+        customRpcUrl: rpcUrl || null,
+        message: rpcUrl ? 'Custom RPC saved' : 'Switched to default RPC',
+      });
+      return;
+    }
+
     jsonResponse(res, 404, { error: 'Auto-trade wallet endpoint not found' });
   } catch (err: any) {
     console.error('[AutoTradeWallet] Request error:', err.message);

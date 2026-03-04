@@ -356,6 +356,13 @@ class TradeExecutionService {
     return trade;
   }
 
+  private getRpcEndpoint(config: AutoTradeConfigData): string {
+    if (config.customRpcUrl) {
+      return config.customRpcUrl;
+    }
+    return SOLANA_RPC;
+  }
+
   private async executeJupiterSwap(
     userId: string,
     config: AutoTradeConfigData,
@@ -367,6 +374,7 @@ class TradeExecutionService {
       const walletConfig = await db.select({
         tradingWalletAddress: autoTradeConfig.tradingWalletAddress,
         encryptedTradingKey: autoTradeConfig.encryptedTradingKey,
+        customRpcUrl: autoTradeConfig.customRpcUrl,
       }).from(autoTradeConfig).where(eq(autoTradeConfig.userId, userId)).limit(1);
 
       if (!walletConfig[0]?.encryptedTradingKey || !walletConfig[0]?.tradingWalletAddress) {
@@ -410,11 +418,12 @@ class TradeExecutionService {
         const tx = VersionedTransaction.deserialize(txBuf);
         tx.sign([keypair]);
 
-        const connection = new Connection(SOLANA_RPC, 'confirmed');
+        const rpcEndpoint = walletConfig[0].customRpcUrl || SOLANA_RPC;
+        const connection = new Connection(rpcEndpoint, 'confirmed');
         const signature = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 3 });
         await connection.confirmTransaction(signature, 'confirmed');
 
-        logger.info({ signature, symbol: signal.tokenSymbol, solAmount: solAmount.toFixed(6) }, '[TradeExecution] BUY swap confirmed');
+        logger.info({ signature, symbol: signal.tokenSymbol, solAmount: solAmount.toFixed(6), rpc: walletConfig[0].customRpcUrl ? 'custom' : 'default' }, '[TradeExecution] BUY swap confirmed');
         return { success: true, txSignature: signature, solAmount: solAmount.toFixed(6), tokenAmount: quote.outAmount };
       } else {
         const tokenBalance = await tradeExecutorService.getWalletTokenBalance(walletAddress, signal.tokenAddress);
@@ -440,11 +449,12 @@ class TradeExecutionService {
         const tx = VersionedTransaction.deserialize(txBuf);
         tx.sign([keypair]);
 
-        const connection = new Connection(SOLANA_RPC, 'confirmed');
+        const rpcEndpoint = walletConfig[0].customRpcUrl || SOLANA_RPC;
+        const connection = new Connection(rpcEndpoint, 'confirmed');
         const signature = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 3 });
         await connection.confirmTransaction(signature, 'confirmed');
 
-        logger.info({ signature, symbol: signal.tokenSymbol }, '[TradeExecution] SELL swap confirmed');
+        logger.info({ signature, symbol: signal.tokenSymbol, rpc: walletConfig[0].customRpcUrl ? 'custom' : 'default' }, '[TradeExecution] SELL swap confirmed');
         return { success: true, txSignature: signature, tokenAmount: tokenBalance.amount, solAmount: (parseFloat(quote.outAmount) / 1e9).toFixed(6) };
       }
     } catch (error: any) {
@@ -664,9 +674,10 @@ ${statusEmoji} <b>TRADE ${status.toUpperCase()}</b> ${actionEmoji}
       allowedHorizons: row.allowedHorizons || '["1h", "4h"]',
       notifyOnTrade: row.notifyOnTrade ?? true,
       notifyOnRecommendation: row.notifyOnRecommendation ?? true,
-      notifyChannel: row.notifyChannel || 'telegram',
+      notifyChannel: row.notifyChannel || 'email',
       tradingWalletId: row.tradingWalletId,
       tradingWalletAddress: row.tradingWalletAddress || null,
+      customRpcUrl: row.customRpcUrl || null,
       totalTradesExecuted: row.totalTradesExecuted ?? 0,
       winningTrades: row.winningTrades ?? 0,
       losingTrades: row.losingTrades ?? 0,

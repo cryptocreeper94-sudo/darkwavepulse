@@ -184,7 +184,8 @@ const defaultConfig = {
   allowedHorizons: '["1h", "4h"]',
   notifyOnTrade: true,
   notifyOnRecommendation: true,
-  notifyChannel: 'telegram',
+  notifyChannel: 'email',
+  customRpcUrl: '',
   totalTradesExecuted: 0,
   winningTrades: 0,
   losingTrades: 0,
@@ -671,32 +672,95 @@ export default function AutoTradeConfig({ userId }) {
           onChange={(v) => updateConfig('notifyOnRecommendation', v)}
           disabled={!config?.enabled}
         />
-        
-        <div style={{ marginTop: '16px' }}>
-          <div style={{ color: '#888', fontSize: '13px', marginBottom: '10px' }}>
-            Notification Channel
-          </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {['telegram', 'email', 'both'].map(channel => (
-              <button
-                key={channel}
-                onClick={() => config?.enabled && updateConfig('notifyChannel', channel)}
-                disabled={!config?.enabled}
-                style={{
-                  padding: '8px 16px',
-                  background: config?.notifyChannel === channel ? '#00D4FF20' : '#141414',
-                  border: config?.notifyChannel === channel ? '1px solid #00D4FF' : '1px solid #333',
-                  borderRadius: '8px',
-                  color: config?.notifyChannel === channel ? '#00D4FF' : '#888',
-                  fontSize: '13px',
-                  cursor: config?.enabled ? 'pointer' : 'not-allowed',
-                  textTransform: 'capitalize'
-                }}
-              >
-                {channel}
-              </button>
-            ))}
-          </div>
+
+        <div style={{ marginTop: '12px', color: '#555', fontSize: '12px' }}>
+          Notifications sent via email when enabled
+        </div>
+      </div>
+
+      <div style={{
+        background: '#1a1a1a',
+        borderRadius: '16px',
+        padding: '24px',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{ 
+          color: '#fff', 
+          fontSize: '18px', 
+          margin: '0 0 6px 0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span>🌐</span>
+          Solana RPC
+        </h2>
+        <p style={{ color: '#666', fontSize: '12px', margin: '0 0 20px 0' }}>
+          Use your own Solana RPC endpoint for trade execution. Leave empty to use the default.
+        </p>
+
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            value={config?.customRpcUrl || ''}
+            onChange={(e) => updateConfig('customRpcUrl', e.target.value)}
+            placeholder="https://your-rpc-endpoint.com"
+            disabled={!config?.enabled}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              paddingRight: config?.customRpcUrl ? '80px' : '16px',
+              background: '#141414',
+              border: '1px solid #333',
+              borderRadius: '10px',
+              color: '#fff',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              outline: 'none',
+              boxSizing: 'border-box',
+              cursor: !config?.enabled ? 'not-allowed' : 'text',
+              opacity: !config?.enabled ? 0.5 : 1
+            }}
+          />
+          {config?.customRpcUrl && (
+            <button
+              onClick={() => updateConfig('customRpcUrl', '')}
+              disabled={!config?.enabled}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                padding: '4px 12px',
+                background: '#FF6B6B20',
+                border: '1px solid #FF6B6B',
+                borderRadius: '6px',
+                color: '#FF6B6B',
+                fontSize: '11px',
+                cursor: 'pointer'
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px', 
+          marginTop: '12px',
+          color: config?.customRpcUrl ? '#00D4FF' : '#555',
+          fontSize: '12px' 
+        }}>
+          <span style={{ 
+            width: '8px', 
+            height: '8px', 
+            borderRadius: '50%', 
+            background: config?.customRpcUrl ? '#00D4FF' : '#555',
+            display: 'inline-block'
+          }} />
+          {config?.customRpcUrl ? 'Using custom RPC endpoint' : 'Using default RPC endpoint'}
         </div>
       </div>
 

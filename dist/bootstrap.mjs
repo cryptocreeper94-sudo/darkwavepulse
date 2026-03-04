@@ -40326,12 +40326,13 @@ var init_schema2 = __esm({
       // Notification Settings
       notifyOnTrade: boolean("notify_on_trade").default(true),
       notifyOnRecommendation: boolean("notify_on_recommendation").default(true),
-      notifyChannel: varchar("notify_channel", { length: 20 }).default("telegram"),
-      // 'telegram' | 'email' | 'both'
+      notifyChannel: varchar("notify_channel", { length: 20 }).default("email"),
       // Wallet for trading (references built-in wallet)
       tradingWalletId: varchar("trading_wallet_id", { length: 255 }),
       tradingWalletAddress: varchar("trading_wallet_address", { length: 255 }),
       encryptedTradingKey: text("encrypted_trading_key"),
+      // Custom Solana RPC endpoint (user-provided)
+      customRpcUrl: text("custom_rpc_url"),
       // Stats
       totalTradesExecuted: integer("total_trades_executed").default(0),
       winningTrades: integer("winning_trades").default(0),
@@ -61770,9 +61771,10 @@ var init_autoTradeService = __esm({
           allowedHorizons: row.allowedHorizons || '["1h", "4h"]',
           notifyOnTrade: row.notifyOnTrade ?? true,
           notifyOnRecommendation: row.notifyOnRecommendation ?? true,
-          notifyChannel: row.notifyChannel || "telegram",
+          notifyChannel: row.notifyChannel || "email",
           tradingWalletId: row.tradingWalletId,
           tradingWalletAddress: row.tradingWalletAddress || null,
+          customRpcUrl: row.customRpcUrl || null,
           totalTradesExecuted: row.totalTradesExecuted ?? 0,
           winningTrades: row.winningTrades ?? 0,
           losingTrades: row.losingTrades ?? 0,
@@ -64015,11 +64017,18 @@ var init_tradeExecutionService = __esm({
         }
         return trade;
       }
+      getRpcEndpoint(config) {
+        if (config.customRpcUrl) {
+          return config.customRpcUrl;
+        }
+        return SOLANA_RPC;
+      }
       async executeJupiterSwap(userId, config, signal, amountUsd, tradeType) {
         try {
           const walletConfig = await db.select({
             tradingWalletAddress: autoTradeConfig.tradingWalletAddress,
-            encryptedTradingKey: autoTradeConfig.encryptedTradingKey
+            encryptedTradingKey: autoTradeConfig.encryptedTradingKey,
+            customRpcUrl: autoTradeConfig.customRpcUrl
           }).from(autoTradeConfig).where(eq(autoTradeConfig.userId, userId)).limit(1);
           if (!walletConfig[0]?.encryptedTradingKey || !walletConfig[0]?.tradingWalletAddress) {
             logger2.warn({ userId }, "[TradeExecution] No trading wallet linked - recording as paper trade");
@@ -64054,10 +64063,11 @@ var init_tradeExecutionService = __esm({
             const txBuf = Buffer.from(swapTxBase64, "base64");
             const tx = import_web33.VersionedTransaction.deserialize(txBuf);
             tx.sign([keypair]);
-            const connection = new import_web34.Connection(SOLANA_RPC, "confirmed");
+            const rpcEndpoint = walletConfig[0].customRpcUrl || SOLANA_RPC;
+            const connection = new import_web34.Connection(rpcEndpoint, "confirmed");
             const signature = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 3 });
             await connection.confirmTransaction(signature, "confirmed");
-            logger2.info({ signature, symbol: signal.tokenSymbol, solAmount: solAmount.toFixed(6) }, "[TradeExecution] BUY swap confirmed");
+            logger2.info({ signature, symbol: signal.tokenSymbol, solAmount: solAmount.toFixed(6), rpc: walletConfig[0].customRpcUrl ? "custom" : "default" }, "[TradeExecution] BUY swap confirmed");
             return { success: true, txSignature: signature, solAmount: solAmount.toFixed(6), tokenAmount: quote.outAmount };
           } else {
             const tokenBalance = await tradeExecutorService.getWalletTokenBalance(walletAddress, signal.tokenAddress);
@@ -64079,10 +64089,11 @@ var init_tradeExecutionService = __esm({
             const txBuf = Buffer.from(swapTxBase64, "base64");
             const tx = import_web33.VersionedTransaction.deserialize(txBuf);
             tx.sign([keypair]);
-            const connection = new import_web34.Connection(SOLANA_RPC, "confirmed");
+            const rpcEndpoint = walletConfig[0].customRpcUrl || SOLANA_RPC;
+            const connection = new import_web34.Connection(rpcEndpoint, "confirmed");
             const signature = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 3 });
             await connection.confirmTransaction(signature, "confirmed");
-            logger2.info({ signature, symbol: signal.tokenSymbol }, "[TradeExecution] SELL swap confirmed");
+            logger2.info({ signature, symbol: signal.tokenSymbol, rpc: walletConfig[0].customRpcUrl ? "custom" : "default" }, "[TradeExecution] SELL swap confirmed");
             return { success: true, txSignature: signature, tokenAmount: tokenBalance.amount, solAmount: (parseFloat(quote.outAmount) / 1e9).toFixed(6) };
           }
         } catch (error) {
@@ -64248,9 +64259,10 @@ ${statusEmoji} <b>TRADE ${status.toUpperCase()}</b> ${actionEmoji}
           allowedHorizons: row.allowedHorizons || '["1h", "4h"]',
           notifyOnTrade: row.notifyOnTrade ?? true,
           notifyOnRecommendation: row.notifyOnRecommendation ?? true,
-          notifyChannel: row.notifyChannel || "telegram",
+          notifyChannel: row.notifyChannel || "email",
           tradingWalletId: row.tradingWalletId,
           tradingWalletAddress: row.tradingWalletAddress || null,
+          customRpcUrl: row.customRpcUrl || null,
           totalTradesExecuted: row.totalTradesExecuted ?? 0,
           winningTrades: row.winningTrades ?? 0,
           losingTrades: row.losingTrades ?? 0,
@@ -66176,6 +66188,54 @@ async function handleAutoTradeWalletRequest(req, res, urlPath) {
       );
       await pool2.end();
       jsonResponse(res, 200, { success: true, message: "Trading wallet unlinked and auto-trade disabled" });
+      return;
+    }
+    if (urlPath === "/api/auto-trade/wallet/rpc" && req.method === "GET") {
+      const userId = new URL(req.url || "", `http://${req.headers.host}`).searchParams.get("userId");
+      if (!userId) {
+        jsonResponse(res, 400, { error: "userId is required" });
+        return;
+      }
+      const pool2 = await getDbPool();
+      const result = await pool2.query("SELECT custom_rpc_url FROM auto_trade_config WHERE user_id = $1", [userId]);
+      await pool2.end();
+      jsonResponse(res, 200, {
+        customRpcUrl: result.rows[0]?.custom_rpc_url || null,
+        usingDefault: !result.rows[0]?.custom_rpc_url
+      });
+      return;
+    }
+    if (urlPath === "/api/auto-trade/wallet/rpc" && req.method === "POST") {
+      const body = await readBody(req);
+      const { userId, rpcUrl } = body;
+      if (!userId) {
+        jsonResponse(res, 400, { error: "userId is required" });
+        return;
+      }
+      if (rpcUrl && typeof rpcUrl === "string") {
+        try {
+          const url2 = new URL(rpcUrl);
+          if (!["http:", "https:"].includes(url2.protocol)) {
+            jsonResponse(res, 400, { error: "RPC URL must use http or https" });
+            return;
+          }
+        } catch {
+          jsonResponse(res, 400, { error: "Invalid RPC URL format" });
+          return;
+        }
+      }
+      const pool2 = await getDbPool();
+      await pool2.query(
+        `INSERT INTO auto_trade_config (user_id, custom_rpc_url, updated_at) VALUES ($1, $2, NOW())
+         ON CONFLICT (user_id) DO UPDATE SET custom_rpc_url = $2, updated_at = NOW()`,
+        [userId, rpcUrl || null]
+      );
+      await pool2.end();
+      jsonResponse(res, 200, {
+        success: true,
+        customRpcUrl: rpcUrl || null,
+        message: rpcUrl ? "Custom RPC saved" : "Switched to default RPC"
+      });
       return;
     }
     jsonResponse(res, 404, { error: "Auto-trade wallet endpoint not found" });
