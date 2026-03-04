@@ -96,13 +96,19 @@ const DEAD_ADDRESSES = [
 
 class EvmSafetyEngine {
   private providers: Map<ChainId, ethers.JsonRpcProvider> = new Map();
+  private failedChains: Set<ChainId> = new Set();
+
+  private getProvider(chain: ChainId): ethers.JsonRpcProvider | null {
+    if (this.failedChains.has(chain)) return null;
+    if (this.providers.has(chain)) return this.providers.get(chain)!;
+    const config = CHAIN_CONFIGS[chain];
+    if (!config?.isEvm) return null;
+    const provider = new ethers.JsonRpcProvider(config.rpcUrl);
+    this.providers.set(chain, provider);
+    return provider;
+  }
 
   constructor() {
-    for (const [chainId, config] of Object.entries(CHAIN_CONFIGS)) {
-      if (config.isEvm) {
-        this.providers.set(chainId as ChainId, new ethers.JsonRpcProvider(config.rpcUrl));
-      }
-    }
   }
 
   async runFullSafetyCheck(
@@ -252,7 +258,10 @@ class EvmSafetyEngine {
     ownerCanPause: boolean;
     ownerCanBlacklist: boolean;
   }> {
-    const provider = this.providers.get(chain)!;
+    const provider = this.getProvider(chain);
+    if (!provider) {
+      return { hasOwner: false, isRenounced: true, ownerCanMint: false, ownerCanPause: false, ownerCanBlacklist: false };
+    }
     const contract = new ethers.Contract(tokenAddress, ERC20_EXTENDED_ABI, provider);
 
     let ownerAddress: string | undefined;

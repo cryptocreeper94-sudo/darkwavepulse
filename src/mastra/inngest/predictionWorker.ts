@@ -446,6 +446,5 @@ export const strikeAgentOutcomeWorker = inngest.createFunction(
 export const predictionWorkerFunctions = [
   predictionOutcomeWorker,
   predictionCreatedHandler,
-  modelTrainingWorker,
   strikeAgentOutcomeWorker,
 ];
