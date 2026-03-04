@@ -1486,47 +1486,80 @@ async function handlePublicMarketRequest(req: http.IncomingMessage, res: http.Se
         return;
       }
       
-      const recent = await pool.query(`
-        SELECT token_symbol, ai_recommendation, ai_score, price_usd, created_at
-        FROM strikeagent_predictions 
+      const recentPredictions = await pool.query(`
+        SELECT ticker, signal, confidence, price_at_prediction, created_at
+        FROM prediction_events 
         WHERE created_at > NOW() - INTERVAL '6 hours'
+          AND signal IN ('BUY', 'SELL', 'STRONG_BUY', 'STRONG_SELL', 'HOLD')
         ORDER BY created_at DESC
         LIMIT 100
       `);
       
-      const stats = await pool.query(`
-        SELECT COUNT(*) as total,
-               COUNT(CASE WHEN ai_score >= 60 THEN 1 END) as bullish,
-               ROUND(AVG(ai_score)::numeric, 1) as avg_score
-        FROM strikeagent_predictions
+      const predictionStats = await pool.query(`
+        SELECT 
+          COUNT(*) as total,
+          COUNT(CASE WHEN signal IN ('BUY', 'STRONG_BUY') THEN 1 END) as bullish_count
+        FROM prediction_events
+      `);
+
+      const accuracyStats = await pool.query(`
+        SELECT 
+          COALESCE(ROUND(
+            (COUNT(CASE WHEN is_correct = true THEN 1 END)::numeric / NULLIF(COUNT(*)::numeric, 0)) * 100, 1
+          ), 0) as accuracy
+        FROM prediction_outcomes
+      `);
+
+      const avgReturnStats = await pool.query(`
+        SELECT COALESCE(ROUND(AVG(ABS(price_change_percent::numeric)), 1), 0) as avg_return
+        FROM prediction_outcomes
+        WHERE is_correct = true
       `);
       
       const seen = new Set<string>();
       const topSignals: any[] = [];
-      for (const row of recent.rows) {
-        if (seen.has(row.token_symbol)) continue;
-        seen.add(row.token_symbol);
-        const score = parseInt(row.ai_score);
+      for (const row of recentPredictions.rows) {
+        const ticker = row.ticker?.toUpperCase();
+        if (!ticker || seen.has(ticker)) continue;
+        seen.add(ticker);
+
+        const signal = row.signal;
+        let direction = 'neutral';
+        let confidenceValue = 0.5;
+
+        if (signal === 'STRONG_BUY') { direction = 'long'; confidenceValue = 0.9; }
+        else if (signal === 'BUY') { direction = 'long'; confidenceValue = 0.75; }
+        else if (signal === 'STRONG_SELL') { direction = 'short'; confidenceValue = 0.9; }
+        else if (signal === 'SELL') { direction = 'short'; confidenceValue = 0.75; }
+        else if (signal === 'HOLD') { direction = 'neutral'; confidenceValue = 0.5; }
+
+        if (row.confidence === 'HIGH') confidenceValue = Math.min(confidenceValue + 0.1, 0.99);
+        else if (row.confidence === 'LOW') confidenceValue = Math.max(confidenceValue - 0.15, 0.1);
+
+        const price = parseFloat(row.price_at_prediction) || 0;
+        const assetName = ticker.replace(/-/g, '').replace(/\d+$/, '');
+
         topSignals.push({
-          asset: row.token_symbol,
-          direction: score >= 60 ? 'bullish' : score <= 40 ? 'bearish' : 'neutral',
-          confidence: score,
-          timeframe: '4h',
-          price: parseFloat(row.price_usd) || 0,
-          change24h: 0
+          asset: `${assetName}/USD`,
+          direction,
+          confidence: Math.round(confidenceValue * 100) / 100,
+          price,
+          timeframe: '4h'
         });
         if (topSignals.length >= 5) break;
       }
       
-      const s = stats.rows[0];
-      const totalPredictions = parseInt(s.total);
-      const avgScore = parseFloat(s.avg_score) || 50;
-      const sentiment = avgScore >= 60 ? 'bullish' : avgScore <= 40 ? 'bearish' : 'neutral';
-      const accuracy = totalPredictions > 0 ? Math.round((parseInt(s.bullish) / totalPredictions) * 1000) / 10 : 0;
+      const ps = predictionStats.rows[0];
+      const totalPredictions = parseInt(ps.total);
+      const bullishCount = parseInt(ps.bullish_count);
+      const bullishPct = totalPredictions > 0 ? Math.round((bullishCount / totalPredictions) * 100) : 50;
+      const sentiment = bullishPct >= 60 ? 'bullish' : bullishPct <= 40 ? 'bearish' : 'neutral';
+      const accuracy = parseFloat(accuracyStats.rows[0]?.accuracy) || 0;
+      const avgReturn = parseFloat(avgReturnStats.rows[0]?.avg_return) || 0;
       
       const activeSignals = await pool.query(`
-        SELECT COUNT(DISTINCT token_symbol) as count 
-        FROM strikeagent_predictions 
+        SELECT COUNT(DISTINCT ticker) as count 
+        FROM prediction_events 
         WHERE created_at > NOW() - INTERVAL '1 hour'
       `);
       
@@ -1535,10 +1568,11 @@ async function handlePublicMarketRequest(req: http.IncomingMessage, res: http.Se
       const data = {
         topSignals,
         marketSentiment: sentiment,
-        sentimentScore: Math.round(avgScore),
+        sentimentScore: bullishPct,
         activeSignals: parseInt(activeSignals.rows[0].count),
         predictionAccuracy: accuracy,
         totalPredictions,
+        avgReturnPerTrade: avgReturn,
         lastUpdated: new Date().toISOString()
       };
       
