@@ -8,9 +8,9 @@ echo "📦 [Render] Build starting..."
 # Set Node options
 export NODE_OPTIONS="--max-old-space-size=4096"
 
-# 1. Install root (backend) dependencies
+# 1. Install ALL deps (devDependencies needed for build tools)
 echo "📚 Installing backend dependencies..."
-npm install --legacy-peer-deps --ignore-scripts || npm install --legacy-peer-deps --force
+NODE_ENV=development npm install --legacy-peer-deps --ignore-scripts || npm install --legacy-peer-deps --force
 
 # Rebuild native modules (bcrypt, etc.)
 npm rebuild bcrypt 2>/dev/null || true
@@ -18,7 +18,7 @@ npm rebuild bcrypt 2>/dev/null || true
 # 2. Install frontend dependencies
 echo "📚 Installing frontend dependencies..."
 cd darkwave-web
-npm install --legacy-peer-deps || npm install --force
+NODE_ENV=development npm install --legacy-peer-deps || npm install --force
 cd ..
 
 # 3. Build frontend
@@ -49,7 +49,7 @@ npx esbuild src/bootstrap.ts \
 
 # 6. Build Mastra
 echo "🤖 Building Mastra..."
-NODE_OPTIONS='--max-old-space-size=4096' npx mastra build || true
+npx mastra build || true
 
 # 7. Patch Mastra (fix uuid ESM import)
 if [ -f "scripts/patch-mastra.sh" ]; then
