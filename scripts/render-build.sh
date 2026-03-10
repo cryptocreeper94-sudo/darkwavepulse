@@ -5,14 +5,20 @@ set -e
 
 echo "📦 [Render] Build starting..."
 
+# Set Node options
+export NODE_OPTIONS="--max-old-space-size=4096"
+
 # 1. Install root (backend) dependencies
 echo "📚 Installing backend dependencies..."
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --ignore-scripts || npm install --legacy-peer-deps --force
+
+# Rebuild native modules (bcrypt, etc.)
+npm rebuild bcrypt 2>/dev/null || true
 
 # 2. Install frontend dependencies
 echo "📚 Installing frontend dependencies..."
 cd darkwave-web
-npm install
+npm install --legacy-peer-deps || npm install --force
 cd ..
 
 # 3. Build frontend
