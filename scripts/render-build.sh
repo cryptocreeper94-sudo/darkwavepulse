@@ -32,37 +32,17 @@ echo "📂 Copying frontend build to public/..."
 mkdir -p public
 cp -r darkwave-web/dist/* public/
 
-# 5. Build backend with esbuild
-echo "🔧 Building backend..."
-npx esbuild src/bootstrap.ts \
-  --bundle \
-  --platform=node \
-  --target=node20 \
-  --format=esm \
-  --outfile=dist/bootstrap.mjs \
-  --external:pg-native \
-  --external:pg \
-  --external:cpu-features \
-  --external:ssh2 \
-  --external:better-sqlite3 \
-  --external:bun:sqlite
-
-# 6. Build Mastra
-echo "🤖 Building Mastra..."
-npx mastra build || true
-
-# 7. Patch Mastra (fix uuid ESM import)
-if [ -f "scripts/patch-mastra.sh" ]; then
-  bash scripts/patch-mastra.sh || true
+# 5. Create tools stub (required by mastra)
+mkdir -p .mastra/.build
+if [ ! -f ".mastra/.build/tools.mjs" ]; then
+  echo 'export const tools = {};' > .mastra/.build/tools.mjs
+  echo "✅ Created tools.mjs stub"
 fi
 
-if [ -f ".mastra/output/mastra.mjs" ]; then
-  sed -i "s/import require\$\$0\$8\$1, { v4 as v4\$1 } from 'uuid';/import * as require\$\$0\$8\$1 from 'uuid'; const { v4: v4\$1 } = require\$\$0\$8\$1;/g" .mastra/output/mastra.mjs 2>/dev/null || true
-fi
-
-# 8. Install Mastra output deps
-if [ -d ".mastra/output" ]; then
-  npm install --prefix .mastra/output --legacy-peer-deps --omit=dev || true
+# 6. Install .mastra/output deps if package.json exists
+if [ -f ".mastra/output/package.json" ]; then
+  echo "📚 Installing Mastra output dependencies..."
+  npm install --prefix .mastra/output --legacy-peer-deps --omit=dev 2>/dev/null || true
 fi
 
 echo "✅ [Render] Build complete!"
