@@ -1,0 +1,26 @@
+# Render Blueprint — Pulse (DarkWave Pulse)
+# Deploy via: https://render.com/deploy
+
+services:
+  - type: web
+    name: pulse
+    runtime: node
+    region: ohio
+    plan: starter
+    branch: main
+    repo: https://github.com/cryptocreeper94-sudo/pulse
+    buildCommand: bash scripts/render-build.sh
+    startCommand: bash scripts/render-start.sh
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_VERSION
+        value: 20.9.0
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=4096
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pulse-db
+          property: connectionString
+      # All other secrets should be added via Render Dashboard > Environment
