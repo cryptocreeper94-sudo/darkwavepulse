@@ -123,6 +123,19 @@ function CoinRow({ coin, rank, onClick, isFavorite, onToggleFavorite }) {
   
   const aiSignal = getAISignalStyle(coin.aiSignal, coin.aiScore)
   
+  const formatSupply = (supply) => {
+    if (!supply) return '--'
+    if (supply >= 1e9) return `${(supply / 1e9).toFixed(1)}B`
+    if (supply >= 1e6) return `${(supply / 1e6).toFixed(1)}M`
+    if (supply >= 1e3) return `${(supply / 1e3).toFixed(1)}K`
+    return supply.toLocaleString()
+  }
+  
+  // Calculate 24h range position (where current price sits between low and high)
+  const rangePercent = (coin.high_24h && coin.low_24h && coin.high_24h !== coin.low_24h)
+    ? ((coin.price - coin.low_24h) / (coin.high_24h - coin.low_24h)) * 100
+    : 50
+  
   return (
     <tr className="clickable-row" onClick={handleClick}>
       <td style={{ width: '40px', textAlign: 'center', color: '#666', fontSize: '13px' }}>
@@ -151,10 +164,20 @@ function CoinRow({ coin, rank, onClick, isFavorite, onToggleFavorite }) {
             style={{ width: 24, height: 24, borderRadius: '50%' }}
             onError={(e) => e.target.src = '/darkwave-coin.png'}
           />
-          <strong>{coin.symbol}</strong>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <strong>{coin.symbol}</strong>
+            <span style={{ fontSize: '10px', color: '#666', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{coin.name}</span>
+          </div>
         </div>
       </td>
-      <td style={{ color: isPositive ? '#00D4FF' : '#FF4444' }}>{formatPrice(coin.price)}</td>
+      <td>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+          <span style={{ color: isPositive ? '#00D4FF' : '#FF4444', fontWeight: '600' }}>{formatPrice(coin.price)}</span>
+          <span style={{ fontSize: '10px', color: '#555' }}>
+            {coin.priceChange24h ? (coin.priceChange24h >= 0 ? '+' : '') + formatPrice(Math.abs(coin.priceChange24h)) : ''}
+          </span>
+        </div>
+      </td>
       <td className={isPositive ? 'positive' : 'negative'}>{formatChange(coin.change)}</td>
       <td style={{ padding: '6px 8px' }}>
         <Sparkline 
@@ -203,6 +226,45 @@ function CoinRow({ coin, rank, onClick, isFavorite, onToggleFavorite }) {
         </div>
       </td>
       <td style={{ color: '#888' }}>{formatVolume(coin.volume)}</td>
+      <td>
+        {coin.high_24h && coin.low_24h ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '90px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+              <span style={{ color: '#FF4444' }}>{formatPrice(coin.low_24h)}</span>
+              <span style={{ color: '#39FF14' }}>{formatPrice(coin.high_24h)}</span>
+            </div>
+            <div style={{ 
+              height: '4px', 
+              borderRadius: '2px', 
+              background: 'rgba(255,255,255,0.1)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: `${Math.max(2, Math.min(98, rangePercent))}%`,
+                borderRadius: '2px',
+                background: 'linear-gradient(90deg, #FF4444, #FFB800, #39FF14)',
+              }} />
+            </div>
+          </div>
+        ) : (
+          <span style={{ color: '#555', fontSize: '12px' }}>--</span>
+        )}
+      </td>
+      <td>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+          <span style={{ color: '#aaa', fontSize: '12px' }}>{formatSupply(coin.circulatingSupply)}</span>
+          {coin.totalSupply && (
+            <span style={{ fontSize: '10px', color: '#555' }}>
+              /{formatSupply(coin.totalSupply)}
+            </span>
+          )}
+        </div>
+      </td>
     </tr>
   )
 }
@@ -367,7 +429,14 @@ export default function MarketsTab() {
         setPredictions([
           { symbol: 'BTC', name: 'Bitcoin', signal: 'BUY', confidence: 72, change: 2.3 },
           { symbol: 'ETH', name: 'Ethereum', signal: 'HOLD', confidence: 65, change: 1.8 },
-          { symbol: 'SOL', name: 'Solana', signal: 'SELL', confidence: 58, change: -0.5 },
+          { symbol: 'SOL', name: 'Solana', signal: 'BUY', confidence: 78, change: 4.2 },
+          { symbol: 'BNB', name: 'BNB', signal: 'HOLD', confidence: 61, change: 0.9 },
+          { symbol: 'XRP', name: 'XRP', signal: 'SELL', confidence: 58, change: -1.5 },
+          { symbol: 'ADA', name: 'Cardano', signal: 'BUY', confidence: 69, change: 3.1 },
+          { symbol: 'DOGE', name: 'Dogecoin', signal: 'WATCH', confidence: 52, change: -0.8 },
+          { symbol: 'AVAX', name: 'Avalanche', signal: 'BUY', confidence: 74, change: 5.6 },
+          { symbol: 'DOT', name: 'Polkadot', signal: 'HOLD', confidence: 63, change: 1.2 },
+          { symbol: 'LINK', name: 'Chainlink', signal: 'BUY', confidence: 71, change: 3.8 },
         ])
       } finally {
         setPredictionsLoading(false)
@@ -462,12 +531,14 @@ export default function MarketsTab() {
                   <th>AI Signal</th>
                   <th>Market Cap</th>
                   <th>Volume</th>
+                  <th>24h Range</th>
+                  <th>Supply</th>
                 </tr>
               </thead>
               <tbody>
                 {coinsLoading ? (
                   <tr>
-                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                    <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                         <div className="loading-spinner" style={{ width: '20px', height: '20px' }}></div>
                         Loading coins...
@@ -476,7 +547,7 @@ export default function MarketsTab() {
                   </tr>
                 ) : coins.length === 0 ? (
                   <tr>
-                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                    <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
                       No coins found in this category
                     </td>
                   </tr>

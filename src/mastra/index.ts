@@ -1445,7 +1445,16 @@ export const mastra = new Mastra({
               volume: coin.total_volume,
               marketCap: coin.market_cap,
               marketCapChange: coin.market_cap_change_percentage_24h || 0,
-              image: coin.image
+              image: coin.image,
+              sparkline_in_7d: coin.sparkline_in_7d || null,
+              sparkline: coin.sparkline_in_7d?.price || null,
+              high_24h: coin.high_24h || null,
+              low_24h: coin.low_24h || null,
+              ath: coin.ath || null,
+              athChangePercentage: coin.ath_change_percentage || null,
+              circulatingSupply: coin.circulating_supply || null,
+              totalSupply: coin.total_supply || null,
+              priceChange24h: coin.price_change_24h || 0,
             });
             
             const priceChangeKey = timeframe === '1h' ? 'price_change_percentage_1h_in_currency' : 'price_change_percentage_24h';
@@ -1453,22 +1462,22 @@ export const mastra = new Mastra({
             
             switch (category) {
               case 'top':
-                rawData = await coinGeckoClient.getMarkets({ per_page: 10, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ per_page: 10, price_change_percentage: priceChangeParam, sparkline: true });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'meme':
-                rawData = await coinGeckoClient.getMarkets({ category: 'meme-token', per_page: 10, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'meme-token', per_page: 10, price_change_percentage: priceChangeParam, sparkline: true });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'defi':
-                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-finance-defi', per_page: 10, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-finance-defi', per_page: 10, price_change_percentage: priceChangeParam, sparkline: true });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
               case 'dex':
-                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-exchange', per_page: 10, price_change_percentage: priceChangeParam });
+                rawData = await coinGeckoClient.getMarkets({ category: 'decentralized-exchange', per_page: 10, price_change_percentage: priceChangeParam, sparkline: true });
                 coins = rawData.map((coin: any) => mapCoinWithExtras(coin, priceChangeKey));
                 break;
                 
@@ -1476,7 +1485,8 @@ export const mastra = new Mastra({
                 const gainersData = await coinGeckoClient.getMarkets({
                   order: 'market_cap_desc',
                   per_page: 25,
-                  price_change_percentage: priceChangeParam
+                  price_change_percentage: priceChangeParam,
+                  sparkline: true
                 });
                 coins = gainersData
                   .filter((coin: any) => (coin[priceChangeKey] || coin.price_change_percentage_24h || 0) > 0)
@@ -1489,7 +1499,8 @@ export const mastra = new Mastra({
                 const losersData = await coinGeckoClient.getMarkets({
                   order: 'market_cap_desc',
                   per_page: 25,
-                  price_change_percentage: priceChangeParam
+                  price_change_percentage: priceChangeParam,
+                  sparkline: true
                 });
                 coins = losersData
                   .filter((coin: any) => (coin[priceChangeKey] || coin.price_change_percentage_24h || 0) < 0)
